@@ -9,8 +9,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 const sesClient = new SESClient({ 
   region: 'ap-southeast-1',
 });
-// Next.js 14+ app router: use segmentConfig to disable body parsing for Stripe signature verification
-export const segmentConfig = {
+// Next.js app directory: use config to disable body parsing for Stripe signature verification
+export const config = {
   api: {
     bodyParser: false,
   },
