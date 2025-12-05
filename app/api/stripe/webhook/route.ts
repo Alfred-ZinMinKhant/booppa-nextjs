@@ -87,7 +87,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
       },
       Message: {
         Subject: {
-          Data: "Payment Confirmed - ${productName}",
+          Data: `Payment Confirmed - ${productName}`,
         },
         Body: {
           Html: {
@@ -132,7 +132,7 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
       },
       Message: {
         Subject: {
-          Data: "Payment Failed - Action Required",
+          Data: `Payment Failed - Action Required`,
         },
         Body: {
           Html: {

@@ -21,21 +21,21 @@ export async function POST(req: NextRequest) {
       },
       Message: {
         Subject: {
-          Data: "Your BOOPPA Report - ${company}",
+          Data: `Your BOOPPA Report - ${company}`,
         },
         Body: {
           Html: {
-            Data: (
-              "<html>"
-              "<body>"
-              "<h2>Thank you for your interest, ${name}!</h2>"
-              "<p>We received your request for a personalized compliance report for <b>${company}</b>.</p>"
-              "<p>Your primary interest: <b>${interest}</b></p>"
-              "<p>Our team will generate your report within 24 hours.</p>"
-              "<p>Best Regards,<br/>The BOOPPA Team</p>"
-              "</body>"
-              "</html>"
-            ),
+            Data: `
+              <html>
+                <body>
+                  <h2>Thank you for your interest, ${name}!</h2>
+                  <p>We received your request for a personalized compliance report for <b>${company}</b>.</p>
+                  <p>Your primary interest: <b>${interest}</b></p>
+                  <p>Our team will generate your report within 24 hours.</p>
+                  <p>Best Regards,<br/>The BOOPPA Team</p>
+                </body>
+              </html>
+            `,
           },
         },
       },
