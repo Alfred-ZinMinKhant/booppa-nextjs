@@ -4,6 +4,7 @@ import { Check, Shield, FileText, Users, Zap } from 'lucide-react';
 export const metadata = {
   title: 'PDPA Compliance Singapore | BOOPPA – Automated Data Protection Solution',
   description: 'Complete PDPA compliance for Singapore. Basic: SGD 299/month. Pro: SGD 799/month. Blockchain audit trails, automated consent management.',
+  metadataBase: new URL('https://www.booppa.io'),
 };
 
 export default function PDPAPage() {

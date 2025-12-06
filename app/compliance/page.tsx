@@ -4,6 +4,7 @@ import { Check, Shield, Globe, Server, Zap, Users } from 'lucide-react';
 export const metadata = {
   title: 'Compliance Suite | BOOPPA – Enterprise Regulatory Compliance',
   description: 'Complete compliance automation for MAS, PDPA, and enterprise regulations. Standard: SGD 1,299/month. Pro: SGD 1,999/month.',
+  metadataBase: new URL('https://www.booppa.io'),
 };
 
 export default function CompliancePage() {
