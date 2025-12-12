@@ -1,14 +1,16 @@
 'use client'
 
+
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, X, ArrowRight } from 'lucide-react';
 
 const navigation = [
   { name: 'PDPA Suite', href: '/pdpa' },
   { name: 'Compliance Suite', href: '/compliance' },
   { name: 'Supply Chain', href: '/supply-chain' },
-  { name: 'Pricing', href: '#pricing' },
+  { name: 'Pricing', href: '/pricing' },
   { name: 'Blog', href: '/blog' },
   { name: 'Book Demo', href: '/demo' },
 ];
@@ -20,9 +22,16 @@ export default function Navigation() {
     <header className="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-gray-800/70">
       <nav className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
         <div className="flex items-center justify-between">
-          <div className="flex lg:flex-1">
-            <Link href="/" className="-m-1.5 p-1.5 text-2xl font-black text-white">
-              BOOPPA
+          <div className="flex lg:flex-1 items-center">
+            <Link href="/" className="-m-1.5 p-1.5 flex items-center">
+              <Image
+                src="/logo.png"
+                alt="BOOPPA Logo"
+                width={160}
+                height={48}
+                priority
+                className="h-12 w-auto"
+              />
             </Link>
           </div>
           <div className="flex lg:hidden">
@@ -61,8 +70,15 @@ export default function Navigation() {
           <div className="fixed inset-0 z-50 bg-black/80" onClick={() => setMobileMenuOpen(false)} />
           <div className="fixed inset-y-0 right-0 z-50 w-full max-w-xs overflow-y-auto bg-gray-900 px-6 py-6">
             <div className="flex items-center justify-between">
-              <Link href="/" className="text-2xl font-black text-white" onClick={() => setMobileMenuOpen(false)}>
-                BOOPPA
+              <Link href="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
+                <Image
+                  src="/logo.png"
+                  alt="BOOPPA Logo"
+                  width={140}
+                  height={42}
+                  priority
+                  className="h-10 w-auto"
+                />
               </Link>
               <button
                 type="button"

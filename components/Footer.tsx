@@ -1,4 +1,6 @@
+
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
 export default function Footer() {
@@ -7,7 +9,15 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-xl font-black mb-4">BOOPPA</h3>
+            <div className="flex items-center mb-4">
+              <Image
+                src="/logo.png"
+                alt="BOOPPA Logo"
+                width={120}
+                height={40}
+                className="h-10 w-auto"
+              />
+            </div>
             <p className="text-gray-400 text-sm">
               Enterprise blockchain compliance for Singapore.
             </p>
@@ -25,6 +35,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-gray-400">
               <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
               <li><Link href="/demo" className="hover:text-white transition-colors">Book Demo</Link></li>
+              <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
             </ul>
