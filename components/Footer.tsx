@@ -68,7 +68,7 @@ export default function Footer() {
               </p>
             </div>
             <div className="mt-4 md:mt-0">
-              <p className="text-xs">MTCS Level 1 • AWS Singapore • Polygon Blockchain</p>
+              <p className="text-xs">MTCS Level 1 Aligned Cloud Security • AWS Singapore • Polygon Blockchain</p>
             </div>
           </div>
         </div>
