@@ -6,13 +6,14 @@ export default function HowItWorks() {
     { icon: Link, title: '2. Polygon Notarization', desc: 'Immutable record created on Polygon blockchain with timestamp and transaction ID.' },
     { icon: FileText, title: '3. Generate Evidence Pack', desc: 'Receive full package: original data, hashes, Polygon proofs, chain-of-custody logs.' },
     { icon: Download, title: '4. Download & Verify', desc: 'Instant QR-verifiable report, designed for audits and court use (subject to judicial acceptance).' },
+    { icon: FileText, title: '5. AI-Enhanced Insights', desc: 'Generate intelligent audit narratives and risk summaries using advanced AI – fully PDPA-compliant (no personal data used for training).' },
   ];
 
   return (
     <section className="py-20 bg-gray-950 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-6 text-center">
         <h2 className="text-4xl font-black mb-12 text-white">How It Works – In 30 Seconds</h2>
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-5 gap-8">
           {steps.map((step, i) => (
             <div key={i} className="bg-gray-900/50 p-8 rounded-2xl border border-gray-800">
               <step.icon className="w-12 h-12 mx-auto mb-4 text-booppa-green" />

@@ -1,3 +1,4 @@
+
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -185,6 +186,22 @@ export default function SecurityCompliancePage() {
             <li>Evidence Pack examples</li>
             <li>RFP and due diligence responses</li>
           </ul>
+        </section>
+
+                {/* AI and Automated Processing */}
+        <section className="mb-16">
+          <h2 className="text-3xl font-bold mb-6">AI and Automated Processing</h2>
+          <p className="text-gray-300 mb-4">
+            Booppa leverages AI for enhanced report narratives and compliance insights, while ensuring full PDPA alignment:
+          </p>
+          <ul className="list-disc pl-8 space-y-2 text-gray-300 mb-4">
+            <li>No personal data is used for AI training or processing.</li>
+            <li>AI outputs are deterministic and auditable, with human oversight.</li>
+            <li>Rule-based automation combined with selective AI for explanatory summaries.</li>
+          </ul>
+          <p className="text-gray-300">
+            This approach follows PDPC Advisory Guidelines on Use of Personal Data in AI Recommendation and Decision Systems (2024-2025), minimizing risks while delivering smarter evidence.
+          </p>
         </section>
 
         <p className="text-sm text-gray-500 italic text-center">

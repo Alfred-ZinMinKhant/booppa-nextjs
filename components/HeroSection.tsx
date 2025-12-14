@@ -38,6 +38,7 @@ export default function HeroSection() {
           <div className="flex flex-wrap justify-center gap-3 mb-6">
             {[
               '2,800+ Singapore Companies',
+              'AI-Powered Insights + Polygon Blockchain',
               'Polygon Blockchain-Verified Records',
               'PDPA & MAS Regulatory Aligned',
               'AWS Singapore Infrastructure'
@@ -57,7 +58,7 @@ export default function HeroSection() {
 
           {/* Subheadline (updated) */}
           <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
-            Fix your PDPA compliance in <span className="text-green-400 font-bold">30 seconds</span> with Polygon blockchain-verified records, designed to generate court-admissible evidence <span className="italic">(subject to judicial acceptance)</span>. Supported by detailed evidence packs linking on-chain proofs to originals.
+            Fix your PDPA compliance in <span className="text-green-400 font-bold">30 seconds</span> with AI-powered insights and Polygon blockchain-verified records, designed to generate court-admissible evidence <span className="italic">(subject to judicial acceptance)</span>. Supported by detailed evidence packs linking on-chain proofs to originals.
           </p>
 
           {/* Pricing and CTA (unchanged) */}
