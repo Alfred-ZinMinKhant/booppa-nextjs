@@ -75,7 +75,7 @@ export default function SupplyChainPage() {
             Supply Chain Traceability
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Create unchangeable, court-admissible evidence for your logistics, ESG, and regulatory filings using the Polygon blockchain.
+            Create immutable, Polygon blockchain-verified records for your logistics, ESG, and regulatory filings. Designed to generate court-admissible evidence <span className="italic">(subject to judicial acceptance)</span>.
           </p>
           <div className="mt-8">
             <Link

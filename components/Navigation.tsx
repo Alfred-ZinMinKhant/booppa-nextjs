@@ -13,6 +13,7 @@ const navigation = [
   { name: 'Pricing', href: '/pricing' },
   { name: 'Blog', href: '/blog' },
   { name: 'Book Demo', href: '/demo' },
+  { name: 'Security & Compliance', href: '/security' },
 ];
 
 export default function Navigation() {

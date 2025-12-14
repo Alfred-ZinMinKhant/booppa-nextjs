@@ -36,6 +36,7 @@ export default function Footer() {
               <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
               <li><Link href="/demo" className="hover:text-white transition-colors">Book Demo</Link></li>
               <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+              <li><Link href="/security" className="hover:text-white transition-colors">Security & Compliance</Link></li>
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
             </ul>
@@ -62,6 +63,9 @@ export default function Footer() {
               <p className="font-medium text-white">Booppa Smart Care LLC</p>
               <p className="mt-1">Registered in Delaware • File No. 7994123</p>
               <p className="text-xs mt-2">© 2025 Booppa Smart Care LLC • All rights reserved</p>
+              <p className="text-xs mt-2 text-gray-400">
+                Designed to support compliance processes. Not a regulatory certification.
+              </p>
             </div>
             <div className="mt-4 md:mt-0">
               <p className="text-xs">MTCS Level 1 • AWS Singapore • Polygon Blockchain</p>
