@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -53,4 +54,10 @@
   .calendly-inline-widget {
     min-height: 700px;
   }
+}
+
+/* Ensure visible placeholder for QR scan form */
+.qr-scan-form input::placeholder {
+  color: #6B7280 !important;
+  opacity: 1;
 }

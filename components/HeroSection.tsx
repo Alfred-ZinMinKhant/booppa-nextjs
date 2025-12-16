@@ -73,6 +73,12 @@ export default function HeroSection() {
             >
               {isLoading ? 'Redirecting…' : 'Fix Your PDPA in 30 Seconds – SGD 69'}
             </button>
+            <Link
+              href="/qr-scan"
+              className="bg-white hover:bg-gray-100 text-green-700 font-bold px-8 py-3 rounded-full transition-colors text-lg shadow-lg border border-green-700"
+            >
+              Free Instant PDPA Scan
+            </Link>
           </div>
 
           {/* Legal disclaimer (new) */}

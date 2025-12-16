@@ -4,6 +4,12 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    'placeholder-gray-400',
+    'placeholder-gray-500',
+    'placeholder-gray-600',
+    'placeholder-gray-700',
+  ],
   theme: {
     extend: {
       animation: {
