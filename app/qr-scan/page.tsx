@@ -46,16 +46,16 @@ export default function QRScanPage() {
               type="url"
               required
               placeholder="Website URL (required)"
-              className="w-full border rounded px-3 py-2"
-              style={{ color: formData.website_url ? '#111827' : undefined, '::placeholder': { color: '#6B7280' } }}
+              className="w-full border rounded px-3 py-2 placeholder-gray-400"
+              style={{ color: formData.website_url ? '#111827' : undefined }}
               value={formData.website_url}
               onChange={e => setFormData({ ...formData, website_url: e.target.value })}
             />
             <input
               type="text"
               placeholder="Company Name (optional)"
-              className="w-full border rounded px-3 py-2"
-              style={{ color: formData.company_name ? '#111827' : undefined, '::placeholder': { color: '#6B7280' } }}
+              className="w-full border rounded px-3 py-2 placeholder-gray-400"
+              style={{ color: formData.company_name ? '#111827' : undefined }}
               value={formData.company_name}
               onChange={e => setFormData({ ...formData, company_name: e.target.value })}
             />
@@ -63,8 +63,8 @@ export default function QRScanPage() {
               type="email"
               required
               placeholder="Email (required)"
-              className="w-full border rounded px-3 py-2"
-              style={{ color: formData.email ? '#111827' : undefined, '::placeholder': { color: '#6B7280' } }}
+              className="w-full border rounded px-3 py-2 placeholder-gray-400"
+              style={{ color: formData.email ? '#111827' : undefined }}
               value={formData.email}
               onChange={e => setFormData({ ...formData, email: e.target.value })}
             />
