@@ -5,13 +5,13 @@ const posts = [
     {
     title: 'Singapore Courts and Blockchain Evidence: 2025 Updates on Admissibility and Provenance',
     href: '/blog/singapore-courts-blockchain-evidence-2025',
-    image: '/1%20Authority.jpg',
+    image: '/1-Authority.jpg',
     excerpt: 'How recent High Court rulings shape the admissibility of blockchain evidence in Singapore (2025).',
   },
   {
     title: 'How SMEs Can Reduce Compliance Costs by 90% with Blockchain',
     href: '/blog/how-smes-can-reduce-compliance-costs-by-90-with-blockchain',
-    image: '/2%20Conversion%20Layer.jpg',
+    image: '/2-Conversion-Layer.jpg',
     excerpt: 'A practical guide for SMEs on using on-chain notarization and PDPC guidance to cut compliance costs.',
   },
 ];

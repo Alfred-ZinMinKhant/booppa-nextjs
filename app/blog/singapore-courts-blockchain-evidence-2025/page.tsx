@@ -46,7 +46,7 @@ export default function AuthorityPost() {
       <section className="max-w-4xl mx-auto p-6">
         <div className="overflow-hidden rounded-lg">
           <Image
-            src="/1%20Authority.jpg"
+            src="/1-Authority.jpg"
             alt="Gavel and scales - authority"
             width={1600}
             height={900}

@@ -18,6 +18,7 @@ const navigation = [
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+
   return (
     <header className="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-gray-800/70">
       <nav className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
@@ -67,9 +68,9 @@ export default function Navigation() {
 
         {/* Mobile Menu */}
         <div className={`lg:hidden ${mobileMenuOpen ? 'block' : 'hidden'}`}>
-          <div className="fixed inset-0 z-50 bg-black/80" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-xs overflow-y-auto bg-gray-900 px-6 py-6">
-            <div className="flex items-center justify-between">
+          <div className="fixed inset-0 z-[996] bg-black/80" onClick={() => setMobileMenuOpen(false)} />
+          <div className="fixed top-0 left-0 right-0 bottom-0 h-screen z-[997] w-full overflow-y-auto bg-gray-900 px-6 py-6">
+              <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
                 <Image
                   src="/logo.png"
@@ -80,6 +81,7 @@ export default function Navigation() {
                   className="h-10 w-auto"
                 />
               </Link>
+              
               <button
                 type="button"
                 className="-m-2.5 rounded-md p-2.5 text-gray-400"

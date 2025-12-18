@@ -45,7 +45,7 @@ export default function ConversionPost() {
       <section className="max-w-4xl mx-auto p-6">
         <div className="overflow-hidden rounded-lg">
           <Image
-            src="/2%20Conversion%20Layer.jpg"
+            src="/2-Conversion-Layer.jpg"
             alt="SME compliance cost graph"
             width={1600}
             height={900}
