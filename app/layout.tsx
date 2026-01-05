@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "BOOPPA – Blockchain Compliance Evidence | Singapore PDPA & MAS",
   description: "Enterprise blockchain compliance for Singapore. PDPA Suite from SGD 299/month. Compliance Suite from SGD 1,299/month. Trusted by 2,800+ companies.",
-  keywords: "PDPA Singapore, MAS compliance, blockchain evidence, supply chain traceability, Singapore compliance",
+  keywords: "PDPA Singapore, MAS compliance, blockchain evidence, compliance notarization, Singapore compliance",
   openGraph: {
     title: "BOOPPA – Enterprise Blockchain Compliance Platform",
     description: "PDPA Suite from SGD 299/month. Compliance Suite from SGD 1,299/month. Trusted by 2,800+ Singapore companies.",

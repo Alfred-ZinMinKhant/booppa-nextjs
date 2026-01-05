@@ -27,13 +27,14 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-gray-400">
               <li><Link href="/pdpa" className="hover:text-booppa-blue transition-colors">PDPA Suite</Link></li>
               <li><Link href="/compliance" className="hover:text-booppa-purple transition-colors">Compliance Suite</Link></li>
-              <li><Link href="/supply-chain" className="hover:text-booppa-green transition-colors">Supply Chain</Link></li>
+              <li><Link href="/compliance-notarization" className="hover:text-booppa-green transition-colors">Compliance Notarization</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-4">Resources</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
               <li><Link href="/demo" className="hover:text-white transition-colors">Book Demo</Link></li>
               <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               <li><Link href="/security" className="hover:text-white transition-colors">Security & Compliance</Link></li>

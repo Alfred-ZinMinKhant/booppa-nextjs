@@ -45,7 +45,7 @@ export default function CompliancePage() {
                 {[
                   'Everything in PDPA Pro +',
                   'MAS compliance automation',
-                  'Supply chain evidence tracking',
+                  'Compliance notarization evidence tracking',
                   'Real-time compliance dashboard',
                   '5,000 blockchain notarizations/month',
                   'Advanced audit trail generation',

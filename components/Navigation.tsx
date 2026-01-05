@@ -9,7 +9,7 @@ import { Menu, X, ArrowRight } from 'lucide-react';
 const navigation = [
   { name: 'PDPA Suite', href: '/pdpa' },
   { name: 'Compliance Suite', href: '/compliance' },
-  { name: 'Supply Chain', href: '/supply-chain' },
+  { name: 'Compliance Notarization', href: '/compliance-notarization' },
   { name: 'Pricing', href: '/pricing' },
   { name: 'Blog', href: '/blog' },
   { name: 'Book Demo', href: '/demo' },

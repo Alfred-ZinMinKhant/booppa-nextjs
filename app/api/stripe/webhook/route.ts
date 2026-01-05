@@ -160,9 +160,12 @@ function getProductName(productType: string): string {
     'pdpa_pro': 'PDPA Pro Plan',
     'compliance_standard': 'Compliance Standard Suite',
     'compliance_pro': 'Compliance Pro Suite',
-    'supply_chain_1': 'Supply Chain (1 Document)',
-    'supply_chain_10': 'Supply Chain (10 Documents)',
-    'supply_chain_50': 'Supply Chain (50 Documents)',
+    'supply_chain_1': 'Compliance Notarization (1 Document)',
+    'supply_chain_10': 'Compliance Notarization (10 Documents)',
+    'supply_chain_50': 'Compliance Notarization (50 Documents)',
+    'compliance_notarization_1': 'Compliance Notarization (1 Document)',
+    'compliance_notarization_10': 'Compliance Notarization (10 Documents)',
+    'compliance_notarization_50': 'Compliance Notarization (50 Documents)',
   };
   return map[productType] || 'Product';
 }
