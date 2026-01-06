@@ -6,7 +6,7 @@ export default function SupplyChainCustomsSpeed() {
     <main className="min-h-screen bg-black text-white py-12">
       <section className="max-w-4xl mx-auto px-6">
         <h1 className="text-4xl font-bold mb-6">Solving Singapore Customs Delays with Blockchain Document Verification</h1>
-        <p className="text-gray-300 mb-6"><strong>SEO Focus:</strong> Singapore customs clearance, blockchain logistics, digital certificate of origin, trade compliance.</p>
+        <p className="text-gray-300 mb-6"><strong>MAIN Focus:</strong> Singapore customs clearance, blockchain logistics, digital certificate of origin, trade compliance.</p>
 
         <div className="mb-8">
           <div className="w-full h-72 relative rounded overflow-hidden">
