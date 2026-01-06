@@ -17,6 +17,10 @@ export const metadata: Metadata = {
     description: "PDPA Suite from SGD 299/month. Compliance Suite from SGD 1,299/month. Trusted by 2,800+ Singapore companies.",
     images: ["/og-image.png"],
   },
+  icons: {
+    icon: '/favicon_io/favicon.ico',
+    shortcut: '/favicon_io/favicon.ico',
+  },
 };
 
 export default function RootLayout({

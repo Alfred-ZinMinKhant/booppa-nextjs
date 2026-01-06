@@ -14,6 +14,18 @@ const posts = [
     image: '/2-Conversion-Layer.jpg',
     excerpt: 'A practical guide for SMEs on using on-chain notarization and PDPC guidance to cut compliance costs.',
   },
+  {
+    title: 'Why We Built on AWS Singapore and Polygon for Regulatory Compliance',
+    href: '/blog/infrastructure-aws-polygon',
+    image: '/3-infrastructure-aws-polygon.jpg',
+    excerpt: 'How Booppa combines AWS Singapore hosting with Polygon notarization to meet PDPA and MAS requirements.',
+  },
+  {
+    title: 'Solving Singapore Customs Delays with Blockchain Document Verification',
+    href: '/blog/supply-chain-customs-speed',
+    image: '/4-QR_Container.jpg',
+    excerpt: 'How notarizing shipping documents on Polygon and Booppa QR verification cuts customs clearance times.',
+  },
 ];
 
 export default function BlogPage() {
