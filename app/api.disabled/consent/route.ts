@@ -19,3 +19,4 @@ export async function POST(req: NextRequest) {
   const data = await res.text();
   return NextResponse.json({ ok: true, upstream: data }, { status: res.status });
 }
+

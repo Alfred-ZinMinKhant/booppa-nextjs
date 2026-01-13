@@ -59,7 +59,7 @@ export default function CompliancePage() {
               </ul>
 
               <Link
-                href="/api/stripe/checkout?product=compliance_standard"
+                href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_standard`}
                 className="block w-full text-center bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg transition"
               >
                 Start Standard Suite
@@ -100,7 +100,7 @@ export default function CompliancePage() {
               </ul>
 
               <Link
-                href="/api/stripe/checkout?product=compliance_pro"
+                href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_pro`}
                 className="block w-full text-center bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition"
               >
                 Start Pro Suite

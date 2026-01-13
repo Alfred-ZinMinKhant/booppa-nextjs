@@ -9,13 +9,14 @@ export default function HeroSection() {
   const handleQuickScan = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('/api/stripe/checkout', {
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+      const res = await fetch(`${apiBase}/api/stripe/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          priceId: process.env.NEXT_PUBLIC_STRIPE_PDPA_QUICK_SCAN,
+            priceId: process.env.NEXT_PUBLIC_STRIPE_PDPA_QUICK_SCAN,
           productType: 'pdpa_quick_scan'
         })
       });

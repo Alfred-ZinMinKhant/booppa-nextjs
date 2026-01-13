@@ -7,6 +7,13 @@ const nextConfig = {
         hostname: 'api.qrserver.com',
         pathname: '/v1/create-qr-code/**',
       },
+      // Allow local Django media during development
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8001',
+        pathname: '/media/**',
+      },
       {
         protocol: 'https',
         hostname: 'polygonscan.com',

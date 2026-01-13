@@ -15,7 +15,8 @@ export default function ConversionPost() {
         body: JSON.stringify({ article: 'conversion-layer', cta: 'primary', action: 'click' }),
       });
 
-      const res = await fetch('/api/stripe/checkout', {
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+      const res = await fetch(`${apiBase}/api/stripe/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priceId: PRICE_ENV, productType: 'quick_fix' }),

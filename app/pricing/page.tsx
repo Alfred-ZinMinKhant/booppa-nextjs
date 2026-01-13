@@ -18,7 +18,7 @@ const pdpaPlans = [
       'No subscription required',
       'Can be upgraded to full compliance coverage at any time',
     ],
-    link: '/api/stripe/checkout?product=pdpa_quick_scan',
+    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_quick_scan`,
     button: 'Get PDPA Snapshot',
     color: 'green',
   },
@@ -34,7 +34,7 @@ const pdpaPlans = [
       'Email support for compliance operations',
       'Periodic compliance reporting for internal review',
     ],
-    link: '/api/stripe/checkout?product=pdpa_basic',
+    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_basic`,
     button: 'Start PDPA Basic',
     color: 'blue',
   },
@@ -49,7 +49,7 @@ const pdpaPlans = [
       'Priority support',
       'Automated compliance workflows aligned with PDPA requirements',
     ],
-    link: '/api/stripe/checkout?product=pdpa_pro',
+    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_pro`,
     button: 'Start PDPA Pro',
     color: 'purple',
   },
@@ -69,7 +69,7 @@ const compliancePlans = [
       'Advanced audit trail generation',
       'Priority email support',
     ],
-    link: '/api/stripe/checkout?product=compliance_standard',
+    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_standard`,
     button: 'Start Standard Suite',
     color: 'purple',
   },
@@ -84,7 +84,7 @@ const compliancePlans = [
       'Dedicated compliance manager',
       '24/7 support',
     ],
-    link: '/api/stripe/checkout?product=compliance_pro',
+    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_pro`,
     button: 'Start Pro Suite',
     color: 'pink',
   },
@@ -101,7 +101,7 @@ const supplyChainPlans = [
       'Court-admissible audit trail',
       'QR code link generation',
     ],
-    link: '/api/stripe/checkout?product=compliance_notarization_1',
+    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_notarization_1`,
     button: 'Buy Now',
     color: 'green',
   },
@@ -115,7 +115,7 @@ const supplyChainPlans = [
       'API access included',
       '3 months data retention',
     ],
-    link: '/api/stripe/checkout?product=compliance_notarization_10',
+    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_notarization_10`,
     button: 'Buy Now',
     color: 'blue',
   },
@@ -130,7 +130,7 @@ const supplyChainPlans = [
       'Customized reporting dashboard',
       '12 months data retention',
     ],
-    link: '/api/stripe/checkout?product=compliance_notarization_50',
+    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_notarization_50`,
     button: 'Buy Now',
     color: 'purple',
   },
@@ -183,7 +183,7 @@ export default function PricingPage() {
           <p className="text-lg text-gray-300 mb-4">Choose the level of evidence your organization needs. Compliance is not a checklist. It’s the ability to prove what was compliant, when, and how.</p>
           <p className="text-gray-400 mb-6">BOOPPA provides verifiable compliance evidence for PDPA, MAS, and operational requirements — from one-time pre-audit snapshots to full enterprise audit coverage.</p>
           <div className="mt-6">
-            <Link href="/api/stripe/checkout?product=pdpa_quick_scan" className="inline-flex items-center justify-center rounded-lg bg-green-400 px-6 py-3 text-lg font-semibold text-black hover:bg-green-300 transition">Start with a PDPA Snapshot – SGD 69</Link>
+            <Link href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_quick_scan`} className="inline-flex items-center justify-center rounded-lg bg-green-400 px-6 py-3 text-lg font-semibold text-black hover:bg-green-300 transition">Start with a PDPA Snapshot – SGD 69</Link>
             <div className="text-sm text-gray-400 mt-2">No subscription • Upgrade anytime</div>
           </div>
           <p className="text-gray-400 mt-6">Every BOOPPA plan produces evidence you can retain, export, and defend.</p>

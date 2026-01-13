@@ -110,7 +110,7 @@ export default function ComplianceNotarizationPage() {
                 <ul className="text-gray-300 mb-6 space-y-2">
                   {tier.features.map((f) => <li key={f} className="flex items-start"><Check className="w-5 h-5 text-green-400 mr-3 mt-0.5" />{f}</li>)}
                 </ul>
-                <Link href={`/api/stripe/checkout?product=${tier.productType}`} className="mt-auto inline-flex items-center justify-center rounded-lg bg-booppa-green px-4 py-2 text-black font-semibold">Buy Now</Link>
+                <Link href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=${tier.productType}`} className="mt-auto inline-flex items-center justify-center rounded-lg bg-booppa-green px-4 py-2 text-black font-semibold">Buy Now</Link>
               </div>
             ))}
           </div>

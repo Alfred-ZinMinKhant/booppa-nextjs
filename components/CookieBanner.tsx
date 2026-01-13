@@ -12,8 +12,8 @@ type ConsentRecord = {
 const PRIVACY_VERSION = process.env.NEXT_PUBLIC_PRIVACY_VERSION || "2025-12-22";
 
 function sendConsent(record: ConsentRecord) {
-  // POST to the Next.js server route which forwards to backend
-  return fetch("/api/consent", {
+  const base = process.env.NEXT_PUBLIC_API_BASE || "";
+  return fetch(`${base}/api/v1/consent`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(record),

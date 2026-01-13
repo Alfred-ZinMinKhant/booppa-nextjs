@@ -11,12 +11,20 @@ export default function VerifyPayment({ sessionId }: { sessionId: string }) {
   useEffect(() => {
     async function verify() {
       try {
-        const response = await fetch(`/api/checkout/verify?session_id=${sessionId}`);
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+        const response = await fetch(`${apiBase}/api/stripe/checkout/verify?session_id=${sessionId}`);
         const data = await response.json();
 
         if (response.ok && data.success) {
           setStatus('success');
           setMessage('Payment successfully verified! Your service has been activated.');
+          // store product type for conditional UI (e.g., quick-scan -> show file)
+          if (data.product_type) {
+            (window as any).__booppa_product_type = data.product_type;
+          }
+          if (data.customer_email) {
+            (window as any).__booppa_customer_email = data.customer_email;
+          }
         } else {
           setStatus('error');
           setMessage('Payment verification failed. Please check your email for confirmation or contact support.');
@@ -47,14 +55,21 @@ export default function VerifyPayment({ sessionId }: { sessionId: string }) {
       </>
     );
   } else if (status === 'success') {
+    const product = (window as any).__booppa_product_type;
     content = (
       <>
         <CheckCircle className={`${iconClass} text-booppa-green`} />
         <h2 className="text-2xl font-semibold text-white">Payment Confirmed!</h2>
         <p className="text-gray-400 mt-2">{message}</p>
-        <Link href="/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-          Go to Dashboard
-        </Link>
+        {product === 'pdpa_quick_scan' ? (
+          <Link href={`/pdpa/report?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            View Report
+          </Link>
+        ) : (
+          <Link href="/admin/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            Go to Dashboard
+          </Link>
+        )}
       </>
     );
   } else {

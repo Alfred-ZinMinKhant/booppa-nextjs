@@ -1,58 +1,53 @@
+"use server";
+
 import Link from 'next/link';
 import Image from 'next/image';
 
-const posts = [
-    {
-    title: 'Singapore Courts and Blockchain Evidence: 2025 Updates on Admissibility and Provenance',
-    href: '/blog/singapore-courts-blockchain-evidence-2025',
-    image: '/1-Authority.jpg',
-    excerpt: 'How recent High Court rulings shape the admissibility of blockchain evidence in Singapore (2025).',
-  },
-  {
-    title: 'How SMEs Can Reduce Compliance Costs by 90% with Blockchain',
-    href: '/blog/how-smes-can-reduce-compliance-costs-by-90-with-blockchain',
-    image: '/2-Conversion-Layer.jpg',
-    excerpt: 'A practical guide for SMEs on using on-chain notarization and PDPC guidance to cut compliance costs.',
-  },
-  {
-    title: 'Why We Built on AWS Singapore and Polygon for Regulatory Compliance',
-    href: '/blog/infrastructure-aws-polygon',
-    image: '/3-infrastructure-aws-polygon.jpg',
-    excerpt: 'How Booppa combines AWS Singapore hosting with Polygon notarization to meet PDPA and MAS requirements.',
-  },
-  {
-    title: 'Solving Singapore Customs Delays with Blockchain Document Verification',
-    href: '/blog/supply-chain-customs-speed',
-    image: '/4-QR_Container.jpg',
-    excerpt: 'How notarizing shipping documents on Polygon and Booppa QR verification cuts customs clearance times.',
-  },
-];
+async function fetchPosts() {
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_CMS_BASE || 'http://localhost:8001';
+  try {
+    const res = await fetch(`${apiBase}/api/public/blogs/`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.results || [];
+  } catch (e) {
+    console.error('Error fetching posts', e);
+    return [];
+  }
+}
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await fetchPosts();
+
   return (
     <main className="min-h-screen bg-black text-white py-12">
       <section className="max-w-6xl mx-auto px-6">
         <h1 className="text-4xl font-bold mb-8">Blog</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {posts.map((p) => (
-            <article key={p.href} className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
-              <Link href={p.href} className="block">
-                <div className="h-44 w-full relative">
-                  <Image src={p.image} alt={p.title} fill className="object-cover" />
-                </div>
-                <div className="p-6">
-                  <h2 className="text-2xl font-semibold">{p.title}</h2>
-                  <p className="mt-3 text-gray-300">{p.excerpt}</p>
-                  <span className="mt-4 inline-flex items-center gap-2 text-booppa-blue bg-white/5 hover:bg-white/10 transition-colors duration-150 px-3 py-1 rounded-md font-medium w-max">
-                    Read more
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </div>
-              </Link>
-            </article>
-          ))}
+          {posts.map((p: any) => {
+            const href = `/blog/${p.slug}`;
+            const image = (p.images && p.images.length > 0 && p.images[0]) || '/default-blog.jpg';
+            const excerpt = p.content ? p.content.substring(0, 160) + '...' : '';
+            return (
+              <article key={p.id} className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
+                <Link href={href} className="block">
+                  <div className="h-44 w-full relative">
+                    <Image src={image} alt={p.title} fill className="object-cover" />
+                  </div>
+                  <div className="p-6">
+                    <h2 className="text-2xl font-semibold">{p.title}</h2>
+                    <p className="mt-3 text-gray-300">{excerpt}</p>
+                    <span className="mt-4 inline-flex items-center gap-2 text-booppa-blue bg-white/5 hover:bg-white/10 transition-colors duration-150 px-3 py-1 rounded-md font-medium w-max">
+                      Read more
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </div>
+                </Link>
+              </article>
+            );
+          })}
         </div>
       </section>
     </main>

@@ -169,3 +169,4 @@ function getProductName(productType: string): string {
   };
   return map[productType] || 'Product';
 }
+

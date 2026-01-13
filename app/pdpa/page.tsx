@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const QuickScanButton = dynamic(() => import('@/components/QuickScanButton'), { ssr: false });
 import { Check, Shield, FileText, Users, Zap } from 'lucide-react';
 
 export const metadata = {
@@ -33,12 +36,11 @@ export default function PDPAPage() {
             <div className="text-center">
               <div className="text-5xl font-black text-green-400 mb-4">SGD 69</div>
               <p className="text-gray-400 mb-6">One-time payment • No subscription</p>
-              <Link
-                href="/api/stripe/checkout?product=pdpa_quick_scan"
-                className="inline-flex items-center justify-center rounded-lg bg-green-500 px-8 py-3 text-lg font-semibold text-white hover:bg-green-600 transition"
-              >
-                Get Quick Scan Report
-              </Link>
+              {/* Create report, then start checkout */}
+              <div className="inline-block">
+                {/* @ts-ignore Server->Client import allowed via new component */}
+                <QuickScanButton />
+              </div>
             </div>
           </div>
         </div>
@@ -80,7 +82,7 @@ export default function PDPAPage() {
               </ul>
 
               <Link
-                href="/api/stripe/checkout?product=pdpa_basic"
+                href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_basic`}
                 className="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition"
               >
                 Start Basic Plan
@@ -120,7 +122,7 @@ export default function PDPAPage() {
               </ul>
 
               <Link
-                href="/api/stripe/checkout?product=pdpa_pro"
+                href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_pro`}
                 className="block w-full text-center bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition"
               >
                 Start Pro Plan

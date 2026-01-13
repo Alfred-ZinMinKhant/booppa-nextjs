@@ -27,7 +27,8 @@ export default function AdminDashboard() {
       setRefreshing(true);
       setError("");
       try {
-        const res = await fetch("/api/admin-refresh", {
+        const base = process.env.NEXT_PUBLIC_API_BASE || "";
+        const res = await fetch(`${base}/api/v1/auth/refresh`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refresh_token: refreshToken }),
