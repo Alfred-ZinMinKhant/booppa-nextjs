@@ -24,6 +24,12 @@ const nextConfig = {
         hostname: 'assets.calendly.com',
         pathname: '/**',
       },
+      {
+        protocol: 'http',
+        hostname: '13.229.135.184',
+        port: '8001',
+        pathname: '/media/**',
+      },
     ],
   },
 };
