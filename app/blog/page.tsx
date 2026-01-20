@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import truncate from 'html-truncate';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -41,7 +42,12 @@ export default function BlogPage() {
             {posts.map((p: any) => {
               const href = `/blog/${p.slug}`;
               const image = (p.images && p.images.length > 0 && p.images[0]) || '/default-blog.jpg';
-              const excerpt = p.content ? p.content.substring(0, 160) + '...' : '';
+              // Create a short HTML excerpt (preserve tags, but truncate)
+              let excerpt = '';
+              if (p.content) {
+                // Use html-truncate to safely truncate HTML content
+                excerpt = truncate(p.content, 160, { ellipsis: '...' });
+              }
               return (
                 <article key={p.id} className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
                   <Link href={href} className="block">
@@ -50,7 +56,8 @@ export default function BlogPage() {
                     </div>
                     <div className="p-6">
                       <h2 className="text-2xl font-semibold">{p.title}</h2>
-                      <p className="mt-3 text-gray-300">{excerpt}</p>
+                      <p className="mt-3 text-gray-300" dangerouslySetInnerHTML={{ __html: excerpt }} />
+                      
                       <span className="mt-4 inline-flex items-center gap-2 text-booppa-blue bg-white/5 hover:bg-white/10 transition-colors duration-150 px-3 py-1 rounded-md font-medium w-max">
                         Read more
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -20,6 +20,36 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
           </div>
         </div>
         <article className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div className="mt-8 flex flex-wrap gap-4">
+          {post.cta1_text && post.cta1_url && (
+            <a
+              href={post.cta1_url}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={post.cta1_text}
+              className="inline-flex items-center gap-3 text-white bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 px-5 py-3 rounded-full font-semibold"
+            >
+              <span>{post.cta1_text}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+          )}
+          {post.cta2_text && post.cta2_url && (
+            <a
+              href={post.cta2_url}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={post.cta2_text}
+              className="inline-flex items-center gap-3 text-white border border-gray-700 bg-transparent hover:bg-gray-800 transition px-5 py-3 rounded-full font-medium"
+            >
+              <span>{post.cta2_text}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          )}
+        </div>
       </section>
     </main>
   );
