@@ -21,6 +21,7 @@ export default function DemoPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<{ id: string; token: string } | null>(null);
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date());
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -59,6 +60,38 @@ export default function DemoPage() {
     () => (dateList.length ? dateList[dateList.length - 1] : ''),
     [dateList]
   );
+
+  const availableSet = useMemo(() => new Set(dateList), [dateList]);
+
+  const formatDateKey = (date: Date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+
+  const getCalendarDays = (month: Date) => {
+    const year = month.getFullYear();
+    const monthIndex = month.getMonth();
+    const firstDay = new Date(year, monthIndex, 1);
+    const startWeekday = firstDay.getDay();
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const days: Array<{ date: Date; currentMonth: boolean }> = [];
+
+    for (let i = startWeekday; i > 0; i -= 1) {
+      const d = new Date(year, monthIndex, 1 - i);
+      days.push({ date: d, currentMonth: false });
+    }
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      days.push({ date: new Date(year, monthIndex, day), currentMonth: true });
+    }
+    const remaining = 42 - days.length;
+    for (let i = 1; i <= remaining; i += 1) {
+      const d = new Date(year, monthIndex + 1, i);
+      days.push({ date: d, currentMonth: false });
+    }
+    return days;
+  };
 
   const timeSlots = useMemo(() => {
     if (!selectedDate) return [] as Slot[];
@@ -128,31 +161,80 @@ export default function DemoPage() {
                 <p className="text-gray-400">Loading slots...</p>
               ) : (
                 <div className="rounded-xl border border-gray-800 bg-gray-950/60 p-4">
-                  <label className="block text-sm text-gray-300 mb-2">Pick a date</label>
-                  <input
-                    type="date"
-                    min={minDate}
-                    max={maxDate}
-                    value={selectedDate ?? ''}
-                    onChange={(e) => {
-                      const next = e.target.value;
-                      setSelectedSlot(null);
-                      if (!next) {
-                        setSelectedDate(null);
-                        return;
+                  <div className="flex items-center justify-between mb-4">
+                    <button
+                      type="button"
+                      className="text-sm text-gray-300 hover:text-white"
+                      onClick={() =>
+                        setCalendarMonth(
+                          new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1)
+                        )
                       }
-                      if (!dates[next]) {
-                        setError('No slots are available for that date.');
-                        setSelectedDate(next);
-                        return;
+                    >
+                      ← Prev
+                    </button>
+                    <div className="text-white font-semibold">
+                      {calendarMonth.toLocaleDateString('en-US', {
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </div>
+                    <button
+                      type="button"
+                      className="text-sm text-gray-300 hover:text-white"
+                      onClick={() =>
+                        setCalendarMonth(
+                          new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1)
+                        )
                       }
-                      setError(null);
-                      setSelectedDate(next);
-                    }}
-                    className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-white"
-                  />
+                    >
+                      Next →
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-7 text-xs text-gray-400 mb-2">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                      <div key={d} className="text-center py-1">
+                        {d}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {getCalendarDays(calendarMonth).map(({ date, currentMonth }, idx) => {
+                      const key = formatDateKey(date);
+                      const inRange = (!minDate || key >= minDate) && (!maxDate || key <= maxDate);
+                      const available = availableSet.has(key);
+                      const isSelected = selectedDate === key;
+                      const disabled = !currentMonth || !inRange || !available;
+
+                      return (
+                        <button
+                          key={`${key}-${idx}`}
+                          type="button"
+                          disabled={disabled}
+                          onClick={() => {
+                            setSelectedSlot(null);
+                            if (!available) {
+                              setError('No slots are available for that date.');
+                              return;
+                            }
+                            setError(null);
+                            setSelectedDate(key);
+                          }}
+                          className={`h-10 rounded-md text-sm transition ${
+                            disabled
+                              ? 'text-gray-600'
+                              : isSelected
+                              ? 'bg-booppa-green/20 text-white border border-booppa-green'
+                              : 'text-gray-200 hover:border hover:border-gray-500'
+                          }`}
+                        >
+                          {date.getDate()}
+                        </button>
+                      );
+                    })}
+                  </div>
                   {minDate && maxDate && (
-                    <p className="mt-2 text-xs text-gray-500">
+                    <p className="mt-3 text-xs text-gray-500">
                       Available from {minDate} to {maxDate}
                     </p>
                   )}
