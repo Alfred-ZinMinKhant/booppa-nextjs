@@ -30,6 +30,11 @@ const nextConfig = {
         port: '8001',
         pathname: '/media/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cms.booppa.io',
+        pathname: '/media/**',
+      },
     ],
   },
 };
