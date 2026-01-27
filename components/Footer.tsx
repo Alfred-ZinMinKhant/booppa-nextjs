@@ -45,9 +45,9 @@ export default function Footer() {
           <div>
             <h4 className="font-bold mb-4">Contact</h4>
             <div className="space-y-3 text-sm text-gray-400">
-              <p className="flex items-center gap-2">
-                <Mail className="w-4 h-4" /> support@booppa.io
-              </p>
+              <Link href="/support" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Mail className="w-4 h-4" /> Submit a support ticket
+              </Link>
               <p className="flex items-center gap-2">
                 <Phone className="w-4 h-4" /> +65 1234 5678
               </p>
