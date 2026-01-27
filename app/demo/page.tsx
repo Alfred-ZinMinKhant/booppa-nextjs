@@ -54,6 +54,11 @@ export default function DemoPage() {
   }, [slots]);
 
   const dateList = useMemo(() => Object.keys(dates).sort(), [dates]);
+  const minDate = useMemo(() => (dateList.length ? dateList[0] : ''), [dateList]);
+  const maxDate = useMemo(
+    () => (dateList.length ? dateList[dateList.length - 1] : ''),
+    [dateList]
+  );
 
   const timeSlots = useMemo(() => {
     if (!selectedDate) return [] as Slot[];
@@ -92,11 +97,16 @@ export default function DemoPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-black">
-      <div className="w-full max-w-4xl mx-auto p-6 bg-gray-900 rounded-xl shadow-lg border border-gray-800">
-        <h1 className="text-3xl font-bold text-white mb-4 text-center">Book a Live Demo</h1>
-        <p className="text-gray-400 text-center mb-8">
-          Select a time slot below to schedule a live walkthrough with our team.
-        </p>
+      <div className="w-full max-w-5xl mx-auto p-6 md:p-8 bg-gray-900 rounded-2xl shadow-xl border border-gray-800">
+        <div className="text-center mb-8">
+          <span className="inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-xs text-green-200">
+            Available in Thailand time
+          </span>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mt-4">Book a Live Demo</h1>
+          <p className="text-gray-400 mt-2">
+            Pick a date and time that suits you. We’ll confirm by email.
+          </p>
+        </div>
 
         {error && (
           <div className="mb-6 rounded-md border border-red-500/30 bg-red-500/10 p-4 text-red-200">
@@ -111,56 +121,81 @@ export default function DemoPage() {
             <p className="text-sm text-green-200">We’ll contact you to confirm details.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-8">
             <div>
-              <h2 className="text-lg font-semibold text-white mb-3">Choose a date</h2>
+              <h2 className="text-lg font-semibold text-white mb-4">Select a date</h2>
               {loading ? (
                 <p className="text-gray-400">Loading slots...</p>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  {dateList.map((date) => (
-                    <button
-                      key={date}
-                      onClick={() => {
-                        setSelectedDate(date);
-                        setSelectedSlot(null);
-                      }}
-                      className={`rounded-lg border px-3 py-2 text-sm transition ${
-                        selectedDate === date
-                          ? 'border-booppa-green bg-booppa-green/10 text-white'
-                          : 'border-gray-700 text-gray-300 hover:border-gray-500'
-                      }`}
-                    >
-                      {new Date(date).toLocaleDateString('en-SG', {
-                        weekday: 'short',
-                        day: 'numeric',
-                        month: 'short',
-                      })}
-                    </button>
-                  ))}
+                <div className="rounded-xl border border-gray-800 bg-gray-950/60 p-4">
+                  <label className="block text-sm text-gray-300 mb-2">Pick a date</label>
+                  <input
+                    type="date"
+                    min={minDate}
+                    max={maxDate}
+                    value={selectedDate ?? ''}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setSelectedSlot(null);
+                      if (!next) {
+                        setSelectedDate(null);
+                        return;
+                      }
+                      if (!dates[next]) {
+                        setError('No slots are available for that date.');
+                        setSelectedDate(next);
+                        return;
+                      }
+                      setError(null);
+                      setSelectedDate(next);
+                    }}
+                    className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-white"
+                  />
+                  {minDate && maxDate && (
+                    <p className="mt-2 text-xs text-gray-500">
+                      Available from {minDate} to {maxDate}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
 
             <div>
-              <h2 className="text-lg font-semibold text-white mb-3">Choose a time</h2>
+              <h2 className="text-lg font-semibold text-white mb-4">Select a time</h2>
               {!selectedDate ? (
-                <p className="text-gray-400">Pick a date to see available times.</p>
+                <div className="rounded-lg border border-dashed border-gray-700 p-6 text-gray-400">
+                  Choose a date to see available times.
+                </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  {timeSlots.map((slot) => (
-                    <button
-                      key={slot.id}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`rounded-lg border px-3 py-2 text-sm transition ${
-                        selectedSlot?.id === slot.id
-                          ? 'border-booppa-green bg-booppa-green/10 text-white'
-                          : 'border-gray-700 text-gray-300 hover:border-gray-500'
-                      }`}
-                    >
-                      {slot.start_time} - {slot.end_time}
-                    </button>
-                  ))}
+                <div>
+                  <div className="mb-4 text-sm text-gray-400">
+                    {new Date(selectedDate).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </div>
+                  {timeSlots.length === 0 ? (
+                    <div className="rounded-lg border border-dashed border-gray-700 p-6 text-gray-400">
+                      No available time slots for this date.
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {timeSlots.map((slot) => (
+                        <button
+                          key={slot.id}
+                          onClick={() => setSelectedSlot(slot)}
+                          className={`rounded-full border px-4 py-2 text-sm transition ${
+                            selectedSlot?.id === slot.id
+                              ? 'border-booppa-green bg-booppa-green/10 text-white'
+                              : 'border-gray-700 text-gray-300 hover:border-gray-500'
+                          }`}
+                        >
+                          {slot.start_time} - {slot.end_time}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
