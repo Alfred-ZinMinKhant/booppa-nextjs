@@ -64,12 +64,6 @@ export default function Navigation() {
             >
               PDPA Quick Scan <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
-            <Link 
-              href="/qr-scan" 
-              className="ml-6 text-sm font-semibold leading-6 text-white hover:text-gray-300"
-            >
-              Free PDPA Scan
-            </Link>
           </div>
         </div>
 
@@ -120,13 +114,7 @@ export default function Navigation() {
                   >
                     PDPA Quick Scan
                   </Link>
-                  <Link
-                    href="/qr-scan"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="-mx-3 mt-2 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-white hover:bg-gray-800"
-                  >
-                    Free PDPA Scan
-                  </Link>
+                  
                 </div>
               </div>
             </div>

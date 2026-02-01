@@ -45,6 +45,26 @@ export default function PDPAPage() {
           </div>
         </div>
 
+        {/* Free Scan Section */}
+        <div id="free-scan" className="mb-20">
+          <div className="bg-gray-900/40 rounded-2xl p-8 border border-gray-800">
+            <div className="text-center mb-6">
+              <h2 className="text-3xl font-bold text-white mb-3">Free Instant PDPA Scan</h2>
+              <p className="text-gray-300 text-lg">
+                Get a quick compliance snapshot in seconds. Limited to one scan per month per email.
+              </p>
+            </div>
+            <div className="text-center">
+              <Link
+                href="/qr-scan"
+                className="inline-flex items-center justify-center rounded-lg bg-white text-black px-8 py-3 font-semibold hover:bg-gray-100 transition"
+              >
+                Start Free Scan
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Pricing */}
         <div id="pricing" className="mb-20">
           <h2 className="text-3xl font-bold text-white text-center mb-12">PDPA Compliance Plans</h2>
