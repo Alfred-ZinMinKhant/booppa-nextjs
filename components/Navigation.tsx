@@ -10,6 +10,7 @@ const navigation = [
   { name: 'PDPA Suite', href: '/pdpa' },
   { name: 'Compliance Suite', href: '/compliance' },
   { name: 'Compliance Notarization', href: '/compliance-notarization' },
+  { name: 'Free PDPA Scan', href: '/qr-scan' },
   { name: 'Pricing', href: '/pricing' },
   { name: 'Blog', href: '/blog' },
   { name: 'Book Demo', href: '/demo' },
@@ -63,6 +64,12 @@ export default function Navigation() {
             >
               PDPA Quick Scan <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
+            <Link 
+              href="/qr-scan" 
+              className="ml-6 text-sm font-semibold leading-6 text-white hover:text-gray-300"
+            >
+              Free PDPA Scan
+            </Link>
           </div>
         </div>
 
@@ -112,6 +119,13 @@ export default function Navigation() {
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-booppa-green hover:bg-gray-800"
                   >
                     PDPA Quick Scan
+                  </Link>
+                  <Link
+                    href="/qr-scan"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="-mx-3 mt-2 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-white hover:bg-gray-800"
+                  >
+                    Free PDPA Scan
                   </Link>
                 </div>
               </div>
