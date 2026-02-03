@@ -105,6 +105,60 @@ export default function ReportClient() {
 
   return (
     <main className="min-h-[60vh] flex flex-col items-center justify-center p-4">
+      {status === "loading" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-sky-500 to-sky-600">
+          <div className="w-[92%] max-w-3xl rounded-3xl bg-white p-8 shadow-2xl">
+            <div className="text-center">
+              <div className="text-lg font-semibold text-gray-900">Your scan results are being generated...</div>
+              <div className="text-sm font-bold tracking-widest text-gray-700 mt-1">BOOPPA.IO</div>
+            </div>
+
+            <div className="mt-8 rounded-2xl border border-gray-200 p-6">
+              <div className="text-lg font-semibold text-gray-900">Almost done!</div>
+              <div className="mt-3 h-3 w-full rounded-full bg-gray-200">
+                <div className="h-3 w-[70%] rounded-full bg-sky-500" />
+              </div>
+              <div className="mt-3 flex items-center text-sm text-gray-600">
+                <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300">⏱</span>
+                Usually your results will be ready in less than 2 min.
+              </div>
+            </div>
+
+            <div className="mt-6 text-sm text-gray-600">
+              Enter your email address to access and view your results. A copy of the scan results will be sent by email.
+            </div>
+
+            <div className="mt-4">
+              <input
+                type="email"
+                placeholder="Email address"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900"
+                disabled
+              />
+            </div>
+
+            <div className="mt-4 flex items-start gap-2 text-xs text-gray-600">
+              <input type="checkbox" className="mt-0.5" disabled />
+              <span>
+                I would like to receive exclusive communications on tips, offers, and updates. I can easily revoke this any time by clicking the unsubscribe link or by emailing Cookiebot™ at unsubscribe@usercentrics.com.
+              </span>
+            </div>
+
+            <div className="mt-4 text-xs text-gray-500">
+              By submitting this form I agree to the Usercentrics A/S Terms of Service and Cookiebot™ Privacy Policy.
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                className="rounded-lg bg-sky-500 px-6 py-3 text-sm font-semibold text-white"
+                disabled
+              >
+                GET RESULTS
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="w-full max-w-5xl text-center">
         <h1 className="text-3xl font-bold mb-4">PDPA Quick Scan Report</h1>
         <p className="text-gray-500 mb-6">{message}</p>
@@ -130,7 +184,11 @@ export default function ReportClient() {
               <section className="rounded-2xl border border-gray-800 bg-gray-900/50 p-5">
                 <h3 className="text-xl font-semibold mb-3">Website Screenshot</h3>
                 <img
-                  src={`data:image/png;base64,${siteScreenshot}`}
+                  src={
+                    siteScreenshot.startsWith("data:image")
+                      ? siteScreenshot
+                      : `data:image/png;base64,${siteScreenshot}`
+                  }
                   alt="Website screenshot"
                   className="w-full rounded-xl border border-gray-800"
                 />
