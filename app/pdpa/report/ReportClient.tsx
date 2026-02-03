@@ -65,6 +65,7 @@ export default function ReportClient() {
         return;
       }
 
+      let isReady = false;
       try {
         const apiBase = (process.env.NEXT_PUBLIC_API_BASE as string) ?? "http://localhost:8000";
         const res = await fetch(`${apiBase}/api/reports/by-session?session_id=${sessionId}`);
@@ -80,6 +81,7 @@ export default function ReportClient() {
             setReportUrl(data.url);
           }
           if (data.report || data.url) {
+            isReady = true;
             setStatus("ready");
             setMessage("Your report is ready. Review below.");
           } else {
@@ -98,9 +100,11 @@ export default function ReportClient() {
         setStatus("error");
         setMessage(e.message || "Network error while checking report");
       } finally {
-        setAttempts((prev) => prev + 1);
-        if (status !== "ready" && attempts < 30) {
-          timeoutId = setTimeout(load, 5000);
+        if (!isReady) {
+          setAttempts((prev) => prev + 1);
+          if (status !== "ready" && attempts < 30) {
+            timeoutId = setTimeout(load, 5000);
+          }
         }
       }
     }
@@ -135,30 +139,34 @@ export default function ReportClient() {
   return (
     <main className="min-h-[60vh] flex flex-col items-center justify-center p-4">
       {status === "loading" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-sky-500 to-sky-600">
-          <div className="w-[92%] max-w-3xl rounded-3xl bg-white p-8 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-black via-gray-950 to-black">
+          <div className="absolute inset-0 opacity-40">
+            <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-booppa-blue/30 blur-3xl" />
+            <div className="absolute bottom-[-120px] right-[-120px] h-80 w-80 rounded-full bg-booppa-purple/30 blur-3xl" />
+          </div>
+          <div className="relative w-[92%] max-w-3xl rounded-3xl border border-gray-800/80 bg-gradient-to-br from-gray-900/90 to-black/80 p-8 shadow-2xl">
             <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900">Your scan results are being generated...</div>
-              <div className="text-sm font-bold tracking-widest text-gray-700 mt-1">BOOPPA.IO</div>
+              <div className="text-lg font-semibold text-white">Your scan results are being generated...</div>
+              <div className="text-sm font-bold tracking-widest text-gray-400 mt-1">BOOPPA.IO</div>
             </div>
 
-            <div className="mt-8 rounded-2xl border border-gray-200 p-6">
-              <div className="text-lg font-semibold text-gray-900">
+            <div className="mt-8 rounded-2xl border border-gray-800 bg-black/40 p-6">
+              <div className="text-lg font-semibold text-white">
                 {loadingSteps[loadingStep]?.label ?? "Almost done!"}
               </div>
-              <div className="mt-3 h-3 w-full rounded-full bg-gray-200">
+              <div className="mt-3 h-3 w-full rounded-full bg-gray-800">
                 <div
-                  className="h-3 rounded-full bg-sky-500 transition-all duration-700"
+                  className="h-3 rounded-full bg-gradient-to-r from-booppa-blue via-booppa-purple to-booppa-pink transition-all duration-700"
                   style={{ width: `${Math.min(progress, 98)}%` }}
                 />
               </div>
-              <div className="mt-3 flex items-center text-sm text-gray-600">
-                <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300">⏱</span>
+              <div className="mt-3 flex items-center text-sm text-gray-400">
+                <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-700">⏱</span>
                 Usually your results will be ready in less than 2 min.
               </div>
             </div>
 
-            <div className="mt-6 text-sm text-gray-600">
+            <div className="mt-6 text-sm text-gray-400">
               Enter your email address to access and view your results. A copy of the scan results will be sent by email.
             </div>
 
@@ -166,25 +174,25 @@ export default function ReportClient() {
               <input
                 type="email"
                 placeholder="Email address"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900"
+                className="w-full rounded-lg border border-gray-800 bg-black/60 px-4 py-3 text-gray-200 placeholder-gray-500"
                 disabled
               />
             </div>
 
-            <div className="mt-4 flex items-start gap-2 text-xs text-gray-600">
+            <div className="mt-4 flex items-start gap-2 text-xs text-gray-500">
               <input type="checkbox" className="mt-0.5" disabled />
               <span>
                 I would like to receive exclusive communications on tips, offers, and updates. I can easily revoke this any time by clicking the unsubscribe link or by emailing Cookiebot™ at unsubscribe@usercentrics.com.
               </span>
             </div>
 
-            <div className="mt-4 text-xs text-gray-500">
+            <div className="mt-4 text-xs text-gray-600">
               By submitting this form I agree to the Usercentrics A/S Terms of Service and Cookiebot™ Privacy Policy.
             </div>
 
             <div className="mt-6 flex justify-end">
               <button
-                className="rounded-lg bg-sky-500 px-6 py-3 text-sm font-semibold text-white"
+                className="rounded-lg bg-booppa-blue px-6 py-3 text-sm font-semibold text-white"
                 disabled
               >
                 GET RESULTS
