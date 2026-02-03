@@ -123,6 +123,15 @@ export default function ReportClient() {
               </section>
             )}
 
+            {report?.executive_summary && !report?.detailed_findings?.length && (
+              <section>
+                <h2 className="text-xl font-semibold mb-2">Full Report</h2>
+                <pre className="whitespace-pre-wrap text-gray-200 bg-gray-900/60 border border-gray-800 rounded-lg p-4 text-sm">
+                  {report.executive_summary}
+                </pre>
+              </section>
+            )}
+
             {report?.risk_assessment && (
               <section>
                 <h2 className="text-xl font-semibold mb-2">Risk Assessment</h2>
