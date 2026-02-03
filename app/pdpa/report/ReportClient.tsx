@@ -35,6 +35,7 @@ export default function ReportClient() {
   const [report, setReport] = useState<StructuredReport | null>(null);
   const [siteScreenshot, setSiteScreenshot] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [attempts, setAttempts] = useState(0);
 
   useEffect(() => {
     try {
@@ -46,6 +47,8 @@ export default function ReportClient() {
   }, []);
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
     async function load() {
       if (!sessionId) {
         setStatus("error");
@@ -71,12 +74,12 @@ export default function ReportClient() {
             setStatus("ready");
             setMessage("Your report is ready. Review below.");
           } else {
-            setStatus("not_ready");
-            setMessage("Report not ready yet. We'll email you when it's available.");
+            setStatus("loading");
+            setMessage("Report is processing. Please wait...");
           }
         } else if (res.status === 404) {
-          setStatus("not_ready");
-          setMessage("Report not found yet. Please check back later or contact support.");
+          setStatus("loading");
+          setMessage("Report is processing. Please wait...");
         } else {
           const err = await res.text();
           setStatus("error");
@@ -85,73 +88,102 @@ export default function ReportClient() {
       } catch (e: any) {
         setStatus("error");
         setMessage(e.message || "Network error while checking report");
+      } finally {
+        setAttempts((prev) => prev + 1);
+        if (status !== "ready" && attempts < 30) {
+          timeoutId = setTimeout(load, 5000);
+        }
       }
     }
 
     if (sessionId) load();
-  }, [sessionId]);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [sessionId, attempts, status]);
 
   return (
     <main className="min-h-[60vh] flex flex-col items-center justify-center p-4">
-      <div className="max-w-2xl text-center">
+      <div className="w-full max-w-5xl text-center">
         <h1 className="text-3xl font-bold mb-4">PDPA Quick Scan Report</h1>
         <p className="text-gray-500 mb-6">{message}</p>
 
         {status === "loading" && <div className="text-sm text-gray-400">Checking...</div>}
         {status === "ready" && (
-          <div className="w-full text-left mt-6 space-y-6">
+          <div className="w-full text-left mt-8 space-y-8">
+            <section className="rounded-2xl border border-gray-800 bg-gradient-to-br from-gray-900/80 to-gray-900/40 p-6">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-semibold text-white">Audit Summary</h2>
+                  <p className="text-sm text-gray-400">PDPA Quick Scan Report</p>
+                </div>
+                {report?.report_metadata?.report_id && (
+                  <div className="rounded-full border border-gray-700 bg-black/40 px-4 py-2 text-xs text-gray-300">
+                    Report ID: {report.report_metadata.report_id}
+                  </div>
+                )}
+              </div>
+            </section>
+
             {siteScreenshot && (
-              <section>
-                <h2 className="text-xl font-semibold mb-2">Website Screenshot</h2>
+              <section className="rounded-2xl border border-gray-800 bg-gray-900/50 p-5">
+                <h3 className="text-xl font-semibold mb-3">Website Screenshot</h3>
                 <img
                   src={`data:image/png;base64,${siteScreenshot}`}
                   alt="Website screenshot"
-                  className="w-full rounded-lg border border-gray-800"
+                  className="w-full rounded-xl border border-gray-800"
                 />
-              </section>
-            )}
-            {report?.report_metadata?.report_id && (
-              <div className="text-xs text-gray-500">Report ID: {report.report_metadata.report_id}</div>
-            )}
-
-            {report?.executive_summary && (
-              <section>
-                <h2 className="text-xl font-semibold mb-2">Executive Summary</h2>
-                {report.executive_summary.split("\n\n").map((p, idx) => (
-                  <p key={idx} className="text-gray-300 mb-2 whitespace-pre-line">{p}</p>
-                ))}
-              </section>
-            )}
-
-            {report?.executive_summary && !report?.detailed_findings?.length && (
-              <section>
-                <h2 className="text-xl font-semibold mb-2">Full Report</h2>
-                <pre className="whitespace-pre-wrap text-gray-200 bg-gray-900/60 border border-gray-800 rounded-lg p-4 text-sm">
-                  {report.executive_summary}
-                </pre>
               </section>
             )}
 
             {report?.risk_assessment && (
               <section>
-                <h2 className="text-xl font-semibold mb-2">Risk Assessment</h2>
-                <p className="text-gray-300">Score: {report.risk_assessment.score ?? "N/A"}</p>
-                <p className="text-gray-300">Level: {report.risk_assessment.level ?? "N/A"}</p>
-                <p className="text-gray-400">{report.risk_assessment.description}</p>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4">
+                    <div className="text-xs uppercase tracking-wide text-gray-400">Risk Score</div>
+                    <div className="mt-2 text-3xl font-bold text-white">{report.risk_assessment.score ?? "N/A"}</div>
+                  </div>
+                  <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4">
+                    <div className="text-xs uppercase tracking-wide text-gray-400">Risk Level</div>
+                    <div className="mt-2 text-2xl font-semibold text-white">{report.risk_assessment.level ?? "N/A"}</div>
+                    {report.risk_assessment.description && (
+                      <div className="mt-1 text-sm text-gray-400">{report.risk_assessment.description}</div>
+                    )}
+                  </div>
+                  <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4">
+                    <div className="text-xs uppercase tracking-wide text-gray-400">AI Model</div>
+                    <div className="mt-2 text-sm text-gray-300">{report.report_metadata?.ai_model ?? "Booppa"}</div>
+                  </div>
+                </div>
               </section>
             )}
 
+            {report?.executive_summary && report?.detailed_findings?.length ? (
+              <section className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
+                <h3 className="text-xl font-semibold mb-3">Executive Summary</h3>
+                {report.executive_summary.split("\n\n").map((p, idx) => (
+                  <p key={idx} className="text-gray-300 mb-3 whitespace-pre-line leading-relaxed">{p}</p>
+                ))}
+              </section>
+            ) : null}
+
             {report?.detailed_findings?.length ? (
               <section>
-                <h2 className="text-xl font-semibold mb-2">Detailed Findings</h2>
+                <h3 className="text-xl font-semibold mb-4">Detailed Findings</h3>
                 <div className="space-y-4">
                   {report.detailed_findings.map((finding, idx) => (
-                    <div key={idx} className="bg-gray-900/60 border border-gray-800 rounded-lg p-4">
-                      <div className="text-sm text-gray-400">{finding.severity} • {finding.type?.replace(/_/g, " ")}</div>
-                      {finding.description && <p className="text-gray-200 mt-2 whitespace-pre-line">{finding.description}</p>}
-                      {finding.evidence && <p className="text-gray-400 mt-2">Evidence: {finding.evidence}</p>}
-                      {finding.penalty?.amount && <p className="text-gray-400 mt-1">Penalty: {finding.penalty.amount}</p>}
-                      {finding.deadline && <p className="text-gray-400 mt-1">Deadline: {finding.deadline}</p>}
+                    <div key={idx} className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5">
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400">
+                        <span className="rounded-full bg-red-500/10 px-3 py-1 text-red-300">{finding.severity}</span>
+                        <span className="text-gray-300">{finding.type?.replace(/_/g, " ")}</span>
+                      </div>
+                      {finding.description && <p className="text-gray-200 mt-3 whitespace-pre-line leading-relaxed">{finding.description}</p>}
+                      <div className="mt-3 grid gap-2 text-sm text-gray-400">
+                        {finding.evidence && <div>Evidence: {finding.evidence}</div>}
+                        {finding.penalty?.amount && <div>Penalty: {finding.penalty.amount}</div>}
+                        {finding.deadline && <div>Deadline: {finding.deadline}</div>}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -160,13 +192,13 @@ export default function ReportClient() {
 
             {report?.recommendations?.length ? (
               <section>
-                <h2 className="text-xl font-semibold mb-2">Recommendations</h2>
-                <div className="space-y-3">
+                <h3 className="text-xl font-semibold mb-4">Recommendations</h3>
+                <div className="space-y-4">
                   {report.recommendations.map((rec, idx) => (
-                    <div key={idx} className="bg-gray-900/60 border border-gray-800 rounded-lg p-4">
+                    <div key={idx} className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5">
                       <div className="text-sm text-gray-400">{rec.violation_type?.replace(/_/g, " ")} • {rec.severity}</div>
                       {rec.actions?.length ? (
-                        <ul className="list-disc ml-5 mt-2 text-gray-200">
+                        <ul className="list-disc ml-5 mt-3 text-gray-200 space-y-1">
                           {rec.actions.map((action, i) => (
                             <li key={i}>{action}</li>
                           ))}
@@ -181,8 +213,8 @@ export default function ReportClient() {
 
             {report?.legal_references?.length ? (
               <section>
-                <h2 className="text-xl font-semibold mb-2">Legal References</h2>
-                <ul className="list-disc ml-5 text-gray-300">
+                <h3 className="text-xl font-semibold mb-4">Legal References</h3>
+                <ul className="list-disc ml-5 text-gray-300 space-y-1">
                   {report.legal_references.map((ref, idx) => (
                     <li key={idx}>
                       {ref.url ? (
@@ -198,18 +230,32 @@ export default function ReportClient() {
               </section>
             ) : null}
 
+            {report?.executive_summary && !report?.detailed_findings?.length && (
+              <section className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
+                <h3 className="text-xl font-semibold mb-3">Full Report</h3>
+                <pre className="whitespace-pre-wrap text-gray-200 text-sm leading-relaxed">{report.executive_summary}</pre>
+              </section>
+            )}
+
             {reportUrl && (
-              <a href={reportUrl} className="inline-block px-6 py-3 bg-teal-600 text-white rounded" target="_blank" rel="noreferrer">
-                Download PDF
-              </a>
+              <div className="pt-2">
+                <a href={reportUrl} className="inline-flex items-center px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-500 transition" target="_blank" rel="noreferrer">
+                  Download PDF
+                </a>
+              </div>
             )}
           </div>
         )}
 
-        {status === "not_ready" && (
+        {status === "loading" && (
           <div className="mt-4">
             <p className="text-sm text-gray-400">If you just completed payment, the report may take a few minutes to generate.</p>
-            <a href="/admin/dashboard" className="mt-4 inline-block px-4 py-2 bg-gray-800 text-white rounded">Go to Dashboard</a>
+            <button
+              onClick={() => setAttempts((prev) => prev + 1)}
+              className="mt-4 inline-block px-4 py-2 bg-gray-800 text-white rounded"
+            >
+              Refresh
+            </button>
           </div>
         )}
 
