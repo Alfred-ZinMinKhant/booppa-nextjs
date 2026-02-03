@@ -36,6 +36,15 @@ export default function ReportClient() {
   const [siteScreenshot, setSiteScreenshot] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [attempts, setAttempts] = useState(0);
+  const [progress, setProgress] = useState(12);
+  const [loadingStep, setLoadingStep] = useState(0);
+
+  const loadingSteps = [
+    { label: "Preparing data...", max: 35 },
+    { label: "Scanning website...", max: 65 },
+    { label: "Analyzing compliance...", max: 85 },
+    { label: "Almost done!", max: 95 },
+  ];
 
   useEffect(() => {
     try {
@@ -103,6 +112,26 @@ export default function ReportClient() {
     };
   }, [sessionId, attempts, status]);
 
+  useEffect(() => {
+    if (status !== "loading") return;
+    const intervalId = setInterval(() => {
+      setProgress((prev) => {
+        const currentStep = loadingSteps[loadingStep] ?? loadingSteps[0];
+        const next = Math.min(prev + Math.random() * 4 + 1, currentStep.max);
+        return Math.round(next * 10) / 10;
+      });
+    }, 700);
+
+    const stepTimer = setInterval(() => {
+      setLoadingStep((prev) => Math.min(prev + 1, loadingSteps.length - 1));
+    }, 5000);
+
+    return () => {
+      clearInterval(intervalId);
+      clearInterval(stepTimer);
+    };
+  }, [status, loadingStep]);
+
   return (
     <main className="min-h-[60vh] flex flex-col items-center justify-center p-4">
       {status === "loading" && (
@@ -114,9 +143,14 @@ export default function ReportClient() {
             </div>
 
             <div className="mt-8 rounded-2xl border border-gray-200 p-6">
-              <div className="text-lg font-semibold text-gray-900">Almost done!</div>
+              <div className="text-lg font-semibold text-gray-900">
+                {loadingSteps[loadingStep]?.label ?? "Almost done!"}
+              </div>
               <div className="mt-3 h-3 w-full rounded-full bg-gray-200">
-                <div className="h-3 w-[70%] rounded-full bg-sky-500" />
+                <div
+                  className="h-3 rounded-full bg-sky-500 transition-all duration-700"
+                  style={{ width: `${Math.min(progress, 98)}%` }}
+                />
               </div>
               <div className="mt-3 flex items-center text-sm text-gray-600">
                 <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300">⏱</span>
