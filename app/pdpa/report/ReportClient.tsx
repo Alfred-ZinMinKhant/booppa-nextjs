@@ -34,6 +34,7 @@ export default function ReportClient() {
   const [reportUrl, setReportUrl] = useState<string | null>(null);
   const [report, setReport] = useState<StructuredReport | null>(null);
   const [siteScreenshot, setSiteScreenshot] = useState<string | null>(null);
+  const [screenshotError, setScreenshotError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [attempts, setAttempts] = useState(0);
   const [progress, setProgress] = useState(12);
@@ -77,10 +78,15 @@ export default function ReportClient() {
           if (data.site_screenshot) {
             setSiteScreenshot(data.site_screenshot);
           }
+          if (data.screenshot_error) {
+            setScreenshotError(data.screenshot_error);
+          }
           if (data.url) {
             setReportUrl(data.url);
           }
-          if (data.report || data.url) {
+          const hasScreenshot = Boolean(data.site_screenshot);
+          const screenshotFailed = Boolean(data.screenshot_error);
+          if ((data.report || data.url) && (hasScreenshot || screenshotFailed)) {
             isReady = true;
             setStatus("ready");
             setMessage("Your report is ready. Review below.");
@@ -102,7 +108,7 @@ export default function ReportClient() {
       } finally {
         if (!isReady) {
           setAttempts((prev) => prev + 1);
-          if (status !== "ready" && attempts < 30) {
+          if (status !== "ready" && attempts < 60) {
             timeoutId = setTimeout(load, 5000);
           }
         }
