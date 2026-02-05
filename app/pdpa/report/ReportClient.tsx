@@ -91,8 +91,8 @@ export default function ReportClient() {
             setStatus("ready");
             setMessage("Your report is ready. Review below.");
           } else {
-            setStatus("loading");
-            setMessage("Report is processing. Please wait...");
+            setStatus((prev) => (prev === "ready" ? "ready" : "loading"));
+            setMessage((prev) => (prev === "Your report is ready. Review below." ? prev : "Report is processing. Please wait..."));
           }
         } else if (res.status === 404) {
           setStatus("loading");
