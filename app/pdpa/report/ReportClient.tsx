@@ -40,6 +40,10 @@ export default function ReportClient() {
   const [progress, setProgress] = useState(12);
   const [loadingStep, setLoadingStep] = useState(0);
 
+  const maxAttempts = 12;
+  const baseDelayMs = 5000;
+  const maxDelayMs = 60000;
+
   const loadingSteps = [
     { label: "Preparing data...", max: 35 },
     { label: "Scanning website...", max: 65 },
@@ -94,6 +98,10 @@ export default function ReportClient() {
             setStatus((prev) => (prev === "ready" ? "ready" : "loading"));
             setMessage((prev) => (prev === "Your report is ready. Review below." ? prev : "Report is processing. Please wait..."));
           }
+        } else if (res.status === 202) {
+          // 202 Accepted = content processing
+          setStatus("loading");
+          setMessage("Report is processing. Please wait...");
         } else if (res.status === 404) {
           setStatus("loading");
           setMessage("Report is processing. Please wait...");
@@ -108,8 +116,13 @@ export default function ReportClient() {
       } finally {
         if (!isReady) {
           setAttempts((prev) => prev + 1);
-          if (status !== "ready" && attempts < 60) {
-            timeoutId = setTimeout(load, 5000);
+          const nextAttempt = attempts + 1;
+          if (status !== "ready" && nextAttempt <= maxAttempts) {
+            const delay = Math.min(
+              Math.round(baseDelayMs * Math.pow(1.6, nextAttempt - 1)),
+              maxDelayMs
+            );
+            timeoutId = setTimeout(load, delay);
           }
         }
       }
