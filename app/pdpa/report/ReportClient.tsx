@@ -39,6 +39,7 @@ export default function ReportClient() {
   const [attempts, setAttempts] = useState(0);
   const [progress, setProgress] = useState(12);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [verification, setVerification] = useState<any>(null);
 
   const maxAttempts = 12;
   const baseDelayMs = 5000;
@@ -87,6 +88,9 @@ export default function ReportClient() {
           }
           if (data.url) {
             setReportUrl(data.url);
+          }
+          if (data.verification) {
+            setVerification(data.verification);
           }
           const hasScreenshot = Boolean(data.site_screenshot);
           const screenshotFailed = Boolean(data.screenshot_error);
@@ -251,6 +255,50 @@ export default function ReportClient() {
                   )}
                 </div>
               </div>
+              {verification && verification.tx_hash && (
+                <div className="mt-4 rounded-xl border border-gray-700/50 bg-black/20 p-4">
+                  <div className="flex items-start gap-4">
+                    {verification.qr_image && (
+                      <div className="flex-shrink-0">
+                        <img
+                          src={`data:image/png;base64,${verification.qr_image}`}
+                          alt="Verification QR Code"
+                          className="h-24 w-24 rounded border border-gray-700"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold text-white mb-2">Blockchain Verification</h3>
+                      <p className="text-xs text-gray-400 mb-2">
+                        This report has been cryptographically anchored on the Polygon blockchain for tamper-proof verification.
+                      </p>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-gray-500">Transaction Hash:</span>
+                        <a
+                          href={`https://amoy.polygonscan.com/tx/${verification.tx_hash}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-mono text-teal-400 hover:text-teal-300 transition"
+                        >
+                          {verification.tx_hash.substring(0, 16)}...{verification.tx_hash.substring(verification.tx_hash.length - 8)}
+                        </a>
+                      </div>
+                      {verification.verify_url && (
+                        <div className="mt-2">
+                          <a
+                            href={verification.verify_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs text-teal-400 hover:text-teal-300 transition"
+                          >
+                            Verify Report →
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </section>
 
             {siteScreenshot && (
