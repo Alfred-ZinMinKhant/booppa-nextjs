@@ -233,11 +233,23 @@ export default function ReportClient() {
                   <h2 className="text-2xl font-semibold text-white">Audit Summary</h2>
                   <p className="text-sm text-gray-400">PDPA Quick Scan Report</p>
                 </div>
-                {report?.report_metadata?.report_id && (
-                  <div className="rounded-full border border-gray-700 bg-black/40 px-4 py-2 text-xs text-gray-300">
-                    Report ID: {report.report_metadata.report_id}
-                  </div>
-                )}
+                <div className="flex items-center gap-3">
+                  {reportUrl && (
+                    <a
+                      href={reportUrl}
+                      className="inline-flex items-center justify-center rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-500 transition"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <span className="mr-2">📄</span> Download PDF
+                    </a>
+                  )}
+                  {report?.report_metadata?.report_id && (
+                    <div className="rounded-full border border-gray-700 bg-black/40 px-4 py-2 text-xs text-gray-300">
+                      Report ID: {report.report_metadata.report_id}
+                    </div>
+                  )}
+                </div>
               </div>
             </section>
 
@@ -357,9 +369,9 @@ export default function ReportClient() {
             )}
 
             {reportUrl && (
-              <div className="pt-2">
-                <a href={reportUrl} className="inline-flex items-center px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-500 transition" target="_blank" rel="noreferrer">
-                  Download PDF
+              <div className="pt-6 border-t border-gray-800 mt-8 flex justify-center">
+                <a href={reportUrl} className="inline-flex items-center px-8 py-4 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-500 transition shadow-lg hover:shadow-teal-500/20" target="_blank" rel="noreferrer">
+                  <span className="mr-2 text-xl">⬇️</span> Download Full PDF Report
                 </a>
               </div>
             )}
