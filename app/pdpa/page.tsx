@@ -50,7 +50,7 @@ export default function PDPAPage() {
               Comprehensive PDF report with full DeepSeek AI analysis, blockchain notarization, and court-admissible proof. Perfect for pre-audit preparation.
             </p>
             <Link
-              href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_quick_scan`}
+              href="/pdpa/quick-scan"
               className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3 text-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition shadow-lg"
             >
               Buy Quick Scan Now →
@@ -134,7 +134,7 @@ export default function PDPAPage() {
               </ul>
 
               <Link
-                href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_quick_scan`}
+                href="/pdpa/quick-scan"
                 className="block w-full text-center bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-lg transition"
               >
                 Buy Pro Scan

@@ -188,39 +188,6 @@ export default function ReportClient() {
                 Usually your results will be ready in less than 2 min.
               </div>
             </div>
-
-            <div className="mt-6 text-sm text-gray-400">
-              Enter your email address to access and view your results. A copy of the scan results will be sent by email.
-            </div>
-
-            <div className="mt-4">
-              <input
-                type="email"
-                placeholder="Email address"
-                className="w-full rounded-lg border border-gray-800 bg-black/60 px-4 py-3 text-gray-200 placeholder-gray-500"
-                disabled
-              />
-            </div>
-
-            <div className="mt-4 flex items-start gap-2 text-xs text-gray-500">
-              <input type="checkbox" className="mt-0.5" disabled />
-              <span>
-                I would like to receive exclusive communications on tips, offers, and updates. I can easily revoke this any time by clicking the unsubscribe link or by emailing Cookiebot™ at unsubscribe@usercentrics.com.
-              </span>
-            </div>
-
-            <div className="mt-4 text-xs text-gray-600">
-              By submitting this form I agree to the Usercentrics A/S Terms of Service and Cookiebot™ Privacy Policy.
-            </div>
-
-            <div className="mt-6 flex justify-end">
-              <button
-                className="rounded-lg bg-booppa-blue px-6 py-3 text-sm font-semibold text-white"
-                disabled
-              >
-                GET RESULTS
-              </button>
-            </div>
           </div>
         </div>
       )}
