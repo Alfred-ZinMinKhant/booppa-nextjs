@@ -21,6 +21,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'amoy.polygonscan.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'assets.calendly.com',
         pathname: '/**',
       },

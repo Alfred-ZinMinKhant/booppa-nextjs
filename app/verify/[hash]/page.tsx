@@ -67,7 +67,7 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
         {data.tx_hash ? (
           <Link
             className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-blue-700"
-            href={`https://polygonscan.com/tx/${data.tx_hash}`}
+            href={`https://amoy.polygonscan.com/tx/${data.tx_hash}`}
             target="_blank"
             rel="noreferrer"
           >
