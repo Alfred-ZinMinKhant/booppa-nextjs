@@ -2,15 +2,22 @@
 
 import { useState } from 'react';
 
+interface ScanResult {
+  message: string;
+  ai_summary?: string;
+  company_name?: string;
+  website_url?: string;
+  scan_date?: string;
+}
+
 export default function QRScanPage() {
   const [formData, setFormData] = useState({ website_url: '', company_name: '', email: '' });
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [result, setResult] = useState<ScanResult | null>(null);
   const [error, setError] = useState('');
 
   const normalizeUrl = (url: string): string => {
     let normalized = url.trim();
-    // Add https:// if no protocol specified
     if (!/^https?:\/\//i.test(normalized)) {
       normalized = `https://${normalized}`;
     }
@@ -21,6 +28,7 @@ export default function QRScanPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setResult(null);
     
     const normalizedUrl = normalizeUrl(formData.website_url);
     
@@ -35,19 +43,9 @@ export default function QRScanPage() {
         }),
       });
 
-      if (res.ok && res.headers.get('content-type')?.includes('application/pdf')) {
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Booppa-PDPA-Scan.pdf';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-        setSuccess(true);
-      } else if (res.ok) {
-        setSuccess(true);
+      if (res.ok) {
+        const data = await res.json();
+        setResult(data);
       } else {
         const errorData = await res.json().catch(() => ({ detail: 'Failed to generate scan' }));
         setError(errorData.detail || 'Something went wrong');
@@ -60,7 +58,7 @@ export default function QRScanPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-block bg-teal-500/20 border border-teal-500 rounded-full px-6 py-2 mb-4">
@@ -76,7 +74,80 @@ export default function QRScanPage() {
 
         {/* Main Card */}
         <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 backdrop-blur-sm">
-          {!success ? (
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-12">
+              <div className="relative w-24 h-24 mx-auto mb-6">
+                <svg className="animate-spin w-24 h-24 text-teal-500" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Analyzing Your Website...</h2>
+              <p className="text-gray-400">Running AI compliance scan • This takes about 20 seconds</p>
+            </div>
+          )}
+
+          {/* Results State */}
+          {!loading && result && (
+            <div className="space-y-6">
+              {/* Success Header */}
+              <div className="text-center pb-6 border-b border-gray-700">
+                <div className="w-16 h-16 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  Scan Complete!
+                </h2>
+                <p className="text-gray-400">
+                  {formData.company_name || formData.website_url} • {new Date().toLocaleDateString()}
+                </p>
+              </div>
+
+              {/* AI Summary */}
+              {result.ai_summary && (
+                <div className="bg-gray-900/50 border border-gray-600 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                    <span>🤖</span> AI Compliance Summary
+                  </h3>
+                  <div className="text-gray-300 whitespace-pre-wrap leading-relaxed">
+                    {result.ai_summary}
+                  </div>
+                </div>
+              )}
+
+              {/* Email Confirmation */}
+              <div className="bg-teal-900/20 border border-teal-700 rounded-xl p-4 text-center">
+                <p className="text-teal-300 text-sm">
+                  ✉️ Full results also sent to <strong>{formData.email}</strong>
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <a
+                  href={`${process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000'}/api/stripe/checkout?product=pdpa_quick_scan`}
+                  className="flex-1 bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition text-center"
+                >
+                  Upgrade to PRO – S$69
+                </a>
+                <button
+                  onClick={() => {
+                    setResult(null);
+                    setFormData({ website_url: '', company_name: '', email: '' });
+                  }}
+                  className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition"
+                >
+                  Scan Another
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Form State */}
+          {!loading && !result && (
             <>
               {error && (
                 <div className="mb-6 bg-red-900/20 border border-red-700 rounded-lg p-4">
@@ -134,56 +205,12 @@ export default function QRScanPage() {
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white py-3 rounded-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white py-3 rounded-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition transform hover:scale-[1.02]"
                 >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Generating Report...
-                    </span>
-                  ) : (
-                    '⚡ Get Free Scan'
-                  )}
+                  ⚡ Get Free Scan
                 </button>
               </form>
             </>
-          ) : (
-            <div className="text-center py-4">
-              <div className="mb-6">
-                <div className="w-16 h-16 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Report Sent!
-                </h2>
-                <p className="text-gray-400 mb-6">
-                  Check your email for your free AI compliance summary
-                </p>
-              </div>
-              
-              <a
-                href="/sme"
-                className="inline-block bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3 rounded-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition transform hover:scale-[1.02]"
-              >
-                Fix All Issues – SGD 69
-              </a>
-              
-              <button
-                onClick={() => {
-                  setSuccess(false);
-                  setFormData({ website_url: '', company_name: '', email: '' });
-                }}
-                className="block w-full mt-4 text-gray-400 hover:text-white transition"
-              >
-                Scan Another Website
-              </button>
-            </div>
           )}
         </div>
 
