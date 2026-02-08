@@ -8,8 +8,6 @@ import { Menu, X, ArrowRight } from 'lucide-react';
 
 const navigation = [
   { name: 'PDPA Suite', href: '/pdpa' },
-  { name: 'Compliance Suite', href: '/compliance' },
-  { name: 'Compliance Notarization', href: '/compliance-notarization' },
   { name: 'Free PDPA Scan', href: '/qr-scan' },
   { name: 'Pricing', href: '/pricing' },
   { name: 'Blog', href: '/blog' },

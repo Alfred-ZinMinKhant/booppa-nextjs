@@ -23,11 +23,11 @@ export default function Footer() {
             </p>
           </div>
           <div>
-            <h4 className="font-bold mb-4">Suites</h4>
+            <h4 className="font-bold mb-4">Product</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link href="/pdpa" className="hover:text-booppa-blue transition-colors">PDPA Suite</Link></li>
-              <li><Link href="/compliance" className="hover:text-booppa-purple transition-colors">Compliance Suite</Link></li>
-              <li><Link href="/compliance-notarization" className="hover:text-booppa-green transition-colors">Compliance Notarization</Link></li>
+              <li><Link href="/pdpa" className="hover:text-booppa-blue transition-colors">PDPA Compliance</Link></li>
+              <li><Link href="/qr-scan" className="hover:text-teal-400 transition-colors">Free PDPA Scan</Link></li>
+              <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
             </ul>
           </div>
           <div>
