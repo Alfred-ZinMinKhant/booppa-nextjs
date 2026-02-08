@@ -3,136 +3,64 @@ import { Check, Shield, Truck, Zap } from 'lucide-react';
 
 export const metadata = {
   title: 'Pricing | BOOPPA – Blockchain Compliance & Traceability',
-  description: 'Transparent pricing for PDPA, Compliance, and Compliance Notarization blockchain solutions. One-time and subscription packages for every business size.'
+  description: 'Simple, transparent pricing for PDPA compliance. Choose from Free basic scan, Pro blockchain notarization, or Enterprise continuous monitoring.'
 };
 
-const pdpaPlans = [
+const pricingTiers = [
   {
-    name: 'PDPA Pre-Audit Snapshot',
-    price: 'SGD 69',
-    subtitle: 'One-time PDPA Website Assessment',
+    name: 'FREE',
+    price: 'S$0',
+    subtitle: 'Basic Web Scan',
     features: [
-      'Point-in-time technical assessment of your website against PDPA obligations',
-      '12-page compliance gap report identifying risks and missing controls',
-      'Timestamped snapshot suitable for internal records',
-      'No subscription required',
-      'Can be upgraded to full compliance coverage at any time',
+      'Basic web scan analysis',
+      'Light AI compliance summary',
+      'Delivered via email',
+      'No PDF report',
+      'No blockchain notarization',
+      'Limited to once per month per email',
+    ],
+    link: '/qr-scan',
+    button: 'Get Free Scan',
+    color: 'gray',
+    bgColor: 'bg-gray-900/30',
+    borderColor: 'border-gray-700',
+  },
+  {
+    name: 'PRO',
+    price: 'S$69',
+    subtitle: 'Per Scan',
+    features: [
+      'Full DeepSeek AI analysis',
+      'Comprehensive PDF compliance report',
+      'Blockchain notarization on Polygon',
+      'QR code for verification',
+      'Court-admissible audit trail',
+      'Permanent blockchain proof',
     ],
     link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_quick_scan`,
-    button: 'Get PDPA Snapshot',
-    color: 'green',
+    button: 'Buy Pro Scan',
+    color: 'teal',
+    bgColor: 'bg-teal-900/20',
+    borderColor: 'border-teal-700',
+    popular: true,
   },
   {
-    name: 'PDPA Operational Compliance – Basic',
-    price: 'SGD 299 / month',
-    subtitle: 'Ongoing PDPA Coverage for SMEs & Digital Businesses',
+    name: 'ENTERPRISE',
+    price: 'S$299',
+    subtitle: 'Per Month',
     features: [
-      'Continuous handling of data-subject requests within PDPA timelines',
-      'Automated consent and activity records for audit purposes',
-      'Compliance dashboard with exportable audit reports',
-      'Standard privacy policy and cookie consent templates',
-      'Email support for compliance operations',
-      'Periodic compliance reporting for internal review',
+      'Continuous vendor monitoring',
+      'Enterprise compliance dashboard',
+      'Multi-vendor tracking & alerts',
+      'Automated compliance workflows',
+      'Priority support',
+      'Custom integrations available',
     ],
     link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_basic`,
-    button: 'Start PDPA Basic',
-    color: 'blue',
-  },
-  {
-    name: 'PDPA Operational Compliance – Pro',
-    price: 'SGD 799 / month',
-    subtitle: 'Advanced PDPA Coverage for Regulated & Growing Organizations',
-    features: [
-      'Unlimited data-subject request handling',
-      'Advanced compliance reporting and analytics',
-      'Custom integrations with internal systems',
-      'Priority support',
-      'Automated compliance workflows aligned with PDPA requirements',
-    ],
-    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_pro`,
-    button: 'Start PDPA Pro',
+    button: 'Contact Sales',
     color: 'purple',
-  },
-];
-
-const compliancePlans = [
-  {
-    name: 'Standard Suite',
-    price: 'SGD 1,299/mo',
-    subtitle: 'Growing Enterprises',
-    features: [
-      'Everything in PDPA Pro +',
-      'MAS compliance automation',
-      'Compliance notarization evidence tracking',
-      'Real-time compliance dashboard',
-      '5,000 blockchain notarizations/month',
-      'Advanced audit trail generation',
-      'Priority email support',
-    ],
-    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_standard`,
-    button: 'Start Standard Suite',
-    color: 'purple',
-  },
-  {
-    name: 'Pro Suite',
-    price: 'SGD 1,999/mo',
-    subtitle: 'Enterprise & Regulated',
-    features: [
-      'Everything in Standard +',
-      'Custom API integrations',
-      'Unlimited blockchain notarizations',
-      'Dedicated compliance manager',
-      '24/7 support',
-    ],
-    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_pro`,
-    button: 'Start Pro Suite',
-    color: 'pink',
-  },
-];
-
-const supplyChainPlans = [
-  {
-    name: 'Single Document',
-    price: 'SGD 69',
-    subtitle: 'One-time notarization',
-    features: [
-      '1 Document notarization',
-      'Polygon Blockchain evidence',
-      'Court-admissible audit trail',
-      'QR code link generation',
-    ],
-    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_notarization_1`,
-    button: 'Buy Now',
-    color: 'green',
-  },
-  {
-    name: 'Small Batch',
-    price: 'SGD 390',
-    subtitle: '10 documents',
-    features: [
-      '10 Document notarizations',
-      'Bulk upload capability',
-      'API access included',
-      '3 months data retention',
-    ],
-    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_notarization_10`,
-    button: 'Buy Now',
-    color: 'blue',
-  },
-  {
-    name: 'Enterprise Batch',
-    price: 'SGD 1,750',
-    subtitle: '50 documents',
-    features: [
-      '50 Document notarizations',
-      'Priority processing',
-      'Dedicated support channel',
-      'Customized reporting dashboard',
-      '12 months data retention',
-    ],
-    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_notarization_50`,
-    button: 'Buy Now',
-    color: 'purple',
+    bgColor: 'bg-purple-900/20',
+    borderColor: 'border-purple-700',
   },
 ];
 
@@ -144,29 +72,41 @@ type PlanCardProps = {
   link: string;
   button: string;
   color: string;
+  bgColor: string;
+  borderColor: string;
+  popular?: boolean;
 };
 
-function PlanCard({ name, price, subtitle, features, link, button, color }: PlanCardProps) {
+function PlanCard({ name, price, subtitle, features, link, button, bgColor, borderColor, popular }: PlanCardProps) {
   return (
-    <div className={`bg-gray-900/50 rounded-2xl p-8 border border-gray-800 flex flex-col hover:shadow-2xl hover:shadow-${color}-900 transition-all`}>
+    <div className={`${bgColor} rounded-2xl p-8 border-2 ${borderColor} flex flex-col hover:shadow-2xl transition-all relative`}>
+      {popular && (
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-teal-500 text-black px-4 py-1 rounded-full text-sm font-bold">
+          MOST POPULAR
+        </div>
+      )}
       <div className="text-center mb-6">
         <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
         <p className="text-gray-400">{subtitle}</p>
       </div>
       <div className="text-center mb-8">
-        <div className={`text-5xl font-black text-${color}-400 mb-2`}>{price}</div>
+        <div className="text-5xl font-black text-white mb-2">{price}</div>
       </div>
       <ul className="space-y-4 mb-8 flex-grow">
         {features.map((feature: string) => (
           <li key={feature} className="flex items-start text-gray-300">
-            <Check className="w-5 h-5 text-green-400 mr-3 flex-shrink-0 mt-0.5" />
+            <Check className="w-5 h-5 text-teal-400 mr-3 flex-shrink-0 mt-0.5" />
             {feature}
           </li>
         ))}
       </ul>
       <Link
         href={link}
-        className={`block w-full text-center bg-${color}-700 hover:bg-${color}-600 text-white font-semibold py-3 px-6 rounded-lg transition mt-auto`}
+        className={`block w-full text-center ${
+          popular 
+            ? 'bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600' 
+            : 'bg-gray-700 hover:bg-gray-600'
+        } text-white font-semibold py-3 px-6 rounded-lg transition mt-auto`}
       >
         {button}
       </Link>
@@ -176,55 +116,88 @@ function PlanCard({ name, price, subtitle, features, link, button, color }: Plan
 
 export default function PricingPage() {
   return (
-    <main className="pt-16 pb-24">
+    <main className="pt-16 pb-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4">Audit-Ready Compliance Pricing</h1>
-          <p className="text-lg text-gray-300 mb-4">Choose the level of evidence your organization needs. Compliance is not a checklist. It’s the ability to prove what was compliant, when, and how.</p>
-          <p className="text-gray-400 mb-6">BOOPPA provides verifiable compliance evidence for PDPA, MAS, and operational requirements — from one-time pre-audit snapshots to full enterprise audit coverage.</p>
-          <div className="mt-6">
-            <Link href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_quick_scan`} className="inline-flex items-center justify-center rounded-lg bg-green-400 px-6 py-3 text-lg font-semibold text-black hover:bg-green-300 transition">Start with a PDPA Snapshot – SGD 69</Link>
-            <div className="text-sm text-gray-400 mt-2">No subscription • Upgrade anytime</div>
-          </div>
-          <p className="text-gray-400 mt-6">Every BOOPPA plan produces evidence you can retain, export, and defend.</p>
+        {/* Header */}
+        <div className="text-center mb-16 max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4">
+            Simple, Transparent Pricing
+          </h1>
+          <p className="text-lg text-gray-300 mb-4">
+            Choose the compliance solution that fits your needs
+          </p>
+          <p className="text-gray-400">
+            From free basic scans to enterprise-grade continuous monitoring
+          </p>
         </div>
-        {/* PDPA Pricing */}
-        <section className="mb-20">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">BOOPPA Pricing
-            <div className="text-sm font-normal text-gray-400 mt-2">Audit-Ready Compliance. Verifiable Evidence. Reduced Risk.</div>
+
+        {/* Pricing Cards */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+          {pricingTiers.map((tier) => (
+            <PlanCard key={tier.name} {...tier} />
+          ))}
+        </div>
+
+        {/* FAQ Section */}
+        <section className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">
+            Frequently Asked Questions
           </h2>
-          <p className="text-center text-gray-400 max-w-3xl mx-auto mb-8">Compliance is not about statements. It is about what you can prove — and when. BOOPPA provides automated compliance evidence, designed to help organizations demonstrate PDPA, MAS, and operational compliance with defensible, time-stamped audit trails.</p>
-          <h3 className="text-2xl text-white font-semibold text-center mb-6">PDPA Pre-Audit Snapshot & Operational Plans</h3>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {pdpaPlans.map((plan) => (
-              <PlanCard key={plan.name} {...plan} />
-            ))}
-          </div>
-        </section>
-        {/* Compliance Suite Pricing */}
-        <section className="mb-20">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Compliance Suite</h2>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {compliancePlans.map((plan) => (
-              <PlanCard key={plan.name} {...plan} />
-            ))}
-          </div>
-        </section>
-        {/* Supply Chain Pricing */}
-        <section>
-          <h2 className="text-3xl font-bold text-white mb-2 text-center">Supply Chain Evidence Notarization</h2>
-          <p className="text-center text-gray-400 mb-6">Court-admissible compliance records for documents & vendors. Independent from PDPA subscriptions.</p>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {supplyChainPlans.map((plan) => (
-              <PlanCard key={plan.name} {...plan} />
-            ))}
+          
+          <div className="space-y-6">
+            <div className="bg-gray-900/30 rounded-xl p-6 border border-gray-800">
+              <h3 className="text-xl font-semibold text-white mb-2">
+                What's included in the free scan?
+              </h3>
+              <p className="text-gray-400">
+                The free tier includes a basic website scan with light AI analysis. You'll receive a compliance summary via email. Perfect for getting started, but limited to once per month per email address.
+              </p>
+            </div>
+
+            <div className="bg-gray-900/30 rounded-xl p-6 border border-gray-800">
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Why choose Pro over Free?
+              </h3>
+              <p className="text-gray-400">
+                Pro ($69) gives you a comprehensive PDF report with full DeepSeek AI analysis, plus blockchain notarization for court-admissible proof. It's a one-time payment with permanent blockchain evidence.
+              </p>
+            </div>
+
+            <div className="bg-gray-900/30 rounded-xl p-6 border border-gray-800">
+              <h3 className="text-xl font-semibold text-white mb-2">
+                When should I consider Enterprise?
+              </h3>
+              <p className="text-gray-400">
+                Enterprise is ideal for organizations that need continuous compliance monitoring across multiple vendors, automated workflows, and a centralized dashboard. At $299/month, it includes priority support and custom integrations.
+              </p>
+            </div>
+
+            <div className="bg-gray-900/30 rounded-xl p-6 border border-gray-800">
+              <h3 className="text-xl font-semibold text-white mb-2">
+                What is blockchain notarization?
+              </h3>
+              <p className="text-gray-400">
+                We record a cryptographic proof of your compliance report on the Polygon blockchain. This creates an immutable, timestamped record that can be independently verified and is court-admissible as evidence.
+              </p>
+            </div>
           </div>
         </section>
 
-        <section className="mt-12">
-          <div className="bg-gray-900/30 rounded-2xl p-8 border border-gray-800 text-center">
-            <h3 className="text-xl font-bold text-white mb-4">Final Compliance Message</h3>
-            <p className="text-gray-300">BOOPPA does not sell compliance promises. BOOPPA delivers audit-ready evidence. If regulators, partners, banks, or insurers ask “Can you prove this?” — you will have a documented answer.</p>
+        {/* CTA Section */}
+        <section className="mt-16 text-center">
+          <div className="bg-gradient-to-r from-teal-900/30 to-emerald-900/30 rounded-2xl p-8 border border-teal-700">
+            <h3 className="text-2xl font-bold text-white mb-4">
+              Start with a Free Scan Today
+            </h3>
+            <p className="text-gray-300 mb-6">
+              Get instant insights into your PDPA compliance status. No credit card required.
+            </p>
+            <Link 
+              href="/qr-scan" 
+              className="inline-block bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3 rounded-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition"
+            >
+              Get Free Scan →
+            </Link>
           </div>
         </section>
       </div>
