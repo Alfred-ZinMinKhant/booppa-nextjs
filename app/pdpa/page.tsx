@@ -22,17 +22,38 @@ export default function PDPAPage() {
         </div>
 
         {/* Free Scan Callout */}
-        <div id="free-scan" className="mb-12">
-          <div className="bg-gradient-to-r from-teal-900/30 to-emerald-900/30 rounded-2xl p-8 border border-teal-700 text-center">
-            <h2 className="text-3xl font-bold text-white mb-3">Try It Free First</h2>
+        <div id="free-scan" className="mb-8">
+          <div className="bg-gradient-to-r from-gray-900/50 to-gray-800/50 rounded-2xl p-8 border border-gray-700 text-center">
+            <h2 className="text-2xl font-bold text-white mb-3">🎁 Free PDPA Scan</h2>
             <p className="text-gray-300 text-lg mb-6">
               Get a quick compliance snapshot in seconds. No credit card required.
             </p>
             <Link
               href="/qr-scan"
-              className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3 font-semibold hover:from-teal-600 hover:to-emerald-600 transition"
+              className="inline-flex items-center justify-center rounded-lg bg-gray-700 hover:bg-gray-600 text-white px-8 py-3 font-semibold transition"
             >
               Start Free Scan →
+            </Link>
+          </div>
+        </div>
+
+        {/* Quick Scan Callout - S$69 */}
+        <div id="quick-scan" className="mb-12">
+          <div className="bg-gradient-to-r from-teal-900/30 to-emerald-900/30 rounded-2xl p-8 border-2 border-teal-500 text-center relative overflow-hidden">
+            <div className="absolute top-4 right-4 bg-teal-500 text-black px-3 py-1 rounded-full text-xs font-bold">
+              MOST POPULAR
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-3">⚡ PDPA Quick Scan</h2>
+            <div className="text-5xl font-black text-teal-400 mb-2">S$69</div>
+            <p className="text-gray-400 mb-4">One-time payment • Full compliance report</p>
+            <p className="text-gray-300 text-lg mb-6 max-w-2xl mx-auto">
+              Comprehensive PDF report with full DeepSeek AI analysis, blockchain notarization, and court-admissible proof. Perfect for pre-audit preparation.
+            </p>
+            <Link
+              href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_quick_scan`}
+              className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3 text-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition shadow-lg"
+            >
+              Buy Quick Scan Now →
             </Link>
           </div>
         </div>
