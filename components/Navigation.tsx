@@ -1,39 +1,48 @@
 'use client'
 
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Menu, X } from 'lucide-react';
 
 const navigation = [
-  { name: 'PDPA Suite', href: '/pdpa' },
-  { name: 'Free PDPA Scan', href: '/qr-scan' },
+  { name: 'Home', href: '/' },
+  { name: 'PDPA Scan', href: '/pdpa' },
+  { name: 'Compliance', href: '/compliance' },
+  { name: 'Notarization', href: '/notarization' },
+  { name: 'Vendor Proof', href: '/vendor' },
+  { name: 'Enterprise', href: '/enterprise' },
   { name: 'Pricing', href: '/pricing' },
+  { name: 'Verify', href: '/verify' },
   { name: 'Blog', href: '/blog' },
-  { name: 'Book Demo', href: '/demo' },
+  { name: 'Demo', href: '/demo' },
+  { name: 'Support', href: '/support' },
 ];
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-gray-800/70">
-      <nav className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#0f172a]/95 shadow-md' : 'bg-[#0f172a]'} backdrop-blur-md border-b border-white/10`}>
+      <nav className="mx-auto max-w-[1400px] px-6 py-4 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="flex lg:flex-1 items-center">
-            <Link href="/" className="-m-1.5 p-1.5 flex items-center">
-              <Image
-                src="/logo.png"
-                alt="BOOPPA Logo"
-                width={160}
-                height={48}
-                priority
-                className="h-12 w-auto"
-              />
+            <Link href="/" className="flex items-center gap-2 font-bold text-xl text-white tracking-wider">
+              <span className="text-[#10b981] text-2xl">◉</span>
+              <span>BOOPPA</span>
             </Link>
           </div>
+          
           <div className="flex lg:hidden">
             <button
               type="button"
@@ -44,80 +53,65 @@ export default function Navigation() {
               <Menu className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
+
           <div className="hidden lg:flex lg:gap-x-8">
-            {navigation.map((item) => (
-              <Link 
-                key={item.name} 
-                href={item.href} 
-                className="text-sm font-semibold leading-6 text-gray-300 hover:text-booppa-blue transition-colors"
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
-          <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            <Link 
-              href="/pdpa#quick-scan" 
-              className="text-sm font-semibold leading-6 text-booppa-green hover:text-booppa-green/80 flex items-center"
-            >
-              PDPA Quick Scan <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
+            {navigation.map((item) => {
+              const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
+              return (
+                <Link 
+                  key={item.name} 
+                  href={item.href} 
+                  className={`text-sm font-medium transition-colors relative py-1 ${isActive ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}
+                >
+                  {item.name}
+                  {isActive && (
+                    <span className="absolute bottom-[-1.5rem] left-0 right-0 h-[2px] bg-[#10b981]" />
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </div>
 
         {/* Mobile Menu */}
-        <div className={`lg:hidden ${mobileMenuOpen ? 'block' : 'hidden'}`}>
-          <div className="fixed inset-0 z-[996] bg-black/80" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed top-0 left-0 right-0 bottom-0 h-screen z-[997] w-full overflow-y-auto bg-gray-900 px-6 py-6">
+        {mobileMenuOpen && (
+          <div className="lg:hidden">
+            <div className="fixed inset-0 z-[996] bg-black/80 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+            <div className="fixed top-0 left-0 right-0 bottom-0 h-screen z-[997] w-full overflow-y-auto bg-[#0f172a] px-6 py-6">
               <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
-                <Image
-                  src="/logo.png"
-                  alt="BOOPPA Logo"
-                  width={140}
-                  height={42}
-                  priority
-                  className="h-10 w-auto"
-                />
-              </Link>
-              
-              <button
-                type="button"
-                className="-m-2.5 rounded-md p-2.5 text-gray-400"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span className="sr-only">Close menu</span>
-                <X className="h-6 w-6" aria-hidden="true" />
-              </button>
-            </div>
-            <div className="mt-6 flow-root">
-              <div className="-my-6 divide-y divide-gray-700">
-                <div className="space-y-2 py-6">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800"
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-                <div className="py-6">
-                  <Link
-                    href="/pdpa#quick-scan"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-booppa-green hover:bg-gray-800"
-                  >
-                    PDPA Quick Scan
-                  </Link>
-                  
+                <Link href="/" className="flex items-center gap-2 font-bold text-xl text-white tracking-wider" onClick={() => setMobileMenuOpen(false)}>
+                  <span className="text-[#10b981] text-2xl">◉</span>
+                  <span>BOOPPA</span>
+                </Link>
+                
+                <button
+                  type="button"
+                  className="-m-2.5 rounded-md p-2.5 text-gray-400"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className="sr-only">Close menu</span>
+                  <X className="h-6 w-6" aria-hidden="true" />
+                </button>
+              </div>
+              <div className="mt-8 flow-root">
+                <div className="divide-y divide-white/10">
+                  <div className="space-y-2 py-6">
+                    {navigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`-mx-3 block rounded-lg px-3 py-3 text-base font-semibold transition-colors ${pathname === item.href ? 'text-[#10b981] bg-white/5' : 'text-white hover:bg-white/5'}`}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </nav>
     </header>
   );

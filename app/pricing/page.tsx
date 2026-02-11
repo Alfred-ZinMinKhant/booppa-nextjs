@@ -1,206 +1,267 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Shield, Truck, Zap } from 'lucide-react';
-
-export const metadata = {
-  title: 'Pricing | BOOPPA – Blockchain Compliance & Traceability',
-  description: 'Simple, transparent pricing for PDPA compliance. Choose from Free basic scan, Pro blockchain notarization, or Enterprise continuous monitoring.'
-};
-
-const pricingTiers = [
-  {
-    name: 'FREE',
-    price: 'S$0',
-    subtitle: 'Basic Web Scan',
-    features: [
-      'Basic web scan analysis',
-      'Light AI compliance summary',
-      'Delivered via email',
-      'No PDF report',
-      'No blockchain notarization',
-      'Limited to once per month per email',
-    ],
-    link: '/qr-scan',
-    button: 'Get Free Scan',
-    color: 'gray',
-    bgColor: 'bg-gray-900/30',
-    borderColor: 'border-gray-700',
-  },
-  {
-    name: 'PRO',
-    price: 'S$69',
-    subtitle: 'Per Scan',
-    features: [
-      'Full DeepSeek AI analysis',
-      'Comprehensive PDF compliance report',
-      'Blockchain notarization on Polygon',
-      'QR code for verification',
-      'Court-admissible audit trail',
-      'Permanent blockchain proof',
-    ],
-    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_quick_scan`,
-    button: 'Buy Pro Scan',
-    color: 'teal',
-    bgColor: 'bg-teal-900/20',
-    borderColor: 'border-teal-700',
-    popular: true,
-  },
-  {
-    name: 'ENTERPRISE',
-    price: 'S$299',
-    subtitle: 'Per Month',
-    features: [
-      'Continuous vendor monitoring',
-      'Enterprise compliance dashboard',
-      'Multi-vendor tracking & alerts',
-      'Automated compliance workflows',
-      'Priority support',
-      'Custom integrations available',
-    ],
-    link: `${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_basic`,
-    button: 'Contact Sales',
-    color: 'purple',
-    bgColor: 'bg-purple-900/20',
-    borderColor: 'border-purple-700',
-  },
-];
-
-type PlanCardProps = {
-  name: string;
-  price: string;
-  subtitle: string;
-  features: string[];
-  link: string;
-  button: string;
-  color: string;
-  bgColor: string;
-  borderColor: string;
-  popular?: boolean;
-};
-
-function PlanCard({ name, price, subtitle, features, link, button, bgColor, borderColor, popular }: PlanCardProps) {
-  return (
-    <div className={`${bgColor} rounded-2xl p-8 border-2 ${borderColor} flex flex-col hover:shadow-2xl transition-all relative`}>
-      {popular && (
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-teal-500 text-black px-4 py-1 rounded-full text-sm font-bold">
-          MOST POPULAR
-        </div>
-      )}
-      <div className="text-center mb-6">
-        <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
-        <p className="text-gray-400">{subtitle}</p>
-      </div>
-      <div className="text-center mb-8">
-        <div className="text-5xl font-black text-white mb-2">{price}</div>
-      </div>
-      <ul className="space-y-4 mb-8 flex-grow">
-        {features.map((feature: string) => (
-          <li key={feature} className="flex items-start text-gray-300">
-            <Check className="w-5 h-5 text-teal-400 mr-3 flex-shrink-0 mt-0.5" />
-            {feature}
-          </li>
-        ))}
-      </ul>
-      <Link
-        href={link}
-        className={`block w-full text-center ${
-          popular 
-            ? 'bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600' 
-            : 'bg-gray-700 hover:bg-gray-600'
-        } text-white font-semibold py-3 px-6 rounded-lg transition mt-auto`}
-      >
-        {button}
-      </Link>
-    </div>
-  );
-}
 
 export default function PricingPage() {
+  const [activeTab, setActiveTab] = useState<'oneoff' | 'monthly' | 'enterprise'>('oneoff');
+
   return (
-    <main className="pt-16 pb-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4">
-            Simple, Transparent Pricing
-          </h1>
-          <p className="text-lg text-gray-300 mb-4">
-            Choose the compliance solution that fits your needs
-          </p>
-          <p className="text-gray-400">
-            From free basic scans to enterprise-grade continuous monitoring
-          </p>
-        </div>
-
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-          {pricingTiers.map((tier) => (
-            <PlanCard key={tier.name} {...tier} />
-          ))}
-        </div>
-
-        {/* FAQ Section */}
-        <section className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">
-            Frequently Asked Questions
-          </h2>
-          
-          <div className="space-y-6">
-            <div className="bg-gray-900/30 rounded-xl p-6 border border-gray-800">
-              <h3 className="text-xl font-semibold text-white mb-2">
-                What's included in the free scan?
-              </h3>
-              <p className="text-gray-400">
-                The free tier includes a basic website scan with light AI analysis. You'll receive a compliance summary via email. Perfect for getting started, but limited to once per month per email address.
-              </p>
-            </div>
-
-            <div className="bg-gray-900/30 rounded-xl p-6 border border-gray-800">
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Why choose Pro over Free?
-              </h3>
-              <p className="text-gray-400">
-                Pro ($69) gives you a comprehensive PDF report with full DeepSeek AI analysis, plus blockchain notarization for court-admissible proof. It's a one-time payment with permanent blockchain evidence.
-              </p>
-            </div>
-
-            <div className="bg-gray-900/30 rounded-xl p-6 border border-gray-800">
-              <h3 className="text-xl font-semibold text-white mb-2">
-                When should I consider Enterprise?
-              </h3>
-              <p className="text-gray-400">
-                Enterprise is ideal for organizations that need continuous compliance monitoring across multiple vendors, automated workflows, and a centralized dashboard. At $299/month, it includes priority support and custom integrations.
-              </p>
-            </div>
-
-            <div className="bg-gray-900/30 rounded-xl p-6 border border-gray-800">
-              <h3 className="text-xl font-semibold text-white mb-2">
-                What is blockchain notarization?
-              </h3>
-              <p className="text-gray-400">
-                We record a cryptographic proof of your compliance report on the Polygon blockchain. This creates an immutable, timestamped record that can be independently verified and is court-admissible as evidence.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-teal-900/30 to-emerald-900/30 rounded-2xl p-8 border border-teal-700">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              Start with a Free Scan Today
-            </h3>
-            <p className="text-gray-300 mb-6">
-              Get instant insights into your PDPA compliance status. No credit card required.
+    <main className="bg-white min-h-screen">
+      <section className="py-24 px-6">
+        <div className="container max-w-[1200px] mx-auto">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl lg:text-6xl font-black mb-6 text-[#0f172a]">Transparent Pricing</h1>
+            <p className="text-xl text-[#64748b] max-w-3xl mx-auto leading-relaxed">
+              No hidden fees. No "contact sales" gatekeeping. Clear costs for Singapore compliance infrastructure.
             </p>
-            <Link 
-              href="/qr-scan" 
-              className="inline-block bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3 rounded-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition"
-            >
-              Get Free Scan →
-            </Link>
           </div>
-        </section>
-      </div>
+
+          <div className="flex justify-center mb-16">
+            <div className="bg-[#f8fafc] p-1.5 rounded-full border border-[#e2e8f0] flex gap-2">
+              {(['oneoff', 'monthly', 'enterprise'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-8 py-3 rounded-full text-sm font-bold transition-all ${
+                    activeTab === tab
+                      ? 'bg-[#10b981] text-white shadow-lg'
+                      : 'text-[#64748b] hover:text-[#0f172a]'
+                  }`}
+                >
+                  {tab === 'oneoff' ? 'One-Time' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ONE-TIME PRICING */}
+          {activeTab === 'oneoff' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Snapshot</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 69</div>
+                <p className="text-sm text-[#64748b] mb-8">One-time technical scan</p>
+                <ul className="space-y-4 mb-10">
+                  {[
+                    '8-section PDPA assessment',
+                    'Risk severity report',
+                    'Specific legislation references',
+                    'Blockchain-anchored timestamp',
+                    'QR verification link',
+                    'Downloadable PDF evidence'
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/pdpa" className="btn btn-primary w-full shadow-lg">Start Scan</Link>
+              </div>
+
+              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Vendor Proof</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 69</div>
+                <p className="text-sm text-[#64748b] mb-8">Reusable procurement evidence</p>
+                <ul className="space-y-4 mb-10">
+                  {[
+                    'Complete PDPA evidence scan',
+                    'Blockchain notarization',
+                    'QR verification portal',
+                    'Polygonscan proof URL',
+                    'Valid for 12 months',
+                    'Reusable for RFPs'
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/vendor" className="btn btn-primary w-full shadow-lg">Create Proof</Link>
+              </div>
+
+              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Document Notarization</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 69</div>
+                <p className="text-sm text-[#64748b] mb-8">Single document</p>
+                <ul className="space-y-4 mb-10">
+                  {[
+                    'Immutable SHA-256 hash',
+                    'Blockchain timestamp',
+                    'QR verification link',
+                    'Court-admissible proof',
+                    'Polygonscan URL'
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8 leading-relaxed">
+                  Batch pricing: 10 docs (SGD 390) | 50 docs (SGD 1,750)
+                </p>
+                <Link href="/notarization" className="btn btn-outline w-full">View Packages</Link>
+              </div>
+            </div>
+          )}
+
+          {/* MONTHLY PRICING */}
+          {activeTab === 'monthly' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Basic</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 299<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">Operational compliance monitoring</p>
+                <ul className="space-y-4 mb-10">
+                  {[
+                    'Compliance dashboard',
+                    '10 DSAR workflows/month',
+                    'Consent activity logging',
+                    'Monthly compliance reports',
+                    'Privacy policy templates',
+                    'Email support'
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">Best for: SMEs, digital companies</p>
+                <Link href="/demo" className="btn btn-primary w-full shadow-lg">Start Trial</Link>
+              </div>
+
+              <div className="bg-white p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-xl relative scale-105 z-10 hover:translate-y-[-5px] transition-all">
+                <div className="absolute top-[-15px] right-10 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Most Popular</div>
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Pro</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 799<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">Advanced compliance operations</p>
+                <ul className="space-y-4 mb-10">
+                  <li className="font-bold text-[#0f172a] text-sm">Everything in Basic, plus:</li>
+                  {[
+                    'Unlimited DSAR workflows',
+                    'Advanced reporting & analytics',
+                    'Workflow automation',
+                    'Internal integrations (Slack, Jira)',
+                    'Priority support (4h response)',
+                    'Quarterly compliance review calls'
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">Best for: Growth-stage companies, regulated entities</p>
+                <Link href="/demo" className="btn btn-primary w-full shadow-lg">Book Demo</Link>
+              </div>
+
+              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Standard Suite</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 1,299<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">MAS + MTCS ready</p>
+                <ul className="space-y-4 mb-10">
+                  <li className="font-bold text-[#0f172a] text-sm">Everything in PDPA Pro, plus:</li>
+                  {[
+                    'MAS operational workflows (TRM, Notice 644)',
+                    '5,000 notarizations/month included',
+                    'Enterprise dashboard',
+                    'Realtime audit trail',
+                    'Compliance health score',
+                    'Evidence export API'
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">Best for: Mid-market enterprises, FinTech</p>
+                <Link href="/demo" className="btn btn-outline w-full">Contact Sales</Link>
+              </div>
+            </div>
+          )}
+
+          {/* ENTERPRISE PRICING */}
+          {activeTab === 'enterprise' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+              <div className="bg-white p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-xl hover:translate-y-[-5px] transition-all">
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Pro Suite</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 1,999<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">Full evidence infrastructure</p>
+                <ul className="space-y-4 mb-10">
+                  <li className="font-bold text-[#0f172a] text-sm">Everything in Standard Suite, plus:</li>
+                  {[
+                    'Unlimited blockchain notarizations',
+                    'Custom API access (RESTful + webhooks)',
+                    'Dedicated compliance manager',
+                    '24/7 priority support',
+                    'White-label reports (your branding)',
+                    'Monthly compliance strategy calls',
+                    'SLA guarantees (99.9% uptime)'
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">Best for: Enterprise procurement teams, regulated organizations</p>
+                <Link href="/demo" className="btn btn-primary w-full shadow-lg">Book Enterprise Demo</Link>
+              </div>
+
+              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-bold mb-6 text-[#0f172a]">Custom Enterprise</h3>
+                  <div className="text-3xl font-bold text-[#0f172a] mb-8">Contact Us</div>
+                  <ul className="space-y-4 mb-8">
+                    {[
+                      '100,000+ notarizations/month',
+                      'On-premise deployment option',
+                      'Custom compliance frameworks',
+                      'Multi-subsidiary management',
+                      'Dedicated infrastructure',
+                      'Custom SLAs',
+                      'Regulatory filing assistance',
+                      'Compliance team training'
+                    ].map((f, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                        <span className="text-[#10b981] font-bold">✓</span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <Link href="/demo" className="btn btn-outline w-full mt-auto">Contact Enterprise Sales</Link>
+              </div>
+            </div>
+          )}
+
+          {/* FAQ Section */}
+          <div className="bg-[#f8fafc] p-8 lg:p-24 rounded-[4rem] border border-[#e2e8f0]">
+            <h2 className="text-3xl lg:text-4xl font-black mb-16 text-center text-[#0f172a]">Pricing FAQ</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12 max-w-5xl mx-auto">
+              {[
+                { q: 'Is this PDPC-approved certification?', a: 'No. BOOPPA provides technical evidence and documentation tools. This is not regulatory certification or legal advice. We help you generate operational compliance evidence — you remain responsible for actual compliance.' },
+                { q: 'Can I cancel anytime?', a: 'Yes. Monthly plans are cancel-anytime with no long-term contracts. Your historical evidence remains accessible for 90 days after cancellation.' },
+                { q: 'Do you offer refunds?', a: 'For one-time scans: Yes, if we\'re unable to successfully scan your website due to technical issues (within 7 days). For monthly plans: Pro-rated refunds for first month only.' },
+                { q: 'What payment methods do you accept?', a: 'All payments processed via Stripe: Credit/debit cards (Visa, Mastercard, Amex), PayNow for Singapore customers, and invoicing for Enterprise (SGD 1,999+ plans).' },
+                { q: 'Is GST included?', a: 'Prices shown exclude GST. 9% GST will be added for Singapore-registered businesses at checkout. International customers: check your local tax requirements.' },
+                { q: 'Can I upgrade/downgrade plans?', a: 'Yes. Upgrades take effect immediately (pro-rated billing). Downgrades take effect at next billing cycle. Contact support@booppa.com for plan changes.' }
+              ].map((faq, i) => (
+                <div key={i}>
+                  <h4 className="text-lg font-bold mb-3 text-[#0f172a] tracking-tight">{faq.q}</h4>
+                  <p className="text-[#64748b] text-sm leading-relaxed">{faq.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

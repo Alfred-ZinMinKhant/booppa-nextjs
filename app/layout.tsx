@@ -1,12 +1,21 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans, Space_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import TrackerGate from "@/components/TrackerGate";
 
-const inter = Inter({ subsets: ["latin"] });
+const dmSans = DM_Sans({ 
+  subsets: ["latin"],
+  variable: '--font-dm-sans',
+});
+
+const spaceMono = Space_Mono({ 
+  weight: ['400', '700'],
+  subsets: ["latin"],
+  variable: '--font-space-mono',
+});
 
 export const metadata: Metadata = {
   title: "BOOPPA – Blockchain Compliance Evidence | Singapore PDPA & MAS",
@@ -29,8 +38,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} bg-black`}>
+    <html lang="en" className={`scroll-smooth ${dmSans.variable} ${spaceMono.variable}`}>
+      <body className="antialiased bg-white text-[#1e293b]">
         <Navigation />
         {children}
         <Footer />

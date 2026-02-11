@@ -1,141 +1,272 @@
 import Link from 'next/link';
-import { Check, Shield, Globe, Server, Zap, Users } from 'lucide-react';
-
-export const metadata = {
-  title: 'Compliance Suite | BOOPPA – Enterprise Regulatory Compliance',
-  description: 'Complete compliance automation for MAS, PDPA, and enterprise regulations. Standard: SGD 1,299/month. Pro: SGD 1,999/month.',
-  metadataBase: new URL('https://www.booppa.io'),
-};
 
 export default function CompliancePage() {
   return (
-    <main className="pt-16 pb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6">
-            Compliance Suite
-          </h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Complete regulatory compliance automation for MAS, PDPA, and enterprise requirements.
-          </p>
-        </div>
+    <main className="bg-white">
+      <section className="py-24 px-6">
+        <div className="container max-w-[1200px] mx-auto">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl lg:text-5xl font-black mb-6 text-[#0f172a]">PDPA Compliance Monitoring</h1>
+            <p className="text-xl text-[#64748b] max-w-3xl mx-auto leading-relaxed">
+              Operational workflows for continuous PDPA compliance tracking, 
+              DSAR handling, and audit evidence generation.
+            </p>
+          </div>
 
-        {/* Pricing */}
-        <div id="pricing" className="mb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">Compliance Suite Plans</h2>
+          <div className="bg-[#f8fafc] p-10 rounded-3xl border-2 border-[#10b981] mb-12 shadow-sm">
+            <h3 className="text-2xl font-bold mb-4 text-[#0f172a]">📊 From Point-in-Time Scans to Continuous Monitoring</h3>
+            <p className="text-[#64748b] mb-4">
+              PDPA Snapshot (SGD 69) gives you a one-time assessment. 
+              Compliance monitoring plans provide ongoing operational infrastructure.
+            </p>
+            <p className="text-[#64748b]">
+              <strong>Use case:</strong> "We need to track consent changes, handle DSAR requests, 
+              and maintain audit trails for PDPC inquiries."
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Standard Plan */}
-            <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-lg mb-4">
-                  <Shield className="w-6 h-6 text-purple-400" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Standard Suite</h3>
-                <p className="text-gray-400">Growing Enterprises</p>
+          {/* Pricing Comparison */}
+          <div className="mb-20">
+            <h2 className="text-3xl font-bold text-center mb-12 text-[#0f172a]">Choose Your Monitoring Level</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white p-10 rounded-3xl border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] hover:shadow-xl transition-all">
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Basic</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 299<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">For SMEs starting compliance operations</p>
+                
+                <ul className="space-y-4 mb-8">
+                  {[
+                    'Compliance dashboard (real-time)',
+                    '10 DSAR workflows per month',
+                    'Consent activity logging',
+                    'Monthly compliance reports',
+                    'Privacy policy templates (SG-specific)',
+                    'Email support (48h response)'
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">
+                  <strong>Best for:</strong> Digital companies 10-50 employees, e-commerce, SaaS startups
+                </p>
+
+                <Link href="/demo" className="btn btn-primary w-full shadow-lg">Start 14-Day Trial</Link>
               </div>
 
-              <div className="text-center mb-8">
-                <div className="text-5xl font-black text-purple-400 mb-2">SGD 1,299<span className="text-2xl">/mo</span></div>
-                <p className="text-gray-500">Billed monthly • Cancel anytime</p>
+              <div className="bg-white p-10 rounded-3xl border-2 border-[#10b981] shadow-xl relative scale-105 z-10 hover:translate-y-[-5px] hover:shadow-2xl transition-all">
+                <div className="absolute top-[-15px] right-6 bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Most Popular</div>
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Pro</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 799<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">For regulated companies with active compliance</p>
+                
+                <ul className="space-y-4 mb-8">
+                  <li className="font-bold text-[#0f172a] text-sm">Everything in Basic, plus:</li>
+                  {[
+                    'Unlimited DSAR workflows',
+                    'Advanced reporting & analytics',
+                    'Workflow automation engine',
+                    'Internal integrations (Slack, Jira, MS Teams)',
+                    'API access for custom workflows',
+                    'Priority support (4h response)',
+                    'Quarterly compliance review calls'
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">
+                  <strong>Best for:</strong> Growth-stage companies 50-200 employees, FinTech, HealthTech, regulated entities
+                </p>
+
+                <Link href="/demo" className="btn btn-primary w-full shadow-lg">Book Demo</Link>
               </div>
 
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Everything in PDPA Pro +',
-                  'MAS compliance automation',
-                  'Compliance notarization evidence tracking',
-                  'Real-time compliance dashboard',
-                  '5,000 blockchain notarizations/month',
-                  'Advanced audit trail generation',
-                  'Priority email support'
-                ].map((feature) => (
-                  <li key={feature} className="flex items-start text-gray-300">
-                    <Check className="w-5 h-5 text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_standard`}
-                className="block w-full text-center bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg transition"
-              >
-                Start Standard Suite
-              </Link>
-            </div>
-
-            {/* Pro Plan */}
-            <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl p-8 border-2 border-purple-500/30">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-pink-500/20 rounded-lg mb-4">
-                  <Zap className="w-6 h-6 text-pink-400" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Pro Suite</h3>
-                <p className="text-gray-400">Enterprise & Regulated Industries</p>
+              <div className="bg-white p-10 rounded-3xl border-2 border-dashed border-[#e2e8f0] flex flex-col justify-center items-center text-center hover:bg-[#f8fafc] transition-all">
+                <h3 className="text-xl font-bold mb-6 text-[#0f172a]">Need More?</h3>
+                <p className="text-[#64748b] mb-6">
+                  For MAS-ready compliance or full enterprise suites, 
+                  see our <Link href="/enterprise" className="text-[#10b981] font-bold hover:underline">Enterprise Solutions</Link>.
+                </p>
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  Standard Suite (SGD 1,299/mo) includes MAS operational workflows.<br />
+                  Pro Suite (SGD 1,999/mo) adds unlimited notarizations and dedicated manager.
+                </p>
               </div>
-
-              <div className="text-center mb-8">
-                <div className="text-5xl font-black text-pink-400 mb-2">SGD 1,999<span className="text-2xl">/mo</span></div>
-                <p className="text-gray-500">Billed monthly • Cancel anytime</p>
-              </div>
-
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Everything in Standard +',
-                  'Unlimited blockchain notarizations',
-                  'Custom compliance workflows',
-                  'Multi-region deployment',
-                  'Dedicated account manager',
-                  '24/7 priority support',
-                  'Custom API integrations',
-                  'Quarterly compliance reviews'
-                ].map((feature) => (
-                  <li key={feature} className="flex items-start text-gray-300">
-                    <Check className="w-5 h-5 text-green-400 mr-3 flex-shrink-0 mt-0.5" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=compliance_pro`}
-                className="block w-full text-center bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition"
-              >
-                Start Pro Suite
-              </Link>
             </div>
           </div>
 
-          {/* Enterprise */}
-          <div className="mt-12 max-w-3xl mx-auto">
-            <div className="bg-gray-900/30 rounded-2xl p-8 border border-gray-800">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-800 rounded-lg mb-4">
-                  <Globe className="w-6 h-6 text-white" />
+          {/* Feature Deep Dive */}
+          <div className="bg-white p-8 lg:p-16 rounded-[2.5rem] shadow-2xl border border-[#e2e8f0] mb-20">
+            <h2 className="text-3xl font-black mb-12 text-[#0f172a]">What's Included: Detailed Breakdown</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+              {[
+                {
+                  t: 'Compliance Dashboard',
+                  d: 'Real-time view of your compliance health score (0-100), recent scans, active DSAR requests, and consent log activity.',
+                  f: ['Compliance health score with trend analysis', 'Recent scan results and issue tracking', 'DSAR queue status and aging', 'Consent activity heatmaps', 'Blockchain notarization history']
+                },
+                {
+                  t: 'DSAR Workflow Management',
+                  d: 'Data Subject Access Request handling with 30-day deadline tracking (PDPA Section 21 requirement).',
+                  f: ['DSAR intake form (public-facing)', 'Internal workflow assignment', '30-day countdown timer', 'Response template library', 'Completion evidence export (PDF + blockchain timestamp)'],
+                  note: 'Basic: 10 DSARs/month | Pro: Unlimited'
+                },
+                {
+                  t: 'Consent Activity Logging',
+                  d: 'Track when users give/withdraw consent for marketing, analytics, etc. Supports PDPA Section 13 consent obligation.',
+                  f: ['Timestamped consent events', 'Purpose-specific tracking (marketing, analytics, sharing)', 'Withdrawal records', 'Source tracking (web form, email, phone)', 'Exportable consent audit trail']
+                },
+                {
+                  t: 'Monthly Compliance Reports',
+                  d: 'Auto-generated monthly summary of compliance activities, suitable for internal audit committees or board reporting.',
+                  f: ['Compliance health score trend (last 6 months)', 'DSAR response time metrics', 'New consents vs withdrawals', 'Security incident tracker', 'Blockchain notarization summary', 'PDF export + email delivery']
+                },
+                {
+                  t: 'Privacy Policy Templates',
+                  d: 'Singapore-specific privacy policy templates aligned with PDPA requirements.',
+                  f: ['Website privacy policy (PDPA-compliant)', 'Mobile app privacy policy', 'Cookie policy', 'DSAR request form template', 'Data breach notification template'],
+                  warning: 'Templates are starting points, not legal advice. Have legal counsel review before publication.'
+                },
+                {
+                  t: 'Integrations (Pro Plan)',
+                  d: 'Connect compliance workflows to your existing tools.',
+                  f: ['Slack: DSAR notifications, alerts', 'Jira: Auto-create tickets', 'MS Teams: Channel notifications', 'Webhooks: Custom endpoints', 'API: RESTful access']
+                }
+              ].map((item, i) => (
+                <div key={i} className="group">
+                  <h3 className="text-2xl font-black text-[#10b981] mb-4 group-hover:translate-x-2 transition-transform tracking-tight">{item.t}</h3>
+                  <p className="text-[#64748b] mb-6 leading-relaxed">{item.d}</p>
+                  <ul className="space-y-3 mb-6">
+                    {item.f.map((feature, j) => (
+                      <li key={j} className="flex items-start gap-3 text-sm text-[#475569]">
+                        <span className="text-[#10b981] font-bold">✓</span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  {item.note && <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-wider">{item.note}</p>}
+                  {item.warning && <p className="p-4 bg-[#fef3c7] rounded-lg text-xs text-[#92400e] border border-[#fde68a]">⚠️ {item.warning}</p>}
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Enterprise Suite</h3>
-                <p className="text-gray-400">Global Organizations, Financial Institutions</p>
-              </div>
+              ))}
+            </div>
+          </div>
 
-              <div className="text-center mb-8">
-                <div className="text-4xl font-black text-white mb-2">Custom Pricing</div>
-                <p className="text-gray-500">Annual contracts • On-premise options • Custom SLAs</p>
-              </div>
+          {/* How It Works */}
+          <div className="bg-[#0f172a] p-12 lg:p-24 rounded-[3rem] text-white mb-20 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-[#10b981] opacity-5 blur-[120px]"></div>
+            <h2 className="text-3xl lg:text-5xl font-black mb-16 relative z-10">How Monitoring Works</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 relative z-10">
+              {[
+                { n: 1, t: 'Initial Setup (Day 1)', d: 'Run baseline PDPA scan, configure DSAR intake form, set up consent tracking snippets for your website.' },
+                { n: 2, t: 'Continuous Logging', d: 'System tracks consent changes, DSAR submissions, and compliance activities automatically.' },
+                { n: 3, t: 'Monthly Reports', d: 'Auto-generated compliance summary delivered to your inbox, with blockchain-anchored evidence.' },
+                { n: 4, t: 'Audit-Ready Evidence', d: 'When PDPC inquiries arrive, export full compliance history with cryptographic timestamps in minutes, not days.' }
+              ].map((item) => (
+                <div key={item.n} className="flex gap-6">
+                  <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-[#10b981] to-[#059669] rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg rotate-3">{item.n}</div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-3">{item.t}</h4>
+                    <p className="text-white/70 leading-relaxed">{item.d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-              <div className="text-center">
-                <Link
-                  href="/demo"
-                  className="inline-flex items-center justify-center rounded-lg border border-purple-500 text-purple-400 hover:bg-purple-500/10 px-8 py-3 font-semibold transition"
-                >
-                  Contact Sales for Enterprise
-                </Link>
+          {/* Use Cases */}
+          <div className="mb-20">
+            <h2 className="text-3xl font-bold text-center mb-12 text-[#0f172a]">Real-World Use Cases</h2>
+            
+            <div className="space-y-6">
+              {[
+                {
+                  t: 'FinTech Startup (50 employees)',
+                  q: 'We\'re raising Series A. Investors want proof we\'re PDPA-compliant. BOOPPA Pro gives us monthly compliance reports we can share in data room.',
+                  r: 'Plan: PDPA Pro (SGD 799/mo) | ROI: Investor confidence + no compliance consultant fees (SGD 5k saved)'
+                },
+                {
+                  t: 'E-commerce Company (150 employees)',
+                  q: 'We get 20-30 DSAR requests per month. Manual tracking in spreadsheets was taking 15 hours/month. BOOPPA workflow cut it to 2 hours.',
+                  r: 'Plan: PDPA Pro (SGD 799/mo) | ROI: 13 hours/month saved (SGD 1,300+ value at SGD 100/hr)'
+                },
+                {
+                  t: 'SaaS Startup (20 employees)',
+                  q: 'Enterprise customers ask "Are you PDPA compliant?" We show them our BOOPPA dashboard. Deal closes faster.',
+                  r: 'Plan: PDPA Basic (SGD 299/mo) | ROI: Sales enablement tool (1 deal = 10x annual cost)'
+                }
+              ].map((item, i) => (
+                <div key={i} className="bg-white p-8 rounded-2xl border-l-8 border-[#10b981] shadow-xl hover:translate-x-2 transition-all">
+                  <h4 className="text-xl font-bold mb-4 text-[#0f172a]">{item.t}</h4>
+                  <p className="text-lg italic text-[#475569] mb-4">"{item.q}"</p>
+                  <p className="text-sm font-bold text-[#10b981] uppercase tracking-wider">{item.r}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Legal Disclaimer */}
+          <div className="bg-[#fef2f2] p-12 rounded-[2rem] border-2 border-[#fecaca] mb-20">
+            <h3 className="text-2xl font-black mb-8 flex items-center gap-3 text-[#991b1b]">⚖️ What This Service Is (and Isn't)</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
+              <div>
+                <h4 className="font-bold text-[#065f46] mb-4 text-xl tracking-tight">✅ What We Provide</h4>
+                <ul className="space-y-3">
+                  {['Operational workflow automation', 'Evidence documentation system', 'DSAR handling infrastructure', 'Compliance activity logging'].map((li, i) => (
+                    <li key={i} className="flex items-center gap-3 text-[#065f46] font-medium">
+                      <span className="font-bold">✓</span>
+                      {li}
+                    </li>
+                  ))}
+                </ul>
               </div>
+              
+              <div>
+                <h4 className="font-bold text-[#991b1b] mb-4 text-xl tracking-tight">❌ What We Don't Provide</h4>
+                <ul className="space-y-3">
+                  {['Legal advice or representation', 'PDPC certification or approval', 'Guarantee of regulatory compliance', 'Substitute for Data Protection Officer'].map((li, i) => (
+                    <li key={i} className="flex items-center gap-3 text-[#991b1b] font-medium">
+                      <span className="font-bold">✕</span>
+                      {li}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <p className="bg-white/50 p-6 rounded-xl text-sm text-[#7f1d1d] leading-relaxed border border-[#fee2e2]">
+              BOOPPA provides operational tools to support your compliance efforts. 
+              Your organization remains responsible for PDPA compliance. 
+              For regulatory guidance, consult PDPC Helpline (+65 6377 3131) or qualified legal counsel.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA section */}
+      <section className="py-24 px-6 bg-[#f8fafc]">
+        <div className="max-w-[1200px] mx-auto bg-gradient-to-br from-[#0f172a] to-[#1e293b] rounded-[3rem] p-12 lg:p-24 text-center text-white shadow-2xl relative overflow-hidden">
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#10b981] opacity-10 rounded-full translate-x-1/2 translate-y-1/2 blur-[100px]"></div>
+          <div className="relative z-10">
+            <h2 className="text-3xl lg:text-5xl font-black mb-6 leading-tight">Ready to Automate Your Compliance Operations?</h2>
+            <p className="text-white/70 text-xl mb-12 max-w-2xl mx-auto font-medium">Start with a 14-day trial of PDPA Basic or book an enterprise demo for Pro plans.</p>
+            <div className="flex flex-wrap justify-center gap-6">
+              <Link href="/demo" className="btn btn-primary px-10 py-5 text-xl font-bold">Start 14-Day Trial</Link>
+              <Link href="/pricing" className="btn btn-secondary bg-white text-[#0f172a] px-10 py-5 text-xl font-bold hover:bg-white/90 border-0 transition-colors">View All Plans</Link>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }

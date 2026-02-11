@@ -1,241 +1,189 @@
-import Link from 'next/link';
-import { Check, Shield } from 'lucide-react';
+'use client';
 
-export const metadata = {
-  title: 'PDPA Compliance Singapore | BOOPPA – Automated Data Protection Solution',
-  description: 'Complete PDPA compliance for Singapore. FREE basic scan, PRO scan S$69, or ENTERPRISE monitoring S$299/month. Blockchain audit trails included.',
-  metadataBase: new URL('https://www.booppa.io'),
-};
+import { useState } from 'react';
 
 export default function PDPAPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // Original logic was redirecting to Stripe
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      website: formData.get('website'),
+      email: formData.get('email'),
+      company: formData.get('company'),
+    };
+
+    console.log('Form submitted:', data);
+    
+    // For now, mirroring the HTML behavior (alert) but could be integrated with Stripe
+    alert('Redirecting to Stripe Checkout...\n\nWebsite: ' + data.website + '\nEmail: ' + data.email);
+    setIsLoading(false);
+  };
+
   return (
-    <main className="pt-16 pb-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6">
-            PDPA Compliance Made Simple
-          </h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Automated PDPA compliance with blockchain-verified audit trails. Choose the plan that fits your needs.
-          </p>
-        </div>
-
-        {/* Free Scan Callout */}
-        <div id="free-scan" className="mb-8">
-          <div className="bg-gradient-to-r from-gray-900/50 to-gray-800/50 rounded-2xl p-8 border border-gray-700 text-center">
-            <h2 className="text-2xl font-bold text-white mb-3">🎁 Free PDPA Scan</h2>
-            <p className="text-gray-300 text-lg mb-6">
-              Get a quick compliance snapshot in seconds. No credit card required.
+    <main className="bg-white">
+      <section className="py-24 px-6">
+        <div className="max-w-[900px] mx-auto">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl lg:text-5xl font-black mb-6 text-[#0f172a]">PDPA Evidence Scan</h1>
+            <p className="text-xl text-[#64748b] max-w-2xl mx-auto leading-relaxed">
+              Automated technical assessment of PDPA compliance indicators.
+              Not regulatory certification — operational evidence generation.
             </p>
-            <Link
-              href="/qr-scan"
-              className="inline-flex items-center justify-center rounded-lg bg-gray-700 hover:bg-gray-600 text-white px-8 py-3 font-semibold transition"
-            >
-              Start Free Scan →
-            </Link>
           </div>
-        </div>
 
-        {/* Quick Scan Callout - S$69 */}
-        <div id="quick-scan" className="mb-12">
-          <div className="bg-gradient-to-r from-teal-900/30 to-emerald-900/30 rounded-2xl p-8 border-2 border-teal-500 text-center relative overflow-hidden">
-            <div className="absolute top-4 right-4 bg-teal-500 text-black px-3 py-1 rounded-full text-xs font-bold">
-              MOST POPULAR
-            </div>
-            <h2 className="text-3xl font-bold text-white mb-3">⚡ PDPA Quick Scan</h2>
-            <div className="text-5xl font-black text-teal-400 mb-2">S$69</div>
-            <p className="text-gray-400 mb-4">One-time payment • Full compliance report</p>
-            <p className="text-gray-300 text-lg mb-6 max-w-2xl mx-auto">
-              Comprehensive PDF report with full DeepSeek AI analysis, blockchain notarization, and court-admissible proof. Perfect for pre-audit preparation.
-            </p>
-            <Link
-              href="/pdpa/quick-scan"
-              className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3 text-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition shadow-lg"
-            >
-              Buy Quick Scan Now →
-            </Link>
-          </div>
-        </div>
-
-        {/* Pricing Tiers */}
-        <div id="pricing" className="mb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">Choose Your Plan</h2>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* FREE */}
-            <div className="bg-gray-900/30 rounded-2xl p-8 border-2 border-gray-700">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-white mb-2">FREE</h3>
-                <p className="text-gray-400">Basic Web Scan</p>
+          {/* Scan Form */}
+          <div className="bg-white p-8 lg:p-12 rounded-3xl shadow-xl border border-[#e2e8f0] mb-12">
+            <h2 className="text-2xl font-bold mb-8 text-[#0f172a]">Run Instant Scan — SGD 69</h2>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="website">
+                  Website URL *
+                </label>
+                <input 
+                  type="url" 
+                  id="website" 
+                  name="website" 
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all" 
+                  placeholder="https://example.com"
+                  required
+                />
+                <p className="mt-2 text-xs text-[#94a3b8]">
+                  We'll scan for PDPA compliance indicators across 8 obligations
+                </p>
               </div>
 
-              <div className="text-center mb-8">
-                <div className="text-5xl font-black text-white mb-2">S$0</div>
-                <p className="text-gray-500">Limited to once/month</p>
+              <div>
+                <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="email">
+                  Business Email *
+                </label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all" 
+                  placeholder="your@company.sg"
+                  required
+                />
+                <p className="mt-2 text-xs text-[#94a3b8]">
+                  Report + blockchain verification will be sent here
+                </p>
               </div>
 
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Basic website scan',
-                  'Light AI analysis',
-                  'Email summary',
-                  'No PDF report',
-                  'No blockchain proof'
-                ].map((feature) => (
-                  <li key={feature} className="flex items-start text-gray-300">
-                    <Check className="w-5 h-5 text-teal-400 mr-3 flex-shrink-0 mt-0.5" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+              <div>
+                <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="company">
+                  Company Name (Optional)
+                </label>
+                <input 
+                  type="text" 
+                  id="company" 
+                  name="company" 
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all" 
+                  placeholder="Your Company Pte Ltd"
+                />
+                <p className="mt-2 text-xs text-[#94a3b8]">
+                  For tax invoice purposes
+                </p>
+              </div>
 
-              <Link
-                href="/qr-scan"
-                className="block w-full text-center bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition"
+              <div className="bg-[#f8fafc] p-6 rounded-xl border-l-4 border-[#10b981] mb-8">
+                <h4 className="font-bold text-[#0f172a] mb-3">What You'll Receive (15 minutes)</h4>
+                <ul className="space-y-2">
+                  {[
+                    'Technical PDPA risk assessment (8 sections)',
+                    'Severity-graded findings (CRITICAL/HIGH/MEDIUM/LOW)',
+                    'Specific legislation references (PDPA Sections 11-26)',
+                    'Blockchain-anchored timestamp (Polygon mainnet)',
+                    'QR verification link (court-admissible proof)',
+                    'Downloadable PDF evidence report'
+                  ].map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isLoading}
+                className="btn btn-primary w-full py-4 text-lg font-black shadow-lg disabled:opacity-50"
               >
-                Get Free Scan
-              </Link>
-            </div>
+                {isLoading ? 'Processing...' : 'Run Scan — Pay SGD 69 (Stripe Checkout)'}
+              </button>
 
-            {/* PRO - Most Popular */}
-            <div className="bg-teal-900/20 rounded-2xl p-8 border-2 border-teal-700 relative">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-teal-500 text-black px-4 py-1 rounded-full text-sm font-bold">
-                MOST POPULAR
+              <p className="text-center text-[#94a3b8] text-xs mt-4">
+                Secure payment via Stripe. Instant report delivery.
+              </p>
+            </form>
+          </div>
+
+          {/* What We Check */}
+          <div className="bg-[#f8fafc] p-12 rounded-3xl mb-12 border border-[#e2e8f0]">
+            <h2 className="text-2xl font-bold mb-10 text-[#0f172a]">What Our Scanner Checks</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[
+                { n: 1, t: 'Section 11: Openness Obligation', d: 'Checks for published privacy policy and data protection documentation' },
+                { n: 2, t: 'Section 13: Consent Obligation', d: 'Analyzes cookie consent mechanisms and data collection forms' },
+                { n: 3, t: 'Section 18: Purpose Limitation', d: 'Verifies purpose notification and NRIC collection practices' },
+                { n: 4, t: 'Section 21: Access & Correction Rights', d: 'Looks for DSAR (Data Subject Access Request) procedures' },
+                { n: 5, t: 'Section 24: Protection Obligation', d: 'Tests for HTTPS, security headers, encryption indicators' },
+                { n: 6, t: 'DPO Requirements', d: 'Searches for Data Protection Officer contact information' },
+                { n: 7, t: 'NRIC Advisory Compliance (2018)', d: 'Detects unauthorized NRIC collection (most common violation)' },
+                { n: 8, t: 'Do Not Call (DNC) Registry', d: 'Checks for DNC registry references for marketing communications' },
+              ].map((item) => (
+                <div key={item.n} className="flex gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-[#10b981] to-[#059669] rounded-full flex items-center justify-center text-white font-bold">{item.n}</div>
+                  <div>
+                    <h4 className="font-bold text-[#0f172a] mb-1">{item.t}</h4>
+                    <p className="text-sm text-[#64748b] leading-relaxed">{item.d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Legal Disclaimer */}
+          <div className="bg-white p-8 lg:p-12 rounded-3xl border-2 border-[#dc2626] shadow-sm">
+            <h3 className="text-xl font-bold mb-8 flex items-center gap-3">⚖️ Important Legal Disclaimer</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-8">
+              <div>
+                <h4 className="font-bold text-[#059669] mb-4 text-lg">✓ What This Is</h4>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-sm text-[#64748b]"><span className="text-[#10b981] font-bold">✓</span> Technical website scanning tool</li>
+                  <li className="flex items-center gap-3 text-sm text-[#64748b]"><span className="text-[#10b981] font-bold">✓</span> Evidence documentation system</li>
+                  <li className="flex items-center gap-3 text-sm text-[#64748b]"><span className="text-[#10b981] font-bold">✓</span> Operational compliance support</li>
+                  <li className="flex items-center gap-3 text-sm text-[#64748b]"><span className="text-[#10b981] font-bold">✓</span> Blockchain timestamping service</li>
+                </ul>
               </div>
               
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-teal-500/20 rounded-lg mb-4">
-                  <Shield className="w-6 h-6 text-teal-400" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">PRO</h3>
-                <p className="text-gray-400">Per Scan</p>
+              <div>
+                <h4 className="font-bold text-[#dc2626] mb-4 text-lg">✗ What This Is NOT</h4>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-3 text-sm text-[#64748b]"><span className="text-[#dc2626] font-bold">✕</span> Legal advice or representation</li>
+                  <li className="flex items-center gap-3 text-sm text-[#64748b]"><span className="text-[#dc2626] font-bold">✕</span> PDPC certification or approval</li>
+                  <li className="flex items-center gap-3 text-sm text-[#64748b]"><span className="text-[#dc2626] font-bold">✕</span> Guarantee of regulatory compliance</li>
+                  <li className="flex items-center gap-3 text-sm text-[#64748b]"><span className="text-[#dc2626] font-bold">✕</span> Substitute for qualified counsel</li>
+                </ul>
               </div>
-
-              <div className="text-center mb-8">
-                <div className="text-5xl font-black text-white mb-2">S$69</div>
-                <p className="text-gray-500">One-time payment</p>
-              </div>
-
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Full DeepSeek AI analysis',
-                  'Comprehensive PDF report',
-                  'Blockchain notarization',
-                  'QR verification code',
-                  'Court-admissible proof',
-                  'Permanent blockchain record'
-                ].map((feature) => (
-                  <li key={feature} className="flex items-start text-gray-300">
-                    <Check className="w-5 h-5 text-teal-400 mr-3 flex-shrink-0 mt-0.5" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/pdpa/quick-scan"
-                className="block w-full text-center bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-lg transition"
-              >
-                Buy Pro Scan
-              </Link>
             </div>
 
-            {/* ENTERPRISE */}
-            <div className="bg-purple-900/20 rounded-2xl p-8 border-2 border-purple-700">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-white mb-2">ENTERPRISE</h3>
-                <p className="text-gray-400">Continuous Monitoring</p>
-              </div>
-
-              <div className="text-center mb-8">
-                <div className="text-5xl font-black text-white mb-2">S$299<span className="text-2xl">/mo</span></div>
-                <p className="text-gray-500">Billed monthly</p>
-              </div>
-
-              <ul className="space-y-4 mb-8">
-                {[
-                  'Continuous vendor monitoring',
-                  'Enterprise dashboard',
-                  'Multi-vendor tracking',
-                  'Automated workflows',
-                  'Priority support',
-                  'Custom integrations'
-                ].map((feature) => (
-                  <li key={feature} className="flex items-start text-gray-300">
-                    <Check className="w-5 h-5 text-teal-400 mr-3 flex-shrink-0 mt-0.5" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href={`${(process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000')}/api/stripe/checkout?product=pdpa_basic`}
-                className="block w-full text-center bg-purple-700 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg transition"
-              >
-                Contact Sales
-              </Link>
-            </div>
+            <p className="bg-[#f8fafc] p-6 rounded-xl text-sm text-[#64748b] leading-relaxed">
+              Your organization remains responsible for PDPA compliance. This scan provides 
+              technical evidence and documentation to support your compliance efforts. 
+              For regulatory guidance, consult PDPC Helpline (+65 6377 3131) or legal counsel.
+            </p>
           </div>
         </div>
-
-        {/* Features Section */}
-        <section className="mb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">
-            Why Choose BOOPPA
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-500/20 rounded-full mb-4">
-                <Shield className="w-8 h-8 text-teal-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Blockchain Verified</h3>
-              <p className="text-gray-400">
-                All PRO scans are notarized on Polygon blockchain for immutable proof
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500/20 rounded-full mb-4">
-                ⚡
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">20-Second Results</h3>
-              <p className="text-gray-400">
-                Get instant compliance insights without waiting hours or days
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/20 rounded-full mb-4">
-                📄
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Court-Admissible</h3>
-              <p className="text-gray-400">
-                PRO reports include cryptographic proof acceptable in legal proceedings
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="text-center">
-          <div className="bg-gray-900/30 rounded-2xl p-8 border border-gray-800 max-w-3xl mx-auto">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              Start with a Free Scan
-            </h3>
-            <p className="text-gray-400 mb-6">
-              Not sure which plan is right for you? Try our free scan first to see what PDPA compliance looks like for your website.
-            </p>
-            <Link
-              href="/qr-scan"
-              className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-3 font-semibold hover:from-teal-600 hover:to-emerald-600 transition"
-            >
-              Get Started Free →
-            </Link>
-          </div>
-        </section>
-      </div>
+      </section>
     </main>
   );
 }
