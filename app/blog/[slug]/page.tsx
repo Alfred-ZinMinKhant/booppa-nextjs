@@ -8,45 +8,48 @@ export default async function BlogDetailPage({ params }: { params: { slug: strin
   const post = await res.json();
 
   return (
-    <main className="min-h-screen bg-black text-white py-12">
-      <section className="max-w-3xl mx-auto px-6">
-        <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-        <div className="flex flex-col gap-4 mb-8">
+    <main className="bg-white min-h-screen text-[#0f172a] py-24 px-6">
+      <section className="max-w-[800px] mx-auto">
+        <h1 className="text-4xl lg:text-5xl font-black mb-8 leading-tight">{post.title}</h1>
+        
+        <div className="mb-12">
           {post.images && post.images.length > 0 && (
-            <Image src={post.images[0]} alt={post.title} width={800} height={400} className="rounded-lg object-cover" />
+            <div className="bg-gray-50 rounded-[2.5rem] p-4 border border-[#e2e8f0] mb-6 overflow-hidden">
+              <Image 
+                src={post.images[0]} 
+                alt={post.title} 
+                width={1200} 
+                height={600} 
+                className="rounded-2xl w-full h-auto object-contain shadow-sm" 
+              />
+            </div>
           )}
-          <div className="text-gray-400 text-sm">
-            By {post.author || 'Unknown'} | Published {post.published_at ? new Date(post.published_at).toLocaleDateString() : 'N/A'}
+          <div className="flex items-center gap-3 text-[#64748b] text-sm font-bold uppercase tracking-wider">
+            <span className="w-8 h-[2px] bg-[#10b981]"></span>
+            By {post.author || 'BOOPPA Compliance Team'} | {post.published_at ? new Date(post.published_at).toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' }) : 'February 2024'}
           </div>
         </div>
-        <article className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
-        <div className="mt-8 flex flex-wrap gap-4">
+
+        <article 
+          className="prose prose-slate max-w-none text-lg leading-relaxed text-[#475569] prose-headings:text-[#0f172a] prose-headings:font-black prose-a:text-[#10b981] prose-strong:text-[#0f172a]" 
+          dangerouslySetInnerHTML={{ __html: post.content }} 
+        />
+
+        <div className="mt-16 pt-12 border-t border-[#f1f5f9] flex flex-wrap gap-4">
           {post.cta1_text && post.cta1_url && (
             <a
               href={post.cta1_url}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={post.cta1_text}
-              className="inline-flex items-center gap-3 text-white bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 px-5 py-3 rounded-full font-semibold"
+              className="btn btn-primary px-8 py-4 font-black"
             >
-              <span>{post.cta1_text}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              {post.cta1_text}
             </a>
           )}
           {post.cta2_text && post.cta2_url && (
             <a
               href={post.cta2_url}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={post.cta2_text}
-              className="inline-flex items-center gap-3 text-white border border-gray-700 bg-transparent hover:bg-gray-800 transition px-5 py-3 rounded-full font-medium"
+              className="btn btn-outline border-[#0f172a] text-[#0f172a] px-8 py-4 font-bold"
             >
-              <span>{post.cta2_text}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
+              {post.cta2_text}
             </a>
           )}
         </div>

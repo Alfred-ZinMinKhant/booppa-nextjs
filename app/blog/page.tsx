@@ -57,12 +57,12 @@ export default function BlogPage() {
               return (
                 <article key={p.id} className="bg-white rounded-3xl overflow-hidden border border-[#e2e8f0] hover:shadow-2xl transition-all group flex flex-col">
                   <Link href={href} className="block grow">
-                    <div className="h-56 w-full relative overflow-hidden">
+                    <div className="h-56 w-full relative overflow-hidden bg-gray-50">
                       <Image 
                         src={image} 
                         alt={p.title} 
                         fill 
-                        className="object-cover group-hover:scale-105 transition-transform duration-500" 
+                        className="object-contain transition-transform duration-500" 
                       />
                       <div className="absolute top-4 left-4">
                         <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-[#0f172a] rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
