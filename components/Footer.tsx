@@ -6,9 +6,8 @@ export default function Footer() {
       <div className="max-w-[1400px] mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           <div className="footer-column">
-            <div className="flex items-center gap-2 font-bold text-xl text-[#0f172a] tracking-wider mb-6">
-              <span className="text-[#10b981] text-2xl">◉</span>
-              <span>BOOPPA</span>
+            <div className="flex items-center gap-2 mb-6">
+              <img src="/logo.png" alt="BOOPPA Logo" className="h-8 w-auto" />
             </div>
             <p className="text-[#64748b] text-sm max-w-xs">
               Evidence infrastructure for Singapore compliance operations.
@@ -21,7 +20,6 @@ export default function Footer() {
               <li><Link href="/pdpa" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">PDPA Scan</Link></li>
               <li><Link href="/compliance" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Compliance Monitoring</Link></li>
               <li><Link href="/notarization" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Evidence Notarization</Link></li>
-              <li><Link href="/vendor" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Vendor Proof</Link></li>
             </ul>
           </div>
 

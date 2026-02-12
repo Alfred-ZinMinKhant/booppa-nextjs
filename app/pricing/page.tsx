@@ -60,27 +60,6 @@ export default function PricingPage() {
                 <Link href="/pdpa" className="btn btn-primary w-full shadow-lg">Start Scan</Link>
               </div>
 
-              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
-                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Vendor Proof</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 69</div>
-                <p className="text-sm text-[#64748b] mb-8">Reusable procurement evidence</p>
-                <ul className="space-y-4 mb-10">
-                  {[
-                    'Complete PDPA evidence scan',
-                    'Blockchain notarization',
-                    'QR verification portal',
-                    'Polygonscan proof URL',
-                    'Valid for 12 months',
-                    'Reusable for RFPs'
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
-                      <span className="text-[#10b981] font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/vendor" className="btn btn-primary w-full shadow-lg">Create Proof</Link>
-              </div>
 
               <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Document Notarization</h3>

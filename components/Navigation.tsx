@@ -10,7 +10,6 @@ const navigation = [
   { name: 'PDPA Scan', href: '/pdpa' },
   { name: 'Compliance', href: '/compliance' },
   { name: 'Notarization', href: '/notarization' },
-  { name: 'Vendor Proof', href: '/vendor' },
   { name: 'Enterprise', href: '/enterprise' },
   { name: 'Pricing', href: '/pricing' },
   { name: 'Verify', href: '/verify' },
@@ -37,9 +36,8 @@ export default function Navigation() {
       <nav className="mx-auto max-w-[1400px] px-6 py-4 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="flex lg:flex-1 items-center">
-            <Link href="/" className="flex items-center gap-2 font-bold text-xl text-white tracking-wider">
-              <span className="text-[#10b981] text-2xl">◉</span>
-              <span>BOOPPA</span>
+            <Link href="/" className="flex items-center gap-2">
+              <img src="/logo.png" alt="BOOPPA Logo" className="h-8 w-auto" />
             </Link>
           </div>
           
@@ -79,9 +77,8 @@ export default function Navigation() {
             <div className="fixed inset-0 z-[996] bg-black/80 md:hidden" onClick={() => setMobileMenuOpen(false)} />
             <div className="fixed top-0 left-0 right-0 bottom-0 h-screen z-[997] w-full overflow-y-auto bg-[#0f172a] px-6 py-6">
               <div className="flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2 font-bold text-xl text-white tracking-wider" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="text-[#10b981] text-2xl">◉</span>
-                  <span>BOOPPA</span>
+                <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                  <img src="/logo.png" alt="BOOPPA Logo" className="h-8 w-auto" />
                 </Link>
                 
                 <button

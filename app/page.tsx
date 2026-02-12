@@ -61,12 +61,6 @@ export default function Home() {
               <p className="text-sm text-[#64748b] mb-6">Anchor compliance documents to Polygon mainnet. Immutable timestamp + QR verification for court-admissibility.</p>
               <Link href="/notarization" className="text-[#10b981] font-bold flex items-center gap-2 hover:gap-3 transition-all">Notarize Document →</Link>
             </div>
-            <div className="bg-white p-8 rounded-2xl border border-[#e2e8f0] group hover:border-[#10b981] hover:translate-y-[-5px] hover:shadow-lg transition-all">
-              <div className="text-5xl font-mono font-bold text-[#e2e8f0] mb-4 group-hover:text-[#10b981] transition-colors leading-none">04</div>
-              <h3 className="text-xl font-bold mb-3">Vendor Proof Records</h3>
-              <p className="text-sm text-[#64748b] mb-6">Generate reusable procurement evidence for vendor assessments. Cryptographic hash + verification portal.</p>
-              <Link href="/vendor" className="text-[#10b981] font-bold flex items-center gap-2 hover:gap-3 transition-all">Create Proof →</Link>
-            </div>
           </div>
         </div>
       </section>
