@@ -18,18 +18,19 @@ export default function Footer() {
             <h4 className="font-bold text-[#0f172a] mb-6">Services</h4>
             <ul className="space-y-4">
               <li><Link href="/pdpa" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">PDPA Scan</Link></li>
-              <li><Link href="/compliance" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Compliance Monitoring</Link></li>
-              <li><Link href="/notarization" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Evidence Notarization</Link></li>
+              <li><Link href="/notarization" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Notarization Express</Link></li>
+              <li><Link href="/rfp-acceleration#express" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">RFP Express</Link></li>
+              <li><Link href="/rfp-acceleration#complete" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">RFP Kit</Link></li>
             </ul>
           </div>
 
           <div className="footer-column">
             <h4 className="font-bold text-[#0f172a] mb-6">Company</h4>
             <ul className="space-y-4">
-              <li><Link href="/enterprise" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Enterprise Solutions</Link></li>
               <li><Link href="/pricing" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Pricing</Link></li>
               <li><Link href="/blog" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Blog</Link></li>
               <li><Link href="/support" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Support</Link></li>
+              <li><Link href="/enterprise" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Enterprise Access</Link></li>
             </ul>
           </div>
 
@@ -37,7 +38,7 @@ export default function Footer() {
             <h4 className="font-bold text-[#0f172a] mb-6">Tools</h4>
             <ul className="space-y-4">
               <li><Link href="/verify" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Verify Evidence</Link></li>
-              <li><Link href="/demo" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Request Demo</Link></li>
+              <li><Link href="/rfp-acceleration" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Compare RFP Plans</Link></li>
               <li><Link href="/support" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Open Ticket</Link></li>
             </ul>
           </div>

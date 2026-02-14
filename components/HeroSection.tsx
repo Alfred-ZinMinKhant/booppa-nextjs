@@ -12,22 +12,22 @@ export default function HeroSection() {
         </div>
         
         <h1 className="hero-title text-4xl lg:text-6xl font-black mb-6 leading-tight text-[#0f172a]">
-          Compliance Evidence.<br />
-          <span className="gradient-text">Blockchain-Anchored.</span><br />
-          Audit-Ready.
+          Submit Ready<br />
+          <span className="gradient-text text-[#10b981]">Procurement Documents</span><br />
+          Without the Delays.
         </h1>
         
         <p className="hero-description text-xl text-[#64748b] mb-12 max-w-xl leading-relaxed">
-          Automated documentation, cryptographic timestamping, and verifiable 
-          audit records for PDPA, MAS, and MTCS compliance operations.
+          PDPA scans, notarizations and RFP evidence packages ready in hours.
+          No audit cycles. No consultancy fees.
         </p>
 
         <div className="hero-cta flex flex-wrap gap-4 mb-12">
-          <Link href="/pdpa" className="btn btn-primary text-lg">
-            Start PDPA Scan — SGD 69
+          <Link href="/rfp-acceleration#express" className="btn btn-primary text-lg">
+            See RFP Kit Express — SGD 129
           </Link>
-          <Link href="/demo" className="btn btn-secondary text-lg">
-            Book Enterprise Demo
+          <Link href="/rfp-acceleration#complete" className="btn btn-secondary text-lg">
+            Get Full RFP Kit
           </Link>
         </div>
 
