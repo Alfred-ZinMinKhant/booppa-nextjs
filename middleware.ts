@@ -1,43 +1,40 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+// Rotte accessibili senza autenticazione
+const publicRoutes  = ['/login', '/register', '/forgot-password', '/', '/trial', '/enterprise-briefing', '/admin/intelligence']
+const publicPrefixes = ['/verify']
+
 export function middleware(request: NextRequest) {
-  // Check if maintenance mode is enabled in environment variables
-  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true';
+  const token              = request.cookies.get('token')?.value
+  const { pathname }       = request.nextUrl
+  const isPublicPrefix     = publicPrefixes.some(p => pathname.startsWith(p))
+  const isPublicRoute      = publicRoutes.some(r => pathname.startsWith(r))
+  const isApiRoute         = pathname.startsWith('/api')
 
-  // Define paths that should NOT be redirected
-  const isPublicAsset = 
-    request.nextUrl.pathname.startsWith('/_next') || 
-    request.nextUrl.pathname.startsWith('/api') || 
-    request.nextUrl.pathname.startsWith('/static') || 
-    request.nextUrl.pathname.includes('.') || 
-    request.nextUrl.pathname === '/favicon.ico';
+  // Le route API gestiscono autonomamente l'autenticazione
+  if (isApiRoute) return NextResponse.next()
 
-  const isMaintenancePage = request.nextUrl.pathname === '/maintenance';
+  // Verify portal è sempre pubblico (token nell'URL, non nel cookie)
+  if (isPublicPrefix) return NextResponse.next()
 
-  // If maintenance mode is on and we are not on the maintenance page or a public asset, redirect
-  if (isMaintenanceMode && !isMaintenancePage && !isPublicAsset) {
-    return NextResponse.redirect(new URL('/maintenance', request.url));
+  // Autenticato → se prova ad accedere a login, vai a dashboard
+  if (token && (pathname === '/login' || pathname === '/register')) {
+    return NextResponse.redirect(new URL('/vendor/dashboard', request.url))
   }
 
-  // If maintenance mode is off and we are on the maintenance page, redirect to home
-  if (!isMaintenanceMode && isMaintenancePage) {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Non autenticato → redirect al login, salvando la rotta di provenienza
+  if (!token && !isPublicRoute) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('from', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
-  return NextResponse.next();
+  return NextResponse.next()
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|public).*)',
   ],
 }

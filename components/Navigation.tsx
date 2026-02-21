@@ -11,12 +11,11 @@ const navigation = [
   { name: 'PDPA Scan', href: '/pdpa' },
   { name: 'Compliance', href: '/compliance' },
   { name: 'Notarization', href: '/notarization' },
-  { name: 'Enterprise', href: '/enterprise' },
-  { name: 'Pricing', href: '/pricing' },
   { name: 'Verify', href: '/verify' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Demo', href: '/demo' },
-  { name: 'Support', href: '/support' },
+  { name: 'Briefing', href: '/enterprise-briefing' },
+  { name: 'Trial', href: '/trial' },
+  { name: 'Vendor Dashboard', href: '/vendor/dashboard' },
+  { name: 'Intelligence', href: '/admin/intelligence' },
 ];
 
 export default function Navigation() {
