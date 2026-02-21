@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { config } from '@/lib/config';
 
 export default function NotarizationPage() {
   const notarizeCheckout = (plan: string) => {
@@ -10,7 +11,13 @@ export default function NotarizationPage() {
       'batch50': { name: '50 Documents', price: 'SGD 1,750' }
     };
     
-    alert('Redirecting to Stripe Checkout...\n\nPlan: ' + plans[plan].name + '\nPrice: ' + plans[plan].price);
+    const productMap: Record<string, string> = {
+      'single': 'compliance_notarization_1',
+      'batch10': 'compliance_notarization_10',
+      'batch50': 'compliance_notarization_50'
+    };
+    
+    window.location.href = `${config.apiUrl}/api/checkout?product=${productMap[plan]}`;
   };
 
   return (

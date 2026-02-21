@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Eye, TrendingUp, AlertTriangle, ShieldAlert, LineChart as ChartIcon, Activity } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
@@ -14,6 +14,30 @@ const INDEX_DATA = [
 ];
 
 export default function AdminIntelligence() {
+  const [data, setData] = useState({ 
+    globalPulse: 81.4, 
+    activeWindows: 412, 
+    vulnerableVectors: 14, 
+    enterpriseValue: 4100000, 
+    indexData: INDEX_DATA,
+    topEnterprises: [] 
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/admin/intelligence')
+      .then(res => res.json())
+      .then(fetchedData => {
+        if (!fetchedData.error) {
+          setData(fetchedData);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return null;
+
   return (
     <div className="min-h-screen bg-neutral-100 p-8 text-neutral-900">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -40,7 +64,7 @@ export default function AdminIntelligence() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-neutral-500 text-sm font-medium">Global Pulse Score</p>
-                  <h3 className="text-3xl font-bold text-neutral-900 mt-2">81.4</h3>
+                  <h3 className="text-3xl font-bold text-neutral-900 mt-2">{data.globalPulse}</h3>
                 </div>
                 <div className="p-2 bg-blue-50 text-blue-600 rounded-md">
                   <Activity className="h-5 w-5" />
@@ -58,7 +82,7 @@ export default function AdminIntelligence() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-neutral-500 text-sm font-medium">Active Procurement Windows</p>
-                  <h3 className="text-3xl font-bold text-neutral-900 mt-2">412</h3>
+                  <h3 className="text-3xl font-bold text-neutral-900 mt-2">{data.activeWindows}</h3>
                 </div>
                 <div className="p-2 bg-amber-50 text-amber-600 rounded-md">
                   <Eye className="h-5 w-5" />
@@ -76,7 +100,7 @@ export default function AdminIntelligence() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-neutral-500 text-sm font-medium">Vulnerable Vectors (High Risk)</p>
-                  <h3 className="text-3xl font-bold text-neutral-900 mt-2">14</h3>
+                  <h3 className="text-3xl font-bold text-neutral-900 mt-2">{data.vulnerableVectors}</h3>
                 </div>
                 <div className="p-2 bg-red-50 text-red-600 rounded-md">
                   <ShieldAlert className="h-5 w-5" />
@@ -94,7 +118,7 @@ export default function AdminIntelligence() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-neutral-300 text-sm font-medium">Enterprise Lead Value</p>
-                  <h3 className="text-3xl font-bold text-white mt-2">$4.1M</h3>
+                  <h3 className="text-3xl font-bold text-white mt-2">${(data.enterpriseValue / 1000000).toFixed(1)}M</h3>
                 </div>
                 <div className="p-2 bg-white/10 text-white rounded-md">
                   <ChartIcon className="h-5 w-5" />
@@ -116,7 +140,7 @@ export default function AdminIntelligence() {
             <div className="p-6 pt-0">
               <div className="h-80 w-full mt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={INDEX_DATA}>
+                  <AreaChart data={data.indexData}>
                     <defs>
                       <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#2563eb" stopOpacity={0.2}/>
@@ -146,13 +170,7 @@ export default function AdminIntelligence() {
             </div>
             <div className="p-6 pt-0">
               <div className="space-y-4 mt-4">
-                {[
-                  { domain: 'enterprisesg.gov.sg', score: 96, industry: 'Government', value: '$850k', status: 'Triggered' },
-                  { domain: 'singtel.com', score: 92, industry: 'Telecommunications', value: '$450k', status: 'Monitoring' },
-                  { domain: 'capitaland.com', score: 88, industry: 'Real Estate', value: '$220k', status: 'Monitoring' },
-                  { domain: 'iras.gov.sg', score: 85, industry: 'Government', value: '$500k', status: 'Monitoring' },
-                  { domain: 'shopee.com', score: 81, industry: 'E-commerce', value: '$180k', status: 'New Signal' }
-                ].map((org, i) => (
+                {data.topEnterprises.length > 0 ? data.topEnterprises.map((org: any, i: number) => (
                   <div key={i} className="flex justify-between items-center p-4 border border-neutral-100 rounded-lg bg-neutral-50 hover:bg-neutral-100 transition">
                     <div className="flex flex-col">
                       <span className="font-semibold text-neutral-900">{org.domain}</span>
@@ -182,7 +200,7 @@ export default function AdminIntelligence() {
                       </div>
                     </div>
                   </div>
-                ))}
+                )) : null}
               </div>
             </div>
           </div>

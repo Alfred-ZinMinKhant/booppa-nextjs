@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { config } from '@/lib/config';
 
 export default function RFPAccelerationPage() {
   return (
@@ -22,12 +23,12 @@ export default function RFPAccelerationPage() {
             BOOPPA generates blockchain-verified evidence that procurement teams trust.
           </p>
           <div className="flex flex-wrap justify-center gap-6">
-            <Link href="#express" className="btn btn-primary px-10 py-4 text-lg">
+            <a href={`${config.apiUrl}/api/checkout?product=rfp_kit_express`} className="btn btn-primary px-10 py-4 text-lg">
               RFP Kit Express — SGD 129
-            </Link>
-            <Link href="#complete" className="btn btn-secondary px-10 py-4 text-lg">
+            </a>
+            <a href={`${config.apiUrl}/api/checkout?product=rfp_kit_complete`} className="btn btn-secondary px-10 py-4 text-lg">
               RFP Kit Complete — SGD 499
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -51,7 +52,7 @@ export default function RFPAccelerationPage() {
                 <li className="flex items-center gap-3 text-[#64748b] opacity-50"><span className="text-[#cbd5e1]">✕</span> No Editable DOCX</li>
                 <li className="flex items-center gap-3 text-[#64748b] opacity-50"><span className="text-[#cbd5e1]">✕</span> No AI Narrative</li>
               </ul>
-              <Link href="/checkout/express" className="btn btn-primary w-full text-center py-4">Generate Express Evidence</Link>
+              <a href={`${config.apiUrl}/api/checkout?product=rfp_kit_express`} className="btn btn-primary w-full text-center py-4 block">Generate Express Evidence</a>
             </div>
 
             {/* Complete Tier */}
@@ -70,7 +71,7 @@ export default function RFPAccelerationPage() {
                 <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Attestation Letter</li>
                 <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Priority 12h Delivery</li>
               </ul>
-              <Link href="/checkout/complete" className="btn btn-primary w-full text-center py-4">Get Full RFP Kit</Link>
+              <a href={`${config.apiUrl}/api/checkout?product=rfp_kit_complete`} className="btn btn-primary w-full text-center py-4 block">Get Full RFP Kit</a>
             </div>
           </div>
         </div>

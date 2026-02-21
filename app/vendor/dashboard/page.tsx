@@ -17,16 +17,30 @@ const MOUNT_DATA = [
 
 export default function VendorDashboard() {
   const [mounted, setMounted] = useState(false);
+  const [data, setData] = useState({ stats: null, chartData: [], recentActivity: [] });
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     setMounted(true);
-    // Real implementation would connect to WebSocket here
-    // import { io } from 'socket.io-client';
-    // const socket = io(process.env.NEXT_PUBLIC_WS_URL);
-    // socket.on('enterprise_visited', (data) => console.log(data));
+    fetch('/api/dashboard')
+      .then(res => res.json())
+      .then(fetchedData => {
+        if (!fetchedData.error) {
+          setData(fetchedData);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted || loading) return null;
+
+  const chartInfo = data.chartData.length ? data.chartData : MOUNT_DATA;
+  const stats = data.stats || { trustScore: 78, enterpriseViews: 184, activeProcurements: 3, govAgencies: 12 };
+  const history = data.recentActivity.length ? data.recentActivity : [
+    { domain: 'defence.gov.sg', type: 'High-Intent View', time: '2 mins ago', color: 'text-purple-400', bg: 'bg-purple-400/10' },
+    { domain: 'dbs.com.sg', type: 'Repeated Visit', time: '14 mins ago', color: 'text-amber-400', bg: 'bg-amber-400/10' }
+  ];
 
   return (
     <div className="min-h-screen bg-neutral-950 p-6">
@@ -55,7 +69,7 @@ export default function VendorDashboard() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-neutral-400 text-sm font-medium">Global Trust Score</p>
-                  <h3 className="text-3xl font-bold text-white mt-2">78<span className="text-sm text-neutral-500 font-normal">/100</span></h3>
+                  <h3 className="text-3xl font-bold text-white mt-2">{stats.trustScore}<span className="text-sm text-neutral-500 font-normal">/100</span></h3>
                 </div>
                 <div className="p-2 bg-blue-500/10 rounded-lg">
                   <Shield className="h-5 w-5 text-blue-500" />
@@ -73,7 +87,7 @@ export default function VendorDashboard() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-neutral-400 text-sm font-medium">Enterprise Views (7d)</p>
-                  <h3 className="text-3xl font-bold text-white mt-2">184</h3>
+                  <h3 className="text-3xl font-bold text-white mt-2">{stats.enterpriseViews}</h3>
                 </div>
                 <div className="p-2 bg-emerald-500/10 rounded-lg">
                   <Eye className="h-5 w-5 text-emerald-500" />
@@ -91,7 +105,7 @@ export default function VendorDashboard() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-neutral-400 text-sm font-medium">Active Procurements</p>
-                  <h3 className="text-3xl font-bold text-white mt-2">3</h3>
+                  <h3 className="text-3xl font-bold text-white mt-2">{stats.activeProcurements}</h3>
                 </div>
                 <div className="p-2 bg-amber-500/10 rounded-lg">
                   <Zap className="h-5 w-5 text-amber-500" />
@@ -108,7 +122,7 @@ export default function VendorDashboard() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-neutral-400 text-sm font-medium">Gov Agencies</p>
-                  <h3 className="text-3xl font-bold text-white mt-2">12</h3>
+                  <h3 className="text-3xl font-bold text-white mt-2">{stats.govAgencies}</h3>
                 </div>
                 <div className="p-2 bg-purple-500/10 rounded-lg">
                   <Building className="h-5 w-5 text-purple-500" />
@@ -130,7 +144,7 @@ export default function VendorDashboard() {
             <div className="p-6 pt-0">
               <div className="h-72 w-full mt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={MOUNT_DATA}>
+                  <AreaChart data={chartInfo}>
                     <defs>
                       <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -166,21 +180,16 @@ export default function VendorDashboard() {
             </div>
             <div className="p-6 pt-4 px-0">
               <div className="space-y-0">
-                {[
-                  { domain: 'defence.gov.sg', type: 'High-Intent View', time: '2 mins ago', color: 'text-purple-400', bg: 'bg-purple-400/10' },
-                  { domain: 'dbs.com.sg', type: 'Repeated Visit (3x)', time: '14 mins ago', color: 'text-amber-400', bg: 'bg-amber-400/10' },
-                  { domain: 'Unknown Enterprise', type: 'First View', time: '1 hour ago', color: 'text-blue-400', bg: 'bg-blue-400/10' },
-                  { domain: 'tech.gov.sg', type: 'Proof Downloaded', time: '3 hours ago', color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-                ].map((item, i) => (
+                {history.map((item: any, i: number) => (
                   <div key={i} className="px-6 py-3 hover:bg-neutral-800/50 transition border-l-2 border-transparent hover:border-neutral-500 cursor-pointer">
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="text-sm font-medium text-neutral-200">{item.domain}</p>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium mt-1 ${item.bg} ${item.color}`}>
+                        <p className="text-sm font-medium text-neutral-200">{item.domain || item.description}</p>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium mt-1 ${item.bg || 'bg-blue-400/10'} ${item.color || 'text-blue-400'}`}>
                           {item.type}
                         </span>
                       </div>
-                      <span className="text-xs text-neutral-500">{item.time}</span>
+                      <span className="text-xs text-neutral-500">{item.time || new Date(item.timestamp).toLocaleTimeString()}</span>
                     </div>
                   </div>
                 ))}
