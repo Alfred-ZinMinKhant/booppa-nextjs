@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Eye, TrendingUp, AlertTriangle, ArrowRight, Bell, Zap, Building } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import VendorStatusBadge from '@/components/vendor/VendorStatusBadge';
+import SectorPressureWidget from '@/components/vendor/SectorPressureWidget';
+import CalDashboard from '@/components/vendor/CalDashboard';
 
 // In a real app, this data is fetched from the V6 OS backend `/api/vendor/dashboard`
 const MOUNT_DATA = [
@@ -202,6 +205,17 @@ export default function VendorDashboard() {
             </div>
           </div>
         </div>
+
+        {/* ── V8 Trust & Activation Layer ─────────────────────────── */}
+        <div className="pt-2 border-t border-neutral-800">
+          <h2 className="text-sm font-semibold text-neutral-400 mb-4">Trust & Activation</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <VendorStatusBadge />
+            <SectorPressureWidget />
+            <CalDashboard />
+          </div>
+        </div>
+
       </div>
     </div>
   );
