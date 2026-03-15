@@ -11,7 +11,7 @@ export default function VerifyPayment({ sessionId }: { sessionId: string }) {
   useEffect(() => {
     async function verify() {
       try {
-        const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.booppa.io';
         const response = await fetch(`${apiBase}/api/stripe/checkout/verify?session_id=${sessionId}`);
         const data = await response.json();
 

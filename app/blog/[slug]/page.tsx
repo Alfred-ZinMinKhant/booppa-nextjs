@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
 export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
-  const apiBase = process.env.NEXT_PUBLIC_API_Backend || process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_CMS_BASE || 'http://localhost:8001';
+  const apiBase = process.env.NEXT_PUBLIC_API_Backend || process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_CMS_BASE || 'https://api.booppa.io';
   const res = await fetch(`${apiBase}/api/public/blogs/${params.slug}/`, { cache: 'no-store' });
   if (!res.ok) return notFound();
   const post = await res.json();

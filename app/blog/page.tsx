@@ -12,7 +12,7 @@ export default function BlogPage() {
   useEffect(() => {
     let mounted = true;
     async function load() {
-      const apiBase = process.env.NEXT_PUBLIC_API_Backend || process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_CMS_BASE || 'http://localhost:8001';
+      const apiBase = process.env.NEXT_PUBLIC_API_Backend || process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_CMS_BASE || 'https://api.booppa.io';
       try {
         const res = await fetch(`${apiBase}/api/public/blogs/`);
         if (!res.ok) return setPosts([]);

@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Rotte accessibili senza autenticazione
-const publicRoutes  = ['/login', '/register', '/forgot-password', '/', '/trial', '/enterprise-briefing', '/admin/intelligence']
-const publicPrefixes = ['/verify']
+// Routes accessible without authentication
+const publicRoutes  = [
+  '/login', '/register', '/forgot-password', '/',
+  '/trial', '/enterprise-briefing', '/admin/intelligence',
+  '/pricing', '/faq', '/support', '/book-demo',
+  '/privacy', '/terms', '/security',
+  '/dpo', '/cookies', '/acceptable-use', '/disclaimer',
+  '/compare', '/rankings', '/insight-dome',
+]
+const publicPrefixes = ['/verify', '/vendors', '/blog']
 
 export function middleware(request: NextRequest) {
   const token              = request.cookies.get('token')?.value

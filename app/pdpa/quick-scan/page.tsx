@@ -1,17 +1,29 @@
 "use client"
 
 import { useState } from "react";
+import { config } from '@/lib/config';
+
+function normalizeUrl(input: string): string {
+  let url = input.trim();
+  if (!url) return url;
+  url = url.replace(/^\/+/, '');
+  if (!/^https?:\/\//i.test(url)) {
+    url = 'https://' + url;
+  }
+  return url;
+}
 
 export default function QuickScanPage() {
   const [website, setWebsite] = useState("");
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+  const apiBase = config.apiUrl;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!website) {
+    const normalizedUrl = normalizeUrl(website);
+    if (!normalizedUrl) {
       alert("Website is required for the Quick Scan");
       return;
     }
@@ -21,7 +33,7 @@ export default function QuickScanPage() {
       const reportRes = await fetch(`${apiBase}/api/reports/public`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ framework: "pdpa_quick_scan", company_name: company || "Quick Scan", website: website, assessment_data: { contact_email: email }, contact_email: email }),
+        body: JSON.stringify({ framework: "pdpa_quick_scan", company_name: company || "Quick Scan", website: normalizedUrl, assessment_data: { contact_email: email }, contact_email: email }),
       });
 
       if (!reportRes.ok) {

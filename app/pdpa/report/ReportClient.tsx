@@ -73,7 +73,7 @@ export default function ReportClient() {
 
       let isReady = false;
       try {
-        const apiBase = (process.env.NEXT_PUBLIC_API_BASE as string) ?? "http://localhost:8000";
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE || "https://api.booppa.io";
         const res = await fetch(`${apiBase}/api/reports/by-session?session_id=${sessionId}`);
         if (res.ok) {
           const data = await res.json();

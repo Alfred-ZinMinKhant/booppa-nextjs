@@ -7,6 +7,9 @@ import { Menu, X } from 'lucide-react';
 
 const navigation = [
   { name: 'Home', href: '/' },
+  { name: 'Vendors', href: '/vendors' },
+  { name: 'Compare', href: '/compare' },
+  { name: 'Rankings', href: '/rankings' },
   { name: 'RFP Kit', href: '/rfp-acceleration' },
   { name: 'PDPA Scan', href: '/pdpa' },
   { name: 'Compliance', href: '/compliance' },

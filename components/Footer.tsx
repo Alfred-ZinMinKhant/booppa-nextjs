@@ -28,6 +28,8 @@ export default function Footer() {
             <h4 className="font-bold text-[#0f172a] mb-6">Company</h4>
             <ul className="space-y-4">
               <li><Link href="/pricing" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Pricing</Link></li>
+              <li><Link href="/vendors" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Vendor Directory</Link></li>
+              <li><Link href="/rankings" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Rankings</Link></li>
               <li><Link href="/blog" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Blog</Link></li>
               <li><Link href="/support" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Support</Link></li>
               <li><Link href="/enterprise" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Enterprise Access</Link></li>
@@ -38,6 +40,7 @@ export default function Footer() {
             <h4 className="font-bold text-[#0f172a] mb-6">Tools</h4>
             <ul className="space-y-4">
               <li><Link href="/verify" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Verify Evidence</Link></li>
+              <li><Link href="/compare" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Compare Vendors</Link></li>
               <li><Link href="/rfp-acceleration" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Compare RFP Plans</Link></li>
               <li><Link href="/support" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Open Ticket</Link></li>
             </ul>
@@ -52,6 +55,15 @@ export default function Footer() {
             <p className="text-[#64748b] text-sm">
               © 2024 BOOPPA. Singapore-based compliance infrastructure.
             </p>
+          </div>
+          <div className="flex flex-wrap gap-4 text-xs text-[#94a3b8]">
+            <Link href="/privacy" className="hover:text-[#10b981] transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-[#10b981] transition-colors">Terms</Link>
+            <Link href="/cookies" className="hover:text-[#10b981] transition-colors">Cookies</Link>
+            <Link href="/acceptable-use" className="hover:text-[#10b981] transition-colors">Acceptable Use</Link>
+            <Link href="/disclaimer" className="hover:text-[#10b981] transition-colors">Disclaimer</Link>
+            <Link href="/dpo" className="hover:text-[#10b981] transition-colors">DPO</Link>
+            <Link href="/security" className="hover:text-[#10b981] transition-colors">Security</Link>
           </div>
         </div>
       </div>

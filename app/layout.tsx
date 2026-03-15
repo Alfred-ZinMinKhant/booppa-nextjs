@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import TrackerGate from "@/components/TrackerGate";
+import FunnelTracker from "@/components/FunnelTracker";
 
 const dmSans = DM_Sans({ 
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export default function RootLayout({
         <Footer />
         <TrackerGate />
         <CookieBanner />
+        <FunnelTracker />
       </body>
     </html>
   );

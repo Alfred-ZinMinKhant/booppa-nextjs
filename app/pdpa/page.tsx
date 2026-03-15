@@ -1,27 +1,82 @@
 'use client';
 
 import { useState } from 'react';
+import { config } from '@/lib/config';
+
+function normalizeUrl(input: string): string {
+  let url = input.trim();
+  if (!url) return url;
+  // Strip leading slashes or whitespace
+  url = url.replace(/^\/+/, '');
+  // If it doesn't start with a protocol, add https://
+  if (!/^https?:\/\//i.test(url)) {
+    url = 'https://' + url;
+  }
+  return url;
+}
 
 export default function PDPAPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const apiBase = config.apiUrl;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Original logic was redirecting to Stripe
     const formData = new FormData(e.currentTarget);
-    const data = {
-      website: formData.get('website'),
-      email: formData.get('email'),
-      company: formData.get('company'),
-    };
+    const website = normalizeUrl(formData.get('website') as string || '');
+    const email = (formData.get('email') as string || '').trim();
+    const company = (formData.get('company') as string || '').trim();
 
-    console.log('Form submitted:', data);
-    
-    // For now, mirroring the HTML behavior (alert) but could be integrated with Stripe
-    alert('Redirecting to Stripe Checkout...\n\nWebsite: ' + data.website + '\nEmail: ' + data.email);
-    setIsLoading(false);
+    if (!website) {
+      alert('Please enter a website URL');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // 1. Create report
+      const reportRes = await fetch(`${apiBase}/api/reports/public`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          framework: 'pdpa_quick_scan',
+          company_name: company || 'Quick Scan',
+          website,
+          assessment_data: { contact_email: email },
+          contact_email: email,
+        }),
+      });
+
+      if (!reportRes.ok) {
+        const text = await reportRes.text();
+        throw new Error(`Failed to create report: ${text}`);
+      }
+
+      const { report_id } = await reportRes.json();
+
+      // 2. Create Stripe checkout session
+      const checkoutRes = await fetch(`${apiBase}/api/stripe/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productType: 'pdpa_quick_scan',
+          reportId: report_id,
+          customerEmail: email,
+        }),
+      });
+
+      if (!checkoutRes.ok) {
+        const text = await checkoutRes.text();
+        throw new Error(`Failed to start checkout: ${text}`);
+      }
+
+      const { url } = await checkoutRes.json();
+      window.location.href = url;
+    } catch (err: any) {
+      alert(err.message || 'Something went wrong. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,11 +101,11 @@ export default function PDPAPage() {
                   Website URL *
                 </label>
                 <input 
-                  type="url" 
+                  type="text" 
                   id="website" 
                   name="website" 
                   className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all" 
-                  placeholder="https://example.com"
+                  placeholder="booppa.io"
                   required
                 />
                 <p className="mt-2 text-xs text-[#94a3b8]">

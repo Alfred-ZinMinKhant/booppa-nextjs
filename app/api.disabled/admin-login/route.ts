@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Replace with your backend URL
-  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+  const backendUrl = process.env.BACKEND_URL || "https://api.booppa.io";
 
   const res = await fetch(`${backendUrl}/api/v1/auth/token`, {
     method: "POST",

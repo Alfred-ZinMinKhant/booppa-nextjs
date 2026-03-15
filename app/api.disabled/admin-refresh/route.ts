@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ detail: "Missing refresh token" }, { status: 400 });
   }
   // Replace with your backend URL
-  const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+  const backendUrl = process.env.BACKEND_URL || "https://api.booppa.io";
   const res = await fetch(`${backendUrl}/api/v1/auth/refresh`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

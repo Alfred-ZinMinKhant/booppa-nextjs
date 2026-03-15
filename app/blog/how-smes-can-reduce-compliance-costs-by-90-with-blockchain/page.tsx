@@ -15,7 +15,7 @@ export default function ConversionPost() {
         body: JSON.stringify({ article: 'conversion-layer', cta: 'primary', action: 'click' }),
       });
 
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? 'https://api.booppa.io';
       const res = await fetch(`${apiBase}/api/stripe/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

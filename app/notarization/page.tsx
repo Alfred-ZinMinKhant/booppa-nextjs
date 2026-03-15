@@ -1,23 +1,43 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { config } from '@/lib/config';
 
 export default function NotarizationPage() {
-  const notarizeCheckout = (plan: string) => {
-    const plans: Record<string, { name: string; price: string }> = {
-      'single': { name: '1 Document', price: 'SGD 69' },
-      'batch10': { name: '10 Documents', price: 'SGD 390' },
-      'batch50': { name: '50 Documents', price: 'SGD 1,750' }
-    };
-    
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const apiBase = config.apiUrl;
+
+  const notarizeCheckout = async (plan: string) => {
     const productMap: Record<string, string> = {
       'single': 'compliance_notarization_1',
       'batch10': 'compliance_notarization_10',
       'batch50': 'compliance_notarization_50'
     };
-    
-    window.location.href = `${config.apiUrl}/api/checkout?product=${productMap[plan]}`;
+
+    setLoadingPlan(plan);
+    try {
+      const res = await fetch(`${apiBase}/api/stripe/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productType: productMap[plan] }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+      }
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        alert('Failed to create checkout session');
+      }
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      alert('Checkout failed. Please try again.');
+    } finally {
+      setLoadingPlan(null);
+    }
   };
 
   return (
@@ -57,8 +77,8 @@ export default function NotarizationPage() {
                     </li>
                   ))}
                 </ul>
-                <button onClick={() => notarizeCheckout('single')} className="btn btn-primary w-full shadow-lg">
-                  Notarize 1 Document — SGD 69
+                <button onClick={() => notarizeCheckout('single')} disabled={loadingPlan === 'single'} className="btn btn-primary w-full shadow-lg disabled:opacity-50">
+                  {loadingPlan === 'single' ? 'Redirecting…' : 'Notarize 1 Document — SGD 69'}
                 </button>
               </div>
 
@@ -76,8 +96,8 @@ export default function NotarizationPage() {
                   ))}
                 </ul>
                 <p className="text-sm font-bold text-[#10b981] mb-8">Save 43% vs single notarization</p>
-                <button onClick={() => notarizeCheckout('batch10')} className="btn btn-primary w-full shadow-lg">
-                  Notarize 10 Documents — SGD 390
+                <button onClick={() => notarizeCheckout('batch10')} disabled={loadingPlan === 'batch10'} className="btn btn-primary w-full shadow-lg disabled:opacity-50">
+                  {loadingPlan === 'batch10' ? 'Redirecting…' : 'Notarize 10 Documents — SGD 390'}
                 </button>
               </div>
 
@@ -96,8 +116,8 @@ export default function NotarizationPage() {
                   ))}
                 </ul>
                 <p className="text-sm font-bold text-[#10b981] mb-8">Save 49% vs single notarization</p>
-                <button onClick={() => notarizeCheckout('batch50')} className="btn btn-primary w-full shadow-lg">
-                  Notarize 50 Documents — SGD 1,750
+                <button onClick={() => notarizeCheckout('batch50')} disabled={loadingPlan === 'batch50'} className="btn btn-primary w-full shadow-lg disabled:opacity-50">
+                  {loadingPlan === 'batch50' ? 'Redirecting…' : 'Notarize 50 Documents — SGD 1,750'}
                 </button>
               </div>
             </div>

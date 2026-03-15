@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ||
   process.env.NEXT_PUBLIC_BACKEND_BASE ||
-  "http://localhost:8000";
+  "https://api.booppa.io";
 
 async function fetchVerification(hash: string) {
   const res = await fetch(`${API_BASE}/api/v1/verify/${hash}`, {

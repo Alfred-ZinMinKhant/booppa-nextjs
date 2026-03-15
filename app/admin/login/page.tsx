@@ -14,7 +14,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError("");
     try {
-      const base = process.env.NEXT_PUBLIC_API_BASE || "";
+      const base = process.env.NEXT_PUBLIC_API_BASE || "https://api.booppa.io";
       const body = new URLSearchParams({ username: email, password });
       const res = await fetch(`${base}/api/v1/auth/token`, {
         method: "POST",
