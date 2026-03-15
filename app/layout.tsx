@@ -19,6 +19,7 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.booppa.io'),
   title: "BOOPPA – Blockchain Compliance Evidence | Singapore PDPA & MAS",
   description: "Enterprise blockchain compliance for Singapore. PDPA Suite from SGD 299/month. Compliance Suite from SGD 1,299/month. Trusted by 2,800+ companies.",
   keywords: "PDPA Singapore, MAS compliance, blockchain evidence, compliance notarization, Singapore compliance",

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { config } from '@/lib/config';
@@ -71,7 +71,7 @@ const STEPS = [
 ];
 
 /* ── Component ── */
-export default function NotarizationResultPage() {
+function NotarizationResultContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const reportIdParam = searchParams.get('report_id');
@@ -377,5 +377,20 @@ export default function NotarizationResultPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function NotarizationResultPage() {
+  return (
+    <Suspense fallback={
+      <main className="bg-gradient-to-b from-[#f0fdf4] via-white to-[#f8fafc] min-h-screen py-16 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h1 className="text-4xl font-black text-[#0f172a] mb-4">Notarization Certificate</h1>
+          <p className="text-[#64748b]">Loading…</p>
+        </div>
+      </main>
+    }>
+      <NotarizationResultContent />
+    </Suspense>
   );
 }
