@@ -9,6 +9,9 @@ const publicRoutes  = [
   '/privacy', '/terms', '/security',
   '/dpo', '/cookies', '/acceptable-use', '/disclaimer',
   '/compare', '/rankings', '/insight-dome',
+  '/notarization', '/pdpa', '/compliance', '/supply-chain',
+  '/rfp-acceleration', '/enterprise', '/demo', '/thank-you',
+  '/qr-scan',
 ]
 const publicPrefixes = ['/verify', '/vendors', '/blog']
 
