@@ -1,9 +1,32 @@
 'use client';
 
-import Link from 'next/link';
+import { useState } from 'react';
 import { config } from '@/lib/config';
 
 export default function RFPAccelerationPage() {
+  const [loading, setLoading] = useState<string | null>(null);
+
+  async function handleCheckout(productType: string) {
+    setLoading(productType);
+    try {
+      const res = await fetch(`${config.apiUrl}/api/stripe/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productType }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.detail || 'Checkout failed. Please try again.');
+      }
+    } catch {
+      alert('Network error. Please try again.');
+    } finally {
+      setLoading(null);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -23,12 +46,20 @@ export default function RFPAccelerationPage() {
             BOOPPA generates blockchain-verified evidence that procurement teams trust.
           </p>
           <div className="flex flex-wrap justify-center gap-6">
-            <a href={`${config.apiUrl}/api/checkout?product=rfp_kit_express`} className="btn btn-primary px-10 py-4 text-lg">
-              RFP Kit Express — SGD 129
-            </a>
-            <a href={`${config.apiUrl}/api/checkout?product=rfp_kit_complete`} className="btn btn-secondary px-10 py-4 text-lg">
-              RFP Kit Complete — SGD 499
-            </a>
+            <button
+              onClick={() => handleCheckout('rfp_express')}
+              disabled={loading === 'rfp_express'}
+              className="btn btn-primary px-10 py-4 text-lg disabled:opacity-60"
+            >
+              {loading === 'rfp_express' ? 'Redirecting…' : 'RFP Kit Express — SGD 129'}
+            </button>
+            <button
+              onClick={() => handleCheckout('rfp_complete')}
+              disabled={loading === 'rfp_complete'}
+              className="btn btn-secondary px-10 py-4 text-lg disabled:opacity-60"
+            >
+              {loading === 'rfp_complete' ? 'Redirecting…' : 'RFP Kit Complete — SGD 499'}
+            </button>
           </div>
         </div>
       </section>
@@ -52,7 +83,13 @@ export default function RFPAccelerationPage() {
                 <li className="flex items-center gap-3 text-[#64748b] opacity-50"><span className="text-[#cbd5e1]">✕</span> No Editable DOCX</li>
                 <li className="flex items-center gap-3 text-[#64748b] opacity-50"><span className="text-[#cbd5e1]">✕</span> No AI Narrative</li>
               </ul>
-              <a href={`${config.apiUrl}/api/checkout?product=rfp_kit_express`} className="btn btn-primary w-full text-center py-4 block">Generate Express Evidence</a>
+              <button
+                onClick={() => handleCheckout('rfp_express')}
+                disabled={loading === 'rfp_express'}
+                className="btn btn-primary w-full text-center py-4 block disabled:opacity-60"
+              >
+                {loading === 'rfp_express' ? 'Redirecting…' : 'Generate Express Evidence'}
+              </button>
             </div>
 
             {/* Complete Tier */}
@@ -71,7 +108,13 @@ export default function RFPAccelerationPage() {
                 <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Attestation Letter</li>
                 <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Priority 12h Delivery</li>
               </ul>
-              <a href={`${config.apiUrl}/api/checkout?product=rfp_kit_complete`} className="btn btn-primary w-full text-center py-4 block">Get Full RFP Kit</a>
+              <button
+                onClick={() => handleCheckout('rfp_complete')}
+                disabled={loading === 'rfp_complete'}
+                className="btn btn-primary w-full text-center py-4 block disabled:opacity-60"
+              >
+                {loading === 'rfp_complete' ? 'Redirecting…' : 'Get Full RFP Kit'}
+              </button>
             </div>
           </div>
         </div>
