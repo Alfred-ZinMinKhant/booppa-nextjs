@@ -68,14 +68,9 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
             View Certificate
           </Link>
         ) : isRfp ? (
-          <>
-            <p className="text-gray-400 mt-4 text-sm text-center max-w-sm">
-              Your RFP Kit is being generated and will be delivered to your email within a few minutes.
-            </p>
-            <Link href="/vendor/dashboard" className="mt-4 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-              Go to Dashboard
-            </Link>
-          </>
+          <Link href={`/rfp-acceleration/result?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            View RFP Kit
+          </Link>
         ) : isVendorProof ? (
           <>
             <p className="text-gray-400 mt-4 text-sm text-center max-w-sm">
