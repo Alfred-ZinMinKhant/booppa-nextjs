@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { config } from "@/lib/config"
 
@@ -13,7 +13,7 @@ function normalizeUrl(input: string): string {
   return url
 }
 
-export default function VendorProofPage() {
+function VendorProofContent() {
   const searchParams = useSearchParams()
   const [website, setWebsite] = useState(searchParams.get("website") || "")
   const [company, setCompany] = useState(searchParams.get("company") || "")
@@ -171,5 +171,17 @@ export default function VendorProofPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function VendorProofPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-[70vh] flex items-center justify-center p-6">
+        <div className="text-gray-400">Loading...</div>
+      </main>
+    }>
+      <VendorProofContent />
+    </Suspense>
   )
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { CheckCircle, Loader2, AlertTriangle, Download } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 const POLL_INTERVAL_MS = 4000;
 const MAX_POLLS = 30; // 2 minutes
 
-export default function RFPResultPage() {
+function RFPResultContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
@@ -109,5 +109,17 @@ export default function RFPResultPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function RFPResultPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-[70vh] flex flex-col items-center justify-center p-4">
+        <Loader2 className="w-16 h-16 text-booppa-blue animate-spin" />
+      </main>
+    }>
+      <RFPResultContent />
+    </Suspense>
   );
 }
