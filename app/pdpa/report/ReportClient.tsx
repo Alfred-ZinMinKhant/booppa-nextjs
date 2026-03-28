@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
+import { config } from "@/lib/config";
 
 type StructuredReport = {
   executive_summary?: string;
@@ -37,6 +38,7 @@ export default function ReportClient() {
   const [screenshotError, setScreenshotError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [attempts, setAttempts] = useState(0);
+  const [retryTrigger, setRetryTrigger] = useState(0);
   const [progress, setProgress] = useState(12);
   const [loadingStep, setLoadingStep] = useState(0);
   const [verification, setVerification] = useState<any>(null);
@@ -73,8 +75,7 @@ export default function ReportClient() {
 
       let isReady = false;
       try {
-        const apiBase = process.env.NEXT_PUBLIC_API_BASE || "https://api.booppa.io";
-        const res = await fetch(`${apiBase}/api/reports/by-session?session_id=${sessionId}`);
+        const res = await fetch(`${config.apiUrl}/api/reports/by-session?session_id=${sessionId}`);
         if (res.ok) {
           const data = await res.json();
           if (data.report) {
@@ -94,7 +95,7 @@ export default function ReportClient() {
           }
           const hasScreenshot = Boolean(data.site_screenshot);
           const screenshotFailed = Boolean(data.screenshot_error);
-          if ((data.report || data.url) && (hasScreenshot || screenshotFailed)) {
+          if ((data.report || data.url) && (hasScreenshot || screenshotFailed || data.status === "completed")) {
             isReady = true;
             setStatus("ready");
             setMessage("Your report is ready. Review below.");
@@ -119,15 +120,20 @@ export default function ReportClient() {
         setMessage(e.message || "Network error while checking report");
       } finally {
         if (!isReady) {
-          setAttempts((prev) => prev + 1);
-          const nextAttempt = attempts + 1;
-          if (status !== "ready" && nextAttempt <= maxAttempts) {
-            const delay = Math.min(
-              Math.round(baseDelayMs * Math.pow(1.6, nextAttempt - 1)),
-              maxDelayMs
-            );
-            timeoutId = setTimeout(load, delay);
-          }
+          setAttempts((prev) => {
+            const next = prev + 1;
+            if (next > maxAttempts) {
+              setStatus("timeout");
+              setMessage("Report is taking longer than expected. Check your email — we'll send it there when it's ready.");
+            } else {
+              const delay = Math.min(
+                Math.round(baseDelayMs * Math.pow(1.6, next - 1)),
+                maxDelayMs
+              );
+              timeoutId = setTimeout(load, delay);
+            }
+            return next;
+          });
         }
       }
     }
@@ -137,10 +143,10 @@ export default function ReportClient() {
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [sessionId, attempts, status]);
+  }, [sessionId, retryTrigger]);
 
   useEffect(() => {
-    if (status !== "loading") return;
+    if (status !== "loading" || attempts > maxAttempts) return;
     const intervalId = setInterval(() => {
       setProgress((prev) => {
         const currentStep = loadingSteps[loadingStep] ?? loadingSteps[0];
@@ -161,7 +167,7 @@ export default function ReportClient() {
 
   return (
     <main className="min-h-[60vh] flex flex-col items-center justify-center p-4">
-      {status === "loading" && (
+      {status === "loading" && attempts <= maxAttempts && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-black via-gray-950 to-black">
           <div className="absolute inset-0 opacity-40">
             <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-booppa-blue/30 blur-3xl" />
@@ -242,7 +248,7 @@ export default function ReportClient() {
                       <div className="flex items-center gap-2 text-xs">
                         <span className="text-gray-500">Transaction Hash:</span>
                         <a
-                          href={`https://amoy.polygonscan.com/tx/${verification.tx_hash}`}
+                          href={verification.polygonscan_url || `https://amoy.polygonscan.com/tx/${verification.tx_hash}`}
                           target="_blank"
                           rel="noreferrer"
                           className="font-mono text-teal-400 hover:text-teal-300 transition"
@@ -397,10 +403,24 @@ export default function ReportClient() {
           <div className="mt-4">
             <p className="text-sm text-gray-400">If you just completed payment, the report may take a few minutes to generate.</p>
             <button
-              onClick={() => setAttempts((prev) => prev + 1)}
+              onClick={() => setRetryTrigger((t) => t + 1)}
               className="mt-4 inline-block px-4 py-2 bg-gray-800 text-white rounded"
             >
               Refresh
+            </button>
+          </div>
+        )}
+
+        {status === "timeout" && (
+          <div className="mt-8 max-w-md mx-auto text-center rounded-xl border border-yellow-700 bg-yellow-900/20 p-6">
+            <div className="text-yellow-400 text-2xl mb-3">⏳</div>
+            <p className="text-yellow-300 font-semibold mb-2">Still processing…</p>
+            <p className="text-gray-400 text-sm">{message}</p>
+            <button
+              onClick={() => { setStatus("loading"); setAttempts(0); setRetryTrigger((t) => t + 1); }}
+              className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-700 transition"
+            >
+              Try Again
             </button>
           </div>
         )}

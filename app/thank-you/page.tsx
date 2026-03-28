@@ -3,7 +3,7 @@ import VerifyPayment from '@/components/VerifyPayment';
 export default function ThankYouPage({
   searchParams,
 }: {
-  searchParams: { session_id: string };
+  searchParams: { session_id: string; product?: string };
 }) {
   return (
     <main className="min-h-[70vh] flex flex-col items-center justify-center p-4">
@@ -15,7 +15,7 @@ export default function ThankYouPage({
           Your payment has been received. We are verifying the transaction details...
         </p>
         {searchParams.session_id && (
-          <VerifyPayment sessionId={searchParams.session_id} />
+          <VerifyPayment sessionId={searchParams.session_id} product={searchParams.product} />
         )}
       </div>
     </main>

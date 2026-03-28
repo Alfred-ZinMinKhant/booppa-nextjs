@@ -159,7 +159,7 @@ function VendorProfile({ vendor }: { vendor: any }) {
               <h3 className="font-bold text-[#0f172a] mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <Link
-                  href={`/trial?vendor=${vendor.seo_slug}`}
+                  href={`/vendor-proof?company=${encodeURIComponent(vendor.company_name)}&website=${encodeURIComponent(vendor.website || '')}`}
                   className="block w-full text-center py-3 px-4 bg-[#10b981] text-white font-bold rounded-xl hover:bg-[#059669] transition-colors"
                 >
                   Run Vendor Proof

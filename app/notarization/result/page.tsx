@@ -80,6 +80,8 @@ function NotarizationResultContent() {
   const [cert, setCert] = useState<CertificateData | null>(null);
   const [error, setError] = useState('');
   const [polling, setPolling] = useState(true);
+  const [pollCount, setPollCount] = useState(0);
+  const MAX_POLLS = 45; // ~3 minutes at 4s intervals
   const apiBase = config.apiUrl;
 
   /* Step 1: resolve report_id from Stripe session if we only have session_id */
@@ -130,7 +132,16 @@ function NotarizationResultContent() {
       setCert(data);
       if (data.pipeline.certificate_ready) {
         setPolling(false);
+        return;
       }
+      setPollCount((prev) => {
+        const next = prev + 1;
+        if (next >= MAX_POLLS) {
+          setPolling(false);
+          setError('Processing is taking longer than expected. Your certificate will be emailed once ready — you can close this page.');
+        }
+        return next;
+      });
     } catch {
       // Silently retry on network errors
     }

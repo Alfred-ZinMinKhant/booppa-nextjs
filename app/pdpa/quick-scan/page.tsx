@@ -27,6 +27,10 @@ export default function QuickScanPage() {
       alert("Website is required for the Quick Scan");
       return;
     }
+    if (!email.trim()) {
+      alert("Email is required so we can deliver your report.");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -76,7 +80,7 @@ export default function QuickScanPage() {
           <label className="block text-sm text-gray-300 mb-1">Company name (optional)</label>
           <input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company Ltd" className="w-full mb-3 p-2 rounded bg-gray-800 border border-gray-700 text-white" />
 
-          <label className="block text-sm text-gray-300 mb-1">Contact email (optional)</label>
+          <label className="block text-sm text-gray-300 mb-1">Contact email *</label>
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" className="w-full mb-4 p-2 rounded bg-gray-800 border border-gray-700 text-white" />
 
           <div className="flex justify-end">

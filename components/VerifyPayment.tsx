@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function VerifyPayment({ sessionId }: { sessionId: string }) {
+export default function VerifyPayment({ sessionId, product: productProp }: { sessionId: string; product?: string }) {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Verifying your payment status...');
+  const [productType, setProductType] = useState<string | undefined>(productProp);
 
   useEffect(() => {
     async function verify() {
@@ -18,13 +19,7 @@ export default function VerifyPayment({ sessionId }: { sessionId: string }) {
         if (response.ok && data.success) {
           setStatus('success');
           setMessage('Payment successfully verified! Your service has been activated.');
-          // store product type for conditional UI (e.g., quick-scan -> show file)
-          if (data.product_type) {
-            (window as any).__booppa_product_type = data.product_type;
-          }
-          if (data.customer_email) {
-            (window as any).__booppa_customer_email = data.customer_email;
-          }
+          if (data.product_type) setProductType(data.product_type);
         } else {
           setStatus('error');
           setMessage('Payment verification failed. Please check your email for confirmation or contact support.');
@@ -55,18 +50,43 @@ export default function VerifyPayment({ sessionId }: { sessionId: string }) {
       </>
     );
   } else if (status === 'success') {
-    const product = (window as any).__booppa_product_type;
+    const isPdpa = productType === 'pdpa_quick_scan';
+    const isNotarization = productType?.startsWith('compliance_notarization');
+    const isRfp = productType === 'rfp_express' || productType === 'rfp_complete';
+    const isVendorProof = productType === 'vendor_proof';
     content = (
       <>
         <CheckCircle className={`${iconClass} text-booppa-green`} />
         <h2 className="text-2xl font-semibold text-white">Payment Confirmed!</h2>
         <p className="text-gray-400 mt-2">{message}</p>
-        {product === 'pdpa_quick_scan' ? (
+        {isPdpa ? (
           <Link href={`/pdpa/report?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-            View Report
+            View PDPA Report
           </Link>
+        ) : isNotarization ? (
+          <Link href={`/notarization/result?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            View Certificate
+          </Link>
+        ) : isRfp ? (
+          <>
+            <p className="text-gray-400 mt-4 text-sm text-center max-w-sm">
+              Your RFP Kit is being generated and will be delivered to your email within a few minutes.
+            </p>
+            <Link href="/vendor/dashboard" className="mt-4 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+              Go to Dashboard
+            </Link>
+          </>
+        ) : isVendorProof ? (
+          <>
+            <p className="text-gray-400 mt-4 text-sm text-center max-w-sm">
+              Your Vendor Proof report is being generated. You will receive a blockchain-notarized PDF certificate by email within a few minutes.
+            </p>
+            <Link href="/vendor/dashboard" className="mt-4 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+              Go to Dashboard
+            </Link>
+          </>
         ) : (
-          <Link href="/admin/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+          <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             Go to Dashboard
           </Link>
         )}

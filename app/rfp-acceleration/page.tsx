@@ -3,6 +3,15 @@
 import { useState } from 'react';
 import { config } from '@/lib/config';
 
+function normalizeUrl(input: string): string {
+  let url = input.trim();
+  if (!url) return url;
+  if (!/^https?:\/\//i.test(url)) {
+    url = 'https://' + url;
+  }
+  return url;
+}
+
 interface VendorForm {
   company_name: string;
   vendor_url: string;
@@ -43,7 +52,7 @@ export default function RFPAccelerationPage() {
         body: JSON.stringify({
           productType,
           company_name: vendorForm.company_name.trim(),
-          vendor_url: vendorForm.vendor_url.trim(),
+          vendor_url: normalizeUrl(vendorForm.vendor_url),
           rfp_description: vendorForm.rfp_description.trim(),
         }),
       });
@@ -89,7 +98,7 @@ export default function RFPAccelerationPage() {
               <div>
                 <label className="block text-sm font-medium text-[#0f172a] mb-1">Company Website <span className="text-red-500">*</span></label>
                 <input
-                  type="url"
+                  type="text"
                   className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
                   placeholder="https://acme.com"
                   value={form.vendor_url}
