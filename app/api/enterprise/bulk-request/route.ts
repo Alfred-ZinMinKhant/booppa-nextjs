@@ -33,17 +33,31 @@ export async function POST(request: Request) {
       )
     }
 
+    // Decode company name from JWT in the httpOnly token cookie
+    const { cookies } = await import('next/headers');
+    const cookieStore = cookies();
+    const token = cookieStore.get('token')?.value;
+    let requesterCompany = 'Unknown Enterprise';
+    if (token) {
+      try {
+        const payload = JSON.parse(
+          Buffer.from(token.split('.')[1], 'base64url').toString('utf8')
+        );
+        requesterCompany = payload.company || payload.sub || 'Unknown Enterprise';
+      } catch { /* invalid token shape — keep default */ }
+    }
+
     // Send requests to backend
-    // This triggers the "Enterprise Loop" from Blueprint v19.5
-    const response = await fetch(`${process.env.API_URL}/api/enterprise/send-requests`, {
+    const { config } = await import('@/lib/config');
+    const response = await fetch(`${config.apiUrl}/api/v1/enterprise/send-requests`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${request.headers.get('authorization')?.split(' ')[1]}`
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
       body: JSON.stringify({
         vendors,
-        requester_company: 'Enterprise Corp', // from JWT
+        requester_company: requesterCompany,
         request_type: 'booppa-proof'
       })
     })

@@ -1,18 +1,31 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { config } from '@/lib/config';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
-    // In a real implementation, this would validate the business details 
-    // and save the vendor trial to the database.
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Trial account generated successfully',
-      data: body
+
+    const res = await fetch(`${config.apiUrl}/api/v1/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: body.email,
+        password: body.password || crypto.randomUUID(),
+        company: body.company_name || body.company || '',
+      }),
     });
-  } catch (error) {
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { success: false, error: data.detail || 'Registration failed' },
+        { status: res.status }
+      );
+    }
+
+    return NextResponse.json({ success: true, message: 'Trial account created', data });
+  } catch {
     return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
   }
 }

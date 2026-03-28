@@ -10,15 +10,17 @@ const navigation = [
   { name: 'Vendors', href: '/vendors' },
   { name: 'Compare', href: '/compare' },
   { name: 'Rankings', href: '/rankings' },
+  { name: 'Tender Check', href: '/tender-check' },
   { name: 'RFP Kit', href: '/rfp-acceleration' },
+  { name: 'Pricing', href: '/pricing' },
   { name: 'PDPA Scan', href: '/pdpa' },
   { name: 'Compliance', href: '/compliance' },
   { name: 'Notarization', href: '/notarization' },
   { name: 'Verify', href: '/verify' },
   { name: 'Briefing', href: '/enterprise-briefing' },
   { name: 'Trial', href: '/trial' },
-  { name: 'Vendor Dashboard', href: '/vendor/dashboard' },
-  { name: 'Intelligence', href: '/admin/intelligence' },
+  { name: 'Dashboard', href: '/vendor/dashboard' },
+  { name: 'Sign In', href: '/auth/login' },
 ];
 
 export default function Navigation() {

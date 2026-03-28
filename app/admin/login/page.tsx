@@ -14,20 +14,15 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError("");
     try {
-      const base = process.env.NEXT_PUBLIC_API_BASE || "https://api.booppa.io";
-      const body = new URLSearchParams({ username: email, password });
-      const res = await fetch(`${base}/api/v1/auth/token`, {
+      const res = await fetch("/api/admin/login", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: body.toString(),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.detail || "Login failed");
-      }
       const data = await res.json();
-      // Store token in localStorage (or cookie if preferred)
-      localStorage.setItem("admin_token", data.access_token);
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed");
+      }
       router.push("/admin/dashboard");
     } catch (err: any) {
       setError(err.message || "Login failed");

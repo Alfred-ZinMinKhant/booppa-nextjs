@@ -37,7 +37,7 @@ export default function PricingPage() {
 
           {/* ONE-TIME PRICING */}
           {activeTab === 'oneoff' && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
               <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Snapshot</h3>
                 <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 69</div>
@@ -83,6 +83,64 @@ export default function PricingPage() {
                   Batch pricing: 10 docs (SGD 390) | 50 docs (SGD 1,750)
                 </p>
                 <Link href="/notarization" className="btn btn-outline w-full">View Packages</Link>
+              </div>
+
+              {/* RFP Kit Express */}
+              <div className="bg-white p-10 rounded-[2.5rem] border-2 border-violet-500 shadow-xl relative hover:translate-y-[-5px] transition-all">
+                <div className="absolute top-[-15px] right-8 bg-violet-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">GeBIZ Ready</div>
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">RFP Kit Express</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 129</div>
+                <p className="text-sm text-[#64748b] mb-8">2-page evidence certificate</p>
+                <ul className="space-y-4 mb-10">
+                  {[
+                    '5 PDPA compliance Q&A answers',
+                    'AI-generated, sector-tailored',
+                    'Blockchain-anchored PDF certificate',
+                    'Ready to attach to GeBIZ submission',
+                    'Delivered by email in minutes',
+                    'Valid for 7 days'
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-violet-500 font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/auth/register?product=rfp_express"
+                  className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg"
+                >
+                  Get RFP Kit Express
+                </Link>
+              </div>
+
+              {/* RFP Kit Complete */}
+              <div className="bg-white p-10 rounded-[2.5rem] border-2 border-emerald-500 shadow-xl relative hover:translate-y-[-5px] transition-all">
+                <div className="absolute top-[-15px] right-8 bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Best Value</div>
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">RFP Kit Complete</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 499</div>
+                <p className="text-sm text-[#64748b] mb-8">Full 15-question evidence pack</p>
+                <ul className="space-y-4 mb-10">
+                  {[
+                    '15 PDPA compliance Q&A answers',
+                    'Editable DOCX + PDF certificate',
+                    'Sector-specific deep analysis',
+                    'Blockchain-anchored evidence',
+                    'Executive summary page',
+                    'Priority email delivery'
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-emerald-500 font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/auth/register?product=rfp_complete"
+                  className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg"
+                >
+                  Get RFP Kit Complete
+                </Link>
               </div>
             </div>
           )}

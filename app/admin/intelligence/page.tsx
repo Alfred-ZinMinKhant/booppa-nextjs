@@ -4,23 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { Eye, TrendingUp, AlertTriangle, ShieldAlert, LineChart as ChartIcon, Activity } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
-const INDEX_DATA = [
-  { p: 'Jun', score: 65, triggers: 12 },
-  { p: 'Jul', score: 68, triggers: 18 },
-  { p: 'Aug', score: 66, triggers: 15 },
-  { p: 'Sep', score: 72, triggers: 24 },
-  { p: 'Oct', score: 78, triggers: 45 },
-  { p: 'Nov', score: 85, triggers: 62 },
-];
-
 export default function AdminIntelligence() {
-  const [data, setData] = useState({ 
-    globalPulse: 81.4, 
-    activeWindows: 412, 
-    vulnerableVectors: 14, 
-    enterpriseValue: 4100000, 
-    indexData: INDEX_DATA,
-    topEnterprises: [] 
+  const [data, setData] = useState({
+    globalPulse: 0,
+    activeWindows: 0,
+    vulnerableVectors: 0,
+    enterpriseValue: 0,
+    indexData: [] as { p: string; score: number; triggers: number }[],
+    topEnterprises: [] as { domain: string; score: number; industry: string; value: string; status: string }[],
   });
   const [loading, setLoading] = useState(true);
 

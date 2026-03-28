@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { config, endpoints } from "@/lib/config";
+import { endpoints } from "@/lib/config";
 
 interface FeatureFlag {
   flag_name: string;
@@ -23,86 +23,43 @@ interface FunnelStage {
 }
 
 export default function AdminDashboard() {
-  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [metrics, setMetrics] = useState<GrowthMetrics | null>(null);
   const [funnel, setFunnel] = useState<FunnelStage[]>([]);
   const router = useRouter();
 
+  // Load dashboard data — cookies are sent automatically (httpOnly)
   useEffect(() => {
-    const t = localStorage.getItem("admin_token");
-    if (!t) {
-      router.replace("/admin/login");
-    } else {
-      setToken(t);
-      setLoading(false);
-    }
-  }, [router]);
-
-  // Load dashboard data once authenticated
-  useEffect(() => {
-    if (!token) return;
     Promise.all([
-      fetch(`${config.apiUrl}/api/v1${endpoints.features.list}`).then(r => r.ok ? r.json() : null),
-      fetch(`${config.apiUrl}/api/v1${endpoints.features.metrics}`).then(r => r.ok ? r.json() : null),
-      fetch(`${config.apiUrl}/api/v1${endpoints.funnel.summary}`).then(r => r.ok ? r.json() : null),
+      fetch(`/api/v1${endpoints.features.list}`, { credentials: 'include' }).then(r => {
+        if (r.status === 401) { router.replace("/admin/login"); return null; }
+        return r.ok ? r.json() : null;
+      }),
+      fetch(`/api/v1${endpoints.features.metrics}`, { credentials: 'include' }).then(r => r.ok ? r.json() : null),
+      fetch(`/api/v1${endpoints.funnel.summary}`, { credentials: 'include' }).then(r => r.ok ? r.json() : null),
     ]).then(([flagData, metricsData, funnelData]) => {
       setFlags(flagData?.flags || flagData || []);
       setMetrics(metricsData);
       setFunnel(funnelData?.stages || []);
-    }).catch(() => {});
-  }, [token]);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, [router]);
 
-  // Token refresh logic (every 10 minutes)
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const refreshToken = localStorage.getItem("admin_refresh_token");
-      if (!refreshToken) return;
-      setRefreshing(true);
-      setError("");
-      try {
-        const res = await fetch(`${config.apiUrl}/api/v1/auth/refresh`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh_token: refreshToken }),
-        });
-        const data = await res.json();
-        if (res.ok && data.access_token) {
-          localStorage.setItem("admin_token", data.access_token);
-          if (data.refresh_token) {
-            localStorage.setItem("admin_refresh_token", data.refresh_token);
-          }
-        } else {
-          setError(data.detail || "Token refresh failed");
-        }
-      } catch (err: any) {
-        setError(err.message || "Token refresh failed");
-      } finally {
-        setRefreshing(false);
-      }
-    }, 10 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_refresh_token");
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
     router.replace("/admin/login");
   };
 
   const toggleFlag = async (flagName: string, currentValue: boolean) => {
     try {
       const res = await fetch(
-        `${config.apiUrl}/api/v1${endpoints.features.set(flagName)}`,
+        `/api/v1${endpoints.features.set(flagName)}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
+          headers: { "Content-Type": "application/json" },
+          credentials: 'include',
           body: JSON.stringify({ enabled: !currentValue }),
         }
       );
@@ -147,11 +104,6 @@ export default function AdminDashboard() {
       {error && (
         <div className="max-w-[1200px] mx-auto px-6 pt-4">
           <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm">{error}</div>
-        </div>
-      )}
-      {refreshing && (
-        <div className="max-w-[1200px] mx-auto px-6 pt-4">
-          <div className="text-sm text-[#64748b]">Refreshing token...</div>
         </div>
       )}
 

@@ -6,17 +6,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import VendorStatusBadge from '@/components/vendor/VendorStatusBadge';
 import SectorPressureWidget from '@/components/vendor/SectorPressureWidget';
 import CalDashboard from '@/components/vendor/CalDashboard';
+import TenderWinProbabilityWidget from '@/components/vendor/TenderWinProbabilityWidget';
 
-// In a real app, this data is fetched from the V6 OS backend `/api/vendor/dashboard`
-const MOUNT_DATA = [
-  { name: 'Mon', views: 4, triggers: 0 },
-  { name: 'Tue', views: 7, triggers: 1 },
-  { name: 'Wed', views: 12, triggers: 2 },
-  { name: 'Thu', views: 28, triggers: 5 },
-  { name: 'Fri', views: 45, triggers: 8 },
-  { name: 'Sat', views: 42, triggers: 4 },
-  { name: 'Sun', views: 56, triggers: 12 },
-];
 
 export default function VendorDashboard() {
   const [mounted, setMounted] = useState(false);
@@ -38,12 +29,9 @@ export default function VendorDashboard() {
 
   if (!mounted || loading) return null;
 
-  const chartInfo = data.chartData.length ? data.chartData : MOUNT_DATA;
-  const stats = data.stats || { trustScore: 78, enterpriseViews: 184, activeProcurements: 3, govAgencies: 12 };
-  const history = data.recentActivity.length ? data.recentActivity : [
-    { domain: 'defence.gov.sg', type: 'High-Intent View', time: '2 mins ago', color: 'text-purple-400', bg: 'bg-purple-400/10' },
-    { domain: 'dbs.com.sg', type: 'Repeated Visit', time: '14 mins ago', color: 'text-amber-400', bg: 'bg-amber-400/10' }
-  ];
+  const chartInfo = data.chartData;
+  const stats = data.stats ?? { trustScore: 0, enterpriseViews: 0, activeProcurements: 0, govAgencies: 0 };
+  const history = data.recentActivity;
 
   return (
     <div className="min-h-screen bg-neutral-950 p-6">
@@ -209,10 +197,11 @@ export default function VendorDashboard() {
         {/* ── V8 Trust & Activation Layer ─────────────────────────── */}
         <div className="pt-2 border-t border-neutral-800">
           <h2 className="text-sm font-semibold text-neutral-400 mb-4">Trust & Activation</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
             <VendorStatusBadge />
             <SectorPressureWidget />
             <CalDashboard />
+            <TenderWinProbabilityWidget />
           </div>
         </div>
 

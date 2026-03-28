@@ -11,24 +11,46 @@ export default function VerifyPage() {
     txHash: string;
     status: string;
     polygonscanUrl: string;
+    network: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleVerify = (e: React.FormEvent) => {
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate verification (in production, this would call /api/verify endpoint)
-    setTimeout(() => {
+    setError('');
+    setResults(null);
+
+    try {
+      const res = await fetch(`/api/v1/verify/${encodeURIComponent(hash.trim())}`);
+      if (res.status === 404) {
+        setError('No record found for this hash or verification ID.');
+        return;
+      }
+      if (!res.ok) {
+        setError('Verification failed — please check the hash and try again.');
+        return;
+      }
+      const record = await res.json();
+      const txHash = record.tx_hash || hash.trim();
       setResults({
-        docType: 'PDPA Evidence Scan',
-        timestamp: new Date().toLocaleString('en-SG', { timeZone: 'Asia/Singapore' }) + ' SGT',
-        txHash: hash.length > 20 ? hash.substring(0, 10) + '...' + hash.substring(hash.length - 8) : hash,
-        status: 'Confirmed (24 blocks)',
-        polygonscanUrl: `https://polygonscan.com/tx/${hash}`
+        docType: record.framework || 'Compliance Evidence',
+        timestamp: record.anchored_at
+          ? new Date(record.anchored_at).toLocaleString('en-SG', { timeZone: 'Asia/Singapore' }) + ' SGT'
+          : 'Pending confirmation',
+        txHash: txHash.length > 20
+          ? txHash.substring(0, 10) + '...' + txHash.substring(txHash.length - 8)
+          : txHash,
+        status: record.anchored ? 'Anchored on-chain' : 'Pending anchor',
+        polygonscanUrl: `https://amoy.polygonscan.com/tx/${txHash}`,
+        network: 'Polygon Amoy Testnet',
       });
+    } catch {
+      setError('Network error — please try again.');
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -74,20 +96,30 @@ export default function VerifyPage() {
               </button>
             </form>
 
+            {error && (
+              <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm font-medium">
+                {error}
+              </div>
+            )}
+
             {results && (
               <div className="mt-12 p-8 bg-[#f0fdf4] rounded-[2rem] border-2 border-[#10b981] animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="flex items-center gap-3 mb-8">
+                <div className="flex items-center gap-3 mb-6">
                   <div className="w-8 h-8 bg-[#10b981] rounded-full flex items-center justify-center text-white">
                     <span className="font-bold">✓</span>
                   </div>
                   <h3 className="text-2xl font-black text-[#059669]">Evidence Verified</h3>
                 </div>
-                
+
+                <div className="mb-6 px-4 py-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-800 text-sm font-medium">
+                  🔶 Testnet Notice: This blockchain anchor is on <strong>Polygon Amoy testnet</strong>, not mainnet.
+                </div>
+
                 <div className="space-y-4 mb-8">
                   {[
                     { l: 'Document Type', v: results.docType },
                     { l: 'Timestamp', v: results.timestamp },
-                    { l: 'Blockchain', v: 'Polygon Mainnet' },
+                    { l: 'Network', v: results.network },
                     { l: 'Transaction Hash', v: results.txHash, mono: true },
                     { l: 'Status', v: results.status, color: 'text-[#10b981]' }
                   ].map((item, i) => (
@@ -104,7 +136,7 @@ export default function VerifyPage() {
                   rel="noopener noreferrer"
                   className="btn btn-outline w-full py-4 text-[#0f172a] border-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all font-bold"
                 >
-                  View on Polygonscan →
+                  View on Amoy Polygonscan (Testnet) →
                 </a>
               </div>
             )}
