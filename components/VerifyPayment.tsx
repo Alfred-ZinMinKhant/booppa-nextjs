@@ -50,7 +50,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
       </>
     );
   } else if (status === 'success') {
-    const isPdpa = productType === 'pdpa_quick_scan';
+    const isPdpa = productType?.startsWith('pdpa');
     const isNotarization = productType?.startsWith('compliance_notarization');
     const isRfp = productType === 'rfp_express' || productType === 'rfp_complete';
     const isVendorProof = productType === 'vendor_proof';
