@@ -3,32 +3,130 @@
 import { useState } from 'react';
 import { config } from '@/lib/config';
 
+interface VendorForm {
+  company_name: string;
+  vendor_url: string;
+  rfp_description: string;
+}
+
 export default function RFPAccelerationPage() {
   const [loading, setLoading] = useState<string | null>(null);
+  const [modalProduct, setModalProduct] = useState<string | null>(null);
+  const [form, setForm] = useState<VendorForm>({ company_name: '', vendor_url: '', rfp_description: '' });
+  const [formError, setFormError] = useState('');
 
-  async function handleCheckout(productType: string) {
+  function openModal(productType: string) {
+    setModalProduct(productType);
+    setFormError('');
+  }
+
+  function closeModal() {
+    setModalProduct(null);
+    setFormError('');
+  }
+
+  async function handleCheckout(productType: string, vendorForm: VendorForm) {
+    if (!vendorForm.company_name.trim()) {
+      setFormError('Company name is required.');
+      return;
+    }
+    if (!vendorForm.vendor_url.trim()) {
+      setFormError('Company website is required.');
+      return;
+    }
     setLoading(productType);
+    setFormError('');
     try {
       const res = await fetch(`${config.apiUrl}/api/stripe/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productType }),
+        body: JSON.stringify({
+          productType,
+          company_name: vendorForm.company_name.trim(),
+          vendor_url: vendorForm.vendor_url.trim(),
+          rfp_description: vendorForm.rfp_description.trim(),
+        }),
       });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert(data.detail || 'Checkout failed. Please try again.');
+        setFormError(data.detail || 'Checkout failed. Please try again.');
+        setLoading(null);
       }
     } catch {
-      alert('Network error. Please try again.');
-    } finally {
+      setFormError('Network error. Please try again.');
       setLoading(null);
     }
   }
 
   return (
     <main className="min-h-screen bg-white">
+      {/* Vendor info modal */}
+      {modalProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+            <h2 className="text-xl font-bold text-[#0f172a] mb-1">Your Company Details</h2>
+            <p className="text-sm text-[#64748b] mb-6">
+              We need these to generate your blockchain-verified RFP evidence package.
+            </p>
+
+            {formError && (
+              <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">{formError}</div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#0f172a] mb-1">Company Name <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                  placeholder="Acme Pte Ltd"
+                  value={form.company_name}
+                  onChange={e => setForm(f => ({ ...f, company_name: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#0f172a] mb-1">Company Website <span className="text-red-500">*</span></label>
+                <input
+                  type="url"
+                  className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                  placeholder="https://acme.com"
+                  value={form.vendor_url}
+                  onChange={e => setForm(f => ({ ...f, vendor_url: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#0f172a] mb-1">RFP Context <span className="text-[#94a3b8] font-normal">(optional)</span></label>
+                <textarea
+                  className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981] resize-none"
+                  rows={3}
+                  placeholder="Brief description of the RFP you're responding to…"
+                  value={form.rfp_description}
+                  onChange={e => setForm(f => ({ ...f, rfp_description: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={closeModal}
+                className="flex-1 px-4 py-2 border border-[#e2e8f0] rounded-lg text-sm font-medium text-[#64748b] hover:border-[#94a3b8] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleCheckout(modalProduct, form)}
+                disabled={loading === modalProduct}
+                className="flex-1 px-4 py-2 bg-[#10b981] text-white rounded-lg text-sm font-medium hover:bg-[#059669] transition-colors disabled:opacity-60"
+              >
+                {loading === modalProduct ? 'Redirecting…' : 'Continue to Payment'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-[#f8fafc] to-white -z-10" />
@@ -42,19 +140,19 @@ export default function RFPAccelerationPage() {
             <span className="text-[#10b981]">Evidence-First.</span>
           </h1>
           <p className="text-xl text-[#64748b] mb-12 max-w-2xl mx-auto leading-relaxed">
-            Stop manually answering the same security and compliance questions. 
+            Stop manually answering the same security and compliance questions.
             BOOPPA generates blockchain-verified evidence that procurement teams trust.
           </p>
           <div className="flex flex-wrap justify-center gap-6">
             <button
-              onClick={() => handleCheckout('rfp_express')}
+              onClick={() => openModal('rfp_express')}
               disabled={loading === 'rfp_express'}
               className="btn btn-primary px-10 py-4 text-lg disabled:opacity-60"
             >
               {loading === 'rfp_express' ? 'Redirecting…' : 'RFP Kit Express — SGD 129'}
             </button>
             <button
-              onClick={() => handleCheckout('rfp_complete')}
+              onClick={() => openModal('rfp_complete')}
               disabled={loading === 'rfp_complete'}
               className="btn btn-secondary px-10 py-4 text-lg disabled:opacity-60"
             >
@@ -84,7 +182,7 @@ export default function RFPAccelerationPage() {
                 <li className="flex items-center gap-3 text-[#64748b] opacity-50"><span className="text-[#cbd5e1]">✕</span> No AI Narrative</li>
               </ul>
               <button
-                onClick={() => handleCheckout('rfp_express')}
+                onClick={() => openModal('rfp_express')}
                 disabled={loading === 'rfp_express'}
                 className="btn btn-primary w-full text-center py-4 block disabled:opacity-60"
               >
@@ -109,7 +207,7 @@ export default function RFPAccelerationPage() {
                 <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Priority 12h Delivery</li>
               </ul>
               <button
-                onClick={() => handleCheckout('rfp_complete')}
+                onClick={() => openModal('rfp_complete')}
                 disabled={loading === 'rfp_complete'}
                 className="btn btn-primary w-full text-center py-4 block disabled:opacity-60"
               >
@@ -125,8 +223,8 @@ export default function RFPAccelerationPage() {
         <div className="max-w-[800px] mx-auto text-center">
           <h2 className="text-3xl font-black text-[#0f172a] mb-8">Reduce Submission Friction</h2>
           <p className="text-lg text-[#64748b] mb-12">
-            Procurement teams are tired of vague answers. By providing 
-            <span className="font-bold text-[#0f172a]"> verifiable evidence</span> up front, 
+            Procurement teams are tired of vague answers. By providing
+            <span className="font-bold text-[#0f172a]"> verifiable evidence</span> up front,
             you move to the top of the pile and close deals faster.
           </p>
         </div>
