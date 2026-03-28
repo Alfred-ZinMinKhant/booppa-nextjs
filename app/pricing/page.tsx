@@ -40,7 +40,7 @@ export default function PricingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
               <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Snapshot</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 69</div>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 79</div>
                 <p className="text-sm text-[#64748b] mb-8">One-time technical scan</p>
                 <ul className="space-y-4 mb-10">
                   {[
@@ -89,7 +89,7 @@ export default function PricingPage() {
               <div className="bg-white p-10 rounded-[2.5rem] border-2 border-violet-500 shadow-xl relative hover:translate-y-[-5px] transition-all">
                 <div className="absolute top-[-15px] right-8 bg-violet-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">GeBIZ Ready</div>
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">RFP Kit Express</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 129</div>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 249</div>
                 <p className="text-sm text-[#64748b] mb-8">2-page evidence certificate</p>
                 <ul className="space-y-4 mb-10">
                   {[
@@ -118,7 +118,7 @@ export default function PricingPage() {
               <div className="bg-white p-10 rounded-[2.5rem] border-2 border-emerald-500 shadow-xl relative hover:translate-y-[-5px] transition-all">
                 <div className="absolute top-[-15px] right-8 bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Best Value</div>
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">RFP Kit Complete</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 499</div>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 599</div>
                 <p className="text-sm text-[#64748b] mb-8">Full 15-question evidence pack</p>
                 <ul className="space-y-4 mb-10">
                   {[

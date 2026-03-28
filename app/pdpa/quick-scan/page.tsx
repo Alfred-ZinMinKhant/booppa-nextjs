@@ -67,7 +67,7 @@ export default function QuickScanPage() {
     <main className="min-h-[60vh] flex items-center justify-center p-6">
       <div className="w-full max-w-xl bg-gray-900 rounded-xl p-8">
         <h1 className="text-2xl font-bold mb-4">PDPA Quick Scan</h1>
-        <p className="text-gray-400 mb-6">Provide your website and contact details to start a one-time PDPA quick scan (SGD 69).</p>
+        <p className="text-gray-400 mb-6">Provide your website and contact details to start a one-time PDPA quick scan (SGD 79).</p>
 
         <form onSubmit={handleSubmit}>
           <label className="block text-sm text-gray-300 mb-1">Website URL</label>

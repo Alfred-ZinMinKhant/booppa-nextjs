@@ -74,7 +74,7 @@ export default function QRScanPage() {
             href="/pdpa/quick-scan"
             className="inline-block bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:from-teal-600 hover:to-emerald-600 transition shadow-lg"
           >
-            Get PRO Report – S$69
+            Get PRO Report – S$79
           </a>
         </div>
       </div>
@@ -316,7 +316,7 @@ export default function QRScanPage() {
                       className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-teal-600 hover:to-emerald-600 transition shadow-lg"
                     >
                       <Shield className="w-5 h-5" />
-                      Get PRO Report – S$69
+                      Get PRO Report – S$79
                     </a>
                     <button
                       onClick={() => {

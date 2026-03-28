@@ -16,7 +16,7 @@ export default function CompliancePage() {
           <div className="bg-[#f8fafc] p-10 rounded-3xl border-2 border-[#10b981] mb-12 shadow-sm">
             <h3 className="text-2xl font-bold mb-4 text-[#0f172a]">📊 From Point-in-Time Scans to Continuous Monitoring</h3>
             <p className="text-[#64748b] mb-4">
-              PDPA Snapshot (SGD 69) gives you a one-time assessment. 
+              PDPA Snapshot (SGD 79) gives you a one-time assessment.
               Compliance monitoring plans provide ongoing operational infrastructure.
             </p>
             <p className="text-[#64748b]">

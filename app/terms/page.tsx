@@ -16,7 +16,7 @@ export default function TermsPage() {
         <h2 className="text-xl font-semibold text-white mt-6">Scope of Services</h2>
         <p className="mb-4">Booppa provides technical compliance tools and services to help organisations assess and improve PDPA compliance in Singapore.</p>
         <ul className="list-disc list-inside mb-4 text-gray-300">
-          <li><strong>PDPA Quick Scan</strong> — a one-time technical review and remediation (SGD 69.00).</li>
+          <li><strong>PDPA Quick Scan</strong> — a one-time technical review and remediation (SGD 79.00).</li>
           <li><strong>Subscription Plans</strong> — ongoing monitoring, consent logging and support (Essential, Pro, Standard Suite, Pro Suite).</li>
           <li><strong>Blockchain Notarization</strong> — optional anchoring of audit artifacts on the Polygon PoS network for tamper-evident proof.</li>
         </ul>

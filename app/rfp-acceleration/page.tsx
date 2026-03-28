@@ -149,14 +149,14 @@ export default function RFPAccelerationPage() {
               disabled={loading === 'rfp_express'}
               className="btn btn-primary px-10 py-4 text-lg disabled:opacity-60"
             >
-              {loading === 'rfp_express' ? 'Redirecting…' : 'RFP Kit Express — SGD 129'}
+              {loading === 'rfp_express' ? 'Redirecting…' : 'RFP Kit Express — SGD 249'}
             </button>
             <button
               onClick={() => openModal('rfp_complete')}
               disabled={loading === 'rfp_complete'}
               className="btn btn-secondary px-10 py-4 text-lg disabled:opacity-60"
             >
-              {loading === 'rfp_complete' ? 'Redirecting…' : 'RFP Kit Complete — SGD 499'}
+              {loading === 'rfp_complete' ? 'Redirecting…' : 'RFP Kit Complete — SGD 599'}
             </button>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function RFPAccelerationPage() {
             <div id="express" className="bg-white p-12 rounded-[2.5rem] border-2 border-[#e2e8f0] relative overflow-hidden transition-all hover:border-[#10b981]">
               <div className="mb-8">
                 <h3 className="text-2xl font-black text-[#0f172a] mb-2">RFP KIT EXPRESS</h3>
-                <div className="text-4xl font-black text-[#10b981] mb-6">SGD 129</div>
+                <div className="text-4xl font-black text-[#10b981] mb-6">SGD 249</div>
                 <p className="text-[#64748b]">Perfect for simple RFPs and basic vendor verification.</p>
               </div>
               <ul className="space-y-4 mb-12">
@@ -195,7 +195,7 @@ export default function RFPAccelerationPage() {
               <div className="absolute top-6 right-6 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase">Enterprise Ready</div>
               <div className="mb-8">
                 <h3 className="text-2xl font-black text-white mb-2">RFP KIT COMPLETE</h3>
-                <div className="text-4xl font-black text-[#10b981] mb-6">SGD 499</div>
+                <div className="text-4xl font-black text-[#10b981] mb-6">SGD 599</div>
                 <p className="text-white/70">Full vendor procurement pack for high-value tenders.</p>
               </div>
               <ul className="space-y-4 mb-12">

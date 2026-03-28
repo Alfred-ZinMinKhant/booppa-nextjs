@@ -93,7 +93,7 @@ export default function PDPAPage() {
 
           {/* Scan Form */}
           <div className="bg-white p-8 lg:p-12 rounded-3xl shadow-xl border border-[#e2e8f0] mb-12">
-            <h2 className="text-2xl font-bold mb-8 text-[#0f172a]">Run Instant Scan — SGD 69</h2>
+            <h2 className="text-2xl font-bold mb-8 text-[#0f172a]">Run Instant Scan — SGD 79</h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -170,7 +170,7 @@ export default function PDPAPage() {
                 disabled={isLoading}
                 className="btn btn-primary w-full py-4 text-lg font-black shadow-lg disabled:opacity-50"
               >
-                {isLoading ? 'Processing...' : 'Run Scan — Pay SGD 69 (Stripe Checkout)'}
+                {isLoading ? 'Processing...' : 'Run Scan — Pay SGD 79 (Stripe Checkout)'}
               </button>
 
               <p className="text-center text-[#94a3b8] text-xs mt-4">
