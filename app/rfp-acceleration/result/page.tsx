@@ -183,6 +183,53 @@ function RFPResultContent() {
               )}
             </div>
 
+            {/* Blockchain Evidence Record */}
+            {result.tx_hash && (
+              <div className="mb-6 rounded-xl border border-gray-700/50 bg-gray-900/60 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">⛓️</span>
+                  <h3 className="text-sm font-semibold text-white">Blockchain Evidence Record</h3>
+                  <span className="ml-auto text-[10px] px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
+                    Polygon Amoy Testnet
+                  </span>
+                </div>
+                <p className="text-xs text-gray-400 mb-4 leading-relaxed">
+                  Your RFP evidence certificate has been cryptographically anchored on the Polygon blockchain.
+                  This creates an immutable, tamper-proof timestamp that procurement teams can independently verify
+                  — without needing to contact BOOPPA.
+                </p>
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-gray-500 shrink-0 w-32">Transaction Hash:</span>
+                    <a
+                      href={result.polygonscan_url || `https://amoy.polygonscan.com/tx/${result.tx_hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-booppa-blue hover:text-booppa-blue/80 transition flex items-center gap-1 break-all"
+                    >
+                      {result.tx_hash.substring(0, 18)}…{result.tx_hash.substring(result.tx_hash.length - 8)}
+                      <ExternalLink className="w-3 h-3 shrink-0" />
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-gray-500 shrink-0 w-32">Verify on-chain:</span>
+                    <a
+                      href={result.polygonscan_url || `https://amoy.polygonscan.com/tx/${result.tx_hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-booppa-green hover:text-booppa-green/80 transition"
+                    >
+                      View on Polygonscan →
+                    </a>
+                  </div>
+                </div>
+                <p className="text-[10px] text-gray-600 mt-4 border-t border-gray-800 pt-3">
+                  Testnet notice: Anchored on Polygon Amoy testnet (public &amp; immutable) for cost efficiency.
+                  Mainnet migration is planned for the enterprise tier.
+                </p>
+              </div>
+            )}
+
             {/* Warnings and Discrepancies */}
             {(result.answer_source === 'template' || (result.discrepancies && result.discrepancies.length > 0)) && (
               <div className="mb-6 space-y-3">

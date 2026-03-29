@@ -484,6 +484,74 @@ export default function RFPAccelerationPage() {
           </p>
         </div>
       </section>
+
+      {/* Blockchain Verification — How It Works */}
+      <section className="py-24 px-6">
+        <div className="max-w-[900px] mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#10b981] rounded-full text-sm font-medium text-[#059669] mb-6 bg-[#f0fdf4]">
+              ⛓️ Polygon Amoy Testnet
+            </div>
+            <h2 className="text-3xl font-black text-[#0f172a] mb-4">Blockchain-Verified PDPA Evidence</h2>
+            <p className="text-lg text-[#64748b] max-w-2xl mx-auto">
+              Every RFP Kit includes a cryptographic proof anchored to the Polygon blockchain — the same
+              infrastructure used for our PDPA and notarization products. Procurement teams can verify
+              your evidence independently, without contacting BOOPPA.
+            </p>
+          </div>
+
+          <div className="space-y-10">
+            {[
+              {
+                n: 1,
+                t: 'Evidence is collected &amp; hashed',
+                d: 'Your company details, questionnaire answers, ACRA registration, SSL grade, and PDPC status are combined into a canonical JSON payload. A SHA-256 hash is derived — a unique 64-character fingerprint of all your evidence.',
+                code: 'SHA-256("company_name:Booppa | uen:... | ssl:A+ | pdpc:clean | ...") → 0x7f9f…',
+              },
+              {
+                n: 2,
+                t: 'Hash anchored on Polygon blockchain',
+                d: 'The hash is written to our deployed EvidenceAnchorV3 smart contract on Polygon Amoy testnet. This creates an immutable, public timestamp that cannot be modified or deleted.',
+                note: 'Why Polygon? Low gas fees (~$0.01 per anchor), Ethereum-backed security, and publicly queryable via Polygonscan.',
+              },
+              {
+                n: 3,
+                t: 'Polygonscan TX ID included in PDF',
+                d: 'The transaction hash appears on your RFP Evidence Certificate PDF and in your result page. Anyone — including procurement officers — can paste the TX ID into Polygonscan to confirm the timestamp independently.',
+              },
+              {
+                n: 4,
+                t: 'Independent, self-service verification',
+                d: 'No login required. Your buyer visits polygonscan.com, searches your TX ID, and sees the exact timestamp the evidence was anchored. This proves your PDPA assertions existed before your RFP submission.',
+              },
+            ].map((step) => (
+              <div key={step.n} className="flex gap-6">
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#10b981] to-[#059669] rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg">
+                  {step.n}
+                </div>
+                <div className="flex-1 pt-1">
+                  <h3 className="text-lg font-bold text-[#0f172a] mb-2" dangerouslySetInnerHTML={{ __html: step.t }} />
+                  <p className="text-[#64748b] leading-relaxed mb-3">{step.d}</p>
+                  {step.code && (
+                    <div className="p-4 bg-[#f8fafc] rounded-lg font-mono text-xs text-[#94a3b8] break-all border border-dashed border-[#cbd5e1]">
+                      {step.code}
+                    </div>
+                  )}
+                  {step.note && <p className="text-sm font-semibold text-[#10b981]">{step.note}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16 bg-[#f0fdf4] border border-[#bbf7d0] rounded-[2rem] p-10 text-center">
+            <p className="text-sm text-[#065f46] font-semibold mb-2">Testnet Notice</p>
+            <p className="text-[#047857] text-sm leading-relaxed max-w-lg mx-auto">
+              RFP Kit anchors are currently on <strong>Polygon Amoy testnet</strong> — fully public and immutable,
+              at near-zero cost. Mainnet migration is planned for the enterprise tier.
+            </p>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
