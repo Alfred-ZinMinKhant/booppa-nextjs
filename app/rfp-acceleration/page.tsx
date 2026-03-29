@@ -16,12 +16,30 @@ interface VendorForm {
   company_name: string;
   vendor_url: string;
   rfp_description: string;
+  uen: string;
+  description: string;
+  dpo_appointed: string;
+  iso_status: string;
+  data_hosting: string;
+  breach_history: string;
 }
+
+const EMPTY_FORM: VendorForm = {
+  company_name: '',
+  vendor_url: '',
+  rfp_description: '',
+  uen: '',
+  description: '',
+  dpo_appointed: 'unknown',
+  iso_status: 'unknown',
+  data_hosting: 'unknown',
+  breach_history: 'unknown',
+};
 
 export default function RFPAccelerationPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [modalProduct, setModalProduct] = useState<string | null>(null);
-  const [form, setForm] = useState<VendorForm>({ company_name: '', vendor_url: '', rfp_description: '' });
+  const [form, setForm] = useState<VendorForm>(EMPTY_FORM);
   const [formError, setFormError] = useState('');
 
   function openModal(productType: string) {
@@ -32,6 +50,7 @@ export default function RFPAccelerationPage() {
   function closeModal() {
     setModalProduct(null);
     setFormError('');
+    setForm(EMPTY_FORM);
   }
 
   async function handleCheckout(productType: string, vendorForm: VendorForm) {
@@ -46,6 +65,14 @@ export default function RFPAccelerationPage() {
     setLoading(productType);
     setFormError('');
     try {
+      const intake: Record<string, string> = {};
+      if (vendorForm.uen.trim()) intake.uen = vendorForm.uen.trim();
+      if (vendorForm.description.trim()) intake.description = vendorForm.description.trim();
+      if (vendorForm.dpo_appointed !== 'unknown') intake.dpo_appointed = vendorForm.dpo_appointed;
+      if (vendorForm.iso_status !== 'unknown') intake.iso_status = vendorForm.iso_status;
+      if (vendorForm.data_hosting !== 'unknown') intake.data_hosting = vendorForm.data_hosting;
+      if (vendorForm.breach_history !== 'unknown') intake.breach_history = vendorForm.breach_history;
+
       const res = await fetch(`${config.apiUrl}/api/stripe/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,6 +81,7 @@ export default function RFPAccelerationPage() {
           company_name: vendorForm.company_name.trim(),
           vendor_url: normalizeUrl(vendorForm.vendor_url),
           rfp_description: vendorForm.rfp_description.trim(),
+          intake_data: Object.keys(intake).length > 0 ? intake : undefined,
         }),
       });
       const data = await res.json();
@@ -109,11 +137,92 @@ export default function RFPAccelerationPage() {
                 <label className="block text-sm font-medium text-[#0f172a] mb-1">RFP Context <span className="text-[#94a3b8] font-normal">(optional)</span></label>
                 <textarea
                   className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981] resize-none"
-                  rows={3}
+                  rows={2}
                   placeholder="Brief description of the RFP you're responding to…"
                   value={form.rfp_description}
                   onChange={e => setForm(f => ({ ...f, rfp_description: e.target.value }))}
                 />
+              </div>
+
+              <div className="pt-3 border-t border-[#f1f5f9]">
+                <p className="text-xs font-semibold text-[#64748b] uppercase tracking-wide mb-3">
+                  Company Facts <span className="font-normal normal-case">(makes answers more accurate)</span>
+                </p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-[#0f172a] mb-1">UEN (Singapore Reg. No.) <span className="text-[#94a3b8] font-normal">(optional)</span></label>
+                    <input
+                      type="text"
+                      className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                      placeholder="e.g. 202012345K"
+                      value={form.uen}
+                      onChange={e => setForm(f => ({ ...f, uen: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[#0f172a] mb-1">What does your company do?</label>
+                    <input
+                      type="text"
+                      className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                      placeholder="e.g. B2B SaaS for HR management"
+                      value={form.description}
+                      onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-[#0f172a] mb-1">DPO Appointed?</label>
+                      <select
+                        className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                        value={form.dpo_appointed}
+                        onChange={e => setForm(f => ({ ...f, dpo_appointed: e.target.value }))}
+                      >
+                        <option value="unknown">Not sure</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="in-progress">In progress</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[#0f172a] mb-1">ISO 27001 / SOC 2?</label>
+                      <select
+                        className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                        value={form.iso_status}
+                        onChange={e => setForm(f => ({ ...f, iso_status: e.target.value }))}
+                      >
+                        <option value="unknown">Not sure</option>
+                        <option value="none">None</option>
+                        <option value="pursuing">Pursuing</option>
+                        <option value="certified">Certified</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[#0f172a] mb-1">Data hosted in SG?</label>
+                      <select
+                        className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                        value={form.data_hosting}
+                        onChange={e => setForm(f => ({ ...f, data_hosting: e.target.value }))}
+                      >
+                        <option value="unknown">Not sure</option>
+                        <option value="singapore">Yes, Singapore</option>
+                        <option value="partial">Partial</option>
+                        <option value="overseas">Overseas</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[#0f172a] mb-1">Breaches (24 months)?</label>
+                      <select
+                        className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                        value={form.breach_history}
+                        onChange={e => setForm(f => ({ ...f, breach_history: e.target.value }))}
+                      >
+                        <option value="unknown">Not sure</option>
+                        <option value="no">None</option>
+                        <option value="yes">Yes</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
