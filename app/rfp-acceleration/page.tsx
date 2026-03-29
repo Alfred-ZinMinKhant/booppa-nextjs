@@ -19,9 +19,17 @@ interface VendorForm {
   uen: string;
   description: string;
   dpo_appointed: string;
+  dpo_name: string;
+  dpo_email: string;
   iso_status: string;
+  iso_cert_number: string;
+  iso_cert_expiry: string;
   data_hosting: string;
+  primary_cloud: string;
   breach_history: string;
+  bcp_last_tested: string;
+  training_frequency: string;
+  key_processors: string;
 }
 
 const EMPTY_FORM: VendorForm = {
@@ -31,9 +39,17 @@ const EMPTY_FORM: VendorForm = {
   uen: '',
   description: '',
   dpo_appointed: 'unknown',
+  dpo_name: '',
+  dpo_email: '',
   iso_status: 'unknown',
+  iso_cert_number: '',
+  iso_cert_expiry: '',
   data_hosting: 'unknown',
+  primary_cloud: '',
   breach_history: 'unknown',
+  bcp_last_tested: '',
+  training_frequency: '',
+  key_processors: '',
 };
 
 export default function RFPAccelerationPage() {
@@ -41,6 +57,7 @@ export default function RFPAccelerationPage() {
   const [modalProduct, setModalProduct] = useState<string | null>(null);
   const [form, setForm] = useState<VendorForm>(EMPTY_FORM);
   const [formError, setFormError] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   function openModal(productType: string) {
     setModalProduct(productType);
@@ -51,6 +68,7 @@ export default function RFPAccelerationPage() {
     setModalProduct(null);
     setFormError('');
     setForm(EMPTY_FORM);
+    setShowAdvanced(false);
   }
 
   async function handleCheckout(productType: string, vendorForm: VendorForm) {
@@ -69,9 +87,17 @@ export default function RFPAccelerationPage() {
       if (vendorForm.uen.trim()) intake.uen = vendorForm.uen.trim();
       if (vendorForm.description.trim()) intake.description = vendorForm.description.trim();
       if (vendorForm.dpo_appointed !== 'unknown') intake.dpo_appointed = vendorForm.dpo_appointed;
+      if (vendorForm.dpo_name.trim()) intake.dpo_name = vendorForm.dpo_name.trim();
+      if (vendorForm.dpo_email.trim()) intake.dpo_email = vendorForm.dpo_email.trim();
       if (vendorForm.iso_status !== 'unknown') intake.iso_status = vendorForm.iso_status;
+      if (vendorForm.iso_cert_number.trim()) intake.iso_cert_number = vendorForm.iso_cert_number.trim();
+      if (vendorForm.iso_cert_expiry.trim()) intake.iso_cert_expiry = vendorForm.iso_cert_expiry.trim();
       if (vendorForm.data_hosting !== 'unknown') intake.data_hosting = vendorForm.data_hosting;
+      if (vendorForm.primary_cloud.trim()) intake.primary_cloud = vendorForm.primary_cloud.trim();
       if (vendorForm.breach_history !== 'unknown') intake.breach_history = vendorForm.breach_history;
+      if (vendorForm.bcp_last_tested.trim()) intake.bcp_last_tested = vendorForm.bcp_last_tested.trim();
+      if (vendorForm.training_frequency.trim()) intake.training_frequency = vendorForm.training_frequency.trim();
+      if (vendorForm.key_processors.trim()) intake.key_processors = vendorForm.key_processors.trim();
 
       const res = await fetch(`${config.apiUrl}/api/stripe/checkout`, {
         method: 'POST',
@@ -222,6 +248,114 @@ export default function RFPAccelerationPage() {
                       </select>
                     </div>
                   </div>
+
+                  {/* Conditional: DPO contact details */}
+                  {form.dpo_appointed === 'yes' && (
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <label className="block text-xs font-medium text-[#0f172a] mb-1">DPO Full Name <span className="text-[#94a3b8] font-normal">(recommended)</span></label>
+                        <input
+                          type="text"
+                          className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                          placeholder="Jane Tan"
+                          value={form.dpo_name}
+                          onChange={e => setForm(f => ({ ...f, dpo_name: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[#0f172a] mb-1">DPO Email <span className="text-[#94a3b8] font-normal">(recommended)</span></label>
+                        <input
+                          type="email"
+                          className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                          placeholder="dpo@company.com"
+                          value={form.dpo_email}
+                          onChange={e => setForm(f => ({ ...f, dpo_email: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Conditional: ISO cert number */}
+                  {form.iso_status === 'certified' && (
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <label className="block text-xs font-medium text-[#0f172a] mb-1">ISO Cert Number <span className="text-[#94a3b8] font-normal">(recommended)</span></label>
+                        <input
+                          type="text"
+                          className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                          placeholder="IS 12345"
+                          value={form.iso_cert_number}
+                          onChange={e => setForm(f => ({ ...f, iso_cert_number: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[#0f172a] mb-1">Cert Expiry Date</label>
+                        <input
+                          type="text"
+                          className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                          placeholder="Dec 2026"
+                          value={form.iso_cert_expiry}
+                          onChange={e => setForm(f => ({ ...f, iso_cert_expiry: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Advanced details — toggle */}
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvanced(v => !v)}
+                    className="text-xs text-[#64748b] hover:text-[#10b981] transition-colors mt-1 text-left"
+                  >
+                    {showAdvanced ? '▲ Hide advanced details' : '▼ Add more details (BCP, training, cloud provider)'}
+                  </button>
+
+                  {showAdvanced && (
+                    <div className="space-y-3 pt-1">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-[#0f172a] mb-1">Cloud Provider</label>
+                          <input
+                            type="text"
+                            className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                            placeholder="AWS ap-southeast-1"
+                            value={form.primary_cloud}
+                            onChange={e => setForm(f => ({ ...f, primary_cloud: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-[#0f172a] mb-1">BCP Last Tested</label>
+                          <input
+                            type="text"
+                            className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                            placeholder="Jan 2025"
+                            value={form.bcp_last_tested}
+                            onChange={e => setForm(f => ({ ...f, bcp_last_tested: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[#0f172a] mb-1">Security Training Frequency</label>
+                        <input
+                          type="text"
+                          className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                          placeholder="e.g. Quarterly, Annual"
+                          value={form.training_frequency}
+                          onChange={e => setForm(f => ({ ...f, training_frequency: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[#0f172a] mb-1">Key Third-Party Data Processors</label>
+                        <input
+                          type="text"
+                          className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                          placeholder="e.g. AWS, Stripe, Sendgrid"
+                          value={form.key_processors}
+                          onChange={e => setForm(f => ({ ...f, key_processors: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
