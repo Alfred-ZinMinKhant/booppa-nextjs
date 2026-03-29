@@ -24,6 +24,13 @@ interface RFPResult {
   tx_hash?: string;
   polygonscan_url?: string;
   generated_at?: string;
+  expires_at?: string;
+  data_sources?: Record<string, any>;
+  discrepancies?: string[];
+  warnings?: string[];
+  answer_source?: 'ai_grounded' | 'template';
+  error?: boolean;
+  detail?: string;
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -61,6 +68,10 @@ function RFPResultContent() {
         const res = await fetch(`${apiBase}/api/stripe/rfp/result?session_id=${sessionId}`);
         if (res.status === 200) {
           const data = await res.json();
+          if (data.error) {
+            setStatus('error');
+            return;
+          }
           if (data.download_url) { setResult(data); setStatus('ready'); return; }
         }
       } catch { /* keep polling */ }
@@ -129,7 +140,7 @@ function RFPResultContent() {
             </div>
 
             {/* Stats row */}
-            <div className="flex flex-wrap gap-3 mb-5">
+            <div className="flex flex-wrap gap-2 mb-5">
               {factCount > 0 && (
                 <span className="text-xs px-2.5 py-1 rounded-full bg-booppa-green/10 text-booppa-green border border-booppa-green/20">
                   {factCount}/{totalCount} answers fact-backed
@@ -145,7 +156,58 @@ function RFPResultContent() {
                   )}
                 </span>
               )}
+              {result.data_sources?.acra_verified && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-booppa-green/10 text-booppa-green border border-booppa-green/20">
+                  ✓ ACRA Verified
+                </span>
+              )}
+              {result.data_sources?.gebiz_supplier && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-booppa-green/10 text-booppa-green border border-booppa-green/20">
+                  ✓ GeBIZ Registered
+                </span>
+              )}
+              {result.data_sources?.ssl_grade && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-booppa-green/10 text-booppa-green border border-booppa-green/20">
+                  SSL: {result.data_sources.ssl_grade}
+                </span>
+              )}
+              {result.data_sources?.vt_checked && !result.data_sources?.vt_flagged && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-booppa-green/10 text-booppa-green border border-booppa-green/20">
+                  ✓ Domain Clean
+                </span>
+              )}
+              {result.data_sources?.pdpc_flagged && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" /> PDPC Flag
+                </span>
+              )}
             </div>
+
+            {/* Warnings and Discrepancies */}
+            {(result.answer_source === 'template' || (result.discrepancies && result.discrepancies.length > 0)) && (
+              <div className="mb-6 space-y-3">
+                {result.answer_source === 'template' && (
+                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex gap-3 text-amber-500/90 text-sm">
+                    <AlertTriangle className="w-5 h-5 shrink-0" />
+                    <div>
+                      <strong className="block font-semibold mb-1">Standard template used</strong>
+                      AI generation was temporarily unavailable. These answers use standard templates. Please review and customize them before submission.
+                    </div>
+                  </div>
+                )}
+                {result.discrepancies && result.discrepancies.length > 0 && (
+                  <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4 flex gap-3 text-orange-200 text-sm">
+                    <AlertTriangle className="w-5 h-5 shrink-0 text-orange-400" />
+                    <div>
+                      <strong className="block font-semibold mb-1 text-orange-400">Action Required: Discrepancies Found</strong>
+                      <ul className="list-disc pl-4 space-y-1">
+                        {result.discrepancies.map((d, i) => <li key={i}>{d}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Q&A */}
             {result.qa_answers && result.qa_answers.length > 0 && (
