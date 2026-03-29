@@ -127,18 +127,19 @@ export default function RFPAccelerationPage() {
     <main className="min-h-screen bg-white">
       {/* Vendor info modal */}
       {modalProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
-            <h2 className="text-xl font-bold text-[#0f172a] mb-1">Your Company Details</h2>
-            <p className="text-sm text-[#64748b] mb-6">
-              We need these to generate your blockchain-verified RFP evidence package.
-            </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-8">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-full flex flex-col">
+            <div className="p-8 pb-4 shrink-0">
+              <h2 className="text-xl font-bold text-[#0f172a] mb-1">Your Company Details</h2>
+              <p className="text-sm text-[#64748b]">
+                We need these to generate your blockchain-verified RFP evidence package.
+              </p>
+            </div>
 
-            {formError && (
-              <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">{formError}</div>
-            )}
-
-            <div className="space-y-4">
+            <div className="px-8 overflow-y-auto min-h-0 space-y-4 pb-4">
+              {formError && (
+                <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">{formError}</div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-[#0f172a] mb-1">Company Name <span className="text-red-500">*</span></label>
                 <input
@@ -359,21 +360,23 @@ export default function RFPAccelerationPage() {
                 </div>
               </div>
             </div>
-
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={closeModal}
-                className="flex-1 px-4 py-2 border border-[#e2e8f0] rounded-lg text-sm font-medium text-[#64748b] hover:border-[#94a3b8] transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleCheckout(modalProduct, form)}
-                disabled={loading === modalProduct}
-                className="flex-1 px-4 py-2 bg-[#10b981] text-white rounded-lg text-sm font-medium hover:bg-[#059669] transition-colors disabled:opacity-60"
-              >
-                {loading === modalProduct ? 'Redirecting…' : 'Continue to Payment'}
-              </button>
+            
+            <div className="p-8 pt-4 border-t border-[#f1f5f9] shrink-0 bg-white rounded-b-2xl">
+              <div className="flex gap-3">
+                <button
+                  onClick={closeModal}
+                  className="flex-1 px-4 py-2 border border-[#e2e8f0] rounded-lg text-sm font-medium text-[#64748b] hover:border-[#94a3b8] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleCheckout(modalProduct, form)}
+                  disabled={loading === modalProduct}
+                  className="flex-1 px-4 py-2 bg-[#10b981] text-white rounded-lg text-sm font-medium hover:bg-[#059669] transition-colors disabled:opacity-60"
+                >
+                  {loading === modalProduct ? 'Redirecting…' : 'Continue to Payment'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
