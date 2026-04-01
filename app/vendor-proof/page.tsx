@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { config } from "@/lib/config"
+import HardenedClickwrap from "@/components/legal/HardenedClickwrap"
 
 function normalizeUrl(input: string): string {
   let url = input.trim()
@@ -20,6 +21,7 @@ function VendorProofContent() {
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [consentValid, setConsentValid] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -136,13 +138,17 @@ function VendorProofContent() {
               />
             </div>
 
+            <div className="pt-2 pb-1 border-t border-gray-700">
+              <HardenedClickwrap onValidityChange={setConsentValid} variant="dark" />
+            </div>
+
             {error && (
               <p className="text-red-400 text-sm">{error}</p>
             )}
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !consentValid}
               className="w-full bg-booppa-blue text-white font-semibold py-3 rounded-lg hover:bg-booppa-blue/80 transition disabled:opacity-50"
             >
               {loading ? "Setting up..." : "Get Vendor Proof — S$149"}

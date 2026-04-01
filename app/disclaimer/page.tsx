@@ -11,7 +11,7 @@ export default function DisclaimerPage() {
       <section className="py-20 px-6 bg-[#0f172a] text-white">
         <div className="max-w-[800px] mx-auto text-center">
           <h1 className="text-3xl lg:text-5xl font-bold mb-4">Disclaimer</h1>
-          <p className="text-xl text-[#94a3b8]">Last updated: March 2026</p>
+          <p className="text-xl text-[#94a3b8]">Version: v17 Hardened &nbsp;·&nbsp; Last updated: April 2026</p>
         </div>
       </section>
 
@@ -76,6 +76,35 @@ export default function DisclaimerPage() {
                 incurred as a result of the use of the platform or reliance on any information
                 provided. Your use of the platform and reliance on any information is solely at
                 your own risk.
+              </p>
+            </div>
+
+            <div className="border-t border-[#e2e8f0] pt-6">
+              <h2 className="text-xl font-bold text-[#0f172a] mb-2">Non-Reliance & Scope of Use (v17 Hardened)</h2>
+              <p className="mb-3">
+                By using any Booppa service, you expressly confirm that:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-sm">
+                <li>
+                  You do not rely, and have not relied, on any Booppa output — including scores,
+                  rankings, probability estimates, or reports — for any legal, financial,
+                  procurement, or regulatory decision.
+                </li>
+                <li>
+                  Booppa is an information tool and not a legal, compliance, or procurement advisor.
+                </li>
+                <li>
+                  No Booppa output constitutes professional advice of any kind, including legal,
+                  financial, regulatory, or compliance advice.
+                </li>
+                <li>
+                  You are solely responsible for all decisions made using or informed by Booppa
+                  outputs, and for obtaining independent professional advice where required.
+                </li>
+              </ul>
+              <p className="mt-3 text-sm font-medium text-[#0f172a]">
+                This non-reliance clause is a material term of the Booppa Terms of Service (v17 Hardened)
+                and your affirmative agreement to it is required to use the platform.
               </p>
             </div>
           </div>

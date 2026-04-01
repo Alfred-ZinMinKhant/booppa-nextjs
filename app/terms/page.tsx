@@ -2,14 +2,15 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Terms of Service | BOOPPA',
-  description: 'Terms of Service for Booppa - includes PDPA and DPO contact information',
+  description: 'Terms of Service for Booppa (v17 Hardened) - includes PDPA, non-reliance acknowledgment, and DPO contact information',
 };
 
 export default function TermsPage() {
   return (
     <main className="pt-16 pb-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-200">
-        <h1 className="text-3xl font-bold text-white mb-4">Terms of Service</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Terms of Service</h1>
+        <p className="text-sm text-emerald-400 mb-4 font-medium">Version: v17 Hardened &nbsp;·&nbsp; Effective: April 2026</p>
 
         <p className="mb-4">Welcome to Booppa.io. These Terms of Service ("Terms") govern your access to and use of Booppa Smart Care LLC's website, automated scanning tools, and DPO Dashboard (collectively, the "Services"). By using our Services you agree to these Terms. If you do not agree, do not use the Services.</p>
 
@@ -33,6 +34,15 @@ export default function TermsPage() {
         <h2 className="text-xl font-semibold text-white mt-6">Data Protection & Privacy</h2>
         <p className="mb-4">Your use of the Services is also governed by our <Link href="/privacy" className="underline">Privacy Policy</Link>, which explains how we collect, use and protect personal data and how we maintain consent logs and audit trails.</p>
 
+        <h2 className="text-xl font-semibold text-white mt-6">Non-Reliance Acknowledgment (v17 Hardened)</h2>
+        <p className="mb-4">By registering, purchasing, or using any Booppa service, you expressly acknowledge and agree that:</p>
+        <ul className="list-disc list-inside mb-4 text-gray-300 space-y-2">
+          <li>You do not rely, and have not relied, on any Booppa output — including scores, rankings, probability estimates, or reports — for any legal, financial, procurement, or regulatory decision.</li>
+          <li>Booppa is an information tool and not a legal, compliance, or procurement advisor.</li>
+          <li>All outputs are automated analyses and must not be treated as legal advice, professional opinions, or regulatory determinations.</li>
+        </ul>
+        <p className="mb-4">This non-reliance acknowledgment is a material term of these Terms. Your affirmative confirmation is required at registration and at each purchase.</p>
+
         <h2 className="text-xl font-semibold text-white mt-6">Limitation of Liability</h2>
         <p className="mb-4">Booppa provides technical assessments and audit-ready evidence to support compliance efforts. However, the ultimate responsibility for legal compliance remains with the Client and its appointed DPO. To the maximum extent permitted by law, Booppa's aggregate liability shall be limited to the fees paid by the client to Booppa in the 12 months preceding the claim; we are not liable for indirect or consequential losses.</p>
 
@@ -46,7 +56,7 @@ export default function TermsPage() {
         <p className="mb-4">For questions about these Terms or to contact our Data Protection Officer, email:</p>
         <p className="mb-6 font-medium"><a href="mailto:evidence@booppa.io" className="underline">evidence@booppa.io</a></p>
 
-        <p className="mt-8 text-sm text-gray-400">Last updated: December 2025</p>
+        <p className="mt-8 text-sm text-gray-400">Last updated: April 2026 &nbsp;·&nbsp; Version: v17 Hardened</p>
       </div>
     </main>
   );

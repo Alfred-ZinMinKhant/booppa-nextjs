@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Space_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
+import GebizTicker from "@/components/GebizTicker";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import TrackerGate from "@/components/TrackerGate";
@@ -42,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${dmSans.variable} ${spaceMono.variable}`}>
       <body className="antialiased bg-white text-[#1e293b]">
+        <GebizTicker />
         <Navigation />
         {children}
         <Footer />

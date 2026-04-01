@@ -9,7 +9,8 @@ export default function PrivacyPage() {
   return (
     <main className="pt-16 pb-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-200">
-        <h1 className="text-3xl font-bold text-white mb-4">Privacy Policy</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Privacy Policy</h1>
+        <p className="text-sm text-emerald-400 mb-4 font-medium">Version: v17 Hardened &nbsp;·&nbsp; Effective: April 2026</p>
 
         <p className="mb-6">Booppa Smart Care LLC ("Booppa", "we", "us" or "our") is committed to protecting the privacy of visitors to our website and users of our services. This Privacy Policy explains what personal data we collect, why we collect it, how we use it, and your rights under Singapore’s Personal Data Protection Act 2012 (PDPA).</p>
 
@@ -54,6 +55,18 @@ export default function PrivacyPage() {
         </ul>
         <p className="mb-4">These records are retained to demonstrate compliance with PDPA and to respond to any regulatory inquiries. Retention may vary by service tier: Essential tier logs are retained for 30 days, while Pro and Suite tiers retain consent and audit logs longer (including unlimited historical retention for Suite where contracted). If you wish to request access to your consent records, please contact the DPO at the email above.</p>
 
+        <h2 className="text-xl font-semibold text-white mt-6">Hardened Consent Records (v17 Hardened)</h2>
+        <p className="mb-4">From April 2026, Booppa maintains an additional immutable record ("Hardened Consent Record") at each registration and purchase. This record is required for legal enforceability of our Terms of Service and contains:</p>
+        <ul className="list-disc list-inside mb-4 text-gray-300">
+          <li>User email address</li>
+          <li>User account ID (where available)</li>
+          <li>Full IP address at time of agreement (not anonymized, retained for evidentiary purposes)</li>
+          <li>Browser user-agent string</li>
+          <li>Legal framework version accepted (e.g., "v17_Hardened")</li>
+          <li>Precise timestamp of affirmative consent</li>
+        </ul>
+        <p className="mb-4">Hardened Consent Records are retained indefinitely as they constitute evidence of a legal agreement. They may be disclosed to regulatory authorities or used in dispute resolution proceedings as permitted by law.</p>
+
         <h2 className="text-xl font-semibold text-white mt-6">Third-Party Trackers and Integrations</h2>
         <p className="mb-4">We only load third-party trackers (e.g., analytics, advertising, Hotjar, Facebook Pixel, Google Analytics) after obtaining explicit consent. Our front-end implements gating logic: any script that collects personal data or performs cross-site tracking is not executed until <em>Accept All</em> is selected. If you detect a tracker loading without consent, please report it to the DPO immediately.</p>
 
@@ -86,7 +99,7 @@ export default function PrivacyPage() {
         <p className="mb-4">If you have any questions, complaints or wish to exercise your rights, please contact our DPO at:</p>
         <p className="mb-6 font-medium"><a href="mailto:evidence@booppa.io" className="underline">evidence@booppa.io</a></p>
 
-        <p className="mt-8 text-sm text-gray-400">Last updated: December 2025 • Privacy Policy version: 2025-12-22</p>
+        <p className="mt-8 text-sm text-gray-400">Last updated: April 2026 &nbsp;·&nbsp; Privacy Policy version: v17 Hardened (2026-04-01)</p>
       </div>
     </main>
   );

@@ -12,6 +12,7 @@ const solutions = [
   { name: 'PDPA Scan',      href: '/pdpa',                desc: 'Data protection gap analysis' },
   { name: 'Notarization',   href: '/notarization',        desc: 'Immutable document anchoring' },
   { name: 'Tender Check',   href: '/tender-check',        desc: 'Government tender eligibility' },
+  { name: 'Opportunities',  href: '/opportunities',        desc: 'Live GeBIZ open tenders' },
   { name: 'Supply Chain',   href: '/supply-chain',        desc: 'Vendor risk screening' },
 ];
 

@@ -4,6 +4,8 @@ import { useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Shield, Mail, Lock, Building2, AlertCircle, Loader2 } from 'lucide-react'
+import HardenedClickwrap from '@/components/legal/HardenedClickwrap'
+import { config } from '@/lib/config'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -12,6 +14,7 @@ export default function RegisterPage() {
   const [company, setCompany] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [consentValid, setConsentValid] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -35,6 +38,13 @@ export default function RegisterPage() {
         setError(data.detail || 'Registration failed')
         return
       }
+
+      // Log hardened consent record (fire-and-forget)
+      fetch(`${config.apiUrl}/api/v1/legal/consent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_email: email, legal_version: 'v17_Hardened' }),
+      }).catch(() => {})
 
       router.push('/vendor/dashboard')
       router.refresh()
@@ -117,6 +127,10 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            <div className="pt-1 pb-1 border-t border-neutral-800">
+              <HardenedClickwrap onValidityChange={setConsentValid} variant="dark" />
+            </div>
+
             {error && (
               <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2.5">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -126,16 +140,12 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !consentValid}
               className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2 text-sm"
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {loading ? 'Creating account…' : 'Create free account'}
             </button>
-
-            <p className="text-neutral-500 text-xs text-center">
-              By registering you agree to our Terms of Service and Privacy Policy.
-            </p>
           </form>
 
           <p className="text-center text-neutral-400 text-sm mt-6">

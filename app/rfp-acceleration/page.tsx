@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { config } from '@/lib/config';
+import HardenedClickwrap from '@/components/legal/HardenedClickwrap';
 
 function normalizeUrl(input: string): string {
   let url = input.trim();
@@ -58,10 +59,12 @@ export default function RFPAccelerationPage() {
   const [form, setForm] = useState<VendorForm>(EMPTY_FORM);
   const [formError, setFormError] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [consentValid, setConsentValid] = useState(false);
 
   function openModal(productType: string) {
     setModalProduct(productType);
     setFormError('');
+    setConsentValid(false);
   }
 
   function closeModal() {
@@ -69,6 +72,7 @@ export default function RFPAccelerationPage() {
     setFormError('');
     setForm(EMPTY_FORM);
     setShowAdvanced(false);
+    setConsentValid(false);
   }
 
   async function handleCheckout(productType: string, vendorForm: VendorForm) {
@@ -361,7 +365,8 @@ export default function RFPAccelerationPage() {
               </div>
             </div>
             
-            <div className="p-8 pt-4 border-t border-[#f1f5f9] shrink-0 bg-white rounded-b-2xl">
+            <div className="p-8 pt-4 border-t border-[#f1f5f9] shrink-0 bg-white rounded-b-2xl space-y-4">
+              <HardenedClickwrap onValidityChange={setConsentValid} variant="light" />
               <div className="flex gap-3">
                 <button
                   onClick={closeModal}
@@ -371,7 +376,7 @@ export default function RFPAccelerationPage() {
                 </button>
                 <button
                   onClick={() => handleCheckout(modalProduct, form)}
-                  disabled={loading === modalProduct}
+                  disabled={loading === modalProduct || !consentValid}
                   className="flex-1 px-4 py-2 bg-[#10b981] text-white rounded-lg text-sm font-medium hover:bg-[#059669] transition-colors disabled:opacity-60"
                 >
                   {loading === modalProduct ? 'Redirecting…' : 'Continue to Payment'}
