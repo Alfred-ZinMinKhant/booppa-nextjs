@@ -43,8 +43,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${dmSans.variable} ${spaceMono.variable}`}>
       <body className="antialiased bg-white text-[#1e293b]">
-        <GebizTicker />
         <Navigation />
+        <GebizTicker />
         {children}
         <Footer />
         <TrackerGate />
