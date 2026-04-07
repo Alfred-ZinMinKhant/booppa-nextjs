@@ -15,6 +15,7 @@ interface Tender {
 export default function GebizTicker() {
   const [tenders, setTenders] = useState<Tender[]>([])
   const [dismissed, setDismissed] = useState(false)
+  const [error, setError] = useState(false)
   const tickerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -22,10 +23,30 @@ export default function GebizTicker() {
       setDismissed(true)
       return
     }
-    fetch(`${appConfig.apiUrl}/api/v1/gebiz/latest-tenders?limit=10`)
-      .then(r => r.ok ? r.json() : [])
-      .then(setTenders)
-      .catch(() => {})
+
+    const url = `${appConfig.apiUrl}/api/v1/gebiz/latest-tenders?limit=10`
+    console.log('[GeBIZ Ticker] Fetching from:', url)
+
+    fetch(url)
+      .then(r => {
+        console.log('[GeBIZ Ticker] Response status:', r.status)
+        if (!r.ok) {
+          console.error('[GeBIZ Ticker] Non-OK response:', r.status, r.statusText)
+          setError(true)
+          return []
+        }
+        return r.json()
+      })
+      .then(data => {
+        console.log('[GeBIZ Ticker] Received tenders:', data?.length ?? 0)
+        if (Array.isArray(data)) {
+          setTenders(data)
+        }
+      })
+      .catch(err => {
+        console.error('[GeBIZ Ticker] Fetch error:', err)
+        setError(true)
+      })
   }, [])
 
   const handleDismiss = () => {
