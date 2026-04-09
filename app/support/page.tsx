@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.booppa.io";
-
 export default function SupportPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<{ ticketId: string; trackingUrl: string } | null>(null);
@@ -23,7 +21,7 @@ export default function SupportPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/api/tickets/submit`, {
+      const res = await fetch(`/api/tickets/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

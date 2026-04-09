@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { config } from '@/lib/config';
+import HardenedClickwrap from '@/components/legal/HardenedClickwrap';
 
 function normalizeUrl(input: string): string {
   let url = input.trim();
@@ -18,6 +19,7 @@ export default function QuickScanPage() {
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [consentValid, setConsentValid] = useState(false);
   const apiBase = config.apiUrl;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -81,10 +83,16 @@ export default function QuickScanPage() {
           <input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company Ltd" className="w-full mb-3 p-2 rounded bg-gray-800 border border-gray-700 text-white" />
 
           <label className="block text-sm text-gray-300 mb-1">Contact email *</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" className="w-full mb-4 p-2 rounded bg-gray-800 border border-gray-700 text-white" />
+          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" className="w-full mb-6 p-2 rounded bg-gray-800 border border-gray-700 text-white" />
+
+          <div className="mb-6 p-4 rounded-lg border border-neutral-700 bg-neutral-800/50">
+            <HardenedClickwrap onValidityChange={setConsentValid} variant="dark" />
+          </div>
 
           <div className="flex justify-end">
-            <button type="submit" className="px-4 py-2 rounded bg-green-500 text-white" disabled={loading}>{loading ? 'Starting...' : 'Start Quick Scan & Checkout'}</button>
+            <button type="submit" className="px-4 py-2 rounded bg-green-500 text-white disabled:opacity-40 disabled:cursor-not-allowed" disabled={loading || !consentValid}>
+              {loading ? 'Starting...' : 'Start Quick Scan & Checkout'}
+            </button>
           </div>
         </form>
       </div>

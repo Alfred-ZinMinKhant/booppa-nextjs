@@ -2,105 +2,153 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Privacy Policy | BOOPPA',
-  description: 'Privacy Policy and Data Protection Officer contact for Booppa',
+  description: 'Privacy Policy for Booppa Smart Care LLC — Singapore PDPA · EU/UK GDPR · CCPA. Effective March 1, 2026.',
 };
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-8">
+      <h2 className="text-base font-bold text-[#0f172a] mb-3">{title}</h2>
+      <div className="text-[#64748b] space-y-3 text-sm leading-relaxed">{children}</div>
+    </div>
+  );
+}
+
+function Li({ children }: { children: React.ReactNode }) {
+  return <li className="ml-4 list-disc">{children}</li>;
+}
 
 export default function PrivacyPage() {
   return (
-    <main className="pt-16 pb-24">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-200">
-        <h1 className="text-3xl font-bold text-white mb-2">Privacy Policy</h1>
-        <p className="text-sm text-emerald-400 mb-4 font-medium">Version: v17 Hardened &nbsp;·&nbsp; Effective: April 2026</p>
+    <main className="min-h-screen bg-[#f8fafc]">
+      <section className="py-16 px-6 bg-[#0f172a] text-white">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#10b981] mb-3">Legal</p>
+          <h1 className="text-3xl font-bold mb-2">Privacy Policy</h1>
+          <p className="text-sm text-[#10b981] font-medium">v17 Hardened · Effective Date: March 1, 2026</p>
+          <p className="text-xs text-white/40 mt-1">Booppa Smart Care LLC · 1209 Orange Street, Wilmington, Delaware 19801, USA</p>
+          <p className="text-xs text-white/40 mt-1">Multi-Jurisdiction: Singapore PDPA · EU/UK GDPR · CCPA</p>
+        </div>
+      </section>
 
-        <p className="mb-6">Booppa Smart Care LLC ("Booppa", "we", "us" or "our") is committed to protecting the privacy of visitors to our website and users of our services. This Privacy Policy explains what personal data we collect, why we collect it, how we use it, and your rights under Singapore’s Personal Data Protection Act 2012 (PDPA).</p>
+      <section className="py-12 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-8 space-y-0">
 
-        <h2 className="text-xl font-semibold text-white mt-6">Scope</h2>
-        <p className="mb-4">This policy applies to personal data collected through our website, applications, services, or provided directly to us by customers, suppliers, job applicants and other business contacts.</p>
+            <Section title="1. Data Controller and DPO">
+              <p>Booppa Smart Care LLC acts as the data controller for personal data processed through the Booppa platform.</p>
+              <p><strong className="text-[#0f172a]">DPO:</strong> <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
+              <p><strong className="text-[#0f172a]">Legal inquiries:</strong> <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a></p>
+              <p className="text-xs bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
+                <strong>For EU/UK users:</strong> Booppa Smart Care LLC is the data controller under GDPR Article 4(7). Where required under Article 27 GDPR, Booppa shall designate an EU-based representative prior to commencing systematic processing of EU residents' personal data.
+              </p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Data Protection Officer (DPO)</h2>
-        <p className="mb-4">If you have any questions, concerns or requests relating to your personal data (including access, correction or deletion requests), please contact our Data Protection Officer (DPO):</p>
-        <p className="mb-6 font-medium"><a href="mailto:evidence@booppa.io" className="underline">evidence@booppa.io</a></p>
+            <Section title="2. Data We Collect">
+              <p><strong className="text-[#0f172a]">Account and Identity Data:</strong> Name, email address, company name, job title, UEN and Singapore business registration details. Payment information is processed and tokenized by Stripe — Booppa does not store card details.</p>
+              <p><strong className="text-[#0f172a]">Verification and Compliance Data:</strong> Business documents uploaded for notarization or verification; website content scanned for PDPA compliance; compliance scores, risk assessments, SHA-256 hash values, and generated reports.</p>
+              <p><strong className="text-[#0f172a]">Usage and Platform Data:</strong> Log data (IP addresses, browser type, pages visited, timestamps, session identifiers); platform activity (searches, vendor profiles viewed, products purchased).</p>
+              <p><strong className="text-[#0f172a]">Procurement Activity Data:</strong> RFP titles and sector information; GeBIZ tender numbers entered for win probability analysis. Vendor identities are never shared with buyers.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Personal Data We Collect</h2>
-        <ul className="list-disc list-inside mb-4 text-gray-300">
-          <li>Contact information (name, email, phone)</li>
-          <li>Company information (company name, role, industry)</li>
-          <li>Transaction and billing details (when you purchase services)</li>
-          <li>Technical data (IP address, browser, device and cookies)</li>
-          <li>Usage data (pages visited, features used, timestamps)</li>
-        </ul>
+            <Section title="3. Legal Basis for Processing">
+              <p><strong className="text-[#0f172a]">Singapore (PDPA 2012):</strong> Processing is limited to: (a) contractual necessity to deliver purchased services; (b) legal compliance obligations; and (c) narrowly defined legitimate interests including platform security, fraud prevention, and core analytics. Consent is obtained where required.</p>
+              <p><strong className="text-[#0f172a]">EU/UK (GDPR / UK GDPR):</strong> Legal bases are limited to:</p>
+              <ul className="space-y-1 mt-1">
+                <Li>Article 6(1)(b) — Performance of a contract: to deliver services you have purchased</Li>
+                <Li>Article 6(1)(c) — Legal obligation: to comply with applicable laws</Li>
+                <Li>Article 6(1)(f) — Legitimate interests: platform security, fraud prevention, and core analytics only</Li>
+                <Li>Article 6(1)(a) — Consent: for marketing communications and non-essential cookies</Li>
+              </ul>
+              <p><strong className="text-[#0f172a]">United States (CCPA):</strong> We process data of California and other US residents in accordance with applicable state privacy laws. Booppa does not sell personal information as defined under the CCPA.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">How We Use Personal Data</h2>
-        <p className="mb-4">We process personal data for the following purposes:</p>
-        <ul className="list-disc list-inside mb-4 text-gray-300">
-          <li>To provide and improve our services and customer support;</li>
-          <li>To process payments and manage billing;</li>
-          <li>To send service-related notifications and reports (including PDPA audit reports);</li>
-          <li>To detect, prevent and investigate security incidents and fraud;</li>
-          <li>To comply with legal obligations and regulatory requests;</li>
-          <li>To maintain audit trails and consent logs to demonstrate lawful basis for processing under PDPA.</li>
-        </ul>
+            <Section title="4. Controller vs. Processor — Data Processing Agreement">
+              <p>Booppa acts as <strong className="text-[#0f172a]">data controller</strong> for all processing activities in connection with platform operations, user accounts, and service delivery. Booppa acts as <strong className="text-[#0f172a]">data processor</strong> where processing personal data on behalf of Enterprise and Enterprise Pro subscribers in connection with their specific procurement workflows.</p>
+              <p><strong className="text-[#0f172a]">Data Processing Agreement (DPA):</strong> Booppa makes a standard DPA available for Enterprise and Enterprise Pro subscribers who process personal data subject to GDPR, UK GDPR, or Singapore PDPA. Request by emailing <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> with subject line "DPA Request." Booppa will provide the DPA within 5 business days.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Consent and Cookie Management</h2>
-        <p className="mb-4">We obtain consent before loading optional trackers. Our cookie banner provides the options to <strong>Accept All</strong>, <strong>Reject Optional</strong>, or <strong>Settings</strong>. Non-essential third-party trackers (analytics, pixels, marketing) are blocked by default until you provide explicit consent. You may change your preferences at any time via the cookie banner.</p>
+            <Section title="5. How We Use Your Data">
+              <p>We use personal data to: deliver products and services you have purchased; process payments and send transaction confirmations; generate compliance reports, certificates, and procurement documentation; calculate vendor trust scores and probability estimates; send operational notifications; improve platform security and functionality; and comply with legal obligations.</p>
+              <p>Marketing communications are sent only where you have opted in or where permitted by applicable law.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Consent Records & Logging</h2>
-        <p className="mb-4">We maintain a secure log of consent records that contains:</p>
-        <ul className="list-disc list-inside mb-4 text-gray-300">
-          <li>Timestamp of consent</li>
-          <li>Anonymized IP address</li>
-          <li>Consent status (e.g., "Full Consent", "Necessary Only")</li>
-          <li>Privacy Policy version accepted</li>
-          <li>Optional metadata (e.g., user agent)</li>
-        </ul>
-        <p className="mb-4">These records are retained to demonstrate compliance with PDPA and to respond to any regulatory inquiries. Retention may vary by service tier: Essential tier logs are retained for 30 days, while Pro and Suite tiers retain consent and audit logs longer (including unlimited historical retention for Suite where contracted). If you wish to request access to your consent records, please contact the DPO at the email above.</p>
+            <Section title="6. Data Sharing — Sub-Processors">
+              <p>We do not sell your personal data to third parties. Sub-processors handling data on our behalf under contractual data processing agreements:</p>
+              <ul className="space-y-1 mt-2">
+                <Li><strong className="text-[#0f172a]">Stripe, Inc.</strong> — payment processing (PCI-DSS Level 1 compliant)</Li>
+                <Li><strong className="text-[#0f172a]">Resend</strong> — transactional email delivery</Li>
+                <Li><strong className="text-[#0f172a]">AWS and/or Cloudflare</strong> — cloud infrastructure, data hosting, and storage</Li>
+                <Li><strong className="text-[#0f172a]">Sentry</strong> — anonymized error monitoring</Li>
+              </ul>
+              <p className="mt-2">Booppa accesses publicly available Singapore government procurement data (GeBIZ) via data.gov.sg APIs and the ACRA BizFile+ registry. No user personal data is transmitted to these sources.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Hardened Consent Records (v17 Hardened)</h2>
-        <p className="mb-4">From April 2026, Booppa maintains an additional immutable record ("Hardened Consent Record") at each registration and purchase. This record is required for legal enforceability of our Terms of Service and contains:</p>
-        <ul className="list-disc list-inside mb-4 text-gray-300">
-          <li>User email address</li>
-          <li>User account ID (where available)</li>
-          <li>Full IP address at time of agreement (not anonymized, retained for evidentiary purposes)</li>
-          <li>Browser user-agent string</li>
-          <li>Legal framework version accepted (e.g., "v17_Hardened")</li>
-          <li>Precise timestamp of affirmative consent</li>
-        </ul>
-        <p className="mb-4">Hardened Consent Records are retained indefinitely as they constitute evidence of a legal agreement. They may be disclosed to regulatory authorities or used in dispute resolution proceedings as permitted by law.</p>
+            <Section title="7. Derived Data Disclaimer">
+              <p>Analytics, scores, rankings, and other outputs derived from personal data are not guaranteed to be accurate, complete, or current; may be based on incomplete or imperfect datasets; do not constitute verified personal data under any regulatory framework; and are subject to model limitations and statistical uncertainty.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Third-Party Trackers and Integrations</h2>
-        <p className="mb-4">We only load third-party trackers (e.g., analytics, advertising, Hotjar, Facebook Pixel, Google Analytics) after obtaining explicit consent. Our front-end implements gating logic: any script that collects personal data or performs cross-site tracking is not executed until <em>Accept All</em> is selected. If you detect a tracker loading without consent, please report it to the DPO immediately.</p>
+            <Section title="8. International Data Transfers">
+              <p>Booppa Smart Care LLC is a US company headquartered in Delaware. Data may be transferred to and stored in the United States and other countries where our service providers operate.</p>
+              <p>For transfers of EU/UK personal data to countries without an adequacy decision, we rely on European Commission Standard Contractual Clauses (SCCs) or the UK International Data Transfer Addendum (IDTA). Copies of applicable transfer mechanisms are available upon request at <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a>.</p>
+              <p>For Singapore users, international transfers comply with Part VI of the PDPA, including the requirement to ensure overseas recipients provide a standard of protection at least comparable to the PDPA.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Data Retention</h2>
-        <p className="mb-4">We retain personal data only as long as necessary to fulfill the purposes outlined above, to comply with legal obligations, or to resolve disputes. Retention periods may vary depending on the product tier and contractual agreement:</p>
-        <ul className="list-disc list-inside mb-4 text-gray-300">
-          <li>Essential tier: logs retained for 30 days.</li>
-          <li>Pro and Suite tiers: extended or unlimited retention as specified in your contract.</li>
-        </ul>
-        <p className="mb-4">Where local law requires a longer retention period, we will retain data as necessary to comply with those obligations.</p>
+            <Section title="9. Data Retention">
+              <ul className="space-y-1">
+                <Li>Account data: duration of account plus <strong className="text-[#0f172a]">7 years</strong> after closure (US tax and legal compliance)</Li>
+                <Li>Transaction records: <strong className="text-[#0f172a]">7 years</strong> (US tax law and Singapore corporate records requirements)</Li>
+                <Li>Compliance reports and certificates: <strong className="text-[#0f172a]">5 years</strong> from generation</Li>
+                <Li>Notarization records and hashes: <strong className="text-[#0f172a]">indefinitely</strong> (integrity of the immutable ledger)</Li>
+                <Li>Server logs: <strong className="text-[#0f172a]">90 days</strong></Li>
+                <Li>Marketing consent records: until withdrawal of consent plus <strong className="text-[#0f172a]">3 years</strong></Li>
+              </ul>
+              <p className="mt-2">Data is securely deleted or anonymized upon expiry of the applicable retention period.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Disclosure of Personal Data</h2>
-        <p className="mb-4">We do not sell or rent your personal data. We may disclose data to third-party service providers only to fulfill the purposes listed above, for example:</p>
-        <ul className="list-disc list-inside mb-4 text-gray-300">
-          <li><strong>Stripe</strong>: For secure payment processing.</li>
-          <li><strong>Polygon Network</strong>: For public (but hashed/anonymized) on-chain verification.</li>
-          <li><strong>Regulatory Authorities</strong>: When required by Singapore law.</li>
-        </ul>
+            <Section title="10. Your Rights — Singapore (PDPA)">
+              <p>Under the PDPA you have the right to access personal data we hold about you; correct inaccurate data; withdraw consent for processing based on consent; and request data portability. Contact <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a>. We will respond within 30 days.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Your Rights</h2>
-        <p className="mb-4">Under the PDPA you may request access to or correction of your personal data, withdraw consent, or request deletion where applicable. To exercise these rights, contact our DPO at <a href="mailto:evidence@booppa.io" className="underline">evidence@booppa.io</a>. We will respond to valid requests within a reasonable timeframe and in accordance with PDPA requirements.</p>
+            <Section title="11. Your Rights — EU/UK (GDPR / UK GDPR)">
+              <p>EU and UK residents have rights including:</p>
+              <ul className="space-y-1 mt-2">
+                <Li>Right of access (Article 15)</Li>
+                <Li>Right to rectification (Article 16)</Li>
+                <Li>Right to erasure (Article 17)</Li>
+                <Li>Right to restriction of processing (Article 18)</Li>
+                <Li>Right to data portability (Article 20)</Li>
+                <Li>Right to object to processing based on legitimate interests (Article 21)</Li>
+                <Li>Right to withdraw consent at any time</Li>
+              </ul>
+              <p className="mt-2">Contact <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a>. EU users may also lodge a complaint with their national supervisory authority. UK users may contact the ICO at <a href="https://ico.org.uk" className="underline text-[#10b981]" target="_blank" rel="noopener noreferrer">ico.org.uk</a> or 0303 123 1113.</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Security</h2>
-        <p className="mb-4">We implement appropriate technical and organizational measures to protect personal data against unauthorized access, disclosure, alteration or destruction. This includes encryption for data at rest and in transit, access controls, and regular security assessments.</p>
+            <Section title="12. Your Rights — California (CCPA)">
+              <p>California residents have the right to know what personal information is collected and how it is used; the right to delete personal information; and the right to opt out of the sale of personal information. Booppa does not sell personal information. Contact <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a> with subject line "CCPA Request."</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Transfers Outside Singapore</h2>
-        <p className="mb-4">Where we transfer personal data outside Singapore (for example to cloud providers or subprocessors), we will ensure appropriate safeguards are in place and that transfers comply with applicable data protection laws.</p>
+            <Section title="13. Data Security">
+              <p>We implement: TLS 1.2+ encryption in transit; encryption at rest for stored data; JWT-based authentication with secure token rotation; Stripe-managed payment processing; role-based access controls; and regular security monitoring.</p>
+              <p>In the event of a data breach, we will notify affected Users and relevant supervisory authorities in accordance with applicable law (72-hour notification under GDPR; 3-day notification under Singapore PDPA as amended).</p>
+            </Section>
 
-        <h2 className="text-xl font-semibold text-white mt-6">Contact & Complaints</h2>
-        <p className="mb-4">If you have any questions, complaints or wish to exercise your rights, please contact our DPO at:</p>
-        <p className="mb-6 font-medium"><a href="mailto:evidence@booppa.io" className="underline">evidence@booppa.io</a></p>
+            <Section title="14. Children's Privacy">
+              <p>The Booppa platform is intended for business users and is not directed at individuals under 18. We do not knowingly collect personal data from minors. Contact <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a> if you believe we have inadvertently collected such data.</p>
+            </Section>
 
-        <p className="mt-8 text-sm text-gray-400">Last updated: April 2026 &nbsp;·&nbsp; Privacy Policy version: v17 Hardened (2026-04-01)</p>
-      </div>
+            <Section title="15. Changes to This Policy">
+              <p>We will notify registered Users by email and by platform notice at least 14 days before material changes take effect. Continued use after the effective date constitutes acceptance.</p>
+            </Section>
+
+            <div className="pt-4 border-t border-[#e2e8f0] text-xs text-[#94a3b8] space-y-1">
+              <p><a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> · <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a></p>
+              <p>Booppa Smart Care LLC · 1209 Orange Street, Wilmington, Delaware 19801, USA</p>
+              <p>Also see: <Link href="/terms" className="underline text-[#10b981]">Terms of Service</Link> · <Link href="/dpo" className="underline text-[#10b981]">DPO Contact</Link> · <Link href="/cookies" className="underline text-[#10b981]">Cookie Policy</Link></p>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

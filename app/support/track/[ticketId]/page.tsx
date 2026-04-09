@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://api.booppa.io";
-
 export default function TrackTicketPage({ params }: { params: { ticketId: string } }) {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -18,7 +16,7 @@ export default function TrackTicketPage({ params }: { params: { ticketId: string
         return;
       }
       try {
-        const res = await fetch(`${API_BASE}/api/tickets/track/${params.ticketId}?token=${token}`);
+        const res = await fetch(`/api/tickets/track/${params.ticketId}?token=${encodeURIComponent(token)}`);
         const json = await res.json().catch(() => null);
         if (!res.ok) {
           throw new Error(json?.detail || "Ticket not found");

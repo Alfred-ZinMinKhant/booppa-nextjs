@@ -7,13 +7,14 @@ import { Menu, X, ChevronDown } from 'lucide-react';
 import { config as appConfig } from '@/lib/config';
 
 const solutions = [
-  { name: 'RFP Kit',        href: '/rfp-acceleration',   desc: 'Blockchain-verified RFP evidence' },
-  { name: 'Compliance',     href: '/compliance',          desc: 'ISO 27001 & SOC 2 readiness' },
-  { name: 'PDPA Scan',      href: '/pdpa',                desc: 'Data protection gap analysis' },
-  { name: 'Notarization',   href: '/notarization',        desc: 'Immutable document anchoring' },
-  { name: 'Tender Check',   href: '/tender-check',        desc: 'Government tender eligibility' },
-  { name: 'Opportunities',  href: '/opportunities',        desc: 'Live GeBIZ open tenders' },
-  { name: 'Supply Chain',   href: '/supply-chain',        desc: 'Vendor risk screening' },
+  { name: 'For Vendors',     href: '/solutions/vendors',    desc: 'Claim, verify, and win more contracts' },
+  { name: 'For Procurement', href: '/solutions/procurement', desc: 'Reduce vendor risk, evaluate faster' },
+  { name: 'RFP Tools',       href: '/rfp',                  desc: 'Prepare better RFP responses' },
+  { name: 'Vendor Proof',    href: '/vendor-proof',         desc: 'Get verified — S$149 one-time' },
+  { name: 'PDPA Scan',       href: '/pdpa',                 desc: 'Data protection gap analysis' },
+  { name: 'Notarization',    href: '/notarization',         desc: 'Immutable document anchoring' },
+  { name: 'Tender Check',    href: '/tender-check',         desc: 'Government tender eligibility' },
+  { name: 'Opportunities',   href: '/opportunities',        desc: 'Live GeBIZ open tenders' },
 ];
 
 export default function Navigation() {
@@ -71,7 +72,7 @@ export default function Navigation() {
           {/* Desktop links */}
           <div className="hidden lg:flex items-center gap-x-8">
             <Link href="/vendors" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/vendors') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
-              Marketplace
+              Network
             </Link>
 
             {/* Solutions dropdown */}
@@ -110,6 +111,14 @@ export default function Navigation() {
             <Link href="/verify" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/verify') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
               Verify
             </Link>
+
+            <Link href="/resources" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/resources') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
+              Resources
+            </Link>
+
+            <Link href="/insights" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/insights') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
+              Insights
+            </Link>
           </div>
 
           {/* Desktop auth actions */}
@@ -135,10 +144,10 @@ export default function Navigation() {
                   Sign In
                 </Link>
                 <Link
-                  href="/trial"
+                  href="/auth/register"
                   className="px-4 py-2 bg-[#10b981] text-white text-sm font-semibold rounded-lg hover:bg-[#059669] transition-colors"
                 >
-                  Get Started
+                  Claim your Profile
                 </Link>
               </>
             )}
@@ -170,10 +179,12 @@ export default function Navigation() {
               </div>
 
               <div className="space-y-1">
-                <MobileLink href="/vendors"          label="Marketplace"         active={pathname?.startsWith('/vendors')}          close={() => setMobileOpen(false)} />
+                <MobileLink href="/vendors"          label="Network"             active={pathname?.startsWith('/vendors')}          close={() => setMobileOpen(false)} />
                 <MobileLink href="/compare"           label="Compare"             active={pathname === '/compare'}                   close={() => setMobileOpen(false)} />
                 <MobileLink href="/pricing"           label="Pricing"             active={pathname === '/pricing'}                   close={() => setMobileOpen(false)} />
                 <MobileLink href="/verify"            label="Verify"              active={pathname?.startsWith('/verify')}           close={() => setMobileOpen(false)} />
+                <MobileLink href="/resources"        label="Resources"           active={pathname?.startsWith('/resources')}        close={() => setMobileOpen(false)} />
+                <MobileLink href="/insights"         label="Insights"            active={pathname?.startsWith('/insights')}          close={() => setMobileOpen(false)} />
 
                 <div className="pt-4 pb-1">
                   <p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/30">Solutions</p>
@@ -196,7 +207,7 @@ export default function Navigation() {
                   ) : (
                     <>
                       <MobileLink href="/login" label="Sign In" active={pathname === '/login'} close={() => setMobileOpen(false)} />
-                      <MobileLink href="/trial" label="Get Started" active={false} close={() => setMobileOpen(false)} highlight />
+                      <MobileLink href="/auth/register" label="Claim your Profile" active={false} close={() => setMobileOpen(false)} highlight />
                     </>
                   )}
                 </div>

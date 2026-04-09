@@ -402,6 +402,16 @@ function TenderCheckContent() {
           </div>
         )}
 
+      {/* Legal Disclaimer */}
+      <div className="mt-8 mx-auto max-w-2xl px-4 pb-12">
+        <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-5">
+          <p className="text-xs text-neutral-400 leading-relaxed">
+            <span className="font-semibold text-neutral-300">Important: </span>
+            Tender Win Probability scores are non-predictive estimates generated for informational purposes only. They do not guarantee, predict, or influence the outcome of any tender award. BOOPPA is not affiliated with, endorsed by, or connected to GeBIZ, the Ministry of Trade and Industry (MTI), the Personal Data Protection Commission (PDPC), or any Singapore government agency. Results are based on publicly available data and internal scoring models. For official tender requirements, refer to the relevant government portal.
+          </p>
+        </div>
+      </div>
+
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { config } from '@/lib/config';
+import HardenedClickwrap from '@/components/legal/HardenedClickwrap';
 
 type UploadResult = {
   report_id: string;
@@ -39,6 +40,7 @@ export default function NotarizationPage() {
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
   const [error, setError] = useState('');
+  const [consentValid, setConsentValid] = useState(false);
 
   const handleSelectPlan = (plan: PlanKey) => {
     setSelectedPlan(plan);
@@ -360,6 +362,10 @@ export default function NotarizationPage() {
                     </ol>
                   </div>
 
+                  <div className="mb-6 p-4 rounded-xl border border-[#e2e8f0] bg-[#f8fafc]">
+                    <HardenedClickwrap onValidityChange={setConsentValid} variant="light" />
+                  </div>
+
                   {error && (
                     <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">{error}</div>
                   )}
@@ -370,8 +376,8 @@ export default function NotarizationPage() {
                     </button>
                     <button
                       onClick={handleCheckout}
-                      disabled={checkingOut}
-                      className="flex-1 btn btn-primary py-3 shadow-lg disabled:opacity-50"
+                      disabled={checkingOut || !consentValid}
+                      className="flex-1 btn btn-primary py-3 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {checkingOut ? 'Redirecting to Payment…' : `Pay ${PLANS[selectedPlan].price} — Notarize Now`}
                     </button>

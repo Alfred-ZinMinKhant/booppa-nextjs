@@ -39,9 +39,10 @@ export default function Footer() {
           <div className="footer-column">
             <h4 className="font-bold text-[#0f172a] mb-6">Tools</h4>
             <ul className="space-y-4">
+              <li><Link href="/check-status" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Check Trust Status</Link></li>
               <li><Link href="/verify" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Verify Evidence</Link></li>
               <li><Link href="/compare" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Compare Vendors</Link></li>
-              <li><Link href="/rfp-acceleration" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Compare RFP Plans</Link></li>
+              <li><Link href="/resources" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Resources</Link></li>
               <li><Link href="/support" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Open Ticket</Link></li>
             </ul>
           </div>
@@ -53,7 +54,7 @@ export default function Footer() {
               BOOPPA provides evidence generation tools. Not regulatory certification or legal advice.
             </p>
             <p className="text-[#64748b] text-sm">
-              © 2024 BOOPPA. Singapore-based compliance infrastructure.
+              © 2026 BOOPPA. Singapore-based compliance infrastructure.
             </p>
           </div>
           <div className="flex flex-wrap gap-4 text-xs text-[#94a3b8]">

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Shield, Eye, TrendingUp, AlertTriangle, ArrowRight, Bell, Zap, Building } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import VendorStatusBadge from '@/components/vendor/VendorStatusBadge';
@@ -44,6 +45,9 @@ export default function VendorDashboard() {
             <p className="text-neutral-400 text-sm mt-1">Real-time enterprise procurement signals</p>
           </div>
           <div className="flex gap-3">
+            <Link href="/vendor/referrals" className="px-4 py-2 bg-neutral-900 text-white rounded-md border border-neutral-800 text-sm font-medium hover:bg-neutral-800 transition">
+              Referrals
+            </Link>
             <button className="px-4 py-2 bg-neutral-900 text-white rounded-md border border-neutral-800 text-sm font-medium hover:bg-neutral-800 transition">
               Share Proof
             </button>

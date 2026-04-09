@@ -9,11 +9,12 @@ const publicRoutes = [
   '/acceptable-use', '/disclaimer',
   '/compare', '/rankings', '/insight-dome',
   '/notarization', '/pdpa', '/compliance', '/supply-chain',
-  '/rfp-acceleration', '/enterprise', '/enterprise-briefing',
+  '/rfp-acceleration', '/rfp', '/enterprise', '/enterprise-briefing',
   '/demo', '/thank-you', '/qr-scan',
-  '/tender-check',
+  '/tender-check', '/vendor-proof', '/opportunities',
+  '/insights', '/resources', '/check-status',
 ]
-const publicPrefixes = ['/verify', '/vendors', '/blog']
+const publicPrefixes = ['/verify', '/vendors', '/blog', '/solutions', '/auth']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

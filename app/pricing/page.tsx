@@ -37,7 +37,60 @@ export default function PricingPage() {
 
           {/* ONE-TIME PRICING */}
           {activeTab === 'oneoff' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8 mb-20">
+
+              {/* FREE tier */}
+              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Free</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 0</div>
+                <p className="text-sm text-[#64748b] mb-8">Claim your presence</p>
+                <ul className="space-y-4 mb-10">
+                  {[
+                    'Claim your company profile',
+                    'Basic public listing',
+                    'Appear in vendor search',
+                    'GeBIZ opportunity feed',
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/auth/register" className="btn btn-outline w-full">Claim Profile</Link>
+              </div>
+
+              {/* VENDOR PROOF — PRIMARY */}
+              <div className="bg-[#0f172a] p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl relative hover:translate-y-[-5px] transition-all">
+                <div className="absolute top-[-15px] left-1/2 -translate-x-1/2 bg-[#10b981] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+                  Most Important
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-white">Vendor Proof</h3>
+                <div className="text-4xl font-bold text-[#10b981] mb-2">SGD 149</div>
+                <p className="text-sm text-white/60 mb-8">One-time · lifetime</p>
+                <ul className="space-y-4 mb-10">
+                  {[
+                    'Verified status badge',
+                    'Procurement filter visibility',
+                    'Compliance score activated',
+                    'Embeddable trust badge',
+                    'CAL engine unlocked',
+                    'Foundation for all products',
+                  ].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-white/80">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/vendor-proof"
+                  className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 px-6 rounded-xl transition shadow-lg shadow-[#10b981]/30"
+                >
+                  Get Vendor Proof
+                </Link>
+              </div>
+
               <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Snapshot</h3>
                 <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 79</div>
@@ -224,7 +277,32 @@ export default function PricingPage() {
 
           {/* ENTERPRISE PRICING */}
           {activeTab === 'enterprise' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+              {/* Enterprise Pro */}
+              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Enterprise Pro</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 1,499<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">Dedicated account management</p>
+                <ul className="space-y-4 mb-10">
+                  {[
+                    'Dedicated account manager',
+                    'SLA on data freshness (24h refresh)',
+                    'Unlimited blockchain notarizations',
+                    'Custom API access',
+                    'White-label compliance reports',
+                    'Priority 2h support response',
+                    'Quarterly strategy calls'
+                  ].map((f) => (
+                    <li key={f} className="flex items-start gap-3 text-sm text-[#64748b]">
+                      <span className="text-[#10b981] font-bold">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">Best for: Mid-market enterprises, procurement teams</p>
+                <Link href="/demo" className="btn btn-outline w-full">Book Demo</Link>
+              </div>
+
               <div className="bg-white p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-xl hover:translate-y-[-5px] transition-all">
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Pro Suite</h3>
                 <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 1,999<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
