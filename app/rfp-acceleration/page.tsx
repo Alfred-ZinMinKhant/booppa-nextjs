@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { config } from '@/lib/config';
 import HardenedClickwrap from '@/components/legal/HardenedClickwrap';
 
@@ -54,7 +55,14 @@ const EMPTY_FORM: VendorForm = {
 };
 
 export default function RFPAccelerationPage() {
+  const [authed, setAuthed] = useState<boolean | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`${config.apiUrl}/api/v1/auth/me`, { credentials: 'include' })
+      .then(r => setAuthed(r.ok))
+      .catch(() => setAuthed(false))
+  }, [])
   const [modalProduct, setModalProduct] = useState<string | null>(null);
   const [form, setForm] = useState<VendorForm>(EMPTY_FORM);
   const [formError, setFormError] = useState('');
@@ -125,6 +133,49 @@ export default function RFPAccelerationPage() {
       setFormError('Network error. Please try again.');
       setLoading(null);
     }
+  }
+
+  if (authed === null) {
+    return (
+      <main className="min-h-[70vh] flex items-center justify-center p-6">
+        <div className="text-gray-500 text-sm">Loading…</div>
+      </main>
+    )
+  }
+
+  if (authed === false) {
+    return (
+      <main className="min-h-[70vh] flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center">
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-10">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-7 h-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-bold text-white mb-2">Sign in to get your RFP Kit</h1>
+            <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+              Your RFP evidence package is tied to your company account. Sign in or create a free account first, then complete your purchase.
+            </p>
+            <div className="space-y-3">
+              <Link
+                href="/login?from=/rfp-acceleration"
+                className="block w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition text-sm"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/register?product=rfp"
+                className="block w-full py-3 border border-gray-700 text-white hover:bg-white/5 font-semibold rounded-xl transition text-sm"
+              >
+                Create Free Account
+              </Link>
+            </div>
+            <p className="text-gray-600 text-xs mt-6">Free account · No credit card needed to register</p>
+          </div>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -434,10 +485,11 @@ export default function RFPAccelerationPage() {
                 <p className="text-[#64748b]">Perfect for simple RFPs and basic vendor verification.</p>
               </div>
               <ul className="space-y-4 mb-12">
-                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> 5 Copy-Ready RFP Answers</li>
-                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> RFP Kit Evidence Certificate</li>
-                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> Blockchain Verification</li>
-                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> QR Validation</li>
+                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> 5 copy-ready RFP compliance answers</li>
+                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> RFP Kit Evidence Certificate (PDF)</li>
+                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> Blockchain-anchored on Polygon</li>
+                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> QR verification badge</li>
+                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> Tender Readiness Score (0–100)</li>
                 <li className="flex items-center gap-3 text-[#64748b] opacity-50"><span className="text-[#cbd5e1]">✕</span> No Editable DOCX</li>
                 <li className="flex items-center gap-3 text-[#64748b] opacity-50"><span className="text-[#cbd5e1]">✕</span> No AI Narrative</li>
               </ul>
@@ -459,12 +511,12 @@ export default function RFPAccelerationPage() {
                 <p className="text-white/70">Full vendor procurement pack for high-value tenders.</p>
               </div>
               <ul className="space-y-4 mb-12">
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> 15 Advanced RFP Answers</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Editable DOCX Template</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> AI Compliance Narrative</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Comprehensive Control Mapping</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Attestation Letter</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Priority 12h Delivery</li>
+                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> 15 advanced RFP compliance answers</li>
+                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Editable DOCX + PDF</li>
+                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> AI compliance narrative</li>
+                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Comprehensive control mapping</li>
+                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Attestation letter</li>
+                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Priority 12h delivery</li>
               </ul>
               <button
                 onClick={() => openModal('rfp_complete')}
