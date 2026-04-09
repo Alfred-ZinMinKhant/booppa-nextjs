@@ -23,7 +23,7 @@ async function getRecentPosts() {
   }
 }
 
-const guides = [
+const FALLBACK_GUIDES = [
   {
     category: 'RFP Tips',
     items: [
@@ -50,6 +50,23 @@ const guides = [
   },
 ];
 
+async function getGuides() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE || 'https://api.booppa.io'}/api/v1/resources/`, {
+      next: { revalidate: 300 },
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    // Convert { categories: { "RFP Tips": [{title, description, href}] } } to guides array format
+    return Object.entries(data.categories || {}).map(([category, items]: [string, any[]]) => ({
+      category,
+      items: items.map(item => ({ title: item.title, desc: item.description || '', href: item.href })),
+    }))
+  } catch {
+    return null
+  }
+}
+
 const tools = [
   { title: 'Tender Win Probability', desc: 'Enter a GeBIZ tender number and get an instant eligibility score.', href: '/tender-check', cta: 'Check Tender →' },
   { title: 'Document Verify', desc: 'Verify any blockchain-anchored BOOPPA document instantly.', href: '/verify', cta: 'Verify Document →' },
@@ -59,6 +76,7 @@ const tools = [
 
 export default async function ResourcesPage() {
   const livePosts = await getRecentPosts();
+  const guides = (await getGuides()) || FALLBACK_GUIDES;
 
   return (
     <main className="overflow-x-hidden">
