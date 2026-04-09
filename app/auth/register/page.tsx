@@ -24,6 +24,10 @@ export default function RegisterPage() {
       setError('Password must be at least 8 characters')
       return
     }
+    if (password.length > 20) {
+      setError('Password must be 20 characters or fewer')
+      return
+    }
 
     setLoading(true)
     try {
@@ -35,7 +39,13 @@ export default function RegisterPage() {
 
       if (!res.ok) {
         const data = await res.json()
-        setError(data.detail || 'Registration failed')
+        const detail: string = typeof data.detail === 'string' ? data.detail : 'Registration failed'
+        // Suppress raw bcrypt/passlib internals — show a clean message instead
+        if (detail.toLowerCase().includes('72 bytes') || detail.toLowerCase().includes('truncate')) {
+          setError('Registration failed — please try a different password')
+        } else {
+          setError(detail)
+        }
         return
       }
 
@@ -121,7 +131,8 @@ export default function RegisterPage() {
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="Min. 8 characters"
+                  placeholder="8–20 characters"
+                  maxLength={20}
                   className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
                 />
               </div>
@@ -150,7 +161,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-neutral-400 text-sm mt-6">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-emerald-400 hover:text-emerald-300 font-medium">
+            <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">
               Sign in
             </Link>
           </p>

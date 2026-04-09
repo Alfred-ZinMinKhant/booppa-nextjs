@@ -1,29 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useState } from 'react'
 import { config, endpoints } from '@/lib/config'
-import { checkFeature, FLAGS } from '@/lib/featureFlags'
+import Link from 'next/link'
 import type { MarketplaceVendor } from '@/types'
 
 export default function ComparePage() {
-  const [enabled, setEnabled] = useState(true)
   const [search, setSearch] = useState('')
   const [results, setResults] = useState<MarketplaceVendor[]>([])
   const [selected, setSelected] = useState<MarketplaceVendor[]>([])
   const [comparison, setComparison] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    checkFeature(FLAGS.COMPARISON).then(setEnabled)
-  }, [])
-
   const searchVendors = async (q: string) => {
     setSearch(q)
     if (q.length < 2) { setResults([]); return }
     try {
       const res = await fetch(
-        `${config.apiUrl}/api/v1${endpoints.marketplace.search}?q=${encodeURIComponent(q)}&per_page=10`
+        `/api/marketplace/search?q=${encodeURIComponent(q)}&per_page=10`
       )
       if (res.ok) {
         const data = await res.json()
@@ -61,23 +55,6 @@ export default function ComparePage() {
     } catch { /* silent */ } finally {
       setLoading(false)
     }
-  }
-
-  if (!enabled) {
-    return (
-      <main className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">🔒</div>
-          <h1 className="text-2xl font-bold text-[#0f172a] mb-2">Coming Soon</h1>
-          <p className="text-[#64748b] mb-6">
-            Vendor comparison will be available once we reach 50 verified vendors in the directory.
-          </p>
-          <Link href="/vendors" className="text-[#10b981] font-bold hover:underline">
-            Browse Vendor Directory →
-          </Link>
-        </div>
-      </main>
-    )
   }
 
   return (

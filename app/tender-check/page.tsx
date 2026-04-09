@@ -151,7 +151,7 @@ function TenderCheckContent() {
 
     try {
       const res = await fetch(`/api/tender-check?tenderNo=${encodeURIComponent(no)}`);
-      if (res.status === 404) { setError(`Tender "${no}" was not found in our shortlist.`); return; }
+      if (res.status === 404) { setError(`Tender "${no}" was not found in GeBIZ data. Please verify the tender number is correct — only open and recently-closed GeBIZ tenders are available.`); return; }
       if (!res.ok) { setError("Could not reach the tender service — please try again."); return; }
       const data: TenderResult = await res.json();
       setResult(data);
@@ -203,9 +203,14 @@ function TenderCheckContent() {
 
         {/* Error */}
         {error && (
-          <div className="flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3">
-            <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
-            <p className="text-sm text-red-300">{error}</p>
+          <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 space-y-1">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
+              <p className="text-sm text-red-300">{error}</p>
+            </div>
+            <p className="text-xs text-neutral-500 pl-7">
+              BOOPPA covers open ITQ/ITT tenders and recently awarded contracts from GeBIZ. Historical or niche procurement opportunities may not be indexed yet.
+            </p>
           </div>
         )}
 
@@ -389,7 +394,7 @@ function TenderCheckContent() {
                   </p>
                 </div>
                 <div className="flex gap-3 flex-shrink-0">
-                  <Link href="/auth/login" className="px-4 py-2 rounded-lg border border-neutral-700 text-sm text-white hover:bg-neutral-800 transition">
+                  <Link href="/login" className="px-4 py-2 rounded-lg border border-neutral-700 text-sm text-white hover:bg-neutral-800 transition">
                     Sign In
                   </Link>
                   <Link href="/auth/register" className="px-4 py-2 rounded-lg bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition">

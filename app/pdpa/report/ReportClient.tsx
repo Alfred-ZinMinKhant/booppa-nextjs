@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { config } from "@/lib/config";
+import Link from "next/link";
 
 type StructuredReport = {
   executive_summary?: string;
@@ -29,36 +30,50 @@ type StructuredReport = {
   report_metadata?: { ai_model?: string; report_id?: string };
 };
 
+const SEVERITY_STYLE: Record<string, string> = {
+  HIGH:     "bg-red-50 text-red-700 border-red-200",
+  MEDIUM:   "bg-amber-50 text-amber-700 border-amber-200",
+  LOW:      "bg-blue-50 text-blue-700 border-blue-200",
+  CRITICAL: "bg-red-100 text-red-800 border-red-300",
+};
+
+const RISK_LEVEL_COLOR: Record<string, string> = {
+  LOW:      "text-emerald-600",
+  MEDIUM:   "text-amber-600",
+  HIGH:     "text-red-600",
+  CRITICAL: "text-red-700",
+};
+
 export default function ReportClient() {
-  const [status, setStatus] = useState("loading");
-  const [message, setMessage] = useState("Checking report availability...");
-  const [reportUrl, setReportUrl] = useState<string | null>(null);
-  const [report, setReport] = useState<StructuredReport | null>(null);
+  const [status, setStatus]               = useState("loading");
+  const [message, setMessage]             = useState("Checking report availability...");
+  const [reportUrl, setReportUrl]         = useState<string | null>(null);
+  const [report, setReport]               = useState<StructuredReport | null>(null);
   const [siteScreenshot, setSiteScreenshot] = useState<string | null>(null);
   const [screenshotError, setScreenshotError] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [attempts, setAttempts] = useState(0);
-  const [retryTrigger, setRetryTrigger] = useState(0);
-  const [progress, setProgress] = useState(12);
-  const [loadingStep, setLoadingStep] = useState(0);
-  const [verification, setVerification] = useState<any>(null);
+  const [sessionId, setSessionId]         = useState<string | null>(null);
+  const [attempts, setAttempts]           = useState(0);
+  const [retryTrigger, setRetryTrigger]   = useState(0);
+  const [progress, setProgress]           = useState(12);
+  const [loadingStep, setLoadingStep]     = useState(0);
+  const [verification, setVerification]   = useState<any>(null);
 
   const maxAttempts = 12;
   const baseDelayMs = 5000;
-  const maxDelayMs = 60000;
+  const maxDelayMs  = 60000;
 
   const loadingSteps = [
-    { label: "Preparing data...", max: 35 },
-    { label: "Scanning website...", max: 65 },
-    { label: "Analyzing compliance...", max: 85 },
-    { label: "Almost done!", max: 95 },
+    { label: "Preparing scan…",         max: 35 },
+    { label: "Scanning your website…",  max: 65 },
+    { label: "Analysing PDPA gaps…",    max: 85 },
+    { label: "Almost done!",            max: 95 },
   ];
 
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       setSessionId(params.get("session_id"));
-    } catch (e) {
+    } catch {
       setSessionId(null);
     }
   }, []);
@@ -78,58 +93,43 @@ export default function ReportClient() {
         const res = await fetch(`${config.apiUrl}/api/reports/by-session?session_id=${sessionId}`);
         if (res.ok) {
           const data = await res.json();
-          if (data.report) {
-            setReport(data.report);
-          }
-          if (data.site_screenshot) {
-            setSiteScreenshot(data.site_screenshot);
-          }
-          if (data.screenshot_error) {
-            setScreenshotError(data.screenshot_error);
-          }
-          if (data.url) {
-            setReportUrl(data.url);
-          }
-          if (data.verification) {
-            setVerification(data.verification);
-          }
-          const hasScreenshot = Boolean(data.site_screenshot);
+          if (data.report)            setReport(data.report);
+          if (data.site_screenshot)   setSiteScreenshot(data.site_screenshot);
+          if (data.screenshot_error)  setScreenshotError(data.screenshot_error);
+          if (data.url)               setReportUrl(data.url);
+          if (data.verification)      setVerification(data.verification);
+
+          const hasScreenshot   = Boolean(data.site_screenshot);
           const screenshotFailed = Boolean(data.screenshot_error);
+
           if ((data.report || data.url) && (hasScreenshot || screenshotFailed || data.status === "completed")) {
             isReady = true;
             setStatus("ready");
-            setMessage("Your report is ready. Review below.");
+            setMessage("Your report is ready.");
           } else {
-            setStatus((prev) => (prev === "ready" ? "ready" : "loading"));
-            setMessage((prev) => (prev === "Your report is ready. Review below." ? prev : "Report is processing. Please wait..."));
+            setStatus(prev => prev === "ready" ? "ready" : "loading");
+            setMessage(prev => prev === "Your report is ready." ? prev : "Report is processing. Please wait...");
           }
-        } else if (res.status === 202) {
-          // 202 Accepted = content processing
-          setStatus("loading");
-          setMessage("Report is processing. Please wait...");
-        } else if (res.status === 404) {
+        } else if (res.status === 202 || res.status === 404) {
           setStatus("loading");
           setMessage("Report is processing. Please wait...");
         } else {
           const err = await res.text();
           setStatus("error");
-          setMessage(`Failed to check report: ${err}`);
+          setMessage(`Failed to load report: ${err}`);
         }
       } catch (e: any) {
         setStatus("error");
         setMessage(e.message || "Network error while checking report");
       } finally {
         if (!isReady) {
-          setAttempts((prev) => {
+          setAttempts(prev => {
             const next = prev + 1;
             if (next > maxAttempts) {
               setStatus("timeout");
-              setMessage("Report is taking longer than expected. Check your email — we'll send it there when it's ready.");
+              setMessage("Report is taking longer than expected. We'll email it to you when it's ready.");
             } else {
-              const delay = Math.min(
-                Math.round(baseDelayMs * Math.pow(1.6, next - 1)),
-                maxDelayMs
-              );
+              const delay = Math.min(Math.round(baseDelayMs * Math.pow(1.6, next - 1)), maxDelayMs);
               timeoutId = setTimeout(load, delay);
             }
             return next;
@@ -139,295 +139,342 @@ export default function ReportClient() {
     }
 
     if (sessionId) load();
-
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
+    return () => { if (timeoutId) clearTimeout(timeoutId); };
   }, [sessionId, retryTrigger]);
 
   useEffect(() => {
     if (status !== "loading" || attempts > maxAttempts) return;
-    const intervalId = setInterval(() => {
-      setProgress((prev) => {
-        const currentStep = loadingSteps[loadingStep] ?? loadingSteps[0];
-        const next = Math.min(prev + Math.random() * 4 + 1, currentStep.max);
-        return Math.round(next * 10) / 10;
+    const iv1 = setInterval(() => {
+      setProgress(prev => {
+        const step = loadingSteps[loadingStep] ?? loadingSteps[0];
+        return Math.round(Math.min(prev + Math.random() * 4 + 1, step.max) * 10) / 10;
       });
     }, 700);
-
-    const stepTimer = setInterval(() => {
-      setLoadingStep((prev) => Math.min(prev + 1, loadingSteps.length - 1));
+    const iv2 = setInterval(() => {
+      setLoadingStep(prev => Math.min(prev + 1, loadingSteps.length - 1));
     }, 5000);
-
-    return () => {
-      clearInterval(intervalId);
-      clearInterval(stepTimer);
-    };
+    return () => { clearInterval(iv1); clearInterval(iv2); };
   }, [status, loadingStep]);
 
-  return (
-    <main className="min-h-[60vh] flex flex-col items-center justify-center p-4">
-      {status === "loading" && attempts <= maxAttempts && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-black via-gray-950 to-black">
-          <div className="absolute inset-0 opacity-40">
-            <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-booppa-blue/30 blur-3xl" />
-            <div className="absolute bottom-[-120px] right-[-120px] h-80 w-80 rounded-full bg-booppa-purple/30 blur-3xl" />
+  /* ── Loading overlay ─────────────────────────────────────────── */
+  if (status === "loading" && attempts <= maxAttempts) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#10b981]/10 mb-6">
+            <svg className="w-8 h-8 text-[#10b981] animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+            </svg>
           </div>
-          <div className="relative w-[92%] max-w-3xl rounded-3xl border border-gray-800/80 bg-gradient-to-br from-gray-900/90 to-black/80 p-8 shadow-2xl">
-            <div className="text-center">
-              <div className="text-lg font-semibold text-white">Your scan results are being generated...</div>
-              <div className="text-sm font-bold tracking-widest text-gray-400 mt-1">BOOPPA.IO</div>
+          <h1 className="text-2xl font-bold text-[#0f172a] mb-2">Generating Your Report</h1>
+          <p className="text-[#64748b] text-sm mb-8">{loadingSteps[loadingStep]?.label ?? "Almost done!"}</p>
+          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+            <div className="flex justify-between text-xs text-[#94a3b8] mb-2">
+              <span>Progress</span>
+              <span>{Math.min(Math.round(progress), 98)}%</span>
             </div>
+            <div className="h-2 w-full rounded-full bg-[#f1f5f9]">
+              <div
+                className="h-2 rounded-full bg-[#10b981] transition-all duration-700"
+                style={{ width: `${Math.min(progress, 98)}%` }}
+              />
+            </div>
+            <p className="text-xs text-[#94a3b8] mt-4">Usually ready in under 2 minutes.</p>
+          </div>
+          <button
+            onClick={() => setRetryTrigger(t => t + 1)}
+            className="mt-6 text-sm text-[#64748b] underline hover:text-[#0f172a] transition"
+          >
+            Refresh now
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-            <div className="mt-8 rounded-2xl border border-gray-800 bg-black/40 p-6">
-              <div className="text-lg font-semibold text-white">
-                {loadingSteps[loadingStep]?.label ?? "Almost done!"}
-              </div>
-              <div className="mt-3 h-3 w-full rounded-full bg-gray-800">
-                <div
-                  className="h-3 rounded-full bg-gradient-to-r from-booppa-blue via-booppa-purple to-booppa-pink transition-all duration-700"
-                  style={{ width: `${Math.min(progress, 98)}%` }}
-                />
-              </div>
-              <div className="mt-3 flex items-center text-sm text-gray-400">
-                <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-700">⏱</span>
-                Usually your results will be ready in less than 2 min.
-              </div>
+  /* ── Timeout ──────────────────────────────────────────────────── */
+  if (status === "timeout") {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center bg-white rounded-2xl border border-[#e2e8f0] p-10 shadow-sm">
+          <div className="text-5xl mb-4">⏳</div>
+          <h2 className="text-xl font-bold text-[#0f172a] mb-2">Still processing…</h2>
+          <p className="text-[#64748b] text-sm mb-6">{message}</p>
+          <button
+            onClick={() => { setStatus("loading"); setAttempts(0); setRetryTrigger(t => t + 1); }}
+            className="px-6 py-3 bg-[#10b981] text-white font-semibold rounded-xl hover:bg-[#059669] transition text-sm"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Error ────────────────────────────────────────────────────── */
+  if (status === "error") {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center bg-white rounded-2xl border border-red-200 p-10 shadow-sm">
+          <div className="text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold text-[#0f172a] mb-2">Something went wrong</h2>
+          <p className="text-[#64748b] text-sm mb-6">{message}</p>
+          <Link href="/pdpa" className="px-6 py-3 bg-[#10b981] text-white font-semibold rounded-xl hover:bg-[#059669] transition text-sm">
+            Back to PDPA Scan
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Report ready ─────────────────────────────────────────────── */
+  const riskScore = report?.risk_assessment?.score;
+  const riskLevel = report?.risk_assessment?.level ?? "";
+  const findings  = report?.detailed_findings ?? [];
+  const recs      = report?.recommendations ?? [];
+
+  return (
+    <main className="min-h-screen bg-[#f8fafc]">
+
+      {/* Header */}
+      <section className="bg-[#0f172a] py-10 px-6">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#10b981] mb-2">PDPA Quick Scan</p>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-white">Compliance Report</h1>
+              {report?.report_metadata?.report_id && (
+                <p className="text-xs text-white/40 mt-1">Report ID: {report.report_metadata.report_id}</p>
+              )}
+            </div>
+            <div className="flex gap-3">
+              {reportUrl && (
+                <a
+                  href={reportUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#10b981] hover:bg-[#059669] text-white text-sm font-semibold rounded-xl transition"
+                >
+                  <span>⬇</span> Download PDF
+                </a>
+              )}
+              <Link
+                href="/pdpa"
+                className="inline-flex items-center px-5 py-2.5 border border-white/20 text-white/80 text-sm font-medium rounded-xl hover:bg-white/5 transition"
+              >
+                New Scan
+              </Link>
             </div>
           </div>
         </div>
-      )}
-      <div className="w-full max-w-5xl text-center">
-        <h1 className="text-3xl font-bold mb-4">PDPA Quick Scan Report</h1>
-        <p className="text-gray-500 mb-6">{message}</p>
+      </section>
 
-        {status === "loading" && <div className="text-sm text-gray-400">Checking...</div>}
-        {status === "ready" && (
-          <div className="w-full text-left mt-8 space-y-8">
-            <section className="rounded-2xl border border-gray-800 bg-gradient-to-br from-gray-900/80 to-gray-900/40 p-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-semibold text-white">Audit Summary</h2>
-                  <p className="text-sm text-gray-400">PDPA Quick Scan Report</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  {reportUrl && (
-                    <a
-                      href={reportUrl}
-                      className="inline-flex items-center justify-center rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-500 transition"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <span className="mr-2">📄</span> Download PDF
-                    </a>
-                  )}
-                  {report?.report_metadata?.report_id && (
-                    <div className="rounded-full border border-gray-700 bg-black/40 px-4 py-2 text-xs text-gray-300">
-                      Report ID: {report.report_metadata.report_id}
-                    </div>
-                  )}
-                </div>
-              </div>
-              {verification && verification.tx_hash && (
-                <div className="mt-4 rounded-xl border border-gray-700/50 bg-black/20 p-4">
-                  <div className="flex items-start gap-4">
-                    {verification.qr_image && (
-                      <div className="flex-shrink-0">
-                        <img
-                          src={`data:image/png;base64,${verification.qr_image}`}
-                          alt="Verification QR Code"
-                          className="h-24 w-24 rounded border border-gray-700"
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <h3 className="text-sm font-semibold text-white mb-2">Blockchain Verification</h3>
-                      <p className="text-xs text-gray-400 mb-2">
-                        This report has been cryptographically anchored on the Polygon blockchain for tamper-proof verification.
-                      </p>
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-gray-500">Transaction Hash:</span>
-                        <a
-                          href={verification.polygonscan_url || `https://amoy.polygonscan.com/tx/${verification.tx_hash}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="font-mono text-teal-400 hover:text-teal-300 transition"
-                        >
-                          {verification.tx_hash.substring(0, 16)}...{verification.tx_hash.substring(verification.tx_hash.length - 8)}
-                        </a>
-                      </div>
-                      {verification.verify_url && (
-                        <div className="mt-2">
-                          <a
-                            href={verification.verify_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-xs text-teal-400 hover:text-teal-300 transition"
-                          >
-                            Verify Report →
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+      <div className="max-w-4xl mx-auto px-6 py-10 space-y-8">
+
+        {/* Risk summary cards */}
+        {report?.risk_assessment && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 text-center shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#94a3b8] mb-2">Risk Score</p>
+              <p className={`text-4xl font-black ${RISK_LEVEL_COLOR[riskLevel] ?? "text-[#0f172a]"}`}>
+                {riskScore ?? "—"}
+              </p>
+              <p className="text-xs text-[#94a3b8] mt-1">out of 100</p>
+            </div>
+            <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 text-center shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#94a3b8] mb-2">Risk Level</p>
+              <p className={`text-2xl font-bold ${RISK_LEVEL_COLOR[riskLevel] ?? "text-[#0f172a]"}`}>
+                {riskLevel || "—"}
+              </p>
+              {report.risk_assessment.description && (
+                <p className="text-xs text-[#64748b] mt-1 leading-snug">{report.risk_assessment.description}</p>
               )}
-            </section>
+            </div>
+            <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 text-center shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#94a3b8] mb-2">Findings</p>
+              <p className="text-4xl font-black text-[#0f172a]">{findings.length}</p>
+              <p className="text-xs text-[#94a3b8] mt-1">issues identified</p>
+            </div>
+          </div>
+        )}
 
-            {siteScreenshot && (
-              <section className="rounded-2xl border border-gray-800 bg-gray-900/50 p-5">
-                <h3 className="text-xl font-semibold mb-3">Website Screenshot</h3>
+        {/* Blockchain verification */}
+        {verification?.tx_hash && (
+          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-6 h-6 rounded-full bg-[#10b981]/10 flex items-center justify-center">
+                <span className="text-[#10b981] text-xs font-bold">✓</span>
+              </div>
+              <h2 className="text-base font-bold text-[#0f172a]">Blockchain-Anchored Report</h2>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              {verification.qr_image && (
                 <img
-                  src={
-                    siteScreenshot.startsWith("data:image")
-                      ? siteScreenshot
-                      : `data:image/png;base64,${siteScreenshot}`
-                  }
-                  alt="Website screenshot"
-                  className="w-full rounded-xl border border-gray-800"
+                  src={`data:image/png;base64,${verification.qr_image}`}
+                  alt="Verification QR"
+                  className="w-20 h-20 rounded-lg border border-[#e2e8f0] flex-shrink-0"
                 />
-              </section>
-            )}
+              )}
+              <div className="space-y-2 text-sm">
+                <p className="text-[#64748b]">This report has been cryptographically anchored on the Polygon blockchain. The hash cannot be altered or backdated.</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-[#94a3b8] text-xs">TX Hash:</span>
+                  <a
+                    href={verification.polygonscan_url || `https://amoy.polygonscan.com/tx/${verification.tx_hash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-xs text-[#10b981] hover:underline"
+                  >
+                    {verification.tx_hash.substring(0, 16)}…{verification.tx_hash.substring(verification.tx_hash.length - 8)}
+                  </a>
+                </div>
+                {verification.verify_url && (
+                  <a href={verification.verify_url} target="_blank" rel="noreferrer" className="text-xs text-[#10b981] hover:underline">
+                    Verify report on Polygonscan →
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
-            {report?.risk_assessment && (
-              <section>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4">
-                    <div className="text-xs uppercase tracking-wide text-gray-400">Risk Score</div>
-                    <div className="mt-2 text-3xl font-bold text-white">{report.risk_assessment.score ?? "N/A"}</div>
-                  </div>
-                  <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4">
-                    <div className="text-xs uppercase tracking-wide text-gray-400">Risk Level</div>
-                    <div className="mt-2 text-2xl font-semibold text-white">{report.risk_assessment.level ?? "N/A"}</div>
-                    {report.risk_assessment.description && (
-                      <div className="mt-1 text-sm text-gray-400">{report.risk_assessment.description}</div>
+        {/* Website screenshot */}
+        {siteScreenshot && (
+          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+            <h2 className="text-base font-bold text-[#0f172a] mb-4">Website Scanned</h2>
+            <img
+              src={siteScreenshot.startsWith("data:image") ? siteScreenshot : `data:image/png;base64,${siteScreenshot}`}
+              alt="Website screenshot"
+              className="w-full rounded-xl border border-[#e2e8f0]"
+            />
+          </div>
+        )}
+
+        {/* Executive summary */}
+        {report?.executive_summary && (
+          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+            <h2 className="text-base font-bold text-[#0f172a] mb-4">Executive Summary</h2>
+            <div className="text-sm text-[#64748b] leading-relaxed space-y-3">
+              {report.executive_summary.split("\n\n").map((p, i) => (
+                <p key={i} className="whitespace-pre-line">{p}</p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Detailed findings */}
+        {findings.length > 0 && (
+          <div>
+            <h2 className="text-base font-bold text-[#0f172a] mb-4">Detailed Findings</h2>
+            <div className="space-y-4">
+              {findings.map((f, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    {f.severity && (
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full border ${SEVERITY_STYLE[f.severity] ?? "bg-[#f8fafc] text-[#64748b] border-[#e2e8f0]"}`}>
+                        {f.severity}
+                      </span>
+                    )}
+                    {f.type && (
+                      <span className="text-sm font-medium text-[#0f172a]">{f.type.replace(/_/g, " ")}</span>
                     )}
                   </div>
-                  <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4">
-                    <div className="text-xs uppercase tracking-wide text-gray-400">AI Model</div>
-                    <div className="mt-2 text-sm text-gray-300">{report.report_metadata?.ai_model ?? "Booppa"}</div>
+                  {f.description && (
+                    <p className="text-sm text-[#64748b] leading-relaxed whitespace-pre-line mb-3">{f.description}</p>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-[#94a3b8]">
+                    {f.evidence  && <div><span className="font-medium text-[#64748b]">Evidence:</span> {f.evidence}</div>}
+                    {f.penalty?.amount && <div><span className="font-medium text-[#64748b]">Penalty:</span> {f.penalty.amount}</div>}
+                    {f.deadline  && <div><span className="font-medium text-[#64748b]">Deadline:</span> {f.deadline}</div>}
                   </div>
                 </div>
-              </section>
-            )}
+              ))}
+            </div>
+          </div>
+        )}
 
-            {report?.executive_summary && report?.detailed_findings?.length ? (
-              <section className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-                <h3 className="text-xl font-semibold mb-3">Executive Summary</h3>
-                {report.executive_summary.split("\n\n").map((p, idx) => (
-                  <p key={idx} className="text-gray-300 mb-3 whitespace-pre-line leading-relaxed">{p}</p>
-                ))}
-              </section>
-            ) : null}
-
-            {report?.detailed_findings?.length ? (
-              <section>
-                <h3 className="text-xl font-semibold mb-4">Detailed Findings</h3>
-                <div className="space-y-4">
-                  {report.detailed_findings.map((finding, idx) => (
-                    <div key={idx} className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5">
-                      <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400">
-                        <span className="rounded-full bg-red-500/10 px-3 py-1 text-red-300">{finding.severity}</span>
-                        <span className="text-gray-300">{finding.type?.replace(/_/g, " ")}</span>
-                      </div>
-                      {finding.description && <p className="text-gray-200 mt-3 whitespace-pre-line leading-relaxed">{finding.description}</p>}
-                      <div className="mt-3 grid gap-2 text-sm text-gray-400">
-                        {finding.evidence && <div>Evidence: {finding.evidence}</div>}
-                        {finding.penalty?.amount && <div>Penalty: {finding.penalty.amount}</div>}
-                        {finding.deadline && <div>Deadline: {finding.deadline}</div>}
-                      </div>
-                    </div>
-                  ))}
+        {/* Recommendations */}
+        {recs.length > 0 && (
+          <div>
+            <h2 className="text-base font-bold text-[#0f172a] mb-4">Recommendations</h2>
+            <div className="space-y-4">
+              {recs.map((rec, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    {rec.severity && (
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full border ${SEVERITY_STYLE[rec.severity] ?? "bg-[#f8fafc] text-[#64748b] border-[#e2e8f0]"}`}>
+                        {rec.severity}
+                      </span>
+                    )}
+                    {rec.violation_type && (
+                      <span className="text-sm font-medium text-[#0f172a]">{rec.violation_type.replace(/_/g, " ")}</span>
+                    )}
+                  </div>
+                  {rec.actions && rec.actions.length > 0 && (
+                    <ul className="space-y-1.5 mb-3">
+                      {rec.actions.map((action, j) => (
+                        <li key={j} className="flex items-start gap-2 text-sm text-[#64748b]">
+                          <span className="text-[#10b981] font-bold mt-0.5">→</span>
+                          {action}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {rec.timeline && (
+                    <p className="text-xs text-[#94a3b8]">Timeline: {rec.timeline}</p>
+                  )}
                 </div>
-              </section>
-            ) : null}
-
-            {report?.recommendations?.length ? (
-              <section>
-                <h3 className="text-xl font-semibold mb-4">Recommendations</h3>
-                <div className="space-y-4">
-                  {report.recommendations.map((rec, idx) => (
-                    <div key={idx} className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5">
-                      <div className="text-sm text-gray-400">{rec.violation_type?.replace(/_/g, " ")} • {rec.severity}</div>
-                      {rec.actions?.length ? (
-                        <ul className="list-disc ml-5 mt-3 text-gray-200 space-y-1">
-                          {rec.actions.map((action, i) => (
-                            <li key={i}>{action}</li>
-                          ))}
-                        </ul>
-                      ) : null}
-                      {rec.timeline && <p className="text-gray-400 mt-2">Timeline: {rec.timeline}</p>}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ) : null}
-
-            {report?.legal_references?.length ? (
-              <section>
-                <h3 className="text-xl font-semibold mb-4">Legal References</h3>
-                <ul className="list-disc ml-5 text-gray-300 space-y-1">
-                  {report.legal_references.map((ref, idx) => (
-                    <li key={idx}>
-                      {ref.url ? (
-                        <a className="text-teal-400 hover:underline" href={ref.url} target="_blank" rel="noreferrer">
-                          {ref.title}
-                        </a>
-                      ) : (
-                        <span>{ref.title}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            {report?.executive_summary && !report?.detailed_findings?.length && (
-              <section className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-                <h3 className="text-xl font-semibold mb-3">Full Report</h3>
-                <pre className="whitespace-pre-wrap text-gray-200 text-sm leading-relaxed">{report.executive_summary}</pre>
-              </section>
-            )}
-
-            {reportUrl && (
-              <div className="pt-6 border-t border-gray-800 mt-8 flex justify-center">
-                <a href={reportUrl} className="inline-flex items-center px-8 py-4 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-500 transition shadow-lg hover:shadow-teal-500/20" target="_blank" rel="noreferrer">
-                  <span className="mr-2 text-xl">⬇️</span> Download Full PDF Report
-                </a>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         )}
 
-        {status === "loading" && (
-          <div className="mt-4">
-            <p className="text-sm text-gray-400">If you just completed payment, the report may take a few minutes to generate.</p>
-            <button
-              onClick={() => setRetryTrigger((t) => t + 1)}
-              className="mt-4 inline-block px-4 py-2 bg-gray-800 text-white rounded"
+        {/* Legal references */}
+        {report?.legal_references && report.legal_references.length > 0 && (
+          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+            <h2 className="text-base font-bold text-[#0f172a] mb-4">Legal References</h2>
+            <ul className="space-y-2">
+              {report.legal_references.map((ref, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm">
+                  <span className="text-[#10b981]">•</span>
+                  {ref.url ? (
+                    <a href={ref.url} target="_blank" rel="noreferrer" className="text-[#10b981] hover:underline">
+                      {ref.title}
+                    </a>
+                  ) : (
+                    <span className="text-[#64748b]">{ref.title}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Download CTA */}
+        {reportUrl && (
+          <div className="bg-[#0f172a] rounded-2xl p-8 text-center">
+            <p className="text-white font-bold text-lg mb-2">Download your full PDF report</p>
+            <p className="text-white/60 text-sm mb-6">Includes all findings, recommendations, and blockchain verification certificate</p>
+            <a
+              href={reportUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition shadow-lg"
             >
-              Refresh
-            </button>
+              <span>⬇</span> Download Full PDF
+            </a>
           </div>
         )}
 
-        {status === "timeout" && (
-          <div className="mt-8 max-w-md mx-auto text-center rounded-xl border border-yellow-700 bg-yellow-900/20 p-6">
-            <div className="text-yellow-400 text-2xl mb-3">⏳</div>
-            <p className="text-yellow-300 font-semibold mb-2">Still processing…</p>
-            <p className="text-gray-400 text-sm">{message}</p>
-            <button
-              onClick={() => { setStatus("loading"); setAttempts(0); setRetryTrigger((t) => t + 1); }}
-              className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-700 transition"
-            >
-              Try Again
-            </button>
-          </div>
-        )}
+        {/* Disclaimer */}
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-sm text-amber-800">
+          <p className="font-semibold mb-1">Disclaimer</p>
+          <p className="leading-relaxed">
+            This PDPA Quick Scan is a technical assessment tool, not a formal regulatory audit. It does not constitute legal advice and does not guarantee compliance with the PDPA or protect against PDPC enforcement action. Booppa is not affiliated with the PDPC or any Singapore government agency. Consult qualified data protection counsel for material compliance decisions.
+          </p>
+        </div>
 
-        {status === "error" && (
-          <div className="mt-4 text-red-600">{message}</div>
-        )}
       </div>
     </main>
   );

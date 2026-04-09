@@ -23,9 +23,7 @@ export default function VendorsPage() {
       params.set('page', String(page))
       params.set('per_page', '24')
 
-      const res = await fetch(
-        `${config.apiUrl}/api/v1${endpoints.marketplace.search}?${params}`
-      )
+      const res = await fetch(`/api/marketplace/search?${params}`)
       if (res.ok) {
         const data = await res.json()
         setVendors(data.vendors || [])
@@ -40,9 +38,7 @@ export default function VendorsPage() {
 
   const fetchIndustries = useCallback(async () => {
     try {
-      const res = await fetch(
-        `${config.apiUrl}/api/v1${endpoints.marketplace.industries}`
-      )
+      const res = await fetch(`/api/marketplace/industries`)
       if (res.ok) {
         const data = await res.json()
         setIndustries(data.industries || data || [])
@@ -129,7 +125,7 @@ export default function VendorsPage() {
               {vendors.map((vendor) => (
                 <Link
                   key={vendor.id}
-                  href={`/vendors/${vendor.seo_slug}`}
+                  href={vendor.seo_slug ? `/vendors/${vendor.seo_slug}` : `/vendors/${vendor.id}`}
                   className="bg-white p-6 rounded-2xl border border-[#e2e8f0] hover:border-[#10b981] hover:translate-y-[-3px] hover:shadow-lg transition-all group"
                 >
                   <div className="flex items-start justify-between mb-3">

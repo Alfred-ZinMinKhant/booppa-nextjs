@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { TrendingUp, Shield, BarChart2, Users } from 'lucide-react';
-import { config as appConfig } from '@/lib/config';
 
 interface LeaderboardEntry {
   rank: number;
@@ -44,8 +43,8 @@ export default function InsightsPage() {
     if (sector) params.set('sector', sector);
 
     Promise.all([
-      fetch(`${appConfig.apiUrl}/api/v1/rankings/leaderboard/all?${params}`).then(r => r.ok ? r.json() : { entries: [] }),
-      fetch(`${appConfig.apiUrl}/api/v1/marketplace/industries`).then(r => r.ok ? r.json() : []),
+      fetch(`/api/rankings/leaderboard?${params}`).then(r => r.ok ? r.json() : { entries: [] }),
+      fetch(`/api/marketplace/industries`).then(r => r.ok ? r.json() : []),
     ]).then(([lb, ind]) => {
       setEntries(lb.entries || lb || []);
       setIndustries(ind || []);

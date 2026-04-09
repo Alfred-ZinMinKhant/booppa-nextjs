@@ -37,163 +37,134 @@ export default function PricingPage() {
 
           {/* ONE-TIME PRICING */}
           {activeTab === 'oneoff' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8 mb-20">
+            <div className="mb-20 space-y-6">
 
-              {/* FREE tier */}
-              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
-                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Free</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 0</div>
-                <p className="text-sm text-[#64748b] mb-8">Claim your presence</p>
-                <ul className="space-y-4 mb-10">
-                  {[
-                    'Claim your company profile',
-                    'Basic public listing',
-                    'Appear in vendor search',
-                    'GeBIZ opportunity feed',
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
-                      <span className="text-[#10b981] font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/auth/register" className="btn btn-outline w-full">Claim Profile</Link>
+              {/* Step 1 label */}
+              <div className="flex items-center gap-3 mb-2">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#10b981] text-white text-xs font-bold">1</span>
+                <h3 className="text-sm font-bold text-[#0f172a] uppercase tracking-wider">Start here — Claim & Verify</h3>
               </div>
 
-              {/* VENDOR PROOF — PRIMARY */}
-              <div className="bg-[#0f172a] p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl relative hover:translate-y-[-5px] transition-all">
-                <div className="absolute top-[-15px] left-1/2 -translate-x-1/2 bg-[#10b981] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
-                  Most Important
+              {/* Row 1: Free + Vendor Proof side-by-side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {/* FREE */}
+                <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-3px] transition-all">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-bold text-[#0f172a]">Free Profile</h3>
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#64748b]">Always free</span>
+                  </div>
+                  <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 0</div>
+                  <p className="text-sm text-[#64748b] mb-6">Claim your presence on Booppa</p>
+                  <ul className="space-y-3 mb-8">
+                    {['Claim your company profile', 'Basic public listing', 'Appear in vendor search', 'GeBIZ opportunity feed'].map((f, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm text-[#64748b]">
+                        <span className="text-[#10b981] font-bold">✓</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/auth/register" className="btn btn-outline w-full">Claim Profile</Link>
                 </div>
-                <h3 className="text-xl font-bold mb-4 text-white">Vendor Proof</h3>
-                <div className="text-4xl font-bold text-[#10b981] mb-2">SGD 149</div>
-                <p className="text-sm text-white/60 mb-8">One-time · lifetime</p>
-                <ul className="space-y-4 mb-10">
-                  {[
-                    'Verified status badge',
-                    'Procurement filter visibility',
-                    'Compliance score activated',
-                    'Embeddable trust badge',
-                    'CAL engine unlocked',
-                    'Foundation for all products',
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-white/80">
-                      <span className="text-[#10b981] font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/vendor-proof"
-                  className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 px-6 rounded-xl transition shadow-lg shadow-[#10b981]/30"
-                >
-                  Get Vendor Proof
-                </Link>
+
+                {/* VENDOR PROOF — PRIMARY */}
+                <div className="bg-[#0f172a] p-8 rounded-[2rem] border-2 border-[#10b981] shadow-2xl relative hover:translate-y-[-3px] transition-all">
+                  <div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-[#10b981] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+                    Start Here
+                  </div>
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-bold text-white">Vendor Proof</h3>
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/20 text-[#10b981]">Lifetime</span>
+                  </div>
+                  <div className="text-4xl font-black text-[#10b981] mb-1">SGD 149</div>
+                  <p className="text-sm text-white/60 mb-6">One-time payment, no renewal</p>
+                  <ul className="space-y-3 mb-8">
+                    {['Verified status badge', 'Procurement filter visibility', 'Compliance score activated', 'Embeddable trust badge', 'CAL engine unlocked', 'Foundation for all products'].map((f, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm text-white/80">
+                        <span className="text-[#10b981] font-bold">✓</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/vendor-proof" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 px-6 rounded-xl transition shadow-lg shadow-[#10b981]/30">
+                    Get Vendor Proof — SGD 149
+                  </Link>
+                </div>
               </div>
 
-              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
-                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Snapshot</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 79</div>
-                <p className="text-sm text-[#64748b] mb-8">One-time technical scan</p>
-                <ul className="space-y-4 mb-10">
-                  {[
-                    '8-section PDPA assessment',
-                    'Risk severity report',
-                    'Specific legislation references',
-                    'Blockchain-anchored timestamp',
-                    'QR verification link',
-                    'Downloadable PDF evidence'
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
-                      <span className="text-[#10b981] font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/pdpa" className="btn btn-primary w-full shadow-lg">Start Scan</Link>
+              {/* Step 2 label */}
+              <div className="flex items-center gap-3 pt-4">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#e2e8f0] text-[#64748b] text-xs font-bold">2</span>
+                <h3 className="text-sm font-bold text-[#0f172a] uppercase tracking-wider">Add compliance tools — mix & match</h3>
               </div>
 
+              {/* Row 2: PDPA + Notarization + RFP Express + RFP Complete */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
-              <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
-                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Document Notarization</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 69</div>
-                <p className="text-sm text-[#64748b] mb-8">Single document</p>
-                <ul className="space-y-4 mb-10">
-                  {[
-                    'Immutable SHA-256 hash',
-                    'Blockchain timestamp',
-                    'QR verification link',
-                    'Court-admissible proof',
-                    'Polygonscan URL'
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
-                      <span className="text-[#10b981] font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8 leading-relaxed">
-                  Batch pricing: 10 docs (SGD 390) | 50 docs (SGD 1,750)
-                </p>
-                <Link href="/notarization" className="btn btn-outline w-full">View Packages</Link>
-              </div>
+                <div className="bg-white p-7 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-3px] hover:border-[#10b981] transition-all">
+                  <h3 className="text-lg font-bold mb-3 text-[#0f172a]">PDPA Snapshot</h3>
+                  <div className="text-3xl font-black text-[#0f172a] mb-1">SGD 79</div>
+                  <p className="text-xs text-[#64748b] mb-5">One-time scan</p>
+                  <ul className="space-y-2 mb-6">
+                    {['8-section PDPA assessment', 'Risk severity report', 'Legislation references', 'Blockchain timestamp', 'Downloadable PDF'].map((f, i) => (
+                      <li key={i} className="flex items-center gap-2 text-xs text-[#64748b]">
+                        <span className="text-[#10b981] font-bold">✓</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/pdpa" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                    Start Scan
+                  </Link>
+                </div>
 
-              {/* RFP Kit Express */}
-              <div className="bg-white p-10 rounded-[2.5rem] border-2 border-violet-500 shadow-xl relative hover:translate-y-[-5px] transition-all">
-                <div className="absolute top-[-15px] right-8 bg-violet-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">GeBIZ Ready</div>
-                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">RFP Kit Express</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 249</div>
-                <p className="text-sm text-[#64748b] mb-8">2-page evidence certificate</p>
-                <ul className="space-y-4 mb-10">
-                  {[
-                    '5 PDPA compliance Q&A answers',
-                    'AI-generated, sector-tailored',
-                    'Blockchain-anchored PDF certificate',
-                    'Ready to attach to GeBIZ submission',
-                    'Delivered by email in minutes',
-                    'Valid for 7 days'
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
-                      <span className="text-violet-500 font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/auth/register?product=rfp_express"
-                  className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg"
-                >
-                  Get RFP Kit Express
-                </Link>
-              </div>
+                <div className="bg-white p-7 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-3px] hover:border-[#10b981] transition-all">
+                  <h3 className="text-lg font-bold mb-3 text-[#0f172a]">Notarization</h3>
+                  <div className="text-3xl font-black text-[#0f172a] mb-1">SGD 69</div>
+                  <p className="text-xs text-[#64748b] mb-5">Per document</p>
+                  <ul className="space-y-2 mb-3">
+                    {['Immutable SHA-256 hash', 'Blockchain timestamp', 'QR verification link', 'Court-admissible proof', 'Polygonscan URL'].map((f, i) => (
+                      <li key={i} className="flex items-center gap-2 text-xs text-[#64748b]">
+                        <span className="text-[#10b981] font-bold">✓</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="text-xs text-[#94a3b8] mb-5">Batch: 10 docs SGD 390 · 50 docs SGD 1,750</p>
+                  <Link href="/notarization" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                    View Packages
+                  </Link>
+                </div>
 
-              {/* RFP Kit Complete */}
-              <div className="bg-white p-10 rounded-[2.5rem] border-2 border-emerald-500 shadow-xl relative hover:translate-y-[-5px] transition-all">
-                <div className="absolute top-[-15px] right-8 bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Best Value</div>
-                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">RFP Kit Complete</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 599</div>
-                <p className="text-sm text-[#64748b] mb-8">Full 15-question evidence pack</p>
-                <ul className="space-y-4 mb-10">
-                  {[
-                    '15 PDPA compliance Q&A answers',
-                    'Editable DOCX + PDF certificate',
-                    'Sector-specific deep analysis',
-                    'Blockchain-anchored evidence',
-                    'Executive summary page',
-                    'Priority email delivery'
-                  ].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
-                      <span className="text-emerald-500 font-bold">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/auth/register?product=rfp_complete"
-                  className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg"
-                >
-                  Get RFP Kit Complete
-                </Link>
+                <div className="bg-white p-7 rounded-[2rem] border-2 border-violet-400 shadow-xl relative hover:translate-y-[-3px] transition-all">
+                  <div className="absolute top-[-12px] right-5 bg-violet-500 text-white px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">GeBIZ Ready</div>
+                  <h3 className="text-lg font-bold mb-3 text-[#0f172a]">RFP Kit Express</h3>
+                  <div className="text-3xl font-black text-[#0f172a] mb-1">SGD 249</div>
+                  <p className="text-xs text-[#64748b] mb-5">2-page evidence cert</p>
+                  <ul className="space-y-2 mb-6">
+                    {['5 PDPA Q&A answers', 'AI sector-tailored', 'Blockchain-anchored PDF', 'GeBIZ submission ready', 'Delivered in minutes'].map((f, i) => (
+                      <li key={i} className="flex items-center gap-2 text-xs text-[#64748b]">
+                        <span className="text-violet-500 font-bold">✓</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/rfp" className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                    Get RFP Express
+                  </Link>
+                </div>
+
+                <div className="bg-white p-7 rounded-[2rem] border-2 border-emerald-400 shadow-xl relative hover:translate-y-[-3px] transition-all">
+                  <div className="absolute top-[-12px] right-5 bg-emerald-500 text-white px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">Best Value</div>
+                  <h3 className="text-lg font-bold mb-3 text-[#0f172a]">RFP Kit Complete</h3>
+                  <div className="text-3xl font-black text-[#0f172a] mb-1">SGD 599</div>
+                  <p className="text-xs text-[#64748b] mb-5">Full 15-question evidence pack</p>
+                  <ul className="space-y-2 mb-6">
+                    {['15 PDPA Q&A answers', 'Editable DOCX + PDF', 'Deep sector analysis', 'Blockchain evidence', 'Executive summary'].map((f, i) => (
+                      <li key={i} className="flex items-center gap-2 text-xs text-[#64748b]">
+                        <span className="text-emerald-500 font-bold">✓</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/rfp" className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                    Get RFP Complete
+                  </Link>
+                </div>
               </div>
             </div>
           )}
