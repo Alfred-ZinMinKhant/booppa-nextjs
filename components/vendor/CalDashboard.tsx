@@ -53,7 +53,7 @@ export default function CalDashboard() {
     );
   }
 
-  if (!data) return null;
+  if (!data || !data.ladder) return null;
 
   const { ladder, suggestion, message, sectorPressure } = data;
 

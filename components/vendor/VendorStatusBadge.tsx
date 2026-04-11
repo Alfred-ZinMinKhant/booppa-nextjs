@@ -84,7 +84,7 @@ export default function VendorStatusBadge() {
     );
   }
 
-  if (!status) return null;
+  if (!status || !status.verificationDetail) return null;
 
   const depth   = DEPTH_CONFIG[status.verificationDepth]   || DEPTH_CONFIG.UNVERIFIED;
   const monitor = MONITORING_CONFIG[status.monitoringActivity] || MONITORING_CONFIG.NONE;

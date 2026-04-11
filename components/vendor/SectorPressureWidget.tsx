@@ -39,7 +39,7 @@ export default function SectorPressureWidget() {
     );
   }
 
-  if (!data) return null;
+  if (!data || !data.snapshot) return null;
 
   const { snapshot, message } = data;
   const elevPct = snapshot.totalInSector > 0
