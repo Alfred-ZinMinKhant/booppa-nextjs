@@ -10,6 +10,7 @@ export default function VendorsPage() {
   const [industries, setIndustries] = useState<IndustryCount[]>([])
   const [query, setQuery] = useState('')
   const [selectedIndustry, setSelectedIndustry] = useState('')
+  const [verifiedOnly, setVerifiedOnly] = useState(false)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
@@ -20,6 +21,7 @@ export default function VendorsPage() {
       const params = new URLSearchParams()
       if (query) params.set('q', query)
       if (selectedIndustry) params.set('industry', selectedIndustry)
+      if (verifiedOnly) params.set('verified', 'true')
       params.set('page', String(page))
       params.set('per_page', '24')
 
@@ -34,7 +36,7 @@ export default function VendorsPage() {
     } finally {
       setLoading(false)
     }
-  }, [query, selectedIndustry, page])
+  }, [query, selectedIndustry, verifiedOnly, page])
 
   const fetchIndustries = useCallback(async () => {
     try {
@@ -92,6 +94,17 @@ export default function VendorsPage() {
               </option>
             ))}
           </select>
+          <button
+            type="button"
+            onClick={() => { setVerifiedOnly(v => !v); setPage(1) }}
+            className={`px-4 py-3 rounded-xl border font-medium text-sm transition-colors whitespace-nowrap ${
+              verifiedOnly
+                ? 'bg-[#10b981] border-[#10b981] text-white'
+                : 'border-[#e2e8f0] text-[#64748b] hover:border-[#10b981] hover:text-[#10b981]'
+            }`}
+          >
+            ✓ Verified Only
+          </button>
         </div>
       </section>
 
@@ -158,8 +171,11 @@ export default function VendorsPage() {
 
                   <div className="flex items-center gap-3 text-xs text-[#94a3b8]">
                     <span>{vendor.country}</span>
-                    {vendor.claimed && (
-                      <span className="text-[#10b981] font-medium">✓ Claimed</span>
+                    {vendor.verified && (
+                      <span className="text-[#10b981] font-medium">✓ Verified</span>
+                    )}
+                    {!vendor.verified && vendor.claimed && (
+                      <span className="text-[#64748b] font-medium">Claimed</span>
                     )}
                     {vendor.tier && (
                       <span className="font-medium uppercase">{vendor.tier}</span>
