@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CheckCircle2, Circle, ChevronRight, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, Circle, ChevronRight, Sparkles, ArrowRight } from "lucide-react";
+
+const NEXT_STEP_MAP: Record<string, { href: string; label: string }> = {
+  VERIFIED:   { href: "/vendor-proof",      label: "Get Verified" },
+  NOTARIZED:  { href: "/notarization",      label: "Notarize a Document" },
+  PROMINENT:  { href: "/pdpa",              label: "Run PDPA Scan" },
+  ELITE:      { href: "/rfp-acceleration",  label: "Get RFP Complete" },
+};
 
 interface LadderLevel {
   level: string;
@@ -124,7 +132,7 @@ export default function CalDashboard() {
         <div className="mx-4 mb-4 rounded-lg border border-indigo-500/20 bg-indigo-500/5 p-4">
           <div className="flex items-start gap-2">
             <Sparkles className="h-4 w-4 text-indigo-400 flex-shrink-0 mt-0.5" />
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-indigo-300">
                 Upgrade insight · {suggestion.probabilityScore}% signal strength
               </p>
@@ -138,6 +146,16 @@ export default function CalDashboard() {
               style={{ width: `${suggestion.probabilityScore}%` }}
             />
           </div>
+          {/* Action CTA */}
+          {NEXT_STEP_MAP[suggestion.nextLevel] && (
+            <Link
+              href={NEXT_STEP_MAP[suggestion.nextLevel].href}
+              className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
+            >
+              {NEXT_STEP_MAP[suggestion.nextLevel].label}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          )}
         </div>
       )}
 

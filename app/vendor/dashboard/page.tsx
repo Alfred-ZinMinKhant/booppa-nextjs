@@ -41,6 +41,15 @@ export default function VendorDashboard() {
       .catch(() => {});
   }, []);
 
+  const nextStepFromLevel = (level: string): { href: string; label: string } => {
+    switch (level?.toUpperCase()) {
+      case 'BASIC':     return { href: '/notarization',     label: 'Notarize a Document' };
+      case 'STANDARD':  return { href: '/pdpa',             label: 'Run PDPA Scan' };
+      case 'DEEP':      return { href: '/rfp-acceleration', label: 'Get RFP Complete' };
+      default:          return { href: '/notarization',     label: 'Notarize a Document' };
+    }
+  };
+
   const copyBadge = () => {
     if (!badge?.html) return;
     navigator.clipboard.writeText(badge.html).then(() => {
@@ -153,63 +162,72 @@ export default function VendorDashboard() {
 
         {/* ── Vendor Proof Activation Panel ─────────────────────────── */}
         {badge?.active && (
-          <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-6">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-              {/* Left: status */}
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-lg bg-emerald-500/10 flex-shrink-0">
-                  <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+          <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/60 to-neutral-900 overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-0">
+              {/* Status block */}
+              <div className="flex items-center gap-3 px-5 py-4 flex-1 min-w-0">
+                <div className="h-8 w-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                 </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 mb-1">Vendor Proof — Active</p>
-                  <h3 className="text-white font-semibold text-lg leading-snug">
-                    You are now verified and visible to buyers
-                  </h3>
-                  <p className="text-neutral-400 text-sm mt-1">
-                    Compliance score: <span className="text-white font-semibold">{badge.compliance_score}/100</span>
-                    &nbsp;·&nbsp;Level: <span className="text-white font-semibold capitalize">{badge.verification_level?.toLowerCase()}</span>
-                    &nbsp;·&nbsp;Appears in <span className="text-emerald-400 font-semibold">verified-only</span> searches
-                  </p>
-                  {badge.profile_url && (
-                    <Link
-                      href={badge.profile_url}
-                      target="_blank"
-                      className="inline-block mt-2 text-sm text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
-                    >
-                      View public profile →
-                    </Link>
-                  )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-white font-semibold text-sm">Vendor Proof Active</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Verified</span>
+                  </div>
+                  <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                    <span className="text-neutral-400 text-xs">Score <span className="text-white font-medium">{badge.compliance_score}/100</span></span>
+                    <span className="text-neutral-600 text-xs">·</span>
+                    <span className="text-neutral-400 text-xs capitalize">{badge.verification_level?.toLowerCase()} level</span>
+                    <span className="text-neutral-600 text-xs">·</span>
+                    <span className="text-emerald-400 text-xs font-medium">Visible in verified searches</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Right: embeddable badge */}
-              <div className="flex-shrink-0 min-w-[280px]">
-                <p className="text-xs font-medium text-neutral-500 uppercase tracking-widest mb-2">Embed on your website</p>
-                <div className="rounded-lg bg-neutral-900 border border-neutral-700 p-3 font-mono text-xs text-neutral-300 break-all leading-relaxed">
-                  {badge.html}
+              {/* Divider */}
+              <div className="hidden sm:block w-px self-stretch bg-emerald-500/10" />
+
+              {/* Badge embed */}
+              <div className="px-5 py-4 flex items-center gap-3 flex-shrink-0">
+                <div className="font-mono text-[10px] text-neutral-500 bg-neutral-900 border border-neutral-800 rounded px-2 py-1.5 max-w-[180px] truncate hidden md:block">
+                  {badge.html?.slice(0, 60)}…
                 </div>
                 <button
                   type="button"
                   onClick={copyBadge}
-                  className="mt-2 flex items-center gap-2 text-xs text-neutral-400 hover:text-white transition-colors"
+                  className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors whitespace-nowrap"
                 >
                   {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-                  {copied ? 'Copied!' : 'Copy badge HTML'}
+                  {copied ? 'Copied!' : 'Copy badge'}
                 </button>
+                {badge.profile_url && (
+                  <Link
+                    href={badge.profile_url}
+                    target="_blank"
+                    className="text-xs text-neutral-400 hover:text-white transition-colors whitespace-nowrap"
+                  >
+                    Public profile →
+                  </Link>
+                )}
               </div>
-            </div>
 
-            {/* Next step CTA */}
-            <div className="mt-5 pt-5 border-t border-emerald-500/10 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <p className="text-sm text-neutral-400 flex-1">
-                <span className="text-white font-medium">Next step:</span> Add a PDPA Snapshot (+8–25 pts) or notarize a document to unlock elevated procurement visibility.
-              </p>
-              <Link
-                href="/solutions/vendors"
-                className="flex-shrink-0 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors flex items-center gap-2"
-              >
-                See upgrade options <ArrowRight className="h-4 w-4" />
-              </Link>
+              {/* Divider */}
+              <div className="hidden sm:block w-px self-stretch bg-emerald-500/10" />
+
+              {/* Next step CTA */}
+              <div className="px-5 py-4 flex-shrink-0">
+                {(() => {
+                  const next = nextStepFromLevel(badge.verification_level);
+                  return (
+                    <Link
+                      href={next.href}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors whitespace-nowrap"
+                    >
+                      {next.label} <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  );
+                })()}
+              </div>
             </div>
           </div>
         )}
@@ -300,7 +318,7 @@ export default function VendorDashboard() {
         </div>
 
         {/* ── V8 Trust & Activation Layer ─────────────────────────── */}
-        <div className="pt-2 border-t border-neutral-800">
+        <div id="activation-ladder" className="pt-2 border-t border-neutral-800 scroll-mt-6">
           <h2 className="text-sm font-semibold text-neutral-400 mb-4">Trust & Activation</h2>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
             <VendorStatusBadge />
