@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const params = new URLSearchParams({ tenderNo })
   if (vendorId) params.set('vendorId', vendorId)
 
-  const res = await fetchWithAuth(`/tender-check?${params.toString()}`)
+  const res = await fetchWithAuth(`/api/v1/tender-check?${params.toString()}`)
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))

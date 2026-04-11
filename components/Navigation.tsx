@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, LayoutDashboard, ShieldCheck, FileText, Search, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
@@ -16,14 +16,25 @@ const solutions = [
   { name: 'Opportunities',   href: '/opportunities',        desc: 'Live GeBIZ open tenders' },
 ];
 
+const vendorLinks = [
+  { name: 'Dashboard',    href: '/vendor/dashboard', icon: LayoutDashboard },
+  { name: 'Vendor Proof', href: '/vendor-proof',     icon: ShieldCheck },
+  { name: 'Notarization', href: '/notarization',     icon: FileText },
+  { name: 'PDPA Scan',    href: '/pdpa',             icon: ShieldCheck },
+  { name: 'Tender Check', href: '/tender-check',     icon: Search },
+];
+
 export default function Navigation() {
   const [mobileOpen,    setMobileOpen]    = useState(false);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
+  const [userOpen,      setUserOpen]      = useState(false);
   const [scrolled,      setScrolled]      = useState(false);
-  const [authed,        setAuthed]        = useState<boolean | null>(null); // null = unknown
+  const [authed,        setAuthed]        = useState<boolean | null>(null);
+  const [userEmail,     setUserEmail]     = useState<string | null>(null);
   const pathname = usePathname();
   const router   = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const userDropdownRef = useRef<HTMLDivElement>(null);
 
   // Scroll shadow
   useEffect(() => {
@@ -32,19 +43,29 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Check auth state via internal proxy (reads httpOnly cookie server-side)
-  // Run once on mount — after login/logout the page navigates so this re-runs
+  // Check auth state and fetch user info
   useEffect(() => {
     fetch('/api/auth/me')
-      .then(r => setAuthed(r.ok))
+      .then(async r => {
+        if (r.ok) {
+          const data = await r.json().catch(() => ({}));
+          setAuthed(true);
+          setUserEmail(data.email || null);
+        } else {
+          setAuthed(false);
+        }
+      })
       .catch(() => setAuthed(false));
   }, []);
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setSolutionsOpen(false);
+      }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(e.target as Node)) {
+        setUserOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -125,21 +146,60 @@ export default function Navigation() {
           {/* Desktop auth actions */}
           <div className="hidden lg:flex items-center gap-3">
             {authed === true ? (
-              <>
-                <Link
-                  href="/vendor/dashboard"
-                  className="text-sm font-medium text-white/80 hover:text-white transition-colors"
-                >
-                  Dashboard
-                </Link>
+              <div className="relative" ref={userDropdownRef}>
                 <button
                   type="button"
-                  onClick={handleLogout}
-                  className="text-sm font-medium text-white/50 hover:text-white transition-colors"
+                  onClick={() => setUserOpen(o => !o)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
                 >
-                  Sign Out
+                  <div className="h-6 w-6 rounded-full bg-[#10b981]/20 flex items-center justify-center flex-shrink-0">
+                    <User className="h-3.5 w-3.5 text-[#10b981]" />
+                  </div>
+                  <span className="text-sm font-medium text-white/80 max-w-[140px] truncate">
+                    {userEmail ? userEmail.split('@')[0] : 'My Account'}
+                  </span>
+                  <ChevronDown className={`h-3.5 w-3.5 text-white/50 transition-transform ${userOpen ? 'rotate-180' : ''}`} />
                 </button>
-              </>
+
+                {userOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-56 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+                    {/* Email header */}
+                    <div className="px-4 py-3 border-b border-white/10">
+                      <p className="text-xs text-white/40">Signed in as</p>
+                      <p className="text-sm text-white font-medium truncate">{userEmail || 'Vendor'}</p>
+                    </div>
+
+                    {/* Vendor tool links */}
+                    <div className="py-1">
+                      {vendorLinks.map(({ name, href, icon: Icon }) => (
+                        <Link
+                          key={href}
+                          href={href}
+                          onClick={() => setUserOpen(false)}
+                          className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                            pathname?.startsWith(href) ? 'text-[#10b981] bg-[#10b981]/10' : 'text-white/80 hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
+                          <Icon className="h-4 w-4 flex-shrink-0 opacity-70" />
+                          {name}
+                        </Link>
+                      ))}
+                    </div>
+
+                    {/* Sign out */}
+                    <div className="border-t border-white/10 py-1">
+                      <button
+                        type="button"
+                        onClick={() => { setUserOpen(false); handleLogout(); }}
+                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-white/50 hover:bg-white/5 hover:text-white transition-colors"
+                      >
+                        <LogOut className="h-4 w-4 flex-shrink-0" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link href="/login" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
@@ -203,7 +263,13 @@ export default function Navigation() {
                 <div className="pt-6 border-t border-white/10 space-y-1">
                   {authed === true ? (
                     <>
-                      <MobileLink href="/vendor/dashboard" label="Dashboard" active={pathname?.startsWith('/vendor/dashboard')} close={() => setMobileOpen(false)} />
+                      <div className="px-3 py-2 mb-1">
+                        <p className="text-xs text-white/40">Signed in as</p>
+                        <p className="text-sm text-white font-medium truncate">{userEmail || 'Vendor'}</p>
+                      </div>
+                      {vendorLinks.map(({ name, href }) => (
+                        <MobileLink key={href} href={href} label={name} active={pathname?.startsWith(href)} close={() => setMobileOpen(false)} />
+                      ))}
                       <button
                         type="button"
                         onClick={() => { setMobileOpen(false); handleLogout(); }}
