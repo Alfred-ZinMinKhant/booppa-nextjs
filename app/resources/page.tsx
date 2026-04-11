@@ -6,24 +6,43 @@ export const metadata = {
   description: 'Guides, blog posts, RFP tips, and PDPA compliance education for Singapore vendors and procurement teams.',
 };
 
+interface BlogPost {
+  id?: string;
+  slug: string;
+  title: string;
+  category?: string;
+  created_at?: string;
+}
+
+interface GuideItem {
+  title: string;
+  description?: string;
+  href: string;
+}
+
+interface GuideSection {
+  category: string;
+  items: { title: string; desc: string; href: string }[];
+}
+
 const FALLBACK_POSTS = [
   { slug: 'singapore-courts-blockchain-evidence-2025', tag: 'Compliance', title: 'How Singapore Courts Are Accepting Blockchain Evidence in 2025', date: 'Jan 2025' },
   { slug: 'how-smes-can-reduce-compliance-costs-by-90-with-blockchain', tag: 'SME', title: 'How SMEs Can Reduce Compliance Costs by 90% with Blockchain', date: 'Dec 2024' },
   { slug: 'infrastructure-aws-polygon', tag: 'Infrastructure', title: 'Why We Built on AWS Singapore and Polygon', date: 'Nov 2024' },
 ];
 
-async function getRecentPosts() {
+async function getRecentPosts(): Promise<BlogPost[] | null> {
   try {
     const res = await fetch(`${config.apiUrl}/api/public/blogs/?limit=3`, { next: { revalidate: 3600 } });
     if (!res.ok) return null;
     const data = await res.json();
-    return (data.results || []) as any[];
+    return (data.results || []) as BlogPost[];
   } catch {
     return null;
   }
 }
 
-const FALLBACK_GUIDES = [
+const FALLBACK_GUIDES: GuideSection[] = [
   {
     category: 'RFP Tips',
     items: [
@@ -50,7 +69,7 @@ const FALLBACK_GUIDES = [
   },
 ];
 
-async function getGuides() {
+async function getGuides(): Promise<GuideSection[] | null> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE || 'https://api.booppa.io'}/api/v1/resources/`, {
       next: { revalidate: 300 },
@@ -60,7 +79,7 @@ async function getGuides() {
     // Convert { categories: { "RFP Tips": [{title, description, href}] } } to guides array format
     return Object.entries(data.categories || {}).map(([category, items]) => ({
       category,
-      items: (items as any[]).map(item => ({ title: item.title, desc: item.description || '', href: item.href })),
+      items: (items as GuideItem[]).map(item => ({ title: item.title, desc: item.description || '', href: item.href })),
     }))
   } catch {
     return null
@@ -101,7 +120,7 @@ export default async function ResourcesPage() {
 
           {livePosts && livePosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {livePosts.map((post: any) => (
+              {livePosts.map((post: BlogPost) => (
                 <Link
                   key={post.id || post.slug}
                   href={`/blog/${post.slug}`}
@@ -123,8 +142,8 @@ export default async function ResourcesPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {FALLBACK_POSTS.map((post, i) => (
-                <Link key={i} href={`/blog/${post.slug}`} className="group block bg-[#f8fafc] rounded-2xl p-6 border border-[#e2e8f0] hover:border-[#10b981] hover:shadow-md transition-all">
+              {FALLBACK_POSTS.map((post) => (
+                <Link key={post.slug} href={`/blog/${post.slug}`} className="group block bg-[#f8fafc] rounded-2xl p-6 border border-[#e2e8f0] hover:border-[#10b981] hover:shadow-md transition-all">
                   <span className="inline-block text-xs font-bold text-[#10b981] uppercase tracking-wider mb-3">{post.tag}</span>
                   <h3 className="text-base font-bold text-[#0f172a] mb-2 group-hover:text-[#10b981] transition-colors">{post.title}</h3>
                   <span className="text-xs text-[#94a3b8]">{post.date}</span>
@@ -137,12 +156,12 @@ export default async function ResourcesPage() {
 
       {/* Guides */}
       {guides.map((section, si) => (
-        <section key={si} className={`py-20 px-6 ${si % 2 === 0 ? 'bg-[#f8fafc]' : 'bg-white'} border-b border-[#e2e8f0]`}>
+        <section key={section.category} className={`py-20 px-6 ${si % 2 === 0 ? 'bg-[#f8fafc]' : 'bg-white'} border-b border-[#e2e8f0]`}>
           <div className="max-w-[1100px] mx-auto">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#0f172a] mb-10">{section.category}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {section.items.map((item, i) => (
-                <Link key={i} href={item.href} className="group block bg-white rounded-2xl p-6 border border-[#e2e8f0] hover:border-[#10b981] hover:shadow-md transition-all">
+              {section.items.map((item) => (
+                <Link key={item.title} href={item.href} className="group block bg-white rounded-2xl p-6 border border-[#e2e8f0] hover:border-[#10b981] hover:shadow-md transition-all">
                   <h3 className="text-base font-bold text-[#0f172a] mb-2 group-hover:text-[#10b981] transition-colors">{item.title}</h3>
                   <p className="text-sm text-[#64748b] leading-relaxed">{item.desc}</p>
                 </Link>
@@ -157,8 +176,8 @@ export default async function ResourcesPage() {
         <div className="max-w-[1100px] mx-auto">
           <h2 className="text-2xl lg:text-3xl font-bold text-white mb-10">Free Tools</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tools.map((t, i) => (
-              <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-[#10b981] transition-all">
+            {tools.map((t) => (
+              <div key={t.href} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-[#10b981] transition-all">
                 <h3 className="text-base font-bold text-white mb-2">{t.title}</h3>
                 <p className="text-sm text-white/60 mb-6">{t.desc}</p>
                 <Link href={t.href} className="text-[#10b981] font-bold text-sm hover:underline">{t.cta}</Link>
