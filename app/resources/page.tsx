@@ -58,9 +58,9 @@ async function getGuides() {
     if (!res.ok) return null
     const data = await res.json()
     // Convert { categories: { "RFP Tips": [{title, description, href}] } } to guides array format
-    return Object.entries(data.categories || {}).map(([category, items]: [string, any[]]) => ({
+    return Object.entries(data.categories || {}).map(([category, items]) => ({
       category,
-      items: items.map(item => ({ title: item.title, desc: item.description || '', href: item.href })),
+      items: (items as any[]).map(item => ({ title: item.title, desc: item.description || '', href: item.href })),
     }))
   } catch {
     return null
