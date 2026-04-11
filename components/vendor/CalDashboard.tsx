@@ -7,7 +7,7 @@ import { CheckCircle2, Circle, ChevronRight, Sparkles, ArrowRight } from "lucide
 const NEXT_STEP_MAP: Record<string, { href: string; label: string }> = {
   VERIFIED:   { href: "/vendor-proof",      label: "Get Verified" },
   NOTARIZED:  { href: "/notarization",      label: "Notarize a Document" },
-  PROMINENT:  { href: "/pdpa",              label: "Run PDPA Scan" },
+  PROMINENT:  { href: "/notarization",      label: "Add More Evidence" },
   ELITE:      { href: "/rfp-acceleration",  label: "Get RFP Complete" },
 };
 
