@@ -168,6 +168,27 @@ function TenderCheckContent() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [checkingOut, setCheckingOut] = useState<string | null>(null);
+	const [vendorId, setVendorId] = useState<string | null>(null);
+	const [authReady, setAuthReady] = useState(false);
+
+	// Resolve vendor ID once on mount before any search
+	useEffect(() => {
+		fetch('/api/auth/me')
+			.then(r => r.ok ? r.json() : null)
+			.then(data => {
+				if (data?.id) setVendorId(String(data.id));
+			})
+			.catch(() => {})
+			.finally(() => setAuthReady(true));
+	}, []);
+
+	// Auto-search only after auth check completes
+	useEffect(() => {
+		if (!authReady) return;
+		const no = searchParams.get("tenderNo");
+		if (no) runCheck(no);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [authReady]);
 
 	const startCheckout = async (productType: string) => {
 		setCheckingOut(productType);
@@ -191,13 +212,6 @@ function TenderCheckContent() {
 		}
 	};
 
-	// Auto-search if tenderNo is in URL
-	useEffect(() => {
-		const no = searchParams.get("tenderNo");
-		if (no) runCheck(no);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
 	async function runCheck(tenderNo: string) {
 		const no = tenderNo.trim().toUpperCase();
 		if (!no) return;
@@ -207,9 +221,12 @@ function TenderCheckContent() {
 		setResult(null);
 
 		try {
-			const res = await fetch(
-				`/api/tender-check?tenderNo=${encodeURIComponent(no)}`,
-			);
+			const params = new URLSearchParams({ tenderNo: no });
+			// Include vendor ID so backend returns personalised gap analysis
+			const resolvedVendorId = vendorId ?? (authReady ? null : undefined);
+			if (resolvedVendorId) params.set('vendorId', resolvedVendorId);
+
+			const res = await fetch(`/api/tender-check?${params.toString()}`);
 			if (res.status === 404) {
 				setError(
 					`Tender "${no}" was not found in GeBIZ data. Please verify the tender number is correct — only open and recently-closed GeBIZ tenders are available.`,
@@ -234,7 +251,7 @@ function TenderCheckContent() {
 
 	function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
-		runCheck(input);
+		runCheck(input.trim().toUpperCase());
 	}
 
 	return (

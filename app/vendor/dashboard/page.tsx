@@ -61,7 +61,7 @@ export default function VendorDashboard() {
   if (!mounted || loading) return null;
 
   const chartInfo = data.chartData;
-  const stats = data.stats ?? { trustScore: 0, enterpriseViews: 0, activeProcurements: 0, govAgencies: 0 };
+  const stats = data.stats ?? { trustScore: 0, trustScoreDelta: null, enterpriseViews: 0, activeProcurements: 0, activeProcurementsSector: null, govAgencies: 0 };
   const history = data.recentActivity;
 
   return (
@@ -100,9 +100,15 @@ export default function VendorDashboard() {
                   <Shield className="h-5 w-5 text-blue-500" />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs text-emerald-400">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                <span>+4 pts from last assessment</span>
+              <div className="mt-4 flex items-center text-xs">
+                {stats.trustScoreDelta != null && stats.trustScoreDelta !== 0 ? (
+                  <span className="text-emerald-400 flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" />
+                    +{stats.trustScoreDelta} pts from last assessment
+                  </span>
+                ) : (
+                  <span className="text-neutral-500">Add more evidence to improve</span>
+                )}
               </div>
             </div>
           </div>
@@ -118,9 +124,15 @@ export default function VendorDashboard() {
                   <Eye className="h-5 w-5 text-emerald-500" />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs text-emerald-400">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                <span>+124% vs previous week</span>
+              <div className="mt-4 text-xs">
+                {stats.enterpriseViews > 0 ? (
+                  <span className="text-emerald-400 flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" />
+                    Unique domains viewed your profile
+                  </span>
+                ) : (
+                  <span className="text-neutral-500">No profile views yet this week</span>
+                )}
               </div>
             </div>
           </div>
@@ -129,15 +141,21 @@ export default function VendorDashboard() {
             <div className="p-6">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-neutral-400 text-sm font-medium">Active Procurements</p>
+                  <p className="text-neutral-400 text-sm font-medium">Open Tenders</p>
                   <h3 className="text-3xl font-bold text-white mt-2">{stats.activeProcurements}</h3>
                 </div>
                 <div className="p-2 bg-amber-500/10 rounded-lg">
                   <Zap className="h-5 w-5 text-amber-500" />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs text-amber-400">
-                <span>Viewers actively buying in your sector</span>
+              <div className="mt-4 text-xs">
+                {stats.activeProcurements > 0 ? (
+                  <span className="text-amber-400">
+                    Open GeBIZ tenders in {stats.activeProcurementsSector || 'your sector'}
+                  </span>
+                ) : (
+                  <span className="text-neutral-500">No open tenders matched to your sector</span>
+                )}
               </div>
             </div>
           </div>
@@ -153,8 +171,12 @@ export default function VendorDashboard() {
                   <Building className="h-5 w-5 text-purple-500" />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs text-purple-400">
-                <span>Unique .gov.sg domains seen</span>
+              <div className="mt-4 text-xs">
+                {stats.govAgencies > 0 ? (
+                  <span className="text-purple-400">Unique .gov.sg domains viewed your profile</span>
+                ) : (
+                  <span className="text-neutral-500">No gov agency views yet</span>
+                )}
               </div>
             </div>
           </div>
