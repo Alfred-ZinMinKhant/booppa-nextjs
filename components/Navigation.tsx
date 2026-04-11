@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { config as appConfig } from '@/lib/config';
 
 const solutions = [
   { name: 'For Vendors',     href: '/solutions/vendors',    desc: 'Claim, verify, and win more contracts' },
@@ -33,9 +32,9 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Check auth state via /api/v1/auth/me
+  // Check auth state via internal proxy (reads httpOnly cookie server-side)
   useEffect(() => {
-    fetch(`${appConfig.apiUrl}/api/v1/auth/me`, { credentials: 'include' })
+    fetch('/api/auth/me')
       .then(r => setAuthed(r.ok))
       .catch(() => setAuthed(false));
   }, [pathname]);
