@@ -50,8 +50,8 @@ export function middleware(request: NextRequest) {
   const isPublicRoute  = publicRoutes.some(r => pathname === r || (r !== '/' && pathname.startsWith(r)))
 
   if (isPublicPrefix || isPublicRoute) {
-    // If already logged in and trying to hit login/register, send to dashboard
-    if (token && (pathname === '/login' || pathname === '/register')) {
+    // If already logged in, redirect away from auth/marketing entry points
+    if (token && (pathname === '/login' || pathname === '/register' || pathname === '/vendor-proof')) {
       return NextResponse.redirect(new URL('/vendor/dashboard', request.url))
     }
     return NextResponse.next()

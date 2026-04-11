@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchWithAuth } from '@/lib/auth'
+import { fetchWithAuth, getServerSideUser } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const tenderNo = searchParams.get('tenderNo')
-  const vendorId = searchParams.get('vendorId')
+  // Allow explicit override, otherwise resolve from session
+  let vendorId = searchParams.get('vendorId')
 
   if (!tenderNo) {
     return NextResponse.json({ error: 'tenderNo is required' }, { status: 400 })
+  }
+
+  // Auto-inject authenticated vendor ID so signed-in users always get
+  // personalised gap analysis without the frontend needing to pass it
+  if (!vendorId) {
+    const user = await getServerSideUser()
+    if (user?.id) vendorId = String(user.id)
   }
 
   const params = new URLSearchParams({ tenderNo })
