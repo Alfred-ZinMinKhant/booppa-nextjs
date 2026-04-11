@@ -26,7 +26,7 @@ function VendorProofContent() {
   const [authed, setAuthed] = useState<boolean | null>(null)
 
   useEffect(() => {
-    fetch(`${config.apiUrl}/api/v1/auth/me`, { credentials: "include" })
+    fetch('/api/auth/me')
       .then(r => setAuthed(r.ok))
       .catch(() => setAuthed(false))
   }, [])

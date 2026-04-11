@@ -43,7 +43,7 @@ export default function OpportunitiesPage() {
       .catch(() => setLoading(false))
 
     // Check auth + vendor proof status
-    fetch(`${appConfig.apiUrl}/api/v1/auth/me`, { credentials: 'include' })
+    fetch('/api/auth/me')
       .then(async r => {
         if (!r.ok) return
         setAuthed(true)

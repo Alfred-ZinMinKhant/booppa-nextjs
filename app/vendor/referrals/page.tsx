@@ -36,7 +36,7 @@ export default function ReferralsPage() {
 
   // Fetch current user id
   useEffect(() => {
-    fetch(`${appConfig.apiUrl}/api/v1/auth/me`, { credentials: "include" })
+    fetch('/api/auth/me')
       .then(r => r.ok ? r.json() : null)
       .then(me => {
         if (me?.id) setUserId(String(me.id));

@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 
 const solutions = [
   { name: 'For Vendors',     href: '/solutions/vendors',    desc: 'Claim, verify, and win more contracts' },
@@ -33,11 +33,12 @@ export default function Navigation() {
   }, []);
 
   // Check auth state via internal proxy (reads httpOnly cookie server-side)
+  // Run once on mount — after login/logout the page navigates so this re-runs
   useEffect(() => {
     fetch('/api/auth/me')
       .then(r => setAuthed(r.ok))
       .catch(() => setAuthed(false));
-  }, [pathname]);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function Navigation() {
             {/* Solutions dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
+                type="button"
                 onClick={() => setSolutionsOpen(o => !o)}
                 className={`flex items-center gap-1 text-sm font-medium transition-colors ${isSolutionActive ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}
               >
@@ -131,6 +133,7 @@ export default function Navigation() {
                   Dashboard
                 </Link>
                 <button
+                  type="button"
                   onClick={handleLogout}
                   className="text-sm font-medium text-white/50 hover:text-white transition-colors"
                 >
@@ -166,7 +169,12 @@ export default function Navigation() {
         {/* Mobile drawer */}
         {mobileOpen && (
           <>
-            <div className="fixed inset-0 z-[996] bg-black/80" onClick={() => setMobileOpen(false)} />
+            <button
+              type="button"
+              aria-label="Close menu"
+              className="fixed inset-0 z-[996] bg-black/80 cursor-default"
+              onClick={() => setMobileOpen(false)}
+            />
             <div className="fixed inset-0 z-[997] flex flex-col bg-[#0f172a] px-6 py-6 overflow-y-auto">
               <div className="flex items-center justify-between mb-8">
                 <Link href="/" onClick={() => setMobileOpen(false)}>
@@ -178,12 +186,12 @@ export default function Navigation() {
               </div>
 
               <div className="space-y-1">
-                <MobileLink href="/vendors"          label="Network"             active={pathname?.startsWith('/vendors')}          close={() => setMobileOpen(false)} />
-                <MobileLink href="/compare"           label="Compare"             active={pathname === '/compare'}                   close={() => setMobileOpen(false)} />
-                <MobileLink href="/pricing"           label="Pricing"             active={pathname === '/pricing'}                   close={() => setMobileOpen(false)} />
-                <MobileLink href="/verify"            label="Verify"              active={pathname?.startsWith('/verify')}           close={() => setMobileOpen(false)} />
-                <MobileLink href="/resources"        label="Resources"           active={pathname?.startsWith('/resources')}        close={() => setMobileOpen(false)} />
-                <MobileLink href="/insights"         label="Insights"            active={pathname?.startsWith('/insights')}          close={() => setMobileOpen(false)} />
+                <MobileLink href="/vendors"    label="Network"   active={pathname?.startsWith('/vendors')}   close={() => setMobileOpen(false)} />
+                <MobileLink href="/compare"    label="Compare"   active={pathname === '/compare'}            close={() => setMobileOpen(false)} />
+                <MobileLink href="/pricing"    label="Pricing"   active={pathname === '/pricing'}            close={() => setMobileOpen(false)} />
+                <MobileLink href="/verify"     label="Verify"    active={pathname?.startsWith('/verify')}    close={() => setMobileOpen(false)} />
+                <MobileLink href="/resources"  label="Resources" active={pathname?.startsWith('/resources')} close={() => setMobileOpen(false)} />
+                <MobileLink href="/insights"   label="Insights"  active={pathname?.startsWith('/insights')}  close={() => setMobileOpen(false)} />
 
                 <div className="pt-4 pb-1">
                   <p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/30">Solutions</p>
@@ -197,6 +205,7 @@ export default function Navigation() {
                     <>
                       <MobileLink href="/vendor/dashboard" label="Dashboard" active={pathname?.startsWith('/vendor/dashboard')} close={() => setMobileOpen(false)} />
                       <button
+                        type="button"
                         onClick={() => { setMobileOpen(false); handleLogout(); }}
                         className="-mx-3 block w-full text-left rounded-lg px-3 py-3 text-base font-semibold text-white/50 hover:bg-white/5 transition-colors"
                       >
