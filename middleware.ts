@@ -13,8 +13,12 @@ const publicRoutes = [
   '/demo', '/thank-you', '/qr-scan',
   '/tender-check', '/vendor-proof', '/opportunities',
   '/insights', '/resources', '/check-status',
+  '/compliance-notarization',
 ]
 const publicPrefixes = ['/verify', '/vendors', '/blog', '/solutions', '/auth']
+
+// Routes that require a paid plan (pro or enterprise).
+const proPrefixes = ['/vendor/evidence', '/vendor/rfp']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -58,6 +62,18 @@ export function middleware(request: NextRequest) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('from', pathname)
     return NextResponse.redirect(loginUrl)
+  }
+
+  // ── Paywall: PRO-only routes ──────────────────────────────────────────────
+  const isProRoute = proPrefixes.some(p => pathname.startsWith(p))
+  if (isProRoute) {
+    const plan = request.cookies.get('vendor_plan')?.value || 'free'
+    if (plan === 'free') {
+      const pricingUrl = new URL('/pricing', request.url)
+      pricingUrl.searchParams.set('upgrade', '1')
+      pricingUrl.searchParams.set('from', pathname)
+      return NextResponse.redirect(pricingUrl)
+    }
   }
 
   return NextResponse.next()

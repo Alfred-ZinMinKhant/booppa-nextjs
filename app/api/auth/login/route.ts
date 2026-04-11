@@ -33,6 +33,13 @@ export async function POST(req: NextRequest) {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax',
   })
+  response.cookies.set('vendor_plan', data.plan || 'free', {
+    httpOnly: false,
+    path: '/',
+    secure: isProduction,
+    maxAge: 60 * 60 * 24 * 7,
+    sameSite: 'lax',
+  })
 
   return response
 }

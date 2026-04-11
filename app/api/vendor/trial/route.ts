@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
         email: body.email,
         password: body.password || crypto.randomUUID(),
         company: body.company_name || body.company || '',
+        uen: body.uen || undefined,
       }),
     });
 
