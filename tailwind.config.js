@@ -13,8 +13,8 @@ module.exports = {
   theme: {
     extend: {
       animation: {
-        'marquee': 'marquee 40s linear infinite',
-        'marquee-slow': 'marquee 60s linear infinite',
+        'marquee': 'marquee 20s linear infinite',
+        'marquee-slow': 'marquee 40s linear infinite',
       },
       keyframes: {
         marquee: {
