@@ -179,6 +179,61 @@ export default function PDPAPage() {
             </form>
           </div>
 
+          {/* PDPA Monitor subscription upsell */}
+          <div className="mb-12 p-8 rounded-3xl border-2 border-blue-200 bg-blue-50 flex flex-col md:flex-row md:items-center gap-6">
+            <div className="flex-1">
+              <p className="text-xs font-bold uppercase tracking-widest text-blue-500 mb-1">Subscription alternative</p>
+              <h3 className="text-xl font-bold text-[#0f172a] mb-1">PDPA Monitor — SGD 49/mo</h3>
+              <p className="text-sm text-[#475569] mb-3">
+                Instead of a one-off scan, get <strong>quarterly automatic re-scans</strong> (SGD 79 value each),
+                monthly PDPC regulatory alerts, and a running compliance score chart —
+                all for less than one standalone scan per month.
+              </p>
+              <ul className="text-sm text-[#475569] space-y-1">
+                <li>✓ Quarterly PDPA re-scan included (4× per year = SGD 316 value)</li>
+                <li>✓ Monthly plain-language PDPC guideline alerts</li>
+                <li>✓ Always-current PDF ready to share with buyers</li>
+                <li className="text-blue-600 font-medium">Annual plan: SGD 490/yr — saves SGD 98</li>
+              </ul>
+            </div>
+            <div className="flex flex-col gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/checkout', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ productType: 'pdpa_monitor_monthly' }),
+                    });
+                    const data = await res.json();
+                    if (data.url) window.location.href = data.url;
+                  } catch { /* silent */ }
+                }}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition text-sm whitespace-nowrap"
+              >
+                Subscribe — SGD 49/mo
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/checkout', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ productType: 'pdpa_monitor_annual' }),
+                    });
+                    const data = await res.json();
+                    if (data.url) window.location.href = data.url;
+                  } catch { /* silent */ }
+                }}
+                className="px-6 py-3 border border-blue-400 text-blue-600 hover:bg-blue-100 font-semibold rounded-xl transition text-sm whitespace-nowrap"
+              >
+                Annual — SGD 490/yr
+              </button>
+            </div>
+          </div>
+
           {/* What We Check */}
           <div className="bg-[#f8fafc] p-12 rounded-3xl mb-12 border border-[#e2e8f0]">
             <h2 className="text-2xl font-bold mb-10 text-[#0f172a]">What Our Scanner Checks</h2>

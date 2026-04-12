@@ -113,6 +113,30 @@ function RFPResultContent() {
           </div>
         )}
 
+        {status === 'ready' && result && result.product_type === 'rfp_express' && (
+          <div className="mb-5 p-4 rounded-xl border border-booppa-green/30 bg-booppa-green/5 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-white">Upgrade to RFP Complete</p>
+              <p className="text-xs text-gray-400 mt-0.5">Get the full procurement dossier with ACRA validation, deeper Q&amp;A answers, and a DOCX you can edit.</p>
+            </div>
+            <button
+              onClick={async () => {
+                const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.booppa.io';
+                const res = await fetch(`${apiBase}/api/v1/stripe/checkout`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ productType: 'rfp_complete', vendor_url: result.vendor_url, company_name: result.company_name }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (data.url) window.location.href = data.url;
+              }}
+              className="shrink-0 px-4 py-2 bg-booppa-green text-white text-sm font-bold rounded-lg hover:bg-booppa-green/80 transition"
+            >
+              Upgrade — S$599 →
+            </button>
+          </div>
+        )}
+
         {status === 'ready' && result && (
           <>
             {/* Header */}

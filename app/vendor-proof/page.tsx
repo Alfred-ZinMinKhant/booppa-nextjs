@@ -226,6 +226,52 @@ function VendorProofContent() {
               </ul>
             </div>
           </div>
+
+          {/* Vendor Active subscription upsell */}
+          <div className="mt-6 pt-6 border-t border-gray-800">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#10b981] mb-2">Keep it active</p>
+            <p className="text-sm text-gray-300 mb-1 font-semibold">Vendor Active — SGD 39/mo</p>
+            <p className="text-xs text-gray-500 mb-4">
+              Vendor Proof is your entry credential. Vendor Active is the ongoing monitoring layer —
+              monthly score health checks, competitor alerts, and shortlist priority in buyer searches.
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/checkout', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ productType: 'vendor_active_monthly' }),
+                    });
+                    const data = await res.json();
+                    if (data.url) window.location.href = data.url;
+                  } catch { /* silent */ }
+                }}
+                className="w-full py-2.5 bg-[#10b981]/10 border border-[#10b981]/30 text-[#10b981] hover:bg-[#10b981]/20 font-semibold rounded-lg transition text-sm"
+              >
+                Add Vendor Active — SGD 39/mo
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/checkout', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ productType: 'vendor_active_annual' }),
+                    });
+                    const data = await res.json();
+                    if (data.url) window.location.href = data.url;
+                  } catch { /* silent */ }
+                }}
+                className="w-full py-2 text-gray-500 hover:text-gray-300 text-xs transition"
+              >
+                Annual — SGD 390/yr (save SGD 78)
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </main>

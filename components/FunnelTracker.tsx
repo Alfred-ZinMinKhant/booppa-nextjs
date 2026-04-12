@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, Suspense } from "react";
+import { Suspense, useCallback, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { config, endpoints } from "@/lib/config";
 
@@ -37,6 +37,27 @@ function FunnelTrackerInner() {
 		async (stage: string) => {
 			try {
 				const sessionId = getSessionId();
+
+				// Persist UTM params in sessionStorage so they survive navigation
+				const utmKeys = ["utm_source", "utm_medium", "utm_campaign"] as const;
+				utmKeys.forEach((key) => {
+					const val = searchParams.get(key);
+					if (val) sessionStorage.setItem(`booppa_${key}`, val);
+				});
+
+				const utm_source =
+					searchParams.get("utm_source") ||
+					sessionStorage.getItem("booppa_utm_source") ||
+					undefined;
+				const utm_medium =
+					searchParams.get("utm_medium") ||
+					sessionStorage.getItem("booppa_utm_medium") ||
+					undefined;
+				const utm_campaign =
+					searchParams.get("utm_campaign") ||
+					sessionStorage.getItem("booppa_utm_campaign") ||
+					undefined;
+
 				await fetch(`${config.apiUrl}/api/v1${endpoints.funnel.track}`, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -44,9 +65,9 @@ function FunnelTrackerInner() {
 						session_id: sessionId,
 						stage,
 						source: document.referrer || "direct",
-						utm_source: searchParams.get("utm_source") || undefined,
-						utm_medium: searchParams.get("utm_medium") || undefined,
-						utm_campaign: searchParams.get("utm_campaign") || undefined,
+						utm_source,
+						utm_medium,
+						utm_campaign,
 					}),
 					keepalive: true,
 				});

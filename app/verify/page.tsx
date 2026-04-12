@@ -103,6 +103,19 @@ export default function VerifyPage() {
             )}
 
             {results && (
+              <div className="mt-8 p-6 bg-[#0f172a] rounded-2xl border border-[#10b981]/30 text-center">
+                <p className="text-white/70 text-sm mb-3">Evaluating this vendor for procurement?</p>
+                <p className="text-white font-semibold mb-4">See how they stack up against the market in BOOPPA.</p>
+                <Link
+                  href="/vendors"
+                  className="inline-block px-5 py-2.5 bg-[#10b981] text-white text-sm font-bold rounded-lg hover:bg-[#059669] transition-colors"
+                >
+                  Explore Vendor Network →
+                </Link>
+              </div>
+            )}
+
+            {results && (
               <div className="mt-12 p-8 bg-[#f0fdf4] rounded-[2rem] border-2 border-[#10b981] animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-8 h-8 bg-[#10b981] rounded-full flex items-center justify-center text-white">

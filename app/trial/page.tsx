@@ -8,10 +8,12 @@ import {
 	Shield,
 	ArrowRight,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { config } from "@/lib/config";
 
 export default function VendorTrial() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState({
 		email: "",
@@ -21,23 +23,52 @@ export default function VendorTrial() {
 	});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState("");
+	const [accountExists, setAccountExists] = useState(false);
 
 	const handleSubmit = async () => {
 		setIsSubmitting(true);
 		setError("");
+		setAccountExists(false);
 		try {
-			const response = await fetch("/api/vendor/trial", {
+			const referralCode = searchParams.get("ref") || searchParams.get("referral_code") || undefined;
+			const body: Record<string, string> = {
+				email: formData.email,
+				full_name: formData.company,
+				company: formData.company,
+				uen: formData.uen,
+				// auto-generate a temp password on the backend
+				password: Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 6).toUpperCase() + "!",
+			};
+			if (referralCode) body.referral_code = referralCode;
+
+			const response = await fetch(`${config.apiUrl}/api/v1/auth/register`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(formData),
+				body: JSON.stringify(body),
 			});
-			const data = await response.json();
-			if (!response.ok) {
-				setError(
-					data.error || data.detail || "Registration failed. Please try again.",
-				);
+			const data = await response.json().catch(() => ({}));
+
+			if (response.status === 409) {
+				setAccountExists(true);
+				setError("An account already exists with this email. Please sign in.");
 				return;
 			}
+			if (!response.ok) {
+				setError(data.error || data.detail || "Registration failed. Please try again.");
+				return;
+			}
+
+			// Track TRIAL_START funnel event
+			try {
+				const sessionId = sessionStorage.getItem("booppa_sid") || "";
+				await fetch(`${config.apiUrl}/api/v1/funnel/track`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ session_id: sessionId, stage: "TRIAL_START" }),
+					keepalive: true,
+				});
+			} catch { /* non-blocking */ }
+
 			setStep(3);
 		} catch (e) {
 			console.error(e);
@@ -134,6 +165,9 @@ export default function VendorTrial() {
 									<div className="flex items-center gap-2 mt-3 rounded-md bg-red-500/10 border border-red-500/30 px-3 py-2 text-sm text-red-400">
 										<AlertCircle className="h-4 w-4 flex-shrink-0" />
 										<span>{error}</span>
+										{accountExists && (
+											<a href="/login" className="ml-1 underline font-semibold text-blue-400 hover:text-blue-300 whitespace-nowrap">Sign in →</a>
+										)}
 									</div>
 								)}
 							</div>
