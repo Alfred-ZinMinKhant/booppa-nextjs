@@ -81,6 +81,7 @@ export default function Navigation() {
   const isSolutionActive = solutions.some(s => pathname?.startsWith(s.href));
 
   return (
+    <>
     <header className={`sticky top-0 z-50 transition-all duration-300 backdrop-blur-md border-b border-white/10 ${scrolled ? 'bg-[#0f172a]/95 shadow-md' : 'bg-[#0f172a]'}`}>
       <nav className="mx-auto max-w-[1400px] px-6 py-4 lg:px-8">
         <div className="flex items-center justify-between">
@@ -219,78 +220,79 @@ export default function Navigation() {
           <button
             type="button"
             className="lg:hidden -m-2.5 p-2.5 text-gray-400"
-            onClick={() => setMobileOpen(true)}
+            onClick={() => setMobileOpen(o => !o)}
           >
-            <span className="sr-only">Open menu</span>
-            <Menu className="h-6 w-6" />
+            <span className="sr-only">{mobileOpen ? 'Close menu' : 'Open menu'}</span>
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
-
-        {/* Mobile drawer */}
-        {mobileOpen && (
-          <>
-            <button
-              type="button"
-              aria-label="Close menu"
-              className="fixed inset-0 z-[996] bg-black/80 cursor-default"
-              onClick={() => setMobileOpen(false)}
-            />
-            <div className="fixed inset-0 z-[997] flex flex-col bg-[#0f172a] px-6 py-6 overflow-y-auto">
-              <div className="flex items-center justify-between mb-8">
-                <Link href="/" onClick={() => setMobileOpen(false)}>
-                  <img src="/logo.png" alt="BOOPPA" className="h-8 w-auto" />
-                </Link>
-                <button type="button" className="-m-2.5 p-2.5 text-gray-400" onClick={() => setMobileOpen(false)}>
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              <div className="space-y-1">
-                <MobileLink href="/vendors"    label="Network"   active={pathname?.startsWith('/vendors')}   close={() => setMobileOpen(false)} />
-                <MobileLink href="/compare"    label="Compare"   active={pathname === '/compare'}            close={() => setMobileOpen(false)} />
-                <MobileLink href="/pricing"    label="Pricing"   active={pathname === '/pricing'}            close={() => setMobileOpen(false)} />
-                <MobileLink href="/verify"     label="Verify"    active={pathname?.startsWith('/verify')}    close={() => setMobileOpen(false)} />
-                <MobileLink href="/resources"  label="Resources" active={pathname?.startsWith('/resources')} close={() => setMobileOpen(false)} />
-                <MobileLink href="/insights"   label="Insights"  active={pathname?.startsWith('/insights')}  close={() => setMobileOpen(false)} />
-
-                <div className="pt-4 pb-1">
-                  <p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/30">Solutions</p>
-                </div>
-                {solutions.map(s => (
-                  <MobileLink key={s.href} href={s.href} label={s.name} active={pathname?.startsWith(s.href)} close={() => setMobileOpen(false)} />
-                ))}
-
-                <div className="pt-6 border-t border-white/10 space-y-1">
-                  {authed === true ? (
-                    <>
-                      <div className="px-3 py-2 mb-1">
-                        <p className="text-xs text-white/40">Signed in as</p>
-                        <p className="text-sm text-white font-medium truncate">{userEmail || 'Vendor'}</p>
-                      </div>
-                      {vendorLinks.map(({ name, href }) => (
-                        <MobileLink key={href} href={href} label={name} active={pathname?.startsWith(href)} close={() => setMobileOpen(false)} />
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => { setMobileOpen(false); handleLogout(); }}
-                        className="-mx-3 block w-full text-left rounded-lg px-3 py-3 text-base font-semibold text-white/50 hover:bg-white/5 transition-colors"
-                      >
-                        Sign Out
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <MobileLink href="/login" label="Sign In" active={pathname === '/login'} close={() => setMobileOpen(false)} />
-                      <MobileLink href="/auth/register" label="Claim your Profile" active={false} close={() => setMobileOpen(false)} highlight />
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </>
-        )}
       </nav>
     </header>
+
+    {/* Mobile drawer — rendered outside <header> to avoid backdrop-filter containing-block bug */}
+    {mobileOpen && (
+      <>
+        <button
+          type="button"
+          aria-label="Close menu"
+          className="fixed inset-0 z-[996] bg-black/80 cursor-default"
+          onClick={() => setMobileOpen(false)}
+        />
+        <div className="fixed inset-0 z-[997] flex flex-col bg-[#0f172a] px-6 py-6 overflow-y-auto">
+          <div className="flex items-center justify-between mb-8">
+            <Link href="/" onClick={() => setMobileOpen(false)}>
+              <img src="/logo.png" alt="BOOPPA" className="h-8 w-auto" />
+            </Link>
+            <button type="button" className="-m-2.5 p-2.5 text-gray-400" onClick={() => setMobileOpen(false)}>
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+
+          <div className="space-y-1">
+            <MobileLink href="/vendors"    label="Network"   active={pathname?.startsWith('/vendors')}   close={() => setMobileOpen(false)} />
+            <MobileLink href="/compare"    label="Compare"   active={pathname === '/compare'}            close={() => setMobileOpen(false)} />
+            <MobileLink href="/pricing"    label="Pricing"   active={pathname === '/pricing'}            close={() => setMobileOpen(false)} />
+            <MobileLink href="/verify"     label="Verify"    active={pathname?.startsWith('/verify')}    close={() => setMobileOpen(false)} />
+            <MobileLink href="/resources"  label="Resources" active={pathname?.startsWith('/resources')} close={() => setMobileOpen(false)} />
+            <MobileLink href="/insights"   label="Insights"  active={pathname?.startsWith('/insights')}  close={() => setMobileOpen(false)} />
+
+            <div className="pt-4 pb-1">
+              <p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/30">Solutions</p>
+            </div>
+            {solutions.map(s => (
+              <MobileLink key={s.href} href={s.href} label={s.name} active={pathname?.startsWith(s.href)} close={() => setMobileOpen(false)} />
+            ))}
+
+            <div className="pt-6 border-t border-white/10 space-y-1">
+              {authed === true ? (
+                <>
+                  <div className="px-3 py-2 mb-1">
+                    <p className="text-xs text-white/40">Signed in as</p>
+                    <p className="text-sm text-white font-medium truncate">{userEmail || 'Vendor'}</p>
+                  </div>
+                  {vendorLinks.map(({ name, href }) => (
+                    <MobileLink key={href} href={href} label={name} active={pathname?.startsWith(href)} close={() => setMobileOpen(false)} />
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => { setMobileOpen(false); handleLogout(); }}
+                    className="-mx-3 block w-full text-left rounded-lg px-3 py-3 text-base font-semibold text-white/50 hover:bg-white/5 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <MobileLink href="/login" label="Sign In" active={pathname === '/login'} close={() => setMobileOpen(false)} />
+                  <MobileLink href="/auth/register" label="Claim your Profile" active={false} close={() => setMobileOpen(false)} highlight />
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+    </>
   );
 }
 
