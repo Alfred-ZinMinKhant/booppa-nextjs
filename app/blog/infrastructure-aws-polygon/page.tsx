@@ -41,10 +41,10 @@ export default function InfrastructureAwsPolygon() {
           <p>Infrastructure choices define compliance outcomes. Booppa is built exactly where regulators expect it to be.</p>
 
           <p>
-            <Link href="/book-demo/page">→ Test the platform now. Secure your first document for SGD 69</Link>
+            <Link href="/notarization">→ Test the platform now. Secure your first document for SGD 69</Link>
           </p>
           <p>
-            <Link href="/book-demo/page">→ Schedule a 15-minute technical deep dive with our CTO</Link>
+            <Link href="/demo">→ Schedule a 15-minute technical deep dive with our CTO</Link>
           </p>
         </article>
       </section>

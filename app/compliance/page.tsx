@@ -28,21 +28,21 @@ export default function CompliancePage() {
           {/* Pricing Comparison */}
           <div className="mb-20">
             <h2 className="text-3xl font-bold text-center mb-12 text-[#0f172a]">Choose Your Monitoring Level</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* One-time scan */}
               <div className="bg-white p-10 rounded-3xl border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] hover:shadow-xl transition-all">
-                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Basic</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 299<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
-                <p className="text-sm text-[#64748b] mb-8">For SMEs starting compliance operations</p>
-                
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Snapshot</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 79<span className="text-xl text-[#64748b] font-normal"> one-time</span></div>
+                <p className="text-sm text-[#64748b] mb-8">Point-in-time PDPA compliance scan</p>
+
                 <ul className="space-y-4 mb-8">
                   {[
-                    'Compliance dashboard (real-time)',
-                    '10 DSAR workflows per month',
-                    'Consent activity logging',
-                    'Monthly compliance reports',
-                    'Privacy policy templates (SG-specific)',
-                    'Email support (48h response)'
+                    '8-dimension PDPA evaluation',
+                    'Risk severity report',
+                    'Legislation references',
+                    'Blockchain-timestamped PDF',
+                    'QR verification link',
                   ].map((feature, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
                       <span className="text-[#10b981] font-bold">✓</span>
@@ -52,28 +52,29 @@ export default function CompliancePage() {
                 </ul>
 
                 <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">
-                  <strong>Best for:</strong> Digital companies 10-50 employees, e-commerce, SaaS startups
+                  <strong>Best for:</strong> One-off compliance checks before an audit or RFP submission
                 </p>
 
-                <Link href="/demo" className="btn btn-primary w-full shadow-lg">Start 14-Day Trial</Link>
+                <Link href="/pdpa" className="block text-center px-6 py-3 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition-colors w-full">
+                  Run PDPA Scan
+                </Link>
               </div>
 
+              {/* PDPA Monitor subscription */}
               <div className="bg-white p-10 rounded-3xl border-2 border-[#10b981] shadow-xl relative scale-105 z-10 hover:translate-y-[-5px] hover:shadow-2xl transition-all">
                 <div className="absolute top-[-15px] right-6 bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Most Popular</div>
-                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Pro</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 799<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
-                <p className="text-sm text-[#64748b] mb-8">For regulated companies with active compliance</p>
-                
+                <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Monitor</h3>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 49<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">Continuous monitoring with quarterly re-scans</p>
+
                 <ul className="space-y-4 mb-8">
-                  <li className="font-bold text-[#0f172a] text-sm">Everything in Basic, plus:</li>
+                  <li className="font-bold text-[#0f172a] text-sm">Everything in Snapshot, plus:</li>
                   {[
-                    'Unlimited DSAR workflows',
-                    'Advanced reporting & analytics',
-                    'Workflow automation engine',
-                    'Internal integrations (Slack, Jira, MS Teams)',
-                    'API access for custom workflows',
-                    'Priority support (4h response)',
-                    'Quarterly compliance review calls'
+                    'Quarterly automatic PDPA re-scan (SGD 79 value)',
+                    'Monthly PDPC regulatory alerts',
+                    'Running compliance score chart',
+                    'Always-current PDF for buyers',
+                    'Annual plan: SGD 490 (2 months free)',
                   ].map((feature, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
                       <span className="text-[#10b981] font-bold">✓</span>
@@ -83,21 +84,24 @@ export default function CompliancePage() {
                 </ul>
 
                 <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">
-                  <strong>Best for:</strong> Growth-stage companies 50-200 employees, FinTech, HealthTech, regulated entities
+                  <strong>Best for:</strong> Companies that need to show continuous compliance to buyers and auditors
                 </p>
 
-                <Link href="/demo" className="btn btn-primary w-full shadow-lg">Book Demo</Link>
+                <Link href="/pricing" className="block text-center px-6 py-3 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition-colors w-full">
+                  Subscribe — SGD 49/mo
+                </Link>
               </div>
 
+              {/* Enterprise */}
               <div className="bg-white p-10 rounded-3xl border-2 border-dashed border-[#e2e8f0] flex flex-col justify-center items-center text-center hover:bg-[#f8fafc] transition-all">
-                <h3 className="text-xl font-bold mb-6 text-[#0f172a]">Need More?</h3>
+                <h3 className="text-xl font-bold mb-6 text-[#0f172a]">Enterprise</h3>
                 <p className="text-[#64748b] mb-6">
-                  For MAS-ready compliance or full enterprise suites, 
-                  see our <Link href="/enterprise" className="text-[#10b981] font-bold hover:underline">Enterprise Solutions</Link>.
+                  Full compliance suite for regulated businesses — includes PDPA Monitor, Vendor Proof, and RFP tools.
+                  See <Link href="/enterprise" className="text-[#10b981] font-bold hover:underline">Enterprise Solutions</Link>.
                 </p>
                 <p className="text-xs text-[#94a3b8] leading-relaxed">
-                  Standard Suite (SGD 1,299/mo) includes MAS operational workflows.<br />
-                  Pro Suite (SGD 1,999/mo) adds unlimited notarizations and dedicated manager.
+                  Enterprise: SGD 299/mo<br />
+                  Enterprise Pro: SGD 599/mo
                 </p>
               </div>
             </div>
@@ -259,9 +263,9 @@ export default function CompliancePage() {
           <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#10b981] opacity-10 rounded-full translate-x-1/2 translate-y-1/2 blur-[100px]"></div>
           <div className="relative z-10">
             <h2 className="text-3xl lg:text-5xl font-black mb-6 leading-tight">Ready to Automate Your Compliance Operations?</h2>
-            <p className="text-white/70 text-xl mb-12 max-w-2xl mx-auto font-medium">Start with a 14-day trial of PDPA Basic or book an enterprise demo for Pro plans.</p>
+            <p className="text-white/70 text-xl mb-12 max-w-2xl mx-auto font-medium">Start with a one-time PDPA Snapshot or subscribe to PDPA Monitor for continuous coverage.</p>
             <div className="flex flex-wrap justify-center gap-6">
-              <Link href="/demo" className="btn btn-primary px-10 py-5 text-xl font-bold">Start 14-Day Trial</Link>
+              <Link href="/pdpa" className="btn btn-primary px-10 py-5 text-xl font-bold">Run PDPA Scan — SGD 79</Link>
               <Link href="/pricing" className="btn btn-secondary bg-white text-[#0f172a] px-10 py-5 text-xl font-bold hover:bg-white/90 border-0 transition-colors">View All Plans</Link>
             </div>
           </div>

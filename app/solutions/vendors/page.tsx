@@ -104,6 +104,90 @@ export default function SolutionsVendorsPage() {
         </div>
       </section>
 
+      {/* Sample Output Preview */}
+      <section className="py-24 px-6 bg-[#0f172a] text-white">
+        <div className="max-w-[1100px] mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">What you actually receive</h2>
+            <p className="text-white/60 text-xl">Real deliverables — not a dashboard you have to interpret yourself.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            {/* PDPA Report sample */}
+            <div className="bg-[#1e293b] rounded-2xl border border-white/10 overflow-hidden">
+              <div className="bg-[#0f172a] border-b border-white/10 px-5 py-3 flex items-center gap-2">
+                <span className="text-[#10b981] text-xs font-bold uppercase tracking-widest">PDPA Report</span>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-white/60 text-sm">Compliance Score</span>
+                  <span className="text-[#10b981] font-black text-2xl">74<span className="text-sm font-normal text-white/40">/100</span></span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-2">
+                  <div className="bg-[#10b981] h-2 rounded-full" style={{ width: '74%' }} />
+                </div>
+                <div className="space-y-2 pt-2">
+                  {['Notice & Collection', 'Purpose Limitation', 'Consent', 'Access & Correction'].map((item, i) => (
+                    <div key={i} className="flex items-center justify-between text-xs">
+                      <span className="text-white/60">{item}</span>
+                      <span className={i === 2 ? 'text-[#f59e0b] font-bold' : 'text-[#10b981] font-bold'}>{i === 2 ? 'PARTIAL' : 'PASS'}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="pt-3 border-t border-white/10 text-xs text-white/40 font-mono break-all">
+                  tx: 0x3f7a...e92b · Polygon · {new Date().toLocaleDateString('en-SG')}
+                </div>
+              </div>
+            </div>
+
+            {/* Notarization Certificate sample */}
+            <div className="bg-[#1e293b] rounded-2xl border border-white/10 overflow-hidden">
+              <div className="bg-[#0f172a] border-b border-white/10 px-5 py-3 flex items-center gap-2">
+                <span className="text-[#10b981] text-xs font-bold uppercase tracking-widest">Notarization Certificate</span>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="text-white/80 text-sm font-semibold">BOOPPA Notarization</div>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between"><span className="text-white/40">Document</span><span className="text-white/80">ISO27001_cert.pdf</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Hash (SHA-256)</span><span className="text-white/60 font-mono">a3f8...c012</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Blockchain</span><span className="text-[#10b981]">Polygon Mainnet</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Status</span><span className="text-[#10b981] font-bold">ANCHORED ✓</span></div>
+                </div>
+                <div className="flex items-center gap-3 pt-3 border-t border-white/10">
+                  <div className="w-12 h-12 bg-white/5 border border-white/20 rounded-lg flex items-center justify-center text-[#10b981] text-xl">▦</div>
+                  <div className="text-xs text-white/40">QR code — scan to verify on Polygonscan</div>
+                </div>
+              </div>
+            </div>
+
+            {/* RFP Kit sample */}
+            <div className="bg-[#1e293b] rounded-2xl border border-white/10 overflow-hidden">
+              <div className="bg-[#0f172a] border-b border-white/10 px-5 py-3 flex items-center gap-2">
+                <span className="text-[#10b981] text-xs font-bold uppercase tracking-widest">RFP Evidence Package</span>
+              </div>
+              <div className="p-6 space-y-3">
+                <div className="text-white/80 text-sm font-semibold mb-2">Delivered files</div>
+                {[
+                  { icon: '📄', name: 'rfp_answers.docx', desc: '15 copy-ready answers' },
+                  { icon: '📋', name: 'vendor_proof.pdf', desc: 'Blockchain-anchored certificate' },
+                  { icon: '✍️', name: 'attestation_letter.pdf', desc: 'Signed compliance statement' },
+                  { icon: '🔗', name: 'polygonscan_url.txt', desc: 'Immutable blockchain record' },
+                ].map((f, i) => (
+                  <div key={i} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg">
+                    <span>{f.icon}</span>
+                    <div>
+                      <div className="text-xs text-white/80 font-mono">{f.name}</div>
+                      <div className="text-xs text-white/40">{f.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-24 px-6 bg-[#0f172a] text-white text-center">
         <div className="max-w-2xl mx-auto">

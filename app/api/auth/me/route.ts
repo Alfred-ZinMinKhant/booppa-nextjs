@@ -15,5 +15,16 @@ export async function GET(req: NextRequest) {
   if (!res.ok) {
     return NextResponse.json(data, { status: res.status })
   }
-  return NextResponse.json(data)
+
+  const response = NextResponse.json(data)
+  // Sync vendor_plan cookie with the current plan from the backend.
+  // This ensures post-payment state is reflected immediately (e.g. after Stripe checkout).
+  if (data.plan) {
+    response.cookies.set('vendor_plan', data.plan, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      sameSite: 'lax',
+    })
+  }
+  return response
 }

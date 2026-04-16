@@ -23,11 +23,11 @@ export default function SolutionsProcurementPage() {
             Stop chasing vendors for compliance documents. BOOPPA gives your team instant access to blockchain-verified vendor evidence — so you can shortlist confidently and award faster.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/book-demo" className="px-8 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition-colors text-lg">
-              Request Demo
+            <Link href="/vendors" className="px-8 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition-colors text-lg">
+              Browse Vendor Network
             </Link>
-            <Link href="/enterprise" className="px-8 py-4 border border-white/20 hover:border-white/50 text-white font-bold rounded-xl transition-colors text-lg">
-              Enterprise Access
+            <Link href="/compare" className="px-8 py-4 border border-white/20 hover:border-white/50 text-white font-bold rounded-xl transition-colors text-lg">
+              Compare Vendors
             </Link>
           </div>
         </div>
@@ -107,10 +107,15 @@ export default function SolutionsProcurementPage() {
       <section className="py-24 px-6 bg-[#0f172a] text-white text-center">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl lg:text-5xl font-black mb-6">Cut your vendor evaluation time in half.</h2>
-          <p className="text-white/70 text-xl mb-10">See how BOOPPA fits your procurement workflow in a 30-minute demo.</p>
-          <Link href="/book-demo" className="inline-block px-10 py-5 bg-[#10b981] hover:bg-[#059669] text-white font-black text-xl rounded-2xl transition-colors shadow-lg">
-            Request Demo
-          </Link>
+          <p className="text-white/70 text-xl mb-10">All procurement tools are free. Start browsing and verifying vendors now.</p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/vendors" className="inline-block px-10 py-5 bg-[#10b981] hover:bg-[#059669] text-white font-black text-xl rounded-2xl transition-colors shadow-lg">
+              Browse Vendor Network
+            </Link>
+            <Link href="/verify" className="inline-block px-10 py-5 border border-white/30 hover:border-white/60 text-white font-black text-xl rounded-2xl transition-colors">
+              Verify a Document
+            </Link>
+          </div>
         </div>
       </section>
 

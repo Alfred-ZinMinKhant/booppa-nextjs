@@ -43,7 +43,9 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Check auth state and fetch user info
+  // Check auth state and fetch user info.
+  // Re-runs on pathname change so the nav reflects login/logout immediately
+  // without requiring a full page reload.
   useEffect(() => {
     fetch('/api/auth/me')
       .then(async r => {
@@ -53,9 +55,24 @@ export default function Navigation() {
           setUserEmail(data.email || null);
         } else {
           setAuthed(false);
+          setUserEmail(null);
         }
       })
-      .catch(() => setAuthed(false));
+      .catch(() => { setAuthed(false); setUserEmail(null); });
+  }, [pathname]);
+
+  // Poll every 5 minutes to detect session expiry while the user is idle
+  // on the same page (access token TTL is 24h).
+  useEffect(() => {
+    const checkSession = () => {
+      fetch('/api/auth/me')
+        .then(r => {
+          if (!r.ok) { setAuthed(false); setUserEmail(null); }
+        })
+        .catch(() => {});
+    };
+    const id = setInterval(checkSession, 5 * 60 * 1000);
+    return () => clearInterval(id);
   }, []);
 
   // Close dropdowns on outside click

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ExternalLink, FileText, Clock, Building2 } from 'lucide-react'
+import { ExternalLink, FileText, Clock, Building2, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { config as appConfig } from '@/lib/config'
 
@@ -151,6 +151,12 @@ export default function OpportunitiesPage() {
                         <ExternalLink className="h-3 w-3" /> View on GeBIZ
                       </a>
                     )}
+                    <Link
+                      href={`/tender-check?tenderNo=${encodeURIComponent(tender.tender_no)}`}
+                      className="flex items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-300 hover:bg-violet-500/20 transition-colors"
+                    >
+                      <TrendingUp className="h-3 w-3" /> Win Probability
+                    </Link>
                     <Link
                       href={authed ? `/rfp-acceleration?tender=${tender.tender_no}` : '/trial'}
                       className="flex items-center gap-1.5 rounded-lg bg-[#10b981] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#059669] transition-colors"

@@ -40,7 +40,7 @@ export default function EnterprisePage() {
           <div id="pricing" className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
             <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
               <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Standard Compliance Suite</h3>
-              <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 1,299<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+              <div className="text-3xl font-bold text-[#0f172a] mb-2">Contact Us</div>
               <p className="text-sm text-[#64748b] mb-8">MAS + MTCS operational workflows</p>
               
               <ul className="space-y-4 mb-10">
@@ -70,7 +70,7 @@ export default function EnterprisePage() {
             <div className="bg-white p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl relative scale-105 z-10 hover:translate-y-[-5px] transition-all">
               <div className="absolute top-[-15px] right-10 bg-gradient-to-r from-[#0f172a] to-[#1e40af] text-white px-6 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Pro Suite</div>
               <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Pro Compliance Suite</h3>
-              <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 1,999<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+              <div className="text-3xl font-bold text-[#0f172a] mb-2">Contact Us</div>
               <p className="text-sm text-[#64748b] mb-8">Full enterprise evidence infrastructure</p>
               
               <ul className="space-y-4 mb-10">

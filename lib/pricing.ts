@@ -236,7 +236,7 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
     id: 'enterprise_monthly',
     name: 'Enterprise',
     description: 'Full enterprise compliance suite',
-    price: 299,
+    price: 499,
     currency: 'SGD',
     type: 'subscription',
     features: [
@@ -250,7 +250,7 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
     id: 'enterprise_pro_monthly',
     name: 'Enterprise Pro',
     description: 'Enterprise Pro with priority support',
-    price: 599,
+    price: 1499,
     currency: 'SGD',
     type: 'subscription',
     features: [

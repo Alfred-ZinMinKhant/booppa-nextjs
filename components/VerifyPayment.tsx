@@ -20,6 +20,8 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
           setStatus('success');
           setMessage('Payment successfully verified! Your service has been activated.');
           if (data.product_type) setProductType(data.product_type);
+          // Refresh vendor_plan cookie so middleware reflects the new plan immediately
+          fetch('/api/auth/me').catch(() => {});
         } else {
           setStatus('error');
           setMessage('Payment verification failed. Please check your email for confirmation or contact support.');

@@ -6,6 +6,33 @@ export default function Home() {
     <main className="overflow-x-hidden">
       <HeroSection />
 
+      {/* User Segmentation */}
+      <section className="py-16 px-6 bg-white border-b border-[#e2e8f0]">
+        <div className="max-w-[1200px] mx-auto">
+          <p className="text-center text-sm font-semibold uppercase tracking-widest text-[#94a3b8] mb-10">Who are you?</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link href="/solutions/vendors" className="group flex flex-col p-8 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#10b981] hover:shadow-lg transition-all">
+              <div className="text-3xl mb-4">🏢</div>
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2 group-hover:text-[#10b981] transition-colors">I&apos;m a Vendor</h3>
+              <p className="text-sm text-[#64748b] mb-4 flex-1">I need compliance evidence to win government and enterprise contracts.</p>
+              <span className="text-[#10b981] font-bold text-sm">Get verified →</span>
+            </Link>
+            <Link href="/solutions/procurement" className="group flex flex-col p-8 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#10b981] hover:shadow-lg transition-all">
+              <div className="text-3xl mb-4">🔍</div>
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2 group-hover:text-[#10b981] transition-colors">I&apos;m in Procurement</h3>
+              <p className="text-sm text-[#64748b] mb-4 flex-1">I need to verify vendor compliance and reduce evaluation risk.</p>
+              <span className="text-[#10b981] font-bold text-sm">Browse vendors →</span>
+            </Link>
+            <Link href="/enterprise" className="group flex flex-col p-8 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#10b981] hover:shadow-lg transition-all">
+              <div className="text-3xl mb-4">🏗️</div>
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2 group-hover:text-[#10b981] transition-colors">Enterprise Team</h3>
+              <p className="text-sm text-[#64748b] mb-4 flex-1">I need a full compliance suite for my organisation — multiple users, SLA support.</p>
+              <span className="text-[#10b981] font-bold text-sm">See enterprise plans →</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Problem Statement */}
       <section className="py-24 px-6 bg-[#f8fafc]">
         <div className="max-w-[1200px] mx-auto">
