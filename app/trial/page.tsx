@@ -24,6 +24,11 @@ function TrialContent() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState("");
 	const [accountExists, setAccountExists] = useState(false);
+	const [authed, setAuthed] = useState(false);
+
+	React.useEffect(() => {
+		fetch('/api/auth/me').then(r => { if (r.ok) setAuthed(true) }).catch(() => {})
+	}, []);
 
 	const handleSubmit = async () => {
 		setIsSubmitting(true);
@@ -166,7 +171,9 @@ function TrialContent() {
 										<AlertCircle className="h-4 w-4 flex-shrink-0" />
 										<span>{error}</span>
 										{accountExists && (
-											<a href="/vendor/dashboard" className="ml-1 underline font-semibold text-blue-400 hover:text-blue-300 whitespace-nowrap">Sign in →</a>
+											<a href={authed ? "/vendor/dashboard" : "/login"} className="ml-1 underline font-semibold text-blue-400 hover:text-blue-300 whitespace-nowrap">
+												{authed ? "Go to Dashboard →" : "Sign in →"}
+											</a>
 										)}
 									</div>
 								)}

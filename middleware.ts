@@ -51,7 +51,7 @@ export function middleware(request: NextRequest) {
 
   if (isPublicPrefix || isPublicRoute) {
     // If already logged in, redirect away from auth/marketing entry points
-    if (token && (pathname === '/login' || pathname === '/register' || pathname === '/vendor-proof')) {
+    if (token && (pathname === '/login' || pathname === '/register')) {
       return NextResponse.redirect(new URL('/vendor/dashboard', request.url))
     }
     return NextResponse.next()

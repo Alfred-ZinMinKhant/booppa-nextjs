@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Shield, Eye, TrendingUp, ArrowRight, Zap, Building, CheckCircle2, Copy, Check } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Shield, Eye, TrendingUp, ArrowRight, Zap, Building, CheckCircle2, Copy, Check, LogOut } from 'lucide-react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import VendorStatusBadge from '@/components/vendor/VendorStatusBadge';
 import SectorPressureWidget from '@/components/vendor/SectorPressureWidget';
@@ -19,6 +20,7 @@ interface BadgeData {
 }
 
 export default function VendorDashboard() {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [data, setData] = useState({ stats: null, chartData: [], recentActivity: [] });
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,11 @@ export default function VendorDashboard() {
       default:          return { href: '/notarization',     label: 'Notarize a Document' };
     }
   };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.push('/login')
+  }
 
   const copyBadge = () => {
     if (!badge?.html) return;
@@ -83,6 +90,13 @@ export default function VendorDashboard() {
             </button>
             <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition shadow-[0_0_15px_rgba(37,99,235,0.3)]">
               Upgrade to Intel Pro
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-3 py-2 bg-neutral-900 text-neutral-400 rounded-md border border-neutral-800 text-sm font-medium hover:text-white hover:bg-neutral-800 transition flex items-center gap-1.5"
+              title="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function TrackTicketPage({ params }: { params: { ticketId: string } }) {
+function TrackTicketContent({ ticketId }: { ticketId: string }) {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [data, setData] = useState<any>(null);
@@ -16,7 +16,7 @@ export default function TrackTicketPage({ params }: { params: { ticketId: string
         return;
       }
       try {
-        const res = await fetch(`/api/tickets/track/${params.ticketId}?token=${encodeURIComponent(token)}`);
+        const res = await fetch(`/api/tickets/track/${ticketId}?token=${encodeURIComponent(token)}`);
         const json = await res.json().catch(() => null);
         if (!res.ok) {
           throw new Error(json?.detail || "Ticket not found");
@@ -27,7 +27,7 @@ export default function TrackTicketPage({ params }: { params: { ticketId: string
       }
     };
     fetchTicket();
-  }, [params.ticketId, token]);
+  }, [ticketId, token]);
 
   return (
     <main className="min-h-screen bg-black py-16 px-4">
@@ -84,5 +84,13 @@ export default function TrackTicketPage({ params }: { params: { ticketId: string
         )}
       </div>
     </main>
+  );
+}
+
+export default function TrackTicketPage({ params }: { params: { ticketId: string } }) {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <TrackTicketContent ticketId={params.ticketId} />
+    </Suspense>
   );
 }
