@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import {
 	AlertCircle,
 	CheckCircle2,
@@ -11,7 +11,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { config } from "@/lib/config";
 
-export default function VendorTrial() {
+function TrialContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const [step, setStep] = useState(1);
@@ -221,5 +221,13 @@ export default function VendorTrial() {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+export default function VendorTrial() {
+	return (
+		<Suspense fallback={<div className="min-h-screen bg-neutral-900" />}>
+			<TrialContent />
+		</Suspense>
 	);
 }
