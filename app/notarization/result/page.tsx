@@ -120,7 +120,8 @@ function NotarizationResultContent() {
   const fetchCertificate = useCallback(async () => {
     if (!reportId) return;
     try {
-      const res = await fetch(`${apiBase}/api/v1/notarize/certificate/${reportId}`);
+      const sessionParam = sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : '';
+      const res = await fetch(`${apiBase}/api/v1/notarize/certificate/${reportId}${sessionParam}`);
       if (!res.ok) {
         if (res.status === 404) {
           setError('Notarization not found.');
