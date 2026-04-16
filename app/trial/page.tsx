@@ -166,7 +166,7 @@ function TrialContent() {
 										<AlertCircle className="h-4 w-4 flex-shrink-0" />
 										<span>{error}</span>
 										{accountExists && (
-											<a href="/login" className="ml-1 underline font-semibold text-blue-400 hover:text-blue-300 whitespace-nowrap">Sign in →</a>
+											<a href="/vendor/dashboard" className="ml-1 underline font-semibold text-blue-400 hover:text-blue-300 whitespace-nowrap">Sign in →</a>
 										)}
 									</div>
 								)}
