@@ -11,7 +11,7 @@ export async function GET() {
 
 export async function PATCH(req: NextRequest) {
   const body = await req.json()
-  const res = await fetchWithAuth('/vendor/profile', {
+  const res = await fetchWithAuth('/api/v1/vendor/profile', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

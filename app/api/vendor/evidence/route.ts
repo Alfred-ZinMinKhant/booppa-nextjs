@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetchWithAuth } from '@/lib/auth'
 
 export async function GET() {
-  const res = await fetchWithAuth('/notarize/my-uploads')
+  const res = await fetchWithAuth('/api/v1/vendor/evidence')
   if (!res.ok) {
     return NextResponse.json({ error: 'Failed to fetch evidence' }, { status: res.status })
   }
@@ -11,7 +11,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData()
-  const res = await fetchWithAuth('/notarize/upload', {
+  const res = await fetchWithAuth('/api/v1/notarize/upload', {
     method: 'POST',
     body: formData,
   })

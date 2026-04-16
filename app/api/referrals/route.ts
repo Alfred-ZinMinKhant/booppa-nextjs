@@ -5,7 +5,7 @@ import { fetchWithAuth } from '@/lib/auth';
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('user_id');
   if (!userId) return NextResponse.json({ error: 'user_id required' }, { status: 400 });
-  const res = await fetchWithAuth(`/referrals/my/${userId}`);
+  const res = await fetchWithAuth(`/api/v1/referrals/my/${userId}`);
   const data = await res.json().catch(() => []);
   return NextResponse.json(data, { status: res.status });
 }
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 // POST /api/referrals — create referral code
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const res = await fetchWithAuth('/referrals/create', {
+  const res = await fetchWithAuth('/api/v1/referrals/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
