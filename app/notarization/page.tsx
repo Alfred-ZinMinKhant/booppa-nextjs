@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { config } from '@/lib/config';
 import HardenedClickwrap from '@/components/legal/HardenedClickwrap';
@@ -41,6 +41,17 @@ export default function NotarizationPage() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [error, setError] = useState('');
   const [consentValid, setConsentValid] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return;
+        if (data.email) setEmail(data.email);
+        if (data.company) setCompanyName(data.company);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSelectPlan = (plan: PlanKey) => {
     setSelectedPlan(plan);
