@@ -15,7 +15,6 @@ import {
 	Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { config } from "@/lib/config";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -180,10 +179,9 @@ function TenderCheckContent() {
 	const startCheckout = async (productType: string) => {
 		setCheckingOut(productType);
 		try {
-			const res = await fetch(`${config.apiUrl}/api/v1/stripe/checkout`, {
+			const res = await fetch('/api/checkout', {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				credentials: "include",
 				body: JSON.stringify({ productType }),
 			});
 			const data = await res.json();

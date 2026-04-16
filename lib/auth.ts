@@ -36,7 +36,7 @@ export async function refreshServerToken(): Promise<RefreshTokenResponse | null>
   if (!refreshToken) return null
 
   try {
-    const res = await fetch(`${config.apiUrl}${endpoints.auth.refresh}`, {
+    const res = await fetch(`${config.apiUrl}/api/v1${endpoints.auth.refresh}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
@@ -59,7 +59,7 @@ export async function getServerSideUser(): Promise<User | null> {
   if (!token) return null
 
   try {
-    const res = await fetch(`${config.apiUrl}${endpoints.auth.me}`, {
+    const res = await fetch(`${config.apiUrl}/api/v1${endpoints.auth.me}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     })
@@ -70,7 +70,7 @@ export async function getServerSideUser(): Promise<User | null> {
     const refreshed = await refreshServerToken()
     if (!refreshed) return null
 
-    const retry = await fetch(`${config.apiUrl}${endpoints.auth.me}`, {
+    const retry = await fetch(`${config.apiUrl}/api/v1${endpoints.auth.me}`, {
       headers: { Authorization: `Bearer ${refreshed.token}` },
       cache: 'no-store',
     })

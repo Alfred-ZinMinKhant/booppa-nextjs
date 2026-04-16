@@ -2,7 +2,6 @@
 
 import { Suspense, useCallback, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { config, endpoints } from "@/lib/config";
 
 /**
  * FunnelTracker — invisibly tracks page views through the conversion funnel.
@@ -58,7 +57,7 @@ function FunnelTrackerInner() {
 					sessionStorage.getItem("booppa_utm_campaign") ||
 					undefined;
 
-				await fetch(`${config.apiUrl}/api/v1${endpoints.funnel.track}`, {
+				await fetch('/api/funnel/track', {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
