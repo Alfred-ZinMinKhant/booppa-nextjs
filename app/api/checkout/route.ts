@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'https://api.booppa.io'
+import { fetchWithAuth } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    const res = await fetch(`${API_BASE}/api/v1/stripe/checkout`, {
+    const res = await fetchWithAuth('/api/v1/stripe/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

@@ -24,6 +24,9 @@ const vendorLinks = [
   { name: 'Tender Check', href: '/tender-check',     icon: Search },
 ];
 
+// Protected route prefixes — unauthenticated users must be redirected to /login
+const PROTECTED = ['/vendor'];
+
 export default function Navigation() {
   const [mobileOpen,    setMobileOpen]    = useState(false);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
@@ -56,10 +59,13 @@ export default function Navigation() {
         } else {
           setAuthed(false);
           setUserEmail(null);
+          // Stale/expired token — boot to login if on a protected page
+          const onProtected = PROTECTED.some(p => pathname === p || pathname?.startsWith(p + '/'))
+          if (onProtected) router.push('/login')
         }
       })
       .catch(() => { setAuthed(false); setUserEmail(null); });
-  }, [pathname]);
+  }, [pathname, router]);
 
   // Poll every 5 minutes to detect session expiry while the user is idle
   // on the same page (access token TTL is 24h).

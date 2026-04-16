@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { config as appConfig } from '@/lib/config'
 
@@ -15,38 +15,17 @@ interface Tender {
 export default function GebizTicker() {
   const [tenders, setTenders] = useState<Tender[]>([])
   const [dismissed, setDismissed] = useState(false)
-  const [error, setError] = useState(false)
-  const tickerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem('gebiz_ticker_dismissed') === '1') {
+    if (localStorage.getItem('gebiz_ticker_dismissed') === '1') {
       setDismissed(true)
       return
     }
 
-    const url = `${appConfig.apiUrl}/api/v1/gebiz/latest-tenders?limit=10`
-    console.log('[GeBIZ Ticker] Fetching from:', url)
-
-    fetch(url)
-      .then(r => {
-        console.log('[GeBIZ Ticker] Response status:', r.status)
-        if (!r.ok) {
-          console.error('[GeBIZ Ticker] Non-OK response:', r.status, r.statusText)
-          setError(true)
-          return []
-        }
-        return r.json()
-      })
-      .then(data => {
-        console.log('[GeBIZ Ticker] Received tenders:', data?.length ?? 0)
-        if (Array.isArray(data)) {
-          setTenders(data)
-        }
-      })
-      .catch(err => {
-        console.error('[GeBIZ Ticker] Fetch error:', err)
-        setError(true)
-      })
+    fetch(`${appConfig.apiUrl}/api/v1/gebiz/latest-tenders?limit=10`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => { if (Array.isArray(data)) setTenders(data) })
+      .catch(() => {})
   }, [])
 
   const handleDismiss = () => {
@@ -65,10 +44,7 @@ export default function GebizTicker() {
 
       {/* Scrolling track */}
       <div className="overflow-hidden flex-1 relative">
-        <div
-          ref={tickerRef}
-          className="flex gap-12 animate-marquee whitespace-nowrap hover:[animation-play-state:paused]"
-        >
+        <div className="flex gap-12 animate-marquee whitespace-nowrap hover:[animation-play-state:paused]">
           {/* Duplicate for seamless loop */}
           {[...tenders, ...tenders].map((t, i) => (
             <span key={`${t.tender_no}-${i}`} className="inline-flex items-center gap-2 flex-shrink-0">
@@ -107,6 +83,7 @@ export default function GebizTicker() {
 
       {/* Dismiss */}
       <button
+        type="button"
         onClick={handleDismiss}
         aria-label="Dismiss ticker"
         className="flex-shrink-0 px-2 text-white/30 hover:text-white/70 h-full flex items-center"

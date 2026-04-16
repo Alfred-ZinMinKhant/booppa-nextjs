@@ -13,7 +13,14 @@ export async function GET(req: NextRequest) {
 
   const data = await res.json()
   if (!res.ok) {
-    return NextResponse.json(data, { status: res.status })
+    const response = NextResponse.json(data, { status: res.status })
+    if (res.status === 401) {
+      // Clear the stale/expired token so middleware stops letting it through
+      response.cookies.set('token', '', { path: '/', maxAge: 0 })
+      response.cookies.set('refreshToken', '', { path: '/', maxAge: 0 })
+      response.cookies.set('vendor_plan', '', { path: '/', maxAge: 0 })
+    }
+    return response
   }
 
   const response = NextResponse.json(data)

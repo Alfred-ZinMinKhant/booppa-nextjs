@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetchWithAuth } from '@/lib/auth'
 
 export async function GET() {
-  const res = await fetchWithAuth('/auth/me')
+  const res = await fetchWithAuth('/api/v1/vendor/profile')
   if (!res.ok) {
     return NextResponse.json({ error: 'Failed to fetch profile' }, { status: res.status })
   }
