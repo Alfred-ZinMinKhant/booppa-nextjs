@@ -10,10 +10,12 @@ export default function Footer() {
               <img src="/logo.png" alt="BOOPPA Logo" className="h-8 w-auto" />
             </div>
             <p className="text-[#64748b] text-sm max-w-xs">
-              Evidence infrastructure for Singapore compliance operations.
+              Booppa is a Vendor Trust & Compliance Platform for procurement.
+            </p>
+            <p className="text-[#64748b] text-sm max-w-xs">
+              It turns compliance into verifiable, actionable trust.
             </p>
           </div>
-
           <div className="footer-column">
             <h4 className="font-bold text-[#0f172a] mb-6">Services</h4>
             <ul className="space-y-4">
@@ -54,7 +56,7 @@ export default function Footer() {
               BOOPPA provides evidence generation tools. Not regulatory certification or legal advice.
             </p>
             <p className="text-[#64748b] text-sm">
-              © 2026 BOOPPA. Singapore-based compliance infrastructure.
+              © 2026 BOOPPA. Vendor trust & compliance platform
             </p>
           </div>
           <div className="flex flex-wrap gap-4 text-xs text-[#94a3b8]">
