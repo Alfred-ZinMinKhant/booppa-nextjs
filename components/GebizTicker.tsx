@@ -36,7 +36,7 @@ export default function GebizTicker() {
   if (dismissed || tenders.length === 0) return null
 
   return (
-    <div className="bg-[#0f2a1a] border-b border-[#10b981]/20 text-sm text-white/80 flex items-center h-9 overflow-hidden relative">
+    <div className="sticky top-[64px] z-40 bg-[#0f2a1a] border-b border-[#10b981]/20 text-sm text-white/80 flex items-center h-9 overflow-hidden">
       {/* Label */}
       <span className="flex-shrink-0 px-3 text-[#10b981] font-semibold text-xs tracking-wider uppercase whitespace-nowrap border-r border-[#10b981]/20 h-full flex items-center">
         GeBIZ Live
