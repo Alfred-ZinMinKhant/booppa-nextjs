@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { config } from '@/lib/config';
 
 function normalizeUrl(input: string): string {
@@ -175,6 +176,11 @@ export default function PDPAPage() {
 
               <p className="text-center text-[#94a3b8] text-xs mt-4">
                 Secure payment via Stripe. Instant report delivery.
+              </p>
+              <p className="text-center mt-4">
+                <Link href="/pdpa/free-scan" className="text-[#10b981] text-sm font-medium hover:underline">
+                  Not ready to pay? Try our free quick check first
+                </Link>
               </p>
             </form>
           </div>

@@ -168,6 +168,9 @@ function TenderCheckContent() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [checkingOut, setCheckingOut] = useState<string | null>(null);
+	const [claimStep, setClaimStep] = useState<'hidden' | 'form' | 'loading' | 'done'>('hidden');
+	const [claimData, setClaimData] = useState({ companyName: '', email: '', uen: '' });
+	const [claimError, setClaimError] = useState<string | null>(null);
 
 	// Auto-search on mount — vendor ID is injected server-side by the API route
 	useEffect(() => {
@@ -197,7 +200,7 @@ function TenderCheckContent() {
 		}
 	};
 
-	async function runCheck(tenderNo: string) {
+	async function runCheck(tenderNo: string, vendorId?: string) {
 		const no = tenderNo.trim().toUpperCase();
 		if (!no) return;
 
@@ -207,6 +210,7 @@ function TenderCheckContent() {
 
 		try {
 			const params = new URLSearchParams({ tenderNo: no });
+			if (vendorId) params.set('vendorId', vendorId);
 
 			const res = await fetch(`/api/tender-check?${params.toString()}`);
 			if (res.status === 404) {
@@ -507,32 +511,130 @@ function TenderCheckContent() {
 							</div>
 						)}
 
-						{/* Guest CTA — no vendor profile */}
+						{/* Guest CTA — claim profile for personalised results */}
 						{!result.vendorProfile && (
-							<div className="rounded-xl border border-neutral-700 bg-neutral-900 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-								<div>
-									<p className="text-sm font-semibold text-white">
-										See your personalised probability
-									</p>
-									<p className="text-xs text-neutral-400 mt-1">
-										Sign in or create a vendor profile to get gap analysis,
-										upgrade projections, and your exact score.
-									</p>
-								</div>
-								<div className="flex gap-3 flex-shrink-0">
-									<Link
-										href="/login"
-										className="px-4 py-2 rounded-lg border border-neutral-700 text-sm text-white hover:bg-neutral-800 transition"
+							<div className="rounded-xl border border-neutral-700 bg-neutral-900 p-6">
+								{claimStep === 'hidden' && (
+									<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+										<div>
+											<p className="text-sm font-semibold text-white">
+												Get your personalised probability
+											</p>
+											<p className="text-xs text-neutral-400 mt-1">
+												Claim your vendor profile for gap analysis,
+												upgrade projections, and your exact score.
+											</p>
+										</div>
+										<div className="flex gap-3 flex-shrink-0">
+											<Link
+												href="/login"
+												className="px-4 py-2 rounded-lg border border-neutral-700 text-sm text-white hover:bg-neutral-800 transition"
+											>
+												Sign In
+											</Link>
+											<button
+												type="button"
+												onClick={() => setClaimStep('form')}
+												className="px-4 py-2 rounded-lg bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition"
+											>
+												Claim Your Profile
+											</button>
+										</div>
+									</div>
+								)}
+
+								{claimStep === 'form' && (
+									<form
+										onSubmit={async (e) => {
+											e.preventDefault();
+											setClaimStep('loading');
+											setClaimError(null);
+											try {
+												const res = await fetch('/api/tender-check/claim', {
+													method: 'POST',
+													headers: { 'Content-Type': 'application/json' },
+													body: JSON.stringify({
+														company_name: claimData.companyName,
+														email: claimData.email,
+														uen: claimData.uen || null,
+														tender_no: result.tenderNo,
+													}),
+												});
+												const data = await res.json();
+												if (!res.ok) throw new Error(data.detail || 'Failed to claim profile');
+												setClaimStep('done');
+												// Re-fetch with the new vendor ID for personalised results
+												runCheck(result.tenderNo, data.vendor_id);
+											} catch (err: any) {
+												setClaimError(err.message || 'Something went wrong');
+												setClaimStep('form');
+											}
+										}}
+										className="space-y-4"
 									>
-										Sign In
-									</Link>
-									<Link
-										href="/auth/register"
-										className="px-4 py-2 rounded-lg bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition"
-									>
-										Create Profile
-									</Link>
-								</div>
+										<p className="text-sm font-semibold text-white mb-1">Claim your vendor profile</p>
+										<p className="text-xs text-neutral-400 mb-4">
+											No password needed. Get personalised probability instantly.
+										</p>
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+											<input
+												type="text"
+												placeholder="Company Name *"
+												required
+												value={claimData.companyName}
+												onChange={(e) => setClaimData((d) => ({ ...d, companyName: e.target.value }))}
+												className="w-full px-3 py-2.5 bg-neutral-800 border border-neutral-700 rounded-lg text-sm text-white placeholder-neutral-500 focus:ring-1 focus:ring-violet-500 outline-none"
+											/>
+											<input
+												type="email"
+												placeholder="Business Email *"
+												required
+												value={claimData.email}
+												onChange={(e) => setClaimData((d) => ({ ...d, email: e.target.value }))}
+												className="w-full px-3 py-2.5 bg-neutral-800 border border-neutral-700 rounded-lg text-sm text-white placeholder-neutral-500 focus:ring-1 focus:ring-violet-500 outline-none"
+											/>
+										</div>
+										<input
+											type="text"
+											placeholder="UEN (optional — for enhanced accuracy)"
+											value={claimData.uen}
+											onChange={(e) => setClaimData((d) => ({ ...d, uen: e.target.value }))}
+											className="w-full px-3 py-2.5 bg-neutral-800 border border-neutral-700 rounded-lg text-sm text-white placeholder-neutral-500 focus:ring-1 focus:ring-violet-500 outline-none"
+										/>
+										{claimError && <p className="text-red-400 text-xs">{claimError}</p>}
+										<div className="flex gap-3">
+											<button
+												type="submit"
+												className="px-5 py-2.5 rounded-lg bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition"
+											>
+												Get Personalised Results
+											</button>
+											<button
+												type="button"
+												onClick={() => setClaimStep('hidden')}
+												className="px-4 py-2.5 text-neutral-400 text-sm hover:text-white transition"
+											>
+												Cancel
+											</button>
+										</div>
+									</form>
+								)}
+
+								{claimStep === 'loading' && (
+									<div className="flex items-center gap-3 py-2">
+										<div className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+										<p className="text-sm text-neutral-400">Creating your profile...</p>
+									</div>
+								)}
+
+								{claimStep === 'done' && (
+									<div className="flex items-center gap-3 py-2">
+										<CheckCircle2 className="h-5 w-5 text-emerald-400" />
+										<p className="text-sm text-emerald-400 font-medium">
+											Profile claimed! Loading your personalised analysis...
+										</p>
+									</div>
+								)}
 							</div>
 						)}
 					</div>
