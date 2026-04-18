@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { config } from '@/lib/config'
+import { signCookieValue } from '@/lib/cookie-signing'
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value
@@ -26,9 +27,12 @@ export async function GET(req: NextRequest) {
   const response = NextResponse.json(data)
   // Sync vendor_plan cookie with the current plan from the backend.
   // This ensures post-payment state is reflected immediately (e.g. after Stripe checkout).
+  const isProduction = process.env.NODE_ENV === 'production'
   if (data.plan) {
-    response.cookies.set('vendor_plan', data.plan, {
+    response.cookies.set('vendor_plan', await signCookieValue(data.plan), {
+      httpOnly: true,
       path: '/',
+      secure: isProduction,
       maxAge: 60 * 60 * 24 * 7, // 7 days
       sameSite: 'lax',
     })

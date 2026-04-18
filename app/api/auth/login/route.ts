@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { config } from '@/lib/config'
+import { signCookieValue } from '@/lib/cookie-signing'
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
@@ -33,8 +34,8 @@ export async function POST(req: NextRequest) {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax',
   })
-  response.cookies.set('vendor_plan', data.plan || 'free', {
-    httpOnly: false,
+  response.cookies.set('vendor_plan', await signCookieValue(data.plan || 'free'), {
+    httpOnly: true,
     path: '/',
     secure: isProduction,
     maxAge: 60 * 60 * 24 * 7,

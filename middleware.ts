@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { verifyAndParseCookieValue } from '@/lib/cookie-signing'
 
 // Public vendor/user routes — no `token` cookie required
 const publicRoutes = [
@@ -20,7 +21,7 @@ const publicPrefixes = ['/verify', '/vendors', '/blog', '/solutions', '/auth']
 // Routes that require a paid plan (pro or enterprise).
 const proPrefixes = ['/vendor/evidence', '/vendor/rfp']
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // API routes handle their own auth
@@ -67,7 +68,8 @@ export function middleware(request: NextRequest) {
   // ── Paywall: PRO-only routes ──────────────────────────────────────────────
   const isProRoute = proPrefixes.some(p => pathname.startsWith(p))
   if (isProRoute) {
-    const plan = request.cookies.get('vendor_plan')?.value || 'free'
+    const rawPlan = request.cookies.get('vendor_plan')?.value
+    const plan = (rawPlan ? await verifyAndParseCookieValue(rawPlan) : null) || 'free'
     if (plan === 'free') {
       const pricingUrl = new URL('/pricing', request.url)
       pricingUrl.searchParams.set('upgrade', '1')
