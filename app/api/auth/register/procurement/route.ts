@@ -5,21 +5,17 @@ import { signCookieValue } from '@/lib/cookie-signing'
 export async function POST(req: NextRequest) {
   const body = await req.json()
 
-  const res = await fetch(`${config.apiUrl}/api/v1/auth/login`, {
+  const res = await fetch(`${config.apiUrl}/api/v1/auth/register/procurement`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
 
   const text = await res.text()
-  console.log('[LOGIN] Backend status:', res.status)
-  console.log('[LOGIN] Backend response:', text)
-
   let data: any
   try {
     data = JSON.parse(text)
-  } catch (e) {
-    console.error('[LOGIN] Failed to parse response as JSON:', e)
+  } catch {
     return NextResponse.json({ error: 'Invalid backend response' }, { status: 502 })
   }
 
@@ -27,8 +23,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(data, { status: res.status })
   }
 
-  console.log('[LOGIN] Setting cookies, plan:', data.plan)
-  const response = NextResponse.json({ ok: true, role: data.role || 'VENDOR' })
+  const response = NextResponse.json({ ok: true, role: 'PROCUREMENT' })
   const isProduction = process.env.NODE_ENV === 'production'
 
   response.cookies.set('token', data.access_token, {

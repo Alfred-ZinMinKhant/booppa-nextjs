@@ -25,14 +25,16 @@ function LoginForm() {
         body: JSON.stringify({ email, password }),
       })
 
+      const data = await res.json()
+
       if (!res.ok) {
-        const data = await res.json()
         setError(data.detail || 'Invalid email or password')
         return
       }
 
-      const from = searchParams.get('from') || '/vendor/dashboard'
-      router.push(from)
+      const from = searchParams.get('from')
+      const defaultRedirect = data.role === 'PROCUREMENT' ? '/procurement/dashboard' : '/vendor/dashboard'
+      router.push(from || defaultRedirect)
       router.refresh()
     } catch {
       setError('Network error — please try again')
@@ -113,7 +115,11 @@ function LoginForm() {
           <p className="text-center text-neutral-400 text-sm mt-6">
             No account?{' '}
             <Link href="/auth/register" className="text-emerald-400 hover:text-emerald-300 font-medium">
-              Create one free
+              Register as Vendor
+            </Link>
+            {' '}&middot;{' '}
+            <Link href="/auth/register/procurement" className="text-blue-400 hover:text-blue-300 font-medium">
+              Register as Procurement
             </Link>
           </p>
         </div>
