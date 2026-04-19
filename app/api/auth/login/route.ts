@@ -11,12 +11,23 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify(body),
   })
 
-  const data = await res.json()
+  const text = await res.text()
+  console.log('[LOGIN] Backend status:', res.status)
+  console.log('[LOGIN] Backend response:', text)
+
+  let data: any
+  try {
+    data = JSON.parse(text)
+  } catch (e) {
+    console.error('[LOGIN] Failed to parse response as JSON:', e)
+    return NextResponse.json({ error: 'Invalid backend response' }, { status: 502 })
+  }
 
   if (!res.ok) {
     return NextResponse.json(data, { status: res.status })
   }
 
+  console.log('[LOGIN] Setting cookies, plan:', data.plan)
   const response = NextResponse.json({ ok: true })
   const isProduction = process.env.NODE_ENV === 'production'
 
