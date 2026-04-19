@@ -171,6 +171,14 @@ function TenderCheckContent() {
 	const [claimStep, setClaimStep] = useState<'hidden' | 'form' | 'loading' | 'done'>('hidden');
 	const [claimData, setClaimData] = useState({ companyName: '', email: '', uen: '' });
 	const [claimError, setClaimError] = useState<string | null>(null);
+	const [authed, setAuthed] = useState<boolean | null>(null);
+	const [showGate, setShowGate] = useState(false);
+
+	useEffect(() => {
+		fetch('/api/auth/me')
+			.then(r => setAuthed(r.ok))
+			.catch(() => setAuthed(false));
+	}, []);
 
 	// Auto-search on mount — vendor ID is injected server-side by the API route
 	useEffect(() => {
@@ -225,6 +233,7 @@ function TenderCheckContent() {
 			}
 			const data: TenderResult = await res.json();
 			setResult(data);
+			if (!authed) setShowGate(true);
 			router.replace(`/tender-check?tenderNo=${encodeURIComponent(no)}`, {
 				scroll: false,
 			});
@@ -302,7 +311,36 @@ function TenderCheckContent() {
 
 				{/* Results */}
 				{result && !loading && (
-					<div className="space-y-6">
+					<div className="space-y-6 relative">
+						{/* Gate overlay for unauthenticated users */}
+						{showGate && (
+							<>
+								<div className="absolute inset-0 z-10 backdrop-blur-sm bg-neutral-950/60 rounded-xl" />
+								<div className="absolute inset-0 z-20 flex items-start justify-center pt-16">
+									<div className="bg-neutral-900 border border-neutral-700 p-8 rounded-2xl shadow-2xl text-center max-w-md mx-4">
+										<div className="w-14 h-14 bg-violet-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+											<svg className="w-7 h-7 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+										</div>
+										<h3 className="text-xl font-bold text-white mb-2">Your analysis is ready!</h3>
+										<p className="text-sm text-neutral-400 mb-6">
+											Create your free vendor profile to view your tender win probability, gap analysis, and upgrade projections.
+										</p>
+										<Link
+											href="/auth/register"
+											className="inline-block w-full px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition text-sm"
+										>
+											Claim your Profile — Free
+										</Link>
+										<Link
+											href="/login"
+											className="inline-block w-full mt-3 px-6 py-3 bg-neutral-800 border border-neutral-700 hover:bg-neutral-750 text-white font-medium rounded-xl transition text-sm"
+										>
+											Already have an account? Sign in
+										</Link>
+									</div>
+								</div>
+							</>
+						)}
 						{/* Tender info + probability */}
 						<div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 							{/* Gauge card */}

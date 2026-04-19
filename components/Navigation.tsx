@@ -6,17 +6,30 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 
 const forVendors = [
-  { name: 'Vendor Proof',  href: '/vendor-proof',  desc: 'Get verified — S$149 one-time' },
-  { name: 'PDPA Scan',     href: '/pdpa',          desc: 'Data protection gap analysis' },
-  { name: 'Notarization',  href: '/notarization',  desc: 'Immutable document anchoring' },
-  { name: 'RFP Tools',     href: '/rfp',           desc: 'Prepare better RFP responses' },
-  { name: 'Check Tenders', href: '/tender-check',  desc: 'Government tender eligibility' },
+  { name: 'Vendor Dashboard', href: '/vendor/dashboard', desc: 'Your vendor command centre' },
+  { name: 'Vendor Proof',     href: '/vendor-proof',     desc: 'Get verified — S$149 one-time' },
+  { name: 'PDPA Scan',        href: '/pdpa',             desc: 'Data protection gap analysis' },
+  { name: 'Notarization',     href: '/notarization',     desc: 'Immutable document anchoring' },
+  { name: 'RFP Tools',        href: '/rfp',              desc: 'Prepare better RFP responses' },
+  { name: 'Check Tenders',    href: '/tender-check',     desc: 'Government tender eligibility' },
 ];
 
 const forProcurements = [
-  { name: 'Verify',          href: '/verify',   desc: 'Verify vendor credentials' },
-  { name: 'Browse Vendors',  href: '/vendors',  desc: 'Explore the vendor network' },
-  { name: 'Compare Vendors', href: '/compare',  desc: 'Side-by-side vendor comparison' },
+  { name: 'Procurement Dashboard', href: '/procurement/dashboard', desc: 'Your procurement command centre' },
+  { name: 'Verify',                href: '/verify',                desc: 'Verify vendor credentials' },
+  { name: 'Browse Vendors',        href: '/vendors',               desc: 'Explore the vendor network' },
+  { name: 'Compare Vendors',       href: '/compare',               desc: 'Side-by-side vendor comparison' },
+];
+
+const solutions = [
+  { name: 'For Vendors',     href: '/solutions/vendors',     desc: 'Claim, verify, and win more contracts' },
+  { name: 'For Procurement', href: '/solutions/procurement', desc: 'Reduce vendor risk, evaluate faster' },
+  { name: 'RFP Tools',       href: '/rfp',                   desc: 'Prepare better RFP responses' },
+  { name: 'Vendor Proof',    href: '/vendor-proof',          desc: 'Get verified — S$149 one-time' },
+  { name: 'PDPA Scan',       href: '/pdpa',                  desc: 'Data protection gap analysis' },
+  { name: 'Notarization',    href: '/notarization',          desc: 'Immutable document anchoring' },
+  { name: 'Tender Check',    href: '/tender-check',          desc: 'Government tender eligibility' },
+  { name: 'Opportunities',   href: '/opportunities',         desc: 'Live GeBIZ open tenders' },
 ];
 
 const vendorLinks = [
@@ -34,15 +47,17 @@ export default function Navigation() {
   const [mobileOpen,       setMobileOpen]       = useState(false);
   const [vendorsOpen,      setVendorsOpen]      = useState(false);
   const [procurementsOpen, setProcurementsOpen] = useState(false);
+  const [solutionsOpen,    setSolutionsOpen]    = useState(false);
   const [userOpen,         setUserOpen]         = useState(false);
   const [scrolled,         setScrolled]         = useState(false);
   const [authed,           setAuthed]           = useState<boolean | null>(null);
   const [userEmail,        setUserEmail]        = useState<string | null>(null);
   const pathname = usePathname();
   const router   = useRouter();
-  const vendorsDropdownRef     = useRef<HTMLDivElement>(null);
+  const vendorsDropdownRef      = useRef<HTMLDivElement>(null);
   const procurementsDropdownRef = useRef<HTMLDivElement>(null);
-  const userDropdownRef        = useRef<HTMLDivElement>(null);
+  const solutionsDropdownRef    = useRef<HTMLDivElement>(null);
+  const userDropdownRef         = useRef<HTMLDivElement>(null);
 
   // Scroll shadow
   useEffect(() => {
@@ -95,6 +110,9 @@ export default function Navigation() {
       if (procurementsDropdownRef.current && !procurementsDropdownRef.current.contains(e.target as Node)) {
         setProcurementsOpen(false);
       }
+      if (solutionsDropdownRef.current && !solutionsDropdownRef.current.contains(e.target as Node)) {
+        setSolutionsOpen(false);
+      }
       if (userDropdownRef.current && !userDropdownRef.current.contains(e.target as Node)) {
         setUserOpen(false);
       }
@@ -109,8 +127,9 @@ export default function Navigation() {
     router.push('/login');
   };
 
-  const isVendorsActive     = forVendors.some(s => pathname?.startsWith(s.href));
+  const isVendorsActive      = forVendors.some(s => pathname?.startsWith(s.href));
   const isProcurementsActive = forProcurements.some(s => pathname?.startsWith(s.href));
+  const isSolutionsActive    = solutions.some(s => pathname?.startsWith(s.href));
 
   return (
     <>
@@ -133,7 +152,7 @@ export default function Navigation() {
             <div className="relative" ref={vendorsDropdownRef}>
               <button
                 type="button"
-                onClick={() => { setVendorsOpen(o => !o); setProcurementsOpen(false); }}
+                onClick={() => { setVendorsOpen(o => !o); setProcurementsOpen(false); setSolutionsOpen(false); }}
                 className={`flex items-center gap-1 text-sm font-medium transition-colors ${isVendorsActive ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}
               >
                 For Vendors <ChevronDown className={`h-4 w-4 transition-transform ${vendorsOpen ? 'rotate-180' : ''}`} />
@@ -159,7 +178,7 @@ export default function Navigation() {
             <div className="relative" ref={procurementsDropdownRef}>
               <button
                 type="button"
-                onClick={() => { setProcurementsOpen(o => !o); setVendorsOpen(false); }}
+                onClick={() => { setProcurementsOpen(o => !o); setVendorsOpen(false); setSolutionsOpen(false); }}
                 className={`flex items-center gap-1 text-sm font-medium transition-colors ${isProcurementsActive ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}
               >
                 For Procurements <ChevronDown className={`h-4 w-4 transition-transform ${procurementsOpen ? 'rotate-180' : ''}`} />
@@ -181,9 +200,31 @@ export default function Navigation() {
               )}
             </div>
 
-            <Link href="/solutions" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/solutions') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
-              Solutions
-            </Link>
+            {/* Solutions dropdown */}
+            <div className="relative" ref={solutionsDropdownRef}>
+              <button
+                type="button"
+                onClick={() => { setSolutionsOpen(o => !o); setVendorsOpen(false); setProcurementsOpen(false); }}
+                className={`flex items-center gap-1 text-sm font-medium transition-colors ${isSolutionsActive ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}
+              >
+                Solutions <ChevronDown className={`h-4 w-4 transition-transform ${solutionsOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {solutionsOpen && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+                  {solutions.map(s => (
+                    <Link
+                      key={s.href}
+                      href={s.href}
+                      onClick={() => setSolutionsOpen(false)}
+                      className="flex flex-col px-4 py-3 hover:bg-white/5 transition-colors"
+                    >
+                      <span className={`text-sm font-medium ${pathname?.startsWith(s.href) ? 'text-[#10b981]' : 'text-white'}`}>{s.name}</span>
+                      <span className="text-xs text-white/50 mt-0.5">{s.desc}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <Link href="/opportunities" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/opportunities') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
               Vendor Opportunities
@@ -323,7 +364,12 @@ export default function Navigation() {
               <MobileLink key={s.href} href={s.href} label={s.name} active={pathname?.startsWith(s.href)} close={() => setMobileOpen(false)} />
             ))}
 
-            <MobileLink href="/solutions"     label="Solutions"            active={pathname?.startsWith('/solutions')}     close={() => setMobileOpen(false)} />
+            <div className="pt-4 pb-1">
+              <p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/30">Solutions</p>
+            </div>
+            {solutions.map(s => (
+              <MobileLink key={s.href} href={s.href} label={s.name} active={pathname?.startsWith(s.href)} close={() => setMobileOpen(false)} />
+            ))}
             <MobileLink href="/opportunities"  label="Vendor Opportunities" active={pathname?.startsWith('/opportunities')} close={() => setMobileOpen(false)} />
             <MobileLink href="/pricing"        label="Pricing"             active={pathname === '/pricing'}                close={() => setMobileOpen(false)} />
             <MobileLink href="/resources"      label="Resources"           active={pathname?.startsWith('/resources')}     close={() => setMobileOpen(false)} />

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { config } from '@/lib/config'
 
@@ -53,11 +53,18 @@ const severityBorder: Record<string, string> = {
 }
 
 export default function PDPAFreeScan() {
-  const [step, setStep] = useState<'form' | 'loading' | 'results'>('form')
+  const [step, setStep] = useState<'form' | 'loading' | 'gate' | 'results'>('form')
   const [result, setResult] = useState<ScanResult | null>(null)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({ website: '', email: '', company: '' })
   const [unlocking, setUnlocking] = useState(false)
+  const [authed, setAuthed] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => setAuthed(r.ok))
+      .catch(() => setAuthed(false))
+  }, [])
 
   const handleScan = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,7 +96,7 @@ export default function PDPAFreeScan() {
 
       const data: ScanResult = await res.json()
       setResult(data)
-      setStep('results')
+      setStep(authed ? 'results' : 'gate')
     } catch (err: any) {
       setError(err.message || 'Something went wrong')
       setStep('form')
@@ -172,51 +179,128 @@ export default function PDPAFreeScan() {
 
           {/* Form */}
           {step === 'form' && (
-            <div className="bg-white p-8 lg:p-10 rounded-3xl shadow-xl border border-[#e2e8f0]">
-              <form onSubmit={handleScan} className="space-y-5">
-                <div>
-                  <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="website">Website URL *</label>
-                  <input
-                    type="text"
-                    id="website"
-                    value={formData.website}
-                    onChange={(e) => setFormData((d) => ({ ...d, website: e.target.value }))}
-                    className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none"
-                    placeholder="yourcompany.sg"
-                    required
-                  />
+            <>
+              <div className="bg-white p-8 lg:p-10 rounded-3xl shadow-xl border border-[#e2e8f0]">
+                <form onSubmit={handleScan} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="website">Website URL *</label>
+                    <input
+                      type="text"
+                      id="website"
+                      value={formData.website}
+                      onChange={(e) => setFormData((d) => ({ ...d, website: e.target.value }))}
+                      className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none"
+                      placeholder="yourcompany.sg"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="email">Email (optional)</label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))}
+                      className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none"
+                      placeholder="you@company.sg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="company">Company Name (optional)</label>
+                    <input
+                      type="text"
+                      id="company"
+                      value={formData.company}
+                      onChange={(e) => setFormData((d) => ({ ...d, company: e.target.value }))}
+                      className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none"
+                      placeholder="Your Company Pte Ltd"
+                    />
+                  </div>
+                  {error && <p className="text-red-600 text-sm">{error}</p>}
+                  <button type="submit" className="btn btn-primary w-full py-4 text-lg font-black shadow-lg">
+                    Run Free Scan
+                  </button>
+                  <p className="text-center text-[#94a3b8] text-xs">
+                    Checks HTTPS, security headers, cookie consent, and privacy policy presence
+                  </p>
+                </form>
+              </div>
+
+              {/* What we check */}
+              <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl p-6">
+                  <div className="w-10 h-10 bg-[#10b981]/10 rounded-lg flex items-center justify-center mb-4">
+                    <svg className="w-5 h-5 text-[#10b981]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                  </div>
+                  <h3 className="text-base font-bold text-[#0f172a] mb-2">HTTPS & Security Headers</h3>
+                  <p className="text-sm text-[#64748b]">We check if your site uses HTTPS, has proper security headers (CSP, HSTS, X-Frame-Options), and protects against common web vulnerabilities.</p>
                 </div>
-                <div>
-                  <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="email">Email (optional)</label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))}
-                    className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none"
-                    placeholder="you@company.sg"
-                  />
+                <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl p-6">
+                  <div className="w-10 h-10 bg-[#6366f1]/10 rounded-lg flex items-center justify-center mb-4">
+                    <svg className="w-5 h-5 text-[#6366f1]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                  </div>
+                  <h3 className="text-base font-bold text-[#0f172a] mb-2">Cookie Consent & Privacy</h3>
+                  <p className="text-sm text-[#64748b]">We verify the presence of cookie consent banners, privacy policies, and data protection notices as required under Singapore&apos;s PDPA.</p>
                 </div>
-                <div>
-                  <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="company">Company Name (optional)</label>
-                  <input
-                    type="text"
-                    id="company"
-                    value={formData.company}
-                    onChange={(e) => setFormData((d) => ({ ...d, company: e.target.value }))}
-                    className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none"
-                    placeholder="Your Company Pte Ltd"
-                  />
+                <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl p-6">
+                  <div className="w-10 h-10 bg-[#f59e0b]/10 rounded-lg flex items-center justify-center mb-4">
+                    <svg className="w-5 h-5 text-[#f59e0b]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                  </div>
+                  <h3 className="text-base font-bold text-[#0f172a] mb-2">Risk Scoring</h3>
+                  <p className="text-sm text-[#64748b]">Get an instant risk score (0-100) based on your website&apos;s compliance posture. Higher scores indicate more issues that need attention.</p>
                 </div>
-                {error && <p className="text-red-600 text-sm">{error}</p>}
-                <button type="submit" className="btn btn-primary w-full py-4 text-lg font-black shadow-lg">
-                  Run Free Scan
-                </button>
-                <p className="text-center text-[#94a3b8] text-xs">
-                  Checks HTTPS, security headers, cookie consent, and privacy policy presence
+                <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl p-6">
+                  <div className="w-10 h-10 bg-[#ef4444]/10 rounded-lg flex items-center justify-center mb-4">
+                    <svg className="w-5 h-5 text-[#ef4444]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
+                  <h3 className="text-base font-bold text-[#0f172a] mb-2">Actionable Report</h3>
+                  <p className="text-sm text-[#64748b]">Receive a finding with specific legislation references and recommended actions. Upgrade to unlock the full AI-powered report with all findings.</p>
+                </div>
+              </div>
+
+              {/* Why PDPA matters */}
+              <div className="mt-16 text-center">
+                <h2 className="text-2xl font-bold text-[#0f172a] mb-4">Why PDPA Compliance Matters</h2>
+                <p className="text-[#64748b] max-w-2xl mx-auto mb-8">
+                  Singapore&apos;s Personal Data Protection Act (PDPA) applies to all organisations that collect, use, or disclose personal data.
+                  Non-compliance can result in fines up to S$1 million per breach.
                 </p>
-              </form>
-            </div>
+                <div className="flex flex-wrap justify-center gap-8 text-center">
+                  <div>
+                    <p className="text-3xl font-black text-[#0f172a]">S$1M</p>
+                    <p className="text-sm text-[#64748b]">Maximum fine per breach</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-black text-[#0f172a]">32</p>
+                    <p className="text-sm text-[#64748b]">PDPC enforcement actions in 2024</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-black text-[#0f172a]">100%</p>
+                    <p className="text-sm text-[#64748b]">Required for GeBIZ tenders</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Trust indicators */}
+              <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-[#94a3b8]">
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-[#10b981]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  No sign-up required
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-[#10b981]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  Results in under 30 seconds
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-[#10b981]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  100% free — no credit card
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-[#10b981]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  Blockchain-anchored evidence available
+                </span>
+              </div>
+            </>
           )}
 
           {/* Loading */}
@@ -225,6 +309,46 @@ export default function PDPAFreeScan() {
               <div className="inline-block w-12 h-12 border-4 border-[#10b981] border-t-transparent rounded-full animate-spin mb-6" />
               <p className="text-lg text-[#64748b]">Scanning {formData.website}...</p>
               <p className="text-sm text-[#94a3b8] mt-2">Checking security headers and compliance indicators</p>
+            </div>
+          )}
+
+          {/* Gate — claim profile to see results */}
+          {step === 'gate' && result && (
+            <div className="relative">
+              {/* Blurred preview */}
+              <div className="filter blur-sm pointer-events-none select-none" aria-hidden="true">
+                <div className="bg-white p-8 rounded-3xl shadow-xl border border-[#e2e8f0] text-center">
+                  {renderGauge(result.score, result.risk_level)}
+                  <p className="text-sm text-[#64748b] mt-4">
+                    {result.total_findings} issue{result.total_findings !== 1 ? 's' : ''} found on <strong>{result.website_url}</strong>
+                  </p>
+                </div>
+              </div>
+
+              {/* Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-white p-8 rounded-3xl shadow-2xl border border-[#e2e8f0] text-center max-w-md mx-4">
+                  <div className="w-14 h-14 bg-[#10b981]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-7 h-7 text-[#10b981]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0f172a] mb-2">Your scan is ready!</h3>
+                  <p className="text-sm text-[#64748b] mb-6">
+                    Create your free vendor profile to view your PDPA scan results and track your compliance over time.
+                  </p>
+                  <Link
+                    href="/auth/register"
+                    className="inline-block w-full px-6 py-3 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition text-sm"
+                  >
+                    Claim your Profile — Free
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="inline-block w-full mt-3 px-6 py-3 bg-white border border-[#e2e8f0] hover:bg-[#f8fafc] text-[#0f172a] font-medium rounded-xl transition text-sm"
+                  >
+                    Already have an account? Sign in
+                  </Link>
+                </div>
+              </div>
             </div>
           )}
 
