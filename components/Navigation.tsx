@@ -5,15 +5,18 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 
-const solutions = [
-  { name: 'For Vendors',     href: '/solutions/vendors',    desc: 'Claim, verify, and win more contracts' },
-  { name: 'For Procurement', href: '/solutions/procurement', desc: 'Reduce vendor risk, evaluate faster' },
-  { name: 'RFP Tools',       href: '/rfp',                  desc: 'Prepare better RFP responses' },
-  { name: 'Vendor Proof',    href: '/vendor-proof',         desc: 'Get verified — S$149 one-time' },
-  { name: 'PDPA Scan',       href: '/pdpa',                 desc: 'Data protection gap analysis' },
-  { name: 'Notarization',    href: '/notarization',         desc: 'Immutable document anchoring' },
-  { name: 'Tender Check',    href: '/tender-check',         desc: 'Government tender eligibility' },
-  { name: 'Opportunities',   href: '/opportunities',        desc: 'Live GeBIZ open tenders' },
+const forVendors = [
+  { name: 'Vendor Proof',  href: '/vendor-proof',  desc: 'Get verified — S$149 one-time' },
+  { name: 'PDPA Scan',     href: '/pdpa',          desc: 'Data protection gap analysis' },
+  { name: 'Notarization',  href: '/notarization',  desc: 'Immutable document anchoring' },
+  { name: 'RFP Tools',     href: '/rfp',           desc: 'Prepare better RFP responses' },
+  { name: 'Check Tenders', href: '/tender-check',  desc: 'Government tender eligibility' },
+];
+
+const forProcurements = [
+  { name: 'Verify',          href: '/verify',   desc: 'Verify vendor credentials' },
+  { name: 'Browse Vendors',  href: '/vendors',  desc: 'Explore the vendor network' },
+  { name: 'Compare Vendors', href: '/compare',  desc: 'Side-by-side vendor comparison' },
 ];
 
 const vendorLinks = [
@@ -28,16 +31,18 @@ const vendorLinks = [
 const PROTECTED = ['/vendor'];
 
 export default function Navigation() {
-  const [mobileOpen,    setMobileOpen]    = useState(false);
-  const [solutionsOpen, setSolutionsOpen] = useState(false);
-  const [userOpen,      setUserOpen]      = useState(false);
-  const [scrolled,      setScrolled]      = useState(false);
-  const [authed,        setAuthed]        = useState<boolean | null>(null);
-  const [userEmail,     setUserEmail]     = useState<string | null>(null);
+  const [mobileOpen,       setMobileOpen]       = useState(false);
+  const [vendorsOpen,      setVendorsOpen]      = useState(false);
+  const [procurementsOpen, setProcurementsOpen] = useState(false);
+  const [userOpen,         setUserOpen]         = useState(false);
+  const [scrolled,         setScrolled]         = useState(false);
+  const [authed,           setAuthed]           = useState<boolean | null>(null);
+  const [userEmail,        setUserEmail]        = useState<string | null>(null);
   const pathname = usePathname();
   const router   = useRouter();
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const userDropdownRef = useRef<HTMLDivElement>(null);
+  const vendorsDropdownRef     = useRef<HTMLDivElement>(null);
+  const procurementsDropdownRef = useRef<HTMLDivElement>(null);
+  const userDropdownRef        = useRef<HTMLDivElement>(null);
 
   // Scroll shadow
   useEffect(() => {
@@ -84,8 +89,11 @@ export default function Navigation() {
   // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setSolutionsOpen(false);
+      if (vendorsDropdownRef.current && !vendorsDropdownRef.current.contains(e.target as Node)) {
+        setVendorsOpen(false);
+      }
+      if (procurementsDropdownRef.current && !procurementsDropdownRef.current.contains(e.target as Node)) {
+        setProcurementsOpen(false);
       }
       if (userDropdownRef.current && !userDropdownRef.current.contains(e.target as Node)) {
         setUserOpen(false);
@@ -101,7 +109,8 @@ export default function Navigation() {
     router.push('/login');
   };
 
-  const isSolutionActive = solutions.some(s => pathname?.startsWith(s.href));
+  const isVendorsActive     = forVendors.some(s => pathname?.startsWith(s.href));
+  const isProcurementsActive = forProcurements.some(s => pathname?.startsWith(s.href));
 
   return (
     <>
@@ -120,22 +129,22 @@ export default function Navigation() {
               Network
             </Link>
 
-            {/* Solutions dropdown */}
-            <div className="relative" ref={dropdownRef}>
+            {/* For Vendors dropdown */}
+            <div className="relative" ref={vendorsDropdownRef}>
               <button
                 type="button"
-                onClick={() => setSolutionsOpen(o => !o)}
-                className={`flex items-center gap-1 text-sm font-medium transition-colors ${isSolutionActive ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}
+                onClick={() => { setVendorsOpen(o => !o); setProcurementsOpen(false); }}
+                className={`flex items-center gap-1 text-sm font-medium transition-colors ${isVendorsActive ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}
               >
-                Solutions <ChevronDown className={`h-4 w-4 transition-transform ${solutionsOpen ? 'rotate-180' : ''}`} />
+                For Vendors <ChevronDown className={`h-4 w-4 transition-transform ${vendorsOpen ? 'rotate-180' : ''}`} />
               </button>
-              {solutionsOpen && (
+              {vendorsOpen && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
-                  {solutions.map(s => (
+                  {forVendors.map(s => (
                     <Link
                       key={s.href}
                       href={s.href}
-                      onClick={() => setSolutionsOpen(false)}
+                      onClick={() => setVendorsOpen(false)}
                       className="flex flex-col px-4 py-3 hover:bg-white/5 transition-colors"
                     >
                       <span className={`text-sm font-medium ${pathname?.startsWith(s.href) ? 'text-[#10b981]' : 'text-white'}`}>{s.name}</span>
@@ -146,16 +155,42 @@ export default function Navigation() {
               )}
             </div>
 
-            <Link href="/compare" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/compare') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
-              Compare
+            {/* For Procurements dropdown */}
+            <div className="relative" ref={procurementsDropdownRef}>
+              <button
+                type="button"
+                onClick={() => { setProcurementsOpen(o => !o); setVendorsOpen(false); }}
+                className={`flex items-center gap-1 text-sm font-medium transition-colors ${isProcurementsActive ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}
+              >
+                For Procurements <ChevronDown className={`h-4 w-4 transition-transform ${procurementsOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {procurementsOpen && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+                  {forProcurements.map(s => (
+                    <Link
+                      key={s.href}
+                      href={s.href}
+                      onClick={() => setProcurementsOpen(false)}
+                      className="flex flex-col px-4 py-3 hover:bg-white/5 transition-colors"
+                    >
+                      <span className={`text-sm font-medium ${pathname?.startsWith(s.href) ? 'text-[#10b981]' : 'text-white'}`}>{s.name}</span>
+                      <span className="text-xs text-white/50 mt-0.5">{s.desc}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <Link href="/solutions" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/solutions') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
+              Solutions
+            </Link>
+
+            <Link href="/opportunities" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/opportunities') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
+              Vendor Opportunities
             </Link>
 
             <Link href="/pricing" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/pricing') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
               Pricing
-            </Link>
-
-            <Link href="/verify" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/verify') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
-              Verify
             </Link>
 
             <Link href="/resources" className={`text-sm font-medium transition-colors ${pathname?.startsWith('/resources') ? 'text-[#10b981]' : 'text-white/80 hover:text-white'}`}>
@@ -272,19 +307,27 @@ export default function Navigation() {
           </div>
 
           <div className="space-y-1">
-            <MobileLink href="/vendors"    label="Network"   active={pathname?.startsWith('/vendors')}   close={() => setMobileOpen(false)} />
-            <MobileLink href="/compare"    label="Compare"   active={pathname === '/compare'}            close={() => setMobileOpen(false)} />
-            <MobileLink href="/pricing"    label="Pricing"   active={pathname === '/pricing'}            close={() => setMobileOpen(false)} />
-            <MobileLink href="/verify"     label="Verify"    active={pathname?.startsWith('/verify')}    close={() => setMobileOpen(false)} />
-            <MobileLink href="/resources"  label="Resources" active={pathname?.startsWith('/resources')} close={() => setMobileOpen(false)} />
-            <MobileLink href="/insights"   label="Insights"  active={pathname?.startsWith('/insights')}  close={() => setMobileOpen(false)} />
+            <MobileLink href="/vendors"       label="Network"              active={pathname?.startsWith('/vendors')}       close={() => setMobileOpen(false)} />
 
             <div className="pt-4 pb-1">
-              <p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/30">Solutions</p>
+              <p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/30">For Vendors</p>
             </div>
-            {solutions.map(s => (
+            {forVendors.map(s => (
               <MobileLink key={s.href} href={s.href} label={s.name} active={pathname?.startsWith(s.href)} close={() => setMobileOpen(false)} />
             ))}
+
+            <div className="pt-4 pb-1">
+              <p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/30">For Procurements</p>
+            </div>
+            {forProcurements.map(s => (
+              <MobileLink key={s.href} href={s.href} label={s.name} active={pathname?.startsWith(s.href)} close={() => setMobileOpen(false)} />
+            ))}
+
+            <MobileLink href="/solutions"     label="Solutions"            active={pathname?.startsWith('/solutions')}     close={() => setMobileOpen(false)} />
+            <MobileLink href="/opportunities"  label="Vendor Opportunities" active={pathname?.startsWith('/opportunities')} close={() => setMobileOpen(false)} />
+            <MobileLink href="/pricing"        label="Pricing"             active={pathname === '/pricing'}                close={() => setMobileOpen(false)} />
+            <MobileLink href="/resources"      label="Resources"           active={pathname?.startsWith('/resources')}     close={() => setMobileOpen(false)} />
+            <MobileLink href="/insights"       label="Insights"            active={pathname?.startsWith('/insights')}      close={() => setMobileOpen(false)} />
 
             <div className="pt-6 border-t border-white/10 space-y-1">
               {authed === true ? (
