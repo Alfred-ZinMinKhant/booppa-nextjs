@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: {
+    COOKIE_SIGNING_SECRET: process.env.COOKIE_SIGNING_SECRET,
+  },
   images: {
     remotePatterns: [
       {
