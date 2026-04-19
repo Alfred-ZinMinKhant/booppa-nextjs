@@ -132,7 +132,7 @@ export default function InsightsPage() {
   const [industries, setIndustries] = useState<IndustryItem[]>([]);
   const [sector, setSector]         = useState('');
   const [loading, setLoading]       = useState(true);
-  const [showData, setShowData]     = useState(false);
+  const [showData, setShowData]     = useState(true);
 
   const totalVendors    = industries.reduce((sum, i) => sum + i.count, 0);
   const avgScore        = entries.length > 0
