@@ -1,15 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-
-// Pages where the sticky CTA is hidden (already have a prominent claim/register CTA)
-const HIDDEN_ON = ['/auth/register', '/auth/login', '/vendor/dashboard', '/vendor/profile', '/vendor/evidence', '/admin'];
 
 export default function StickyClaimCTA() {
-  const pathname = usePathname();
-
-  if (HIDDEN_ON.some(p => pathname?.startsWith(p))) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
