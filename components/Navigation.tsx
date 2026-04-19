@@ -6,30 +6,30 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 
 const forVendors = [
-  { name: 'Vendor Dashboard', href: '/vendor/dashboard', desc: 'Your vendor command centre' },
-  { name: 'Vendor Proof',     href: '/vendor-proof',     desc: 'Get verified — S$149 one-time' },
-  { name: 'PDPA Scan',        href: '/pdpa',             desc: 'Data protection gap analysis' },
-  { name: 'Notarization',     href: '/notarization',     desc: 'Immutable document anchoring' },
-  { name: 'RFP Tools',        href: '/rfp',              desc: 'Prepare better RFP responses' },
-  { name: 'Check Tenders',    href: '/tender-check',     desc: 'Government tender eligibility' },
+  { name: 'Vendor Dashboard',        href: '/vendor/dashboard', desc: 'Track your trust score, activation ladder, and procurement visibility' },
+  { name: 'Vendor Proof — S$149',    href: '/vendor-proof',     desc: 'Appear in buyer searches — without verification, buyers cannot find you' },
+  { name: 'PDPA Scan — S$79',        href: '/pdpa',             desc: 'Prove data protection compliance before buyers flag you as a liability' },
+  { name: 'Notarization — S$69',     href: '/notarization',     desc: 'Tamper-proof your documents so buyers can verify authenticity instantly' },
+  { name: 'RFP Express — S$249',     href: '/rfp',              desc: 'Submit a credibility-backed tender response instead of price-only bids' },
+  { name: 'Tender Win Calculator',   href: '/tender-check',     desc: 'See your exact win probability for any GeBIZ tender — free' },
 ];
 
 const forProcurements = [
-  { name: 'Procurement Dashboard', href: '/procurement/dashboard', desc: 'Your procurement command centre' },
-  { name: 'Verify',                href: '/verify',                desc: 'Verify vendor credentials' },
-  { name: 'Browse Vendors',        href: '/vendors',               desc: 'Explore the vendor network' },
-  { name: 'Compare Vendors',       href: '/compare',               desc: 'Side-by-side vendor comparison' },
+  { name: 'Procurement Dashboard',   href: '/procurement/dashboard', desc: 'Evaluate, compare, and shortlist vendors with structured trust data' },
+  { name: 'Verify Vendor',           href: '/verify',                desc: 'Check if a vendor is verified and audit their compliance posture' },
+  { name: 'Browse Vendors',          href: '/vendors',               desc: 'Search verified suppliers filtered by sector, score, and risk level' },
+  { name: 'Compare Vendors',         href: '/compare',               desc: 'Side-by-side evaluation of verification depth, risk, and readiness' },
 ];
 
 const solutions = [
-  { name: 'For Vendors',     href: '/solutions/vendors',     desc: 'Claim, verify, and win more contracts' },
-  { name: 'For Procurement', href: '/solutions/procurement', desc: 'Reduce vendor risk, evaluate faster' },
-  { name: 'RFP Tools',       href: '/rfp',                   desc: 'Prepare better RFP responses' },
-  { name: 'Vendor Proof',    href: '/vendor-proof',          desc: 'Get verified — S$149 one-time' },
-  { name: 'PDPA Scan',       href: '/pdpa',                  desc: 'Data protection gap analysis' },
-  { name: 'Notarization',    href: '/notarization',          desc: 'Immutable document anchoring' },
-  { name: 'Tender Check',    href: '/tender-check',          desc: 'Government tender eligibility' },
-  { name: 'Opportunities',   href: '/opportunities',         desc: 'Live GeBIZ open tenders' },
+  { name: 'For Vendors',             href: '/solutions/vendors',     desc: 'Build procurement trust — from verification to tender-ready dossiers' },
+  { name: 'For Procurement',         href: '/solutions/procurement', desc: 'Reduce supplier risk with structured vendor due diligence' },
+  { name: 'Vendor Proof',            href: '/vendor-proof',          desc: 'Buyers filter by verified — without it, you are invisible to them' },
+  { name: 'PDPA Compliance',         href: '/pdpa',                  desc: 'AI scan across 8 PDPA obligations — avoid S$1M penalty exposure' },
+  { name: 'Notarization',            href: '/notarization',          desc: 'SHA-256 hash + QR verification — documents anyone can audit' },
+  { name: 'RFP Tools',               href: '/rfp',                   desc: 'Turn tender bids from price-only into credibility-backed proposals' },
+  { name: 'Tender Win Probability',  href: '/tender-check',          desc: 'See the gap between your current score and sector winners — free' },
+  { name: 'GeBIZ Opportunities',     href: '/opportunities',         desc: 'Live open tenders matched to your sector and verification level' },
 ];
 
 const vendorLinks = [
