@@ -1,18 +1,21 @@
 'use client'
 
 import { useState, useEffect, FormEvent } from 'react'
-import { User, Mail, Building2, Hash, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { User, Mail, Building2, Hash, Save, Loader2, CheckCircle, AlertCircle, Factory } from 'lucide-react'
+import { INDUSTRY_OPTIONS } from '@/lib/industries'
 
 interface Profile {
   id: string
   email: string
   company: string | null
+  industry: string | null
   role: string
 }
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [company, setCompany] = useState('')
+  const [industry, setIndustry] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
@@ -25,6 +28,7 @@ export default function ProfilePage() {
         if (data.id) {
           setProfile(data)
           setCompany(data.company || '')
+          setIndustry(data.industry || '')
         }
       })
       .catch(() => {})
@@ -40,14 +44,14 @@ export default function ProfilePage() {
       const res = await fetch('/api/vendor/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ company }),
+        body: JSON.stringify({ company, industry: industry || undefined }),
       })
       if (!res.ok) {
         const data = await res.json()
         setError(data.detail || 'Save failed')
       } else {
         setSuccess('Profile updated.')
-        setProfile(prev => prev ? { ...prev, company } : prev)
+        setProfile(prev => prev ? { ...prev, company, industry } : prev)
       }
     } catch {
       setError('Network error')
@@ -123,6 +127,25 @@ export default function ProfilePage() {
                   placeholder="Acme Pte Ltd"
                   className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
                 />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+                Industry
+              </label>
+              <div className="relative">
+                <Factory className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                <select
+                  value={industry}
+                  onChange={e => setIndustry(e.target.value)}
+                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 appearance-none"
+                >
+                  <option value="">Select your industry</option>
+                  {INDUSTRY_OPTIONS.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
