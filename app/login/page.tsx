@@ -33,7 +33,7 @@ function LoginForm() {
       }
 
       const from = searchParams.get('from')
-      const defaultRedirect = data.role === 'PROCUREMENT' ? '/procurement/dashboard' : '/vendor/dashboard'
+      const defaultRedirect = data.role === 'PROCUREMENT' ? '/enterprise/procurement' : '/vendor/dashboard'
       router.push(from || defaultRedirect)
       router.refresh()
     } catch {
