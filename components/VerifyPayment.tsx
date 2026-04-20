@@ -53,14 +53,36 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
     );
   } else if (status === 'success') {
     const isPdpa = productType?.startsWith('pdpa');
-    const isNotarization = productType?.startsWith('compliance_notarization');
+    const isNotarization = productType?.startsWith('compliance_notarization') || productType?.startsWith('supply_chain');
     const isRfp = productType === 'rfp_express' || productType === 'rfp_complete';
     const isVendorProof = productType === 'vendor_proof';
     content = (
       <>
         <CheckCircle className={`${iconClass} text-booppa-green`} />
-        <h2 className="text-2xl font-semibold text-white">Payment Confirmed!</h2>
+        <h2 className="text-2xl font-semibold text-white">Thank You for Using Our Service!</h2>
         <p className="text-gray-400 mt-2">{message}</p>
+
+        {/* Email notification banner */}
+        <div className="mt-5 w-full bg-blue-500/10 border border-blue-500/20 rounded-lg px-4 py-3 flex items-start gap-3">
+          <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <div>
+            <p className="text-sm font-semibold text-blue-400">Please check your email</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {isNotarization
+                ? 'Your notarization certificate and blockchain proof will be delivered to your email shortly.'
+                : isPdpa
+                  ? 'Your PDPA compliance report will be sent to your email shortly.'
+                  : isRfp
+                    ? 'Your RFP evidence package will be delivered to your email shortly.'
+                    : isVendorProof
+                      ? 'Your Vendor Proof certificate will be sent to your email within a few minutes.'
+                      : 'A confirmation and your deliverables will be sent to your email shortly.'}
+            </p>
+          </div>
+        </div>
+
         {isPdpa ? (
           <Link href={`/pdpa/report?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             View PDPA Report
@@ -74,14 +96,9 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
             View RFP Kit
           </Link>
         ) : isVendorProof ? (
-          <>
-            <p className="text-gray-400 mt-4 text-sm text-center max-w-sm">
-              Your Vendor Proof report is being generated. You will receive a blockchain-notarized PDF certificate by email within a few minutes.
-            </p>
-            <Link href="/vendor/dashboard" className="mt-4 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-              Go to Dashboard
-            </Link>
-          </>
+          <Link href="/vendor/dashboard" className="mt-4 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            Go to Dashboard
+          </Link>
         ) : (
           <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             Go to Dashboard
