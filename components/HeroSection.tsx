@@ -17,16 +17,25 @@ export default function HeroSection() {
           Win more contracts.
         </h1>
 
-        <p className="text-xl text-[#64748b] mb-12 max-w-xl leading-relaxed">
+        <p className="text-xl text-[#64748b] mb-8 max-w-xl leading-relaxed">
           Booppa helps vendors become trusted and procurement-ready through verified compliance data.
         </p>
+
+        {/* Social proof */}
+        <div className="flex flex-wrap gap-x-6 gap-y-2 mb-10 text-sm text-[#64748b]">
+          <span className="flex items-center gap-1.5"><span className="font-bold text-[#0f172a]">30,000+</span> vendors listed</span>
+          <span className="text-[#e2e8f0]">|</span>
+          <span className="flex items-center gap-1.5"><span className="font-bold text-[#0f172a]">1,000+</span> live tenders tracked</span>
+          <span className="text-[#e2e8f0]">|</span>
+          <span className="flex items-center gap-1.5"><span className="font-bold text-[#0f172a]">SGD 0</span> to get started</span>
+        </div>
 
         <div className="flex flex-wrap gap-4 mb-12">
           <Link href="/auth/register" className="btn btn-primary text-lg">
             Claim your Company Profile (Free)
           </Link>
           <Link href="/check-status" className="btn btn-secondary text-lg">
-            Check your Trust Status
+            Check your Compliance Score →
           </Link>
         </div>
 

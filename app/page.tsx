@@ -14,20 +14,23 @@ export default function Home() {
             <Link href="/solutions/vendors" className="group flex flex-col p-8 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#10b981] hover:shadow-lg transition-all">
               <div className="text-3xl mb-4">🏢</div>
               <h3 className="text-lg font-bold text-[#0f172a] mb-2 group-hover:text-[#10b981] transition-colors">I&apos;m a Vendor</h3>
-              <p className="text-sm text-[#64748b] mb-4 flex-1">I need compliance evidence to win government and enterprise contracts.</p>
-              <span className="text-[#10b981] font-bold text-sm">Get verified →</span>
+              <p className="text-sm text-[#64748b] mb-1 flex-1">I need compliance evidence to win government and enterprise contracts.</p>
+              <p className="text-xs text-[#10b981] font-semibold mb-4">Vendor Proof from SGD 149 · ready in hours</p>
+              <span className="text-[#10b981] font-bold text-sm group-hover:underline">Get verified →</span>
             </Link>
             <Link href="/solutions/procurement" className="group flex flex-col p-8 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#10b981] hover:shadow-lg transition-all">
               <div className="text-3xl mb-4">🔍</div>
               <h3 className="text-lg font-bold text-[#0f172a] mb-2 group-hover:text-[#10b981] transition-colors">I&apos;m in Procurement</h3>
-              <p className="text-sm text-[#64748b] mb-4 flex-1">I need to verify vendor compliance and reduce evaluation risk.</p>
-              <span className="text-[#10b981] font-bold text-sm">Browse vendors →</span>
+              <p className="text-sm text-[#64748b] mb-1 flex-1">I need to verify vendor compliance and reduce evaluation risk.</p>
+              <p className="text-xs text-[#10b981] font-semibold mb-4">30,000+ verified vendors · free to search</p>
+              <span className="text-[#10b981] font-bold text-sm group-hover:underline">Browse vendors →</span>
             </Link>
             <Link href="/enterprise" className="group flex flex-col p-8 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#10b981] hover:shadow-lg transition-all">
               <div className="text-3xl mb-4">🏗️</div>
               <h3 className="text-lg font-bold text-[#0f172a] mb-2 group-hover:text-[#10b981] transition-colors">Enterprise Team</h3>
-              <p className="text-sm text-[#64748b] mb-4 flex-1">I need a full compliance suite for my organisation — multiple users, SLA support.</p>
-              <span className="text-[#10b981] font-bold text-sm">See enterprise plans →</span>
+              <p className="text-sm text-[#64748b] mb-1 flex-1">I need a full compliance suite for my organisation — multiple users, SLA support.</p>
+              <p className="text-xs text-[#10b981] font-semibold mb-4">Custom plans · dedicated SLA · priority support</p>
+              <span className="text-[#10b981] font-bold text-sm group-hover:underline">See enterprise plans →</span>
             </Link>
           </div>
         </div>
@@ -73,29 +76,30 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white p-8 rounded-2xl border border-[#e2e8f0] group hover:border-[#10b981] hover:translate-y-[-5px] hover:shadow-lg transition-all">
+            <div className="bg-white p-8 rounded-2xl border border-[#e2e8f0] group hover:border-[#10b981] hover:translate-y-[-5px] hover:shadow-lg transition-all flex flex-col">
               <div className="text-5xl font-mono font-bold text-[#e2e8f0] mb-4 group-hover:text-[#10b981] transition-colors leading-none">01</div>
               <h3 className="text-xl font-bold mb-3">PDPA Instant Scan</h3>
-              <p className="text-sm text-[#64748b] mb-6">Automated compliance check across 8 PDPA obligations (Sections 11–26). Risk report with blockchain timestamp.</p>
-              <Link href="/pdpa" className="text-[#10b981] font-bold flex items-center gap-2 hover:gap-3 transition-all">Run Scan — SGD 79 →</Link>
+              <p className="text-sm text-[#64748b] mb-6 flex-1">Automated compliance check across 8 PDPA obligations (Sections 11–26). Risk report with blockchain timestamp.</p>
+              <Link href="/pdpa" className="block text-center bg-[#f1f5f9] hover:bg-[#10b981] hover:text-white text-[#0f172a] font-bold text-sm py-2.5 rounded-xl transition-all">Run Scan — SGD 79</Link>
             </div>
-            <div className="bg-white p-8 rounded-2xl border border-[#e2e8f0] group hover:border-[#10b981] hover:translate-y-[-5px] hover:shadow-lg transition-all">
+            <div className="bg-white p-8 rounded-2xl border border-[#e2e8f0] group hover:border-[#10b981] hover:translate-y-[-5px] hover:shadow-lg transition-all flex flex-col">
               <div className="text-5xl font-mono font-bold text-[#e2e8f0] mb-4 group-hover:text-[#10b981] transition-colors leading-none">02</div>
               <h3 className="text-xl font-bold mb-3">Notarization Express</h3>
-              <p className="text-sm text-[#64748b] mb-6">Anchor any compliance document to Polygon mainnet. Immutable timestamp + QR verification for court-admissibility.</p>
-              <Link href="/notarization" className="text-[#10b981] font-bold flex items-center gap-2 hover:gap-3 transition-all">Notarize — SGD 69 →</Link>
+              <p className="text-sm text-[#64748b] mb-6 flex-1">Anchor any compliance document to Polygon mainnet. Immutable timestamp + QR verification for court-admissibility.</p>
+              <Link href="/notarization" className="block text-center bg-[#f1f5f9] hover:bg-[#10b981] hover:text-white text-[#0f172a] font-bold text-sm py-2.5 rounded-xl transition-all">Notarize — SGD 69</Link>
             </div>
-            <div className="bg-white p-8 rounded-2xl border border-[#e2e8f0] group hover:border-[#10b981] hover:translate-y-[-5px] hover:shadow-lg transition-all">
-              <div className="text-5xl font-mono font-bold text-[#e2e8f0] mb-4 group-hover:text-[#10b981] transition-colors leading-none">03</div>
+            <div className="bg-white p-8 rounded-2xl border-2 border-[#10b981] group hover:translate-y-[-5px] hover:shadow-lg transition-all flex flex-col relative">
+              <div className="absolute top-[-12px] left-6 bg-[#10b981] text-white text-xs font-bold px-3 py-0.5 rounded-full uppercase tracking-wider">Most used</div>
+              <div className="text-5xl font-mono font-bold text-[#10b981] mb-4 leading-none">03</div>
               <h3 className="text-xl font-bold mb-3">RFP Express</h3>
-              <p className="text-sm text-[#64748b] mb-6">5 copy-ready RFP answers, Vendor Proof certificate and blockchain verification. Delivered within 24 hours.</p>
-              <Link href="/rfp-acceleration#express" className="text-[#10b981] font-bold flex items-center gap-2 hover:gap-3 transition-all">Generate — SGD 249 →</Link>
+              <p className="text-sm text-[#64748b] mb-6 flex-1">5 copy-ready RFP answers, Vendor Proof certificate and blockchain verification. Delivered within 24 hours.</p>
+              <Link href="/rfp-acceleration#express" className="block text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold text-sm py-2.5 rounded-xl transition-all">Generate — SGD 249</Link>
             </div>
-            <div className="bg-white p-8 rounded-2xl border border-[#e2e8f0] group hover:border-[#10b981] hover:translate-y-[-5px] hover:shadow-lg transition-all">
+            <div className="bg-white p-8 rounded-2xl border border-[#e2e8f0] group hover:border-[#10b981] hover:translate-y-[-5px] hover:shadow-lg transition-all flex flex-col">
               <div className="text-5xl font-mono font-bold text-[#e2e8f0] mb-4 group-hover:text-[#10b981] transition-colors leading-none">04</div>
               <h3 className="text-xl font-bold mb-3">RFP Kit</h3>
-              <p className="text-sm text-[#64748b] mb-6">Full procurement pack: 15 RFP answers, editable DOCX, AI narrative, attestation letter. Enterprise-grade.</p>
-              <Link href="/rfp-acceleration#complete" className="text-[#10b981] font-bold flex items-center gap-2 hover:gap-3 transition-all">Get Kit — SGD 599 →</Link>
+              <p className="text-sm text-[#64748b] mb-6 flex-1">Full procurement pack: 15 RFP answers, editable DOCX, AI narrative, attestation letter. Enterprise-grade.</p>
+              <Link href="/rfp-acceleration#complete" className="block text-center bg-[#f1f5f9] hover:bg-[#10b981] hover:text-white text-[#0f172a] font-bold text-sm py-2.5 rounded-xl transition-all">Get Kit — SGD 599</Link>
             </div>
           </div>
         </div>
@@ -139,6 +143,14 @@ export default function Home() {
               <p className="text-white/80 text-sm">Enterprise teams verify via QR code or blockchain hash. Procurement-accepted format from day one.</p>
             </div>
           </div>
+
+          <div className="mt-14 text-center">
+            <p className="text-white/60 text-sm mb-4">Ready to start? No consultants. No waiting weeks.</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/auth/register" className="bg-[#10b981] hover:bg-[#059669] text-white font-bold px-8 py-3.5 rounded-xl transition-colors">Start free — Claim your profile</Link>
+              <Link href="/rfp-acceleration#express" className="bg-white/10 hover:bg-white/20 text-white font-bold px-8 py-3.5 rounded-xl transition-colors">Get RFP Evidence — SGD 249</Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -147,7 +159,7 @@ export default function Home() {
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-bold mb-4 text-[#0f172a]">Transparent Pricing</h2>
-            <p className="text-xl text-[#64748b]">No "contact sales" gatekeeping. Clear costs.</p>
+            <p className="text-xl text-[#64748b]">No &quot;contact sales&quot; gatekeeping. Clear costs. Start free.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -191,7 +203,7 @@ export default function Home() {
             </div>
 
             <div className="bg-[#0f172a] p-8 rounded-3xl border-2 border-[#10b981] shadow-lg relative transition-all hover:translate-y-[-5px] hover:shadow-2xl">
-              <div className="absolute top-[-15px] right-6 bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Full Package</div>
+              <div className="absolute top-[-15px] right-6 bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Best Value</div>
               <h3 className="text-xl font-bold mb-4 text-white">RFP Kit</h3>
               <div className="text-3xl font-bold text-[#10b981] mb-2">SGD 599</div>
               <p className="text-white/70 text-sm mb-6 pb-6 border-b border-white/10">Enterprise-grade submission</p>
@@ -210,7 +222,7 @@ export default function Home() {
       {/* Legal Clarity */}
       <section className="py-24 px-6 bg-[#f8fafc]">
         <div className="max-w-[1200px] mx-auto">
-          <div className="bg-white p-12 rounded-3xl border-2 border-[#f59e0b] shadow-sm">
+          <div className="bg-white p-12 rounded-3xl border-2 border-[#e2e8f0] shadow-sm">
             <h3 className="text-2xl font-bold mb-8 flex items-center gap-3">⚖️ What BOOPPA Is (and Isn't)</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-8">
@@ -254,10 +266,11 @@ export default function Home() {
           <div className="relative z-10">
             <h2 className="text-3xl lg:text-6xl font-black text-white mb-6 leading-tight">Stop Losing RFPs Because of<br />Compliance Paperwork.</h2>
             <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto">Procurement-ready evidence generated in hours. No audit cycles. No consultancy fees.</p>
-            <div className="flex flex-wrap justify-center gap-6">
+            <div className="flex flex-wrap justify-center gap-6 mb-6">
               <Link href="/rfp-acceleration#express" className="btn btn-primary px-10 py-5 text-xl font-black">Get RFP Evidence — SGD 249</Link>
               <Link href="/rfp-acceleration#complete" className="btn btn-secondary bg-white text-[#0f172a] px-10 py-5 text-xl font-black hover:bg-white/90 border-0 transition-colors">See Full RFP Kit</Link>
             </div>
+            <p className="text-white/40 text-sm">or <Link href="/auth/register" className="text-white/70 hover:text-white underline">claim your free company profile first →</Link></p>
           </div>
         </div>
       </section>
