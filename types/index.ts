@@ -103,7 +103,8 @@ export interface Notification {
 export interface MarketplaceVendor {
   id: string
   company_name: string
-  seo_slug: string
+  slug: string
+  seo_slug?: string  // legacy alias — backend returns 'slug'
   domain?: string
   website?: string
   industry?: string

@@ -9,6 +9,10 @@ import VendorStatusBadge from '@/components/vendor/VendorStatusBadge';
 import SectorPressureWidget from '@/components/vendor/SectorPressureWidget';
 import CalDashboard from '@/components/vendor/CalDashboard';
 import TenderWinProbabilityWidget from '@/components/vendor/TenderWinProbabilityWidget';
+import TrustRing from '@/components/vendor/TrustRing';
+import DepthLadder from '@/components/vendor/DepthLadder';
+import AlertCard from '@/components/vendor/AlertCard';
+import { generateAlerts, type VendorState } from '@/components/vendor/alertEngine';
 
 interface BadgeData {
   active: boolean;
@@ -26,9 +30,18 @@ export default function VendorDashboard() {
   const [loading, setLoading] = useState(true);
   const [badge, setBadge] = useState<BadgeData | null>(null);
   const [copied, setCopied] = useState(false);
+  const [vendorState, setVendorState] = useState<VendorState | null>(null);
+  const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     setMounted(true);
+
+    // Load dismissed alerts from localStorage
+    try {
+      const saved = localStorage.getItem('booppa_dismissed_alerts');
+      if (saved) setDismissedAlerts(new Set(JSON.parse(saved)));
+    } catch {}
+
     fetch('/api/dashboard')
       .then(res => res.json())
       .then(fetchedData => {
@@ -41,7 +54,21 @@ export default function VendorDashboard() {
       .then(res => res.ok ? res.json() : null)
       .then(d => { if (d) setBadge(d); })
       .catch(() => {});
+
+    fetch('/api/vendor/dashboard-alerts')
+      .then(res => res.ok ? res.json() : null)
+      .then(d => { if (d && !d.error) setVendorState(d); })
+      .catch(() => {});
   }, []);
+
+  const handleDismissAlert = (id: string) => {
+    setDismissedAlerts(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      localStorage.setItem('booppa_dismissed_alerts', JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   const nextStepFromLevel = (level: string): { href: string; label: string } => {
     switch (level?.toUpperCase()) {
@@ -71,10 +98,14 @@ export default function VendorDashboard() {
   const stats = data.stats ?? { trustScore: 0, trustScoreDelta: null, enterpriseViews: 0, activeProcurements: 0, activeProcurementsSector: null, govAgencies: 0 };
   const history = data.recentActivity;
 
+  const alerts = vendorState
+    ? generateAlerts(vendorState).filter(a => !dismissedAlerts.has(a.id))
+    : [];
+
   return (
     <div className="min-h-screen bg-neutral-950 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        
+
         {/* Header section */}
         <div className="flex justify-between items-end border-b border-neutral-800 pb-6">
           <div>
@@ -100,6 +131,63 @@ export default function VendorDashboard() {
             </button>
           </div>
         </div>
+
+        {/* ── Trust Status Header ─────────────────────────────────── */}
+        {vendorState && (
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-5 flex items-center gap-6">
+            <TrustRing score={vendorState.trustScore} />
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold text-white truncate">{vendorState.name}</h2>
+              <div className="flex items-center gap-3 mt-1 flex-wrap">
+                {vendorState.uen && (
+                  <span className="text-xs text-slate-500">UEN {vendorState.uen}</span>
+                )}
+                <span className="text-xs text-slate-500">{vendorState.sector}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+                  {vendorState.plan} plan
+                </span>
+              </div>
+              <div className="mt-2">
+                <DepthLadder current={vendorState.verificationDepth} />
+              </div>
+            </div>
+            <div className="flex flex-col items-end gap-1 text-right flex-shrink-0">
+              <span className="text-xs text-slate-500">Sector Percentile</span>
+              <span className="text-2xl font-bold text-white">{vendorState.sectorPercentile}<span className="text-sm text-slate-500">th</span></span>
+            </div>
+          </div>
+        )}
+
+        {/* ── Contextual Alerts ───────────────────────────────────── */}
+        {alerts.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-neutral-400">
+                Action Required ({alerts.length})
+              </h2>
+              {dismissedAlerts.size > 0 && (
+                <button
+                  onClick={() => {
+                    setDismissedAlerts(new Set());
+                    localStorage.removeItem('booppa_dismissed_alerts');
+                  }}
+                  className="text-[10px] text-slate-600 hover:text-slate-400 transition-colors"
+                >
+                  Show dismissed
+                </button>
+              )}
+            </div>
+            <div className="space-y-3">
+              {alerts.map(alert => (
+                <AlertCard
+                  key={alert.id}
+                  alert={alert}
+                  onDismiss={handleDismissAlert}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Top KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -308,7 +396,7 @@ export default function VendorDashboard() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
                     <XAxis dataKey="name" stroke="#525252" tick={{fill: '#a3a3a3', fontSize: 12}} axisLine={false} tickLine={false} />
                     <YAxis stroke="#525252" tick={{fill: '#a3a3a3', fontSize: 12}} axisLine={false} tickLine={false} />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{ backgroundColor: '#171717', borderColor: '#262626', color: '#fff' }}
                       itemStyle={{ color: '#fff' }}
                     />

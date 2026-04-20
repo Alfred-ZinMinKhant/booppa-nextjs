@@ -1,17 +1,49 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 
-export const metadata = {
-  title: 'For Vendors — Claim, Verify & Win More Contracts | BOOPPA',
-  description: 'Claim your free company profile, get verified, and prove procurement-readiness to win more Singapore government and enterprise contracts.',
-};
+function CheckItem({ text, color = 'text-[#10b981]' }: { text: string; color?: string }) {
+  return (
+    <li className="flex items-start gap-2 text-sm text-[#64748b]">
+      <span className={`${color} font-bold flex-shrink-0`}>&#10003;</span>{text}
+    </li>
+  );
+}
+
+async function startCheckout(productType: string): Promise<void> {
+  try {
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productType }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(data.error || 'Unable to start checkout. Please try again.');
+    }
+  } catch {
+    alert('Unable to start checkout. Please try again.');
+  }
+}
 
 export default function SolutionsVendorsPage() {
+  const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
+
+  async function handleCheckout(productType: string) {
+    setLoadingProduct(productType);
+    await startCheckout(productType);
+    setLoadingProduct(null);
+  }
+
   return (
-    <main className="overflow-x-hidden">
+    <main className="bg-white min-h-screen overflow-x-hidden">
 
       {/* Hero */}
       <section className="py-24 px-6 bg-[#0f172a] text-white">
-        <div className="max-w-[1100px] mx-auto text-center">
+        <div className="max-w-[1200px] mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#10b981] rounded-full text-sm font-medium text-[#10b981] mb-8 bg-[rgba(16,185,129,0.1)]">
             For Vendors
           </div>
@@ -20,179 +52,140 @@ export default function SolutionsVendorsPage() {
             <span className="text-[#10b981]">Prove your compliance.</span><br />
             Win more contracts.
           </h1>
-          <p className="text-xl text-white/70 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Stop losing RFPs because of missing paperwork. Claim your free BOOPPA profile, get verified, and submit procurement-ready evidence in hours — not weeks.
+          <p className="text-xl text-white/70 mb-6 max-w-2xl mx-auto leading-relaxed">
+            Stop losing RFPs because of missing paperwork. Choose the plan that fits your needs and become procurement-ready in hours &mdash; not weeks.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/auth/register" className="px-8 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition-colors text-lg">
-              Claim your Company Profile (Free)
-            </Link>
-            <Link href="/check-status" className="px-8 py-4 border border-white/20 hover:border-white/50 text-white font-bold rounded-xl transition-colors text-lg">
-              Check your Trust Status
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Problem */}
-      <section className="py-24 px-6 bg-[#f8fafc]">
-        <div className="max-w-[1100px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold mb-4 text-[#0f172a]">Most vendors lose opportunities before they even apply</h2>
-            <p className="text-xl text-[#64748b]">Disqualification rarely happens because of price. It happens before you even get to the table.</p>
+      {/* 5 Vendor Cards */}
+      <section className="py-20 px-6">
+        <div className="max-w-[1300px] mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">Choose Your Plan</h2>
+            <p className="text-lg text-[#64748b] max-w-2xl mx-auto">Everything you need to become procurement-ready. No hidden fees. No &ldquo;contact sales&rdquo; gatekeeping.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { icon: '❌', title: 'Missing Compliance Evidence', quote: '"Procurement rejected our RFP. Section 4 requires PDPA documentation we didn\'t have."' },
-              { icon: '⏱️', title: 'Consultants Take Weeks', quote: '"Compliance consultant quoted SGD 5,000 and 4 weeks. Our RFP deadline was in 3 days."' },
-              { icon: '📄', title: 'Wrong Format', quote: '"We had a compliance report but GeBIZ required a specific structured format. Disqualified."' },
-            ].map((item, i) => (
-              <div key={i} className="bg-white p-8 rounded-2xl border border-[#e2e8f0] shadow-sm">
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="text-xl font-bold mb-3 text-[#0f172a]">{item.title}</h3>
-                <p className="text-[#64748b] italic text-sm">{item.quote}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Solution — 3 Steps */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-[1100px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold mb-4 text-[#0f172a]">Claim → Verify → Become Procurement-Ready</h2>
-            <p className="text-xl text-[#64748b]">Three steps. No audit cycles. No consultancy fees.</p>
-          </div>
-          <div className="flex flex-wrap items-start justify-center gap-8 lg:gap-4">
-            {[
-              { step: '1', title: 'Claim your Profile', desc: 'Register for free and claim your company profile on BOOPPA. Takes under 5 minutes.' },
-              { step: '2', title: 'Get Verified', desc: 'Submit compliance documents — PDPA, financial records, certifications. We timestamp and anchor them on blockchain.' },
-              { step: '3', title: 'Become Procurement-Ready', desc: 'Your verified profile is visible to procurement teams. Attach your evidence packages directly to RFP submissions.' },
-            ].map((item, i) => (
-              <div key={i} className="flex-1 min-w-[220px] max-w-[300px] text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#10b981] to-[#059669] rounded-full flex items-center justify-center text-2xl font-bold text-white mb-6 mx-auto">{item.step}</div>
-                <h3 className="text-xl font-bold mb-3 text-[#0f172a]">{item.title}</h3>
-                <p className="text-[#64748b] text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
 
-      {/* Products */}
-      <section className="py-24 px-6 bg-[#f8fafc]">
-        <div className="max-w-[1100px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-[#0f172a]">Everything you need to win</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { label: 'Free', title: 'Company Profile', desc: 'Claim your profile, add business details, appear in the Vendor Network.', href: '/auth/register', cta: 'Claim Free →' },
-              { label: 'SGD 79', title: 'PDPA Scan', desc: 'Automated compliance check across 8 PDPA obligations. Blockchain-timestamped risk report.', href: '/pdpa', cta: 'Run Scan →' },
-              { label: 'SGD 249', title: 'RFP Kit Express', desc: '5 copy-ready RFP answers + Vendor Proof certificate. Ready within 24 hours.', href: '/rfp-acceleration#express', cta: 'Get Express →' },
-              { label: 'SGD 599', title: 'RFP Kit Complete', desc: '15 RFP answers, editable DOCX, attestation letter. Enterprise-grade submission pack.', href: '/rfp-acceleration#complete', cta: 'Get Kit →' },
-            ].map((p, i) => (
-              <div key={i} className="bg-white p-8 rounded-2xl border border-[#e2e8f0] hover:border-[#10b981] hover:shadow-lg transition-all">
-                <div className="text-sm font-bold text-[#10b981] mb-2">{p.label}</div>
-                <h3 className="text-lg font-bold mb-2 text-[#0f172a]">{p.title}</h3>
-                <p className="text-sm text-[#64748b] mb-6">{p.desc}</p>
-                <Link href={p.href} className="text-[#10b981] font-bold text-sm hover:underline">{p.cta}</Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Sample Output Preview */}
-      <section className="py-24 px-6 bg-[#0f172a] text-white">
-        <div className="max-w-[1100px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">What you actually receive</h2>
-            <p className="text-white/60 text-xl">Real deliverables — not a dashboard you have to interpret yourself.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            {/* PDPA Report sample */}
-            <div className="bg-[#1e293b] rounded-2xl border border-white/10 overflow-hidden">
-              <div className="bg-[#0f172a] border-b border-white/10 px-5 py-3 flex items-center gap-2">
-                <span className="text-[#10b981] text-xs font-bold uppercase tracking-widest">PDPA Report</span>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-white/60 text-sm">Compliance Score</span>
-                  <span className="text-[#10b981] font-black text-2xl">74<span className="text-sm font-normal text-white/40">/100</span></span>
-                </div>
-                <div className="w-full bg-white/10 rounded-full h-2">
-                  <div className="bg-[#10b981] h-2 rounded-full" style={{ width: '74%' }} />
-                </div>
-                <div className="space-y-2 pt-2">
-                  {['Notice & Collection', 'Purpose Limitation', 'Consent', 'Access & Correction'].map((item, i) => (
-                    <div key={i} className="flex items-center justify-between text-xs">
-                      <span className="text-white/60">{item}</span>
-                      <span className={i === 2 ? 'text-[#f59e0b] font-bold' : 'text-[#10b981] font-bold'}>{i === 2 ? 'PARTIAL' : 'PASS'}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="pt-3 border-t border-white/10 text-xs text-white/40 font-mono break-all">
-                  tx: 0x3f7a...e92b · Polygon · {new Date().toLocaleDateString('en-SG')}
-                </div>
-              </div>
-            </div>
-
-            {/* Notarization Certificate sample */}
-            <div className="bg-[#1e293b] rounded-2xl border border-white/10 overflow-hidden">
-              <div className="bg-[#0f172a] border-b border-white/10 px-5 py-3 flex items-center gap-2">
-                <span className="text-[#10b981] text-xs font-bold uppercase tracking-widest">Notarization Certificate</span>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="text-white/80 text-sm font-semibold">BOOPPA Notarization</div>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between"><span className="text-white/40">Document</span><span className="text-white/80">ISO27001_cert.pdf</span></div>
-                  <div className="flex justify-between"><span className="text-white/40">Hash (SHA-256)</span><span className="text-white/60 font-mono">a3f8...c012</span></div>
-                  <div className="flex justify-between"><span className="text-white/40">Blockchain</span><span className="text-[#10b981]">Polygon Mainnet</span></div>
-                  <div className="flex justify-between"><span className="text-white/40">Status</span><span className="text-[#10b981] font-bold">ANCHORED ✓</span></div>
-                </div>
-                <div className="flex items-center gap-3 pt-3 border-t border-white/10">
-                  <div className="w-12 h-12 bg-white/5 border border-white/20 rounded-lg flex items-center justify-center text-[#10b981] text-xl">▦</div>
-                  <div className="text-xs text-white/40">QR code — scan to verify on Polygonscan</div>
-                </div>
-              </div>
-            </div>
-
-            {/* RFP Kit sample */}
-            <div className="bg-[#1e293b] rounded-2xl border border-white/10 overflow-hidden">
-              <div className="bg-[#0f172a] border-b border-white/10 px-5 py-3 flex items-center gap-2">
-                <span className="text-[#10b981] text-xs font-bold uppercase tracking-widest">RFP Evidence Package</span>
-              </div>
-              <div className="p-6 space-y-3">
-                <div className="text-white/80 text-sm font-semibold mb-2">Delivered files</div>
-                {[
-                  { icon: '📄', name: 'rfp_answers.docx', desc: '15 copy-ready answers' },
-                  { icon: '📋', name: 'vendor_proof.pdf', desc: 'Blockchain-anchored certificate' },
-                  { icon: '✍️', name: 'attestation_letter.pdf', desc: 'Signed compliance statement' },
-                  { icon: '🔗', name: 'polygonscan_url.txt', desc: 'Immutable blockchain record' },
-                ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg">
-                    <span>{f.icon}</span>
-                    <div>
-                      <div className="text-xs text-white/80 font-mono">{f.name}</div>
-                      <div className="text-xs text-white/40">{f.desc}</div>
-                    </div>
-                  </div>
+            {/* 1 — Free Profile */}
+            <div className="bg-white p-6 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#64748b] self-start mb-4">Always free</span>
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2">Free Profile</h3>
+              <div className="text-3xl font-black text-[#0f172a] mb-1">SGD 0</div>
+              <p className="text-xs text-[#64748b] mb-5">Claim your presence on Booppa</p>
+              <ul className="space-y-2 mb-6 flex-1">
+                {['Claim your company profile', 'Basic public listing', 'Appear in vendor search', 'GeBIZ opportunity feed', 'Tender Win Probability calculator'].map((f) => (
+                  <CheckItem key={f} text={f} />
                 ))}
+              </ul>
+              <Link href="/auth/register" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm">
+                Claim Profile
+              </Link>
+            </div>
+
+            {/* 2 — Vendor Proof */}
+            <div className="bg-[#0f172a] p-6 rounded-[2rem] border-2 border-[#10b981] shadow-xl relative hover:-translate-y-1 transition-all flex flex-col">
+              <div className="absolute top-[-12px] left-1/2 -translate-x-1/2 bg-[#10b981] text-white px-4 py-0.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+                Start Here
               </div>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/20 text-[#10b981] self-start mb-4">Lifetime</span>
+              <h3 className="text-lg font-bold text-white mb-2">Vendor Proof</h3>
+              <div className="text-3xl font-black text-[#10b981] mb-1">SGD 149</div>
+              <p className="text-xs text-white/60 mb-5">One-time payment, no renewal</p>
+              <ul className="space-y-2 mb-6 flex-1">
+                {['Verified badge on public profile', 'Visible in verified-only buyer searches', 'complianceScore baseline (30/100)', 'Embeddable trust badge', 'CAL engine activated at Level 1'].map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm text-white/80">
+                    <span className="text-[#10b981] font-bold flex-shrink-0">&#10003;</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/vendor-proof" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/30 text-sm">
+                Get Vendor Proof &mdash; SGD 149
+              </Link>
+            </div>
+
+            {/* 3 — Vendor Trust Pack */}
+            <div className="bg-white p-6 rounded-[2rem] border-2 border-[#10b981] shadow-lg hover:-translate-y-1 transition-all flex flex-col">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/10 text-[#10b981] self-start mb-4">Bundle &middot; 32% off</span>
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2">Vendor Trust Pack</h3>
+              <div className="flex items-end gap-2 mb-1">
+                <span className="text-3xl font-black text-[#0f172a]">SGD 249</span>
+                <span className="text-[#94a3b8] line-through text-sm mb-1">SGD 366</span>
+              </div>
+              <p className="text-xs text-[#10b981] font-semibold mb-5">Save SGD 117</p>
+              <ul className="space-y-2 mb-6 flex-1">
+                {['Vendor Proof (SGD 149)', 'PDPA Snapshot (SGD 79)', '2 Notarizations (SGD 138)', 'Complete trust foundation', 'Blockchain-anchored evidence'].map((f) => (
+                  <CheckItem key={f} text={f} />
+                ))}
+              </ul>
+              <button
+                onClick={() => handleCheckout('vendor_trust_pack')}
+                disabled={loadingProduct === 'vendor_trust_pack'}
+                className="block w-full text-center bg-[#10b981] hover:bg-[#059669] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition text-sm"
+              >
+                {loadingProduct === 'vendor_trust_pack' ? 'Redirecting\u2026' : 'Get Trust Pack \u2014 SGD 249'}
+              </button>
+            </div>
+
+            {/* 4 — RFP Accelerator */}
+            <div className="bg-white p-6 rounded-[2rem] border-2 border-violet-400 shadow-lg relative hover:-translate-y-1 transition-all flex flex-col">
+              <div className="absolute top-[-12px] left-1/2 -translate-x-1/2 bg-violet-500 text-white px-4 py-0.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+                Most Popular
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet-50 text-violet-600 self-start mb-4">Bundle &middot; 27% off</span>
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2">RFP Accelerator</h3>
+              <div className="flex items-end gap-2 mb-1">
+                <span className="text-3xl font-black text-[#0f172a]">SGD 449</span>
+                <span className="text-[#94a3b8] line-through text-sm mb-1">SGD 615</span>
+              </div>
+              <p className="text-xs text-violet-500 font-semibold mb-5">Save SGD 166</p>
+              <ul className="space-y-2 mb-6 flex-1">
+                {['Everything in Trust Pack', 'RFP Express (SGD 249)', 'Tender Readiness Score', 'Strategy 6 shortlist alert', 'Blockchain-anchored kit'].map((f) => (
+                  <CheckItem key={f} text={f} color="text-violet-500" />
+                ))}
+              </ul>
+              <button
+                onClick={() => handleCheckout('rfp_accelerator')}
+                disabled={loadingProduct === 'rfp_accelerator'}
+                className="block w-full text-center bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition text-sm"
+              >
+                {loadingProduct === 'rfp_accelerator' ? 'Redirecting\u2026' : 'Get RFP Accelerator \u2014 SGD 449'}
+              </button>
+            </div>
+
+            {/* 5 — Enterprise Bid Kit */}
+            <div className="bg-white p-6 rounded-[2rem] border-2 border-amber-400 shadow-lg hover:-translate-y-1 transition-all flex flex-col">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-600 self-start mb-4">Bundle &middot; 31% off</span>
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2">Enterprise Bid Kit</h3>
+              <div className="flex items-end gap-2 mb-1">
+                <span className="text-3xl font-black text-[#0f172a]">SGD 899</span>
+                <span className="text-[#94a3b8] line-through text-sm mb-1">SGD 1,310</span>
+              </div>
+              <p className="text-xs text-amber-600 font-semibold mb-5">Save SGD 411</p>
+              <ul className="space-y-2 mb-6 flex-1">
+                {['Vendor Trust Pack included', 'RFP Complete (SGD 599)', '5 extra Notarizations', 'Full procurement dossier', 'For contracts SGD 100k+'].map((f) => (
+                  <CheckItem key={f} text={f} color="text-amber-500" />
+                ))}
+              </ul>
+              <button
+                onClick={() => handleCheckout('enterprise_bid_kit')}
+                disabled={loadingProduct === 'enterprise_bid_kit'}
+                className="block w-full text-center bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition text-sm"
+              >
+                {loadingProduct === 'enterprise_bid_kit' ? 'Redirecting\u2026' : 'Get Enterprise Bid Kit \u2014 SGD 899'}
+              </button>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-24 px-6 bg-[#0f172a] text-white text-center">
+      {/* CTA */}
+      <section className="py-20 px-6 bg-[#0f172a] text-white text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl lg:text-5xl font-black mb-6">Ready to become procurement-ready?</h2>
-          <p className="text-white/70 text-xl mb-10">Claim your free company profile today. No credit card required.</p>
+          <h2 className="text-3xl lg:text-5xl font-black mb-6">Not sure where to start?</h2>
+          <p className="text-white/70 text-xl mb-10">Claim your free company profile. No credit card required.</p>
           <Link href="/auth/register" className="inline-block px-10 py-5 bg-[#10b981] hover:bg-[#059669] text-white font-black text-xl rounded-2xl transition-colors shadow-lg">
             Claim your Company Profile (Free)
           </Link>
