@@ -180,6 +180,15 @@ function TenderCheckContent() {
 			.catch(() => setAuthed(false));
 	}, []);
 
+	// Show/hide gate based on auth state and result data
+	useEffect(() => {
+		if (result && authed === false && !result.vendorProfile) {
+			setShowGate(true);
+		} else if (authed === true || (result && result.vendorProfile)) {
+			setShowGate(false);
+		}
+	}, [result, authed]);
+
 	// Auto-search on mount — vendor ID is injected server-side by the API route
 	useEffect(() => {
 		const no = searchParams.get("tenderNo");
@@ -233,7 +242,6 @@ function TenderCheckContent() {
 			}
 			const data: TenderResult = await res.json();
 			setResult(data);
-			if (!authed) setShowGate(true);
 			router.replace(`/tender-check?tenderNo=${encodeURIComponent(no)}`, {
 				scroll: false,
 			});
