@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Shield, Mail, Lock, Building2, AlertCircle, Loader2, Factory } from 'lucide-react'
+import { Shield, Mail, Lock, Building2, AlertCircle, Loader2, Factory, Globe } from 'lucide-react'
 import HardenedClickwrap from '@/components/legal/HardenedClickwrap'
 import { config } from '@/lib/config'
 import { INDUSTRY_OPTIONS } from '@/lib/industries'
@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [company, setCompany] = useState('')
+  const [website, setWebsite] = useState('')
   const [industry, setIndustry] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -36,7 +37,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, company, industry: industry || undefined }),
+        body: JSON.stringify({ email, password, company, website: website || undefined, industry: industry || undefined }),
       })
 
       if (!res.ok) {
@@ -100,6 +101,22 @@ export default function RegisterPage() {
                   value={company}
                   onChange={e => setCompany(e.target.value)}
                   placeholder="Acme Pte Ltd"
+                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+                Company website
+              </label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                <input
+                  type="text"
+                  value={website}
+                  onChange={e => setWebsite(e.target.value)}
+                  placeholder="acme.com.sg"
                   className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
                 />
               </div>
