@@ -168,7 +168,7 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/rfp" className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                  <Link href="/rfp-acceleration" className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white font-semibold py-2.5 rounded-xl transition text-sm">
                     Get RFP Express
                   </Link>
                 </div>
@@ -183,7 +183,7 @@ export default function PricingPage() {
                       <CheckItem key={f} text={f} color="text-emerald-500" />
                     ))}
                   </ul>
-                  <Link href="/rfp" className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                  <Link href="/rfp-acceleration" className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl transition text-sm">
                     Get RFP Complete
                   </Link>
                 </div>

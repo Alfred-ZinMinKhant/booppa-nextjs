@@ -60,7 +60,19 @@ export default function RFPAccelerationPage() {
 
   useEffect(() => {
     fetch('/api/auth/me')
-      .then(r => setAuthed(r.ok))
+      .then(r => {
+        if (!r.ok) { setAuthed(false); return null; }
+        setAuthed(true);
+        return r.json();
+      })
+      .then(data => {
+        if (!data) return;
+        setForm(prev => ({
+          ...prev,
+          company_name: prev.company_name || data.company || '',
+          vendor_url: prev.vendor_url || data.website || '',
+        }));
+      })
       .catch(() => setAuthed(false))
   }, [])
   const [modalProduct, setModalProduct] = useState<string | null>(null);

@@ -38,7 +38,7 @@ const forVendors = [
 	},
 	{
 		name: "RFP Express — S$249",
-		href: "/rfp",
+		href: "/rfp-acceleration",
 		desc: "Submit a credibility-backed tender response instead of price-only bids",
 	},
 	{
@@ -99,7 +99,7 @@ const solutions = [
 	},
 	{
 		name: "RFP Tools",
-		href: "/rfp",
+		href: "/rfp-acceleration",
 		desc: "Turn tender bids from price-only into credibility-backed proposals",
 	},
 	{

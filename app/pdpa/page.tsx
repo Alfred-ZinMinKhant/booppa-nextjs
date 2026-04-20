@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { config } from '@/lib/config';
 
@@ -18,7 +18,17 @@ function normalizeUrl(input: string): string {
 
 export default function PDPAPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [prefill, setPrefill] = useState<{email?: string; company?: string; website?: string}>({});
   const apiBase = config.apiUrl;
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data) setPrefill({ email: data.email, company: data.company, website: data.website });
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -101,11 +111,13 @@ export default function PDPAPage() {
                 <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="website">
                   Website URL *
                 </label>
-                <input 
-                  type="text" 
-                  id="website" 
-                  name="website" 
-                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all" 
+                <input
+                  type="text"
+                  id="website"
+                  name="website"
+                  key={`website-${prefill.website || ''}`}
+                  defaultValue={prefill.website || ''}
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all"
                   placeholder="booppa.io"
                   required
                 />
@@ -118,11 +130,13 @@ export default function PDPAPage() {
                 <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="email">
                   Business Email *
                 </label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  name="email" 
-                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all" 
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  key={`email-${prefill.email || ''}`}
+                  defaultValue={prefill.email || ''}
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all"
                   placeholder="your@company.sg"
                   required
                 />
@@ -135,11 +149,13 @@ export default function PDPAPage() {
                 <label className="block text-sm font-bold text-[#1e293b] mb-2" htmlFor="company">
                   Company Name (Optional)
                 </label>
-                <input 
-                  type="text" 
-                  id="company" 
-                  name="company" 
-                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all" 
+                <input
+                  type="text"
+                  id="company"
+                  name="company"
+                  key={`company-${prefill.company || ''}`}
+                  defaultValue={prefill.company || ''}
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent outline-none transition-all"
                   placeholder="Your Company Pte Ltd"
                 />
                 <p className="mt-2 text-xs text-[#94a3b8]">

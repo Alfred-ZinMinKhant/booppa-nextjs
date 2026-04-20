@@ -27,7 +27,17 @@ function VendorProofContent() {
 
   useEffect(() => {
     fetch('/api/auth/me')
-      .then(r => setAuthed(r.ok))
+      .then(r => {
+        if (!r.ok) { setAuthed(false); return null; }
+        setAuthed(true);
+        return r.json();
+      })
+      .then(data => {
+        if (!data) return;
+        if (!website && data.website) setWebsite(data.website);
+        if (!company && data.company) setCompany(data.company);
+        if (!email && data.email) setEmail(data.email);
+      })
       .catch(() => setAuthed(false))
   }, [])
 
