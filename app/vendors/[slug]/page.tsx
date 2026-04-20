@@ -91,8 +91,7 @@ export default async function VendorSlugPage({ params }: VendorPageProps) {
 }
 
 function scoreBar(val: number) {
-	const color =
-		val >= 70 ? "#10b981" : val >= 40 ? "#f59e0b" : "#ef4444";
+	const color = val >= 70 ? "#10b981" : val >= 40 ? "#f59e0b" : "#ef4444";
 	return (
 		<div className="flex items-center gap-2">
 			<div className="flex-1 h-1.5 bg-[#f1f5f9] rounded-full overflow-hidden">
@@ -117,7 +116,9 @@ function depthBadge(d: string) {
 		UNVERIFIED: "bg-[#f1f5f9] text-[#94a3b8]",
 	};
 	return (
-		<span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold uppercase ${map[d] ?? "bg-[#f1f5f9] text-[#94a3b8]"}`}>
+		<span
+			className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold uppercase ${map[d] ?? "bg-[#f1f5f9] text-[#94a3b8]"}`}
+		>
 			{d}
 		</span>
 	);
@@ -131,7 +132,9 @@ function riskBadge(r: string) {
 		CRITICAL: "bg-red-50 text-red-600",
 	};
 	return (
-		<span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold uppercase ${map[r] ?? "bg-[#f1f5f9] text-[#94a3b8]"}`}>
+		<span
+			className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold uppercase ${map[r] ?? "bg-[#f1f5f9] text-[#94a3b8]"}`}
+		>
 			{r}
 		</span>
 	);
@@ -145,7 +148,9 @@ function readinessBadge(p: string) {
 		NOT_READY: "bg-[#f1f5f9] text-[#94a3b8]",
 	};
 	return (
-		<span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold uppercase ${map[p] ?? "bg-[#f1f5f9] text-[#94a3b8]"}`}>
+		<span
+			className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold uppercase ${map[p] ?? "bg-[#f1f5f9] text-[#94a3b8]"}`}
+		>
 			{p.replace(/_/g, " ")}
 		</span>
 	);
@@ -268,12 +273,13 @@ function VendorProfile({ vendor }: { vendor: any }) {
 							</div>
 						)}
 
-
 						{/* Procurement Intelligence */}
 						{(vendor.scores || vendor.status) && (
 							<div className="bg-white p-8 rounded-2xl border border-[#e2e8f0]">
 								<div className="flex items-center gap-2 mb-6">
-									<h2 className="text-lg font-bold text-[#0f172a]">Procurement Intelligence</h2>
+									<h2 className="text-lg font-bold text-[#0f172a]">
+										Procurement Intelligence
+									</h2>
 									{vendor.verified && (
 										<span className="inline-flex items-center gap-1 bg-[#10b981]/10 text-[#10b981] text-xs font-bold px-2.5 py-0.5 rounded-full">
 											✓ Verified Data
@@ -283,18 +289,40 @@ function VendorProfile({ vendor }: { vendor: any }) {
 
 								{vendor.scores && (
 									<div className="mb-6">
-										<p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wider mb-3">Trust Scores</p>
+										<p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wider mb-3">
+											Trust Scores
+										</p>
 										<div className="space-y-3">
 											{[
-												{ label: "Overall Trust Score", val: vendor.scores.total_score },
-												{ label: "Compliance", val: vendor.scores.compliance_score },
-												{ label: "Visibility", val: vendor.scores.visibility_score },
-												{ label: "Engagement", val: vendor.scores.engagement_score },
+												{
+													label: "Overall Trust Score",
+													val: vendor.scores.total_score,
+												},
+												{
+													label: "Compliance",
+													val: vendor.scores.compliance_score,
+												},
+												{
+													label: "Visibility",
+													val: vendor.scores.visibility_score,
+												},
+												{
+													label: "Engagement",
+													val: vendor.scores.engagement_score,
+												},
 												{ label: "Recency", val: vendor.scores.recency_score },
-												{ label: "Procurement Interest", val: vendor.scores.procurement_interest_score },
+												{
+													label: "Procurement Interest",
+													val: vendor.scores.procurement_interest_score,
+												},
 											].map(({ label, val }) => (
-												<div key={label} className="grid grid-cols-[160px_1fr] items-center gap-3">
-													<span className="text-xs text-[#64748b]">{label}</span>
+												<div
+													key={label}
+													className="grid grid-cols-[160px_1fr] items-center gap-3"
+												>
+													<span className="text-xs text-[#64748b]">
+														{label}
+													</span>
 													{scoreBar(val)}
 												</div>
 											))}
@@ -304,31 +332,51 @@ function VendorProfile({ vendor }: { vendor: any }) {
 
 								{vendor.status && (
 									<div>
-										<p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wider mb-3">Procurement Status</p>
+										<p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wider mb-3">
+											Procurement Status
+										</p>
 										<div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
 											<div>
-												<div className="text-xs text-[#94a3b8] mb-1">Verification Depth</div>
+												<div className="text-xs text-[#94a3b8] mb-1">
+													Verification Depth
+												</div>
 												{depthBadge(vendor.status.verification_depth)}
 											</div>
 											<div>
-												<div className="text-xs text-[#94a3b8] mb-1">Risk Signal</div>
+												<div className="text-xs text-[#94a3b8] mb-1">
+													Risk Signal
+												</div>
 												{riskBadge(vendor.status.risk_signal)}
 											</div>
 											<div>
-												<div className="text-xs text-[#94a3b8] mb-1">Procurement Readiness</div>
+												<div className="text-xs text-[#94a3b8] mb-1">
+													Procurement Readiness
+												</div>
 												{readinessBadge(vendor.status.procurement_readiness)}
 											</div>
 											<div>
-												<div className="text-xs text-[#94a3b8] mb-1">Monitoring Activity</div>
-												<span className="text-xs font-semibold text-[#0f172a] uppercase">{vendor.status.monitoring_activity}</span>
+												<div className="text-xs text-[#94a3b8] mb-1">
+													Monitoring Activity
+												</div>
+												<span className="text-xs font-semibold text-[#0f172a] uppercase">
+													{vendor.status.monitoring_activity}
+												</span>
 											</div>
 											<div>
-												<div className="text-xs text-[#94a3b8] mb-1">Evidence Count</div>
-												<span className="text-sm font-bold text-[#0f172a]">{vendor.status.evidence_count}</span>
+												<div className="text-xs text-[#94a3b8] mb-1">
+													Evidence Count
+												</div>
+												<span className="text-sm font-bold text-[#0f172a]">
+													{vendor.status.evidence_count}
+												</span>
 											</div>
 											<div>
-												<div className="text-xs text-[#94a3b8] mb-1">Notarization Depth</div>
-												<span className="text-sm font-bold text-[#0f172a]">{vendor.status.notarization_depth}/5</span>
+												<div className="text-xs text-[#94a3b8] mb-1">
+													Notarization Depth
+												</div>
+												<span className="text-sm font-bold text-[#0f172a]">
+													{vendor.status.notarization_depth}/5
+												</span>
 											</div>
 										</div>
 									</div>
@@ -342,27 +390,48 @@ function VendorProfile({ vendor }: { vendor: any }) {
 								<div className="flex items-start gap-3 mb-4">
 									<span className="text-2xl">⚠️</span>
 									<div>
-										<h2 className="text-lg font-bold text-[#0f172a]">No verified data for this vendor</h2>
+										<h2 className="text-lg font-bold text-[#0f172a]">
+											No verified data for this vendor
+										</h2>
 										<p className="text-sm text-[#64748b] mt-1">
-											This profile is unclaimed — there are no trust scores, compliance records, or risk signals on file.
+											This profile is unclaimed — there are no trust scores,
+											compliance records, or risk signals on file.
 										</p>
 									</div>
 								</div>
 								<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
 									{[
-										{ icon: "📋", label: "No compliance records", sub: "PDPA, ISO, and regulatory status unknown" },
-										{ icon: "🔍", label: "Risk unassessed", sub: "No active monitoring or anomaly detection" },
-										{ icon: "📦", label: "Procurement unready", sub: "Cannot be rated READY for sourcing decisions" },
+										{
+											icon: "📋",
+											label: "No compliance records",
+											sub: "PDPA, ISO, and regulatory status unknown",
+										},
+										{
+											icon: "🔍",
+											label: "Risk unassessed",
+											sub: "No active monitoring or anomaly detection",
+										},
+										{
+											icon: "📦",
+											label: "Procurement unready",
+											sub: "Cannot be rated READY for sourcing decisions",
+										},
 									].map(({ icon, label, sub }) => (
-										<div key={label} className="bg-white border border-amber-100 rounded-xl p-4">
+										<div
+											key={label}
+											className="bg-white border border-amber-100 rounded-xl p-4"
+										>
 											<div className="text-xl mb-1">{icon}</div>
-											<div className="text-xs font-bold text-[#0f172a] mb-0.5">{label}</div>
+											<div className="text-xs font-bold text-[#0f172a] mb-0.5">
+												{label}
+											</div>
 											<div className="text-xs text-[#64748b]">{sub}</div>
 										</div>
 									))}
 								</div>
 								<p className="text-xs text-[#94a3b8] mb-3">
-									Run a Vendor Proof to generate a public trust record for this company, or prompt them to claim their profile.
+									Run a Vendor Proof to generate a public trust record for this
+									company, or prompt them to claim their profile.
 								</p>
 								<div className="flex flex-wrap gap-3">
 									<Link
@@ -387,20 +456,37 @@ function VendorProfile({ vendor }: { vendor: any }) {
 								<div className="flex items-start gap-3 mb-4">
 									<span className="text-2xl">🏢</span>
 									<div>
-										<h2 className="text-lg font-bold text-[#0f172a]">Profile claimed — verification pending</h2>
+										<h2 className="text-lg font-bold text-[#0f172a]">
+											Profile claimed — verification pending
+										</h2>
 										<p className="text-sm text-[#64748b] mt-1">
-											This vendor has registered with Booppa but hasn&apos;t completed a full Vendor Proof. Scores will be limited until verification is complete.
+											This vendor has registered with Booppa but hasn&apos;t
+											completed a full Vendor Proof. Scores will be limited
+											until verification is complete.
 										</p>
 									</div>
 								</div>
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
 									{[
-										{ icon: "📋", label: "Compliance unverified", sub: "Regulatory documents not yet checked against live registries" },
-										{ icon: "🔒", label: "Trust score provisional", sub: "Score reflects limited data — full check unlocks full score" },
+										{
+											icon: "📋",
+											label: "Compliance unverified",
+											sub: "Regulatory documents not yet checked against live registries",
+										},
+										{
+											icon: "🔒",
+											label: "Trust score provisional",
+											sub: "Score reflects limited data — full check unlocks full score",
+										},
 									].map(({ icon, label, sub }) => (
-										<div key={label} className="bg-white border border-blue-100 rounded-xl p-4">
+										<div
+											key={label}
+											className="bg-white border border-blue-100 rounded-xl p-4"
+										>
 											<div className="text-xl mb-1">{icon}</div>
-											<div className="text-xs font-bold text-[#0f172a] mb-0.5">{label}</div>
+											<div className="text-xs font-bold text-[#0f172a] mb-0.5">
+												{label}
+											</div>
 											<div className="text-xs text-[#64748b]">{sub}</div>
 										</div>
 									))}
