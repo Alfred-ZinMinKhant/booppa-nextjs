@@ -126,7 +126,7 @@ export default function SolutionsProcurementPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { title: 'Vendor Network', desc: 'Browse the full directory of Singapore SMEs. Filter by compliance status, sector, and verification depth.', href: '/vendors', cta: 'Browse Network \u2192' },
-              { title: 'Vendor Comparison', desc: 'Compare up to 3 vendors side-by-side across compliance scores, evidence, and procurement readiness.', href: '/compare', cta: 'Compare Vendors \u2192' },
+              { title: 'Vendor Comparison', desc: 'Compare up to 4 vendors side-by-side across compliance scores, evidence, and procurement readiness.', href: '/compare', cta: 'Compare Vendors \u2192' },
               { title: 'Document Verify', desc: 'Verify any BOOPPA-issued document instantly. Paste a blockchain hash or scan a QR code to confirm authenticity.', href: '/verify', cta: 'Verify a Document \u2192' },
             ].map((t, i) => (
               <div key={i} className="bg-white p-8 rounded-2xl border border-[#e2e8f0] hover:border-blue-400 hover:shadow-lg transition-all">
