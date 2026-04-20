@@ -6,7 +6,8 @@ import Link from 'next/link';
 function CheckItem({ text, color = 'text-[#10b981]' }: { text: string; color?: string }) {
   return (
     <li className="flex items-start gap-2 text-sm text-[#64748b]">
-      <span className={`${color} font-bold flex-shrink-0`}>&#10003;</span>{text}
+      <span className={`${color} font-bold mt-0.5 flex-shrink-0`}>✓</span>
+      <span>{text}</span>
     </li>
   );
 }
@@ -39,82 +40,107 @@ export default function SolutionsVendorsPage() {
   }
 
   return (
-    <main className="bg-white min-h-screen overflow-x-hidden">
+    <main className="bg-[#f8fafc] min-h-screen overflow-x-hidden">
 
       {/* Hero */}
       <section className="py-24 px-6 bg-[#0f172a] text-white">
-        <div className="max-w-[1200px] mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#10b981] rounded-full text-sm font-medium text-[#10b981] mb-8 bg-[rgba(16,185,129,0.1)]">
-            For Vendors
+        <div className="max-w-[1100px] mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#10b981]/50 rounded-full text-sm font-medium text-[#10b981] mb-8 bg-[#10b981]/10">
+            For Vendors &amp; SMEs
           </div>
           <h1 className="text-4xl lg:text-6xl font-black mb-6 leading-tight">
             Verify your company.<br />
             <span className="text-[#10b981]">Prove your compliance.</span><br />
             Win more contracts.
           </h1>
-          <p className="text-xl text-white/70 mb-6 max-w-2xl mx-auto leading-relaxed">
-            Stop losing RFPs because of missing paperwork. Choose the plan that fits your needs and become procurement-ready in hours &mdash; not weeks.
+          <p className="text-lg text-white/60 mb-12 max-w-xl mx-auto leading-relaxed">
+            Stop losing RFPs because of missing paperwork. Become procurement-ready in hours — not weeks.
           </p>
+          {/* Stats row */}
+          <div className="grid grid-cols-3 gap-6 max-w-xl mx-auto">
+            {[
+              { value: '30,000+', label: 'Vendors listed' },
+              { value: '1,000+', label: 'Live tenders' },
+              { value: 'SGD 0', label: 'To get started' },
+            ].map((s) => (
+              <div key={s.label} className="text-center">
+                <div className="text-2xl lg:text-3xl font-black text-[#10b981]">{s.value}</div>
+                <div className="text-xs text-white/50 mt-1">{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* 5 Vendor Cards */}
+      {/* Free plan banner */}
+      <section className="py-10 px-6 bg-white border-b border-[#e2e8f0]">
+        <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div>
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#64748b] mr-3">Always free</span>
+            <span className="text-lg font-bold text-[#0f172a]">Free Profile</span>
+            <span className="ml-3 text-[#64748b] text-sm">— Claim your company profile, appear in vendor search, access the GeBIZ opportunity feed &amp; Tender Win Probability calculator.</span>
+          </div>
+          <Link href="/auth/register" className="shrink-0 px-6 py-3 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold rounded-xl transition text-sm whitespace-nowrap">
+            Claim Free Profile →
+          </Link>
+        </div>
+      </section>
+
+      {/* Paid Plans */}
       <section className="py-20 px-6">
-        <div className="max-w-[1300px] mx-auto">
+        <div className="max-w-[1100px] mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">Choose Your Plan</h2>
-            <p className="text-lg text-[#64748b] max-w-2xl mx-auto">Everything you need to become procurement-ready. No hidden fees. No &ldquo;contact sales&rdquo; gatekeeping.</p>
+            <p className="text-[#64748b] max-w-lg mx-auto">Everything you need to become procurement-ready. No hidden fees. No &ldquo;contact sales&rdquo; gatekeeping.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
+          {/* Top row: Vendor Proof + Vendor Trust Pack */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
-            {/* 1 — Free Profile */}
-            <div className="bg-white p-6 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#64748b] self-start mb-4">Always free</span>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">Free Profile</h3>
-              <div className="text-3xl font-black text-[#0f172a] mb-1">SGD 0</div>
-              <p className="text-xs text-[#64748b] mb-5">Claim your presence on Booppa</p>
-              <ul className="space-y-2 mb-6 flex-1">
-                {['Claim your company profile', 'Basic public listing', 'Appear in vendor search', 'GeBIZ opportunity feed', 'Tender Win Probability calculator'].map((f) => (
-                  <CheckItem key={f} text={f} />
-                ))}
-              </ul>
-              <Link href="/auth/register" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm">
-                Claim Profile
-              </Link>
-            </div>
-
-            {/* 2 — Vendor Proof */}
-            <div className="bg-[#0f172a] p-6 rounded-[2rem] border-2 border-[#10b981] shadow-xl relative hover:-translate-y-1 transition-all flex flex-col">
-              <div className="absolute top-[-12px] left-1/2 -translate-x-1/2 bg-[#10b981] text-white px-4 py-0.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+            {/* Vendor Proof */}
+            <div className="bg-[#0f172a] p-8 rounded-3xl border-2 border-[#10b981] shadow-xl relative flex flex-col">
+              <div className="absolute top-[-13px] left-8 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                 Start Here
               </div>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/20 text-[#10b981] self-start mb-4">Lifetime</span>
-              <h3 className="text-lg font-bold text-white mb-2">Vendor Proof</h3>
-              <div className="text-3xl font-black text-[#10b981] mb-1">SGD 149</div>
-              <p className="text-xs text-white/60 mb-5">One-time payment, no renewal</p>
-              <ul className="space-y-2 mb-6 flex-1">
-                {['Verified badge on public profile', 'Visible in verified-only buyer searches', 'complianceScore baseline (30/100)', 'Embeddable trust badge', 'CAL engine activated at Level 1'].map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-white/80">
-                    <span className="text-[#10b981] font-bold flex-shrink-0">&#10003;</span>{f}
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/20 text-[#10b981]">Lifetime · one-time</span>
+                  <h3 className="text-2xl font-black text-white mt-3">Vendor Proof</h3>
+                  <p className="text-white/50 text-sm mt-1">Your verified badge on Booppa</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-4xl font-black text-[#10b981]">149</div>
+                  <div className="text-white/50 text-xs">SGD · no renewal</div>
+                </div>
+              </div>
+              <ul className="space-y-2.5 mb-8 flex-1">
+                {['Verified badge on your public profile', 'Appear in verified-only buyer searches', 'Compliance score baseline (30/100)', 'Embeddable trust badge for your website', 'CAL engine activated at Level 1'].map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm text-white/75">
+                    <span className="text-[#10b981] font-bold mt-0.5 flex-shrink-0">✓</span>
+                    <span>{f}</span>
                   </li>
                 ))}
               </ul>
-              <Link href="/vendor-proof" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/30 text-sm">
-                Get Vendor Proof &mdash; SGD 149
+              <Link href="/vendor-proof" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-[#10b981]/20">
+                Get Vendor Proof — SGD 149
               </Link>
             </div>
 
-            {/* 3 — Vendor Trust Pack */}
-            <div className="bg-white p-6 rounded-[2rem] border-2 border-[#10b981] shadow-lg hover:-translate-y-1 transition-all flex flex-col">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/10 text-[#10b981] self-start mb-4">Bundle &middot; 32% off</span>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">Vendor Trust Pack</h3>
-              <div className="flex items-end gap-2 mb-1">
-                <span className="text-3xl font-black text-[#0f172a]">SGD 249</span>
-                <span className="text-[#94a3b8] line-through text-sm mb-1">SGD 366</span>
+            {/* Vendor Trust Pack */}
+            <div className="bg-white p-8 rounded-3xl border-2 border-[#10b981] shadow-lg flex flex-col">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/10 text-[#10b981]">Bundle · 32% off</span>
+                  <h3 className="text-2xl font-black text-[#0f172a] mt-3">Vendor Trust Pack</h3>
+                  <p className="text-[#64748b] text-sm mt-1">Complete compliance foundation</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-4xl font-black text-[#0f172a]">249</div>
+                  <div className="text-[#94a3b8] line-through text-xs">SGD 366</div>
+                  <div className="text-[#10b981] text-xs font-bold">Save SGD 117</div>
+                </div>
               </div>
-              <p className="text-xs text-[#10b981] font-semibold mb-5">Save SGD 117</p>
-              <ul className="space-y-2 mb-6 flex-1">
+              <ul className="space-y-2.5 mb-8 flex-1">
                 {['Vendor Proof (SGD 149)', 'PDPA Snapshot (SGD 79)', '2 Notarizations (SGD 138)', 'Complete trust foundation', 'Blockchain-anchored evidence'].map((f) => (
                   <CheckItem key={f} text={f} />
                 ))}
@@ -122,61 +148,74 @@ export default function SolutionsVendorsPage() {
               <button
                 onClick={() => handleCheckout('vendor_trust_pack')}
                 disabled={loadingProduct === 'vendor_trust_pack'}
-                className="block w-full text-center bg-[#10b981] hover:bg-[#059669] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition text-sm"
+                className="w-full bg-[#10b981] hover:bg-[#059669] disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition"
               >
-                {loadingProduct === 'vendor_trust_pack' ? 'Redirecting\u2026' : 'Get Trust Pack \u2014 SGD 249'}
+                {loadingProduct === 'vendor_trust_pack' ? 'Redirecting…' : 'Get Trust Pack — SGD 249'}
               </button>
             </div>
+          </div>
 
-            {/* 4 — RFP Accelerator */}
-            <div className="bg-white p-6 rounded-[2rem] border-2 border-violet-400 shadow-lg relative hover:-translate-y-1 transition-all flex flex-col">
-              <div className="absolute top-[-12px] left-1/2 -translate-x-1/2 bg-violet-500 text-white px-4 py-0.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+          {/* Bottom row: RFP Accelerator + Enterprise Bid Kit */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* RFP Accelerator */}
+            <div className="bg-white p-8 rounded-3xl border-2 border-violet-400 shadow-lg relative flex flex-col">
+              <div className="absolute top-[-13px] left-8 bg-violet-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                 Most Popular
               </div>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet-50 text-violet-600 self-start mb-4">Bundle &middot; 27% off</span>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">RFP Accelerator</h3>
-              <div className="flex items-end gap-2 mb-1">
-                <span className="text-3xl font-black text-[#0f172a]">SGD 449</span>
-                <span className="text-[#94a3b8] line-through text-sm mb-1">SGD 615</span>
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet-50 text-violet-600">Bundle · 27% off</span>
+                  <h3 className="text-2xl font-black text-[#0f172a] mt-3">RFP Accelerator</h3>
+                  <p className="text-[#64748b] text-sm mt-1">Win government tenders faster</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-4xl font-black text-[#0f172a]">449</div>
+                  <div className="text-[#94a3b8] line-through text-xs">SGD 615</div>
+                  <div className="text-violet-500 text-xs font-bold">Save SGD 166</div>
+                </div>
               </div>
-              <p className="text-xs text-violet-500 font-semibold mb-5">Save SGD 166</p>
-              <ul className="space-y-2 mb-6 flex-1">
-                {['Everything in Trust Pack', 'RFP Express (SGD 249)', 'Tender Readiness Score', 'Strategy 6 shortlist alert', 'Blockchain-anchored kit'].map((f) => (
+              <ul className="space-y-2.5 mb-8 flex-1">
+                {['Everything in Vendor Trust Pack', 'RFP Express (SGD 249)', 'Tender Readiness Score', 'Strategy 6 shortlist alert', 'Blockchain-anchored bid kit'].map((f) => (
                   <CheckItem key={f} text={f} color="text-violet-500" />
                 ))}
               </ul>
               <button
                 onClick={() => handleCheckout('rfp_accelerator')}
                 disabled={loadingProduct === 'rfp_accelerator'}
-                className="block w-full text-center bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition text-sm"
+                className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition"
               >
-                {loadingProduct === 'rfp_accelerator' ? 'Redirecting\u2026' : 'Get RFP Accelerator \u2014 SGD 449'}
+                {loadingProduct === 'rfp_accelerator' ? 'Redirecting…' : 'Get RFP Accelerator — SGD 449'}
               </button>
             </div>
 
-            {/* 5 — Enterprise Bid Kit */}
-            <div className="bg-white p-6 rounded-[2rem] border-2 border-amber-400 shadow-lg hover:-translate-y-1 transition-all flex flex-col">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-600 self-start mb-4">Bundle &middot; 31% off</span>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">Enterprise Bid Kit</h3>
-              <div className="flex items-end gap-2 mb-1">
-                <span className="text-3xl font-black text-[#0f172a]">SGD 899</span>
-                <span className="text-[#94a3b8] line-through text-sm mb-1">SGD 1,310</span>
+            {/* Enterprise Bid Kit */}
+            <div className="bg-white p-8 rounded-3xl border-2 border-amber-400 shadow-lg flex flex-col">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-600">Bundle · 31% off</span>
+                  <h3 className="text-2xl font-black text-[#0f172a] mt-3">Enterprise Bid Kit</h3>
+                  <p className="text-[#64748b] text-sm mt-1">For contracts SGD 100k+</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-4xl font-black text-[#0f172a]">899</div>
+                  <div className="text-[#94a3b8] line-through text-xs">SGD 1,310</div>
+                  <div className="text-amber-600 text-xs font-bold">Save SGD 411</div>
+                </div>
               </div>
-              <p className="text-xs text-amber-600 font-semibold mb-5">Save SGD 411</p>
-              <ul className="space-y-2 mb-6 flex-1">
-                {['Vendor Trust Pack included', 'RFP Complete (SGD 599)', '5 extra Notarizations', 'Full procurement dossier', 'For contracts SGD 100k+'].map((f) => (
+              <ul className="space-y-2.5 mb-8 flex-1">
+                {['Vendor Trust Pack included', 'RFP Complete (SGD 599)', '5 extra Notarizations', 'Full procurement dossier', 'Priority support & review'].map((f) => (
                   <CheckItem key={f} text={f} color="text-amber-500" />
                 ))}
               </ul>
               <button
                 onClick={() => handleCheckout('enterprise_bid_kit')}
                 disabled={loadingProduct === 'enterprise_bid_kit'}
-                className="block w-full text-center bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition text-sm"
+                className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition"
               >
-                {loadingProduct === 'enterprise_bid_kit' ? 'Redirecting\u2026' : 'Get Enterprise Bid Kit \u2014 SGD 899'}
+                {loadingProduct === 'enterprise_bid_kit' ? 'Redirecting…' : 'Get Enterprise Bid Kit — SGD 899'}
               </button>
             </div>
-
           </div>
         </div>
       </section>
@@ -184,10 +223,10 @@ export default function SolutionsVendorsPage() {
       {/* CTA */}
       <section className="py-20 px-6 bg-[#0f172a] text-white text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl lg:text-5xl font-black mb-6">Not sure where to start?</h2>
-          <p className="text-white/70 text-xl mb-10">Claim your free company profile. No credit card required.</p>
-          <Link href="/auth/register" className="inline-block px-10 py-5 bg-[#10b981] hover:bg-[#059669] text-white font-black text-xl rounded-2xl transition-colors shadow-lg">
-            Claim your Company Profile (Free)
+          <h2 className="text-3xl lg:text-4xl font-black mb-4">Not sure where to start?</h2>
+          <p className="text-white/60 text-lg mb-10">Claim your free company profile. No credit card required.</p>
+          <Link href="/auth/register" className="inline-block px-10 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-black text-lg rounded-2xl transition-colors shadow-lg shadow-[#10b981]/20">
+            Claim your Company Profile (Free) →
           </Link>
         </div>
       </section>
