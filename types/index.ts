@@ -116,6 +116,7 @@ export interface MarketplaceVendor {
   logo_url?: string
   claimed: boolean
   verified?: boolean
+  scan_status?: string
   trust_score?: number
   tier?: string
   created_at: string
