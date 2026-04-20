@@ -65,7 +65,7 @@ export default function VendorDashboard() {
     setDismissedAlerts(prev => {
       const next = new Set(prev);
       next.add(id);
-      localStorage.setItem('booppa_dismissed_alerts', JSON.stringify([...next]));
+      localStorage.setItem('booppa_dismissed_alerts', JSON.stringify(Array.from(next)));
       return next;
     });
   };
