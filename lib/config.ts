@@ -21,7 +21,7 @@ export const endpoints = {
   marketplace: {
     search:     '/marketplace/search',
     industries: '/marketplace/industries',
-    vendor:     (slug: string) => `/marketplace/${slug}`,
+    vendor:     (slug: string) => `/marketplace/vendor/${slug}`,
     importCsv:  '/marketplace/import/csv',
   },
   features: {
