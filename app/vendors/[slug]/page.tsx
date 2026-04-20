@@ -91,26 +91,33 @@ export default async function VendorSlugPage({ params }: VendorPageProps) {
 }
 
 function VendorProfile({ vendor }: { vendor: any }) {
-	const initials = vendor.company_name
-		?.split(" ")
-		.slice(0, 2)
-		.map((w: string) => w[0])
-		.join("")
-		.toUpperCase() || "V";
+	const initials =
+		vendor.company_name
+			?.split(" ")
+			.slice(0, 2)
+			.map((w: string) => w[0])
+			.join("")
+			.toUpperCase() || "V";
 
 	const location = [vendor.city, vendor.country].filter(Boolean).join(", ");
 
-	const memberSince = vendor.claimed_at || vendor.created_at
-		? new Date(vendor.claimed_at || vendor.created_at).toLocaleDateString("en-SG", { month: "short", year: "numeric" })
-		: null;
+	const memberSince =
+		vendor.claimed_at || vendor.created_at
+			? new Date(vendor.claimed_at || vendor.created_at).toLocaleDateString(
+					"en-SG",
+					{ month: "short", year: "numeric" },
+				)
+			: null;
 
 	return (
 		<main className="min-h-screen bg-[#f8fafc]">
-
 			{/* Hero */}
 			<section className="py-14 px-6 bg-[#0f172a] text-white">
 				<div className="max-w-[1100px] mx-auto">
-					<Link href="/vendors" className="text-[#94a3b8] hover:text-white mb-6 inline-flex items-center gap-1.5 text-sm transition-colors">
+					<Link
+						href="/vendors"
+						className="text-[#94a3b8] hover:text-white mb-6 inline-flex items-center gap-1.5 text-sm transition-colors"
+					>
 						← Back to directory
 					</Link>
 
@@ -147,13 +154,14 @@ function VendorProfile({ vendor }: { vendor: any }) {
 							{/* Quick facts row */}
 							<div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#94a3b8]">
 								{location && (
-									<span className="flex items-center gap-1">
-										📍 {location}
-									</span>
+									<span className="flex items-center gap-1">📍 {location}</span>
 								)}
 								{vendor.uen && (
 									<span className="flex items-center gap-1">
-										🏢 UEN: <span className="font-mono text-white/80">{vendor.uen}</span>
+										🏢 UEN:{" "}
+										<span className="font-mono text-white/80">
+											{vendor.uen}
+										</span>
 									</span>
 								)}
 								{vendor.domain && (
@@ -172,7 +180,9 @@ function VendorProfile({ vendor }: { vendor: any }) {
 						{/* Trust score */}
 						{vendor.trust_score != null && (
 							<div className="flex-shrink-0 text-center bg-white/5 border border-white/10 rounded-2xl px-6 py-4">
-								<div className={`text-5xl font-black ${vendor.trust_score >= 80 ? "text-[#10b981]" : vendor.trust_score >= 50 ? "text-yellow-400" : "text-red-400"}`}>
+								<div
+									className={`text-5xl font-black ${vendor.trust_score >= 80 ? "text-[#10b981]" : vendor.trust_score >= 50 ? "text-yellow-400" : "text-red-400"}`}
+								>
 									{vendor.trust_score}
 								</div>
 								<div className="text-xs text-[#94a3b8] mt-1">Trust Score</div>
@@ -185,51 +195,75 @@ function VendorProfile({ vendor }: { vendor: any }) {
 			{/* Body */}
 			<section className="py-12 px-6">
 				<div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-
 					{/* ── Left / Main ── */}
 					<div className="lg:col-span-2 space-y-6">
-
 						{/* About */}
 						{vendor.short_description && (
 							<div className="bg-white p-8 rounded-2xl border border-[#e2e8f0]">
 								<h2 className="text-lg font-bold text-[#0f172a] mb-3">About</h2>
-								<p className="text-[#64748b] leading-relaxed">{vendor.short_description}</p>
+								<p className="text-[#64748b] leading-relaxed">
+									{vendor.short_description}
+								</p>
 							</div>
 						)}
 
 						{/* Company details */}
 						<div className="bg-white p-8 rounded-2xl border border-[#e2e8f0]">
-							<h2 className="text-lg font-bold text-[#0f172a] mb-5">Company Details</h2>
+							<h2 className="text-lg font-bold text-[#0f172a] mb-5">
+								Company Details
+							</h2>
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-8">
 								{vendor.uen && (
 									<div>
-										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">UEN</div>
-										<div className="font-mono font-semibold text-[#0f172a]">{vendor.uen}</div>
+										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">
+											UEN
+										</div>
+										<div className="font-mono font-semibold text-[#0f172a]">
+											{vendor.uen}
+										</div>
 									</div>
 								)}
 								{vendor.industry && (
 									<div>
-										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">Industry</div>
-										<div className="font-semibold text-[#0f172a]">{vendor.industry}</div>
+										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">
+											Industry
+										</div>
+										<div className="font-semibold text-[#0f172a]">
+											{vendor.industry}
+										</div>
 									</div>
 								)}
 								{location && (
 									<div>
-										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">Location</div>
-										<div className="font-semibold text-[#0f172a]">{location}</div>
+										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">
+											Location
+										</div>
+										<div className="font-semibold text-[#0f172a]">
+											{location}
+										</div>
 									</div>
 								)}
 								{vendor.domain && (
 									<div>
-										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">Domain</div>
-										<div className="font-semibold text-[#0f172a]">{vendor.domain}</div>
+										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">
+											Domain
+										</div>
+										<div className="font-semibold text-[#0f172a]">
+											{vendor.domain}
+										</div>
 									</div>
 								)}
 								{vendor.website && (
 									<div>
-										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">Website</div>
+										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">
+											Website
+										</div>
 										<a
-											href={vendor.website.startsWith("http") ? vendor.website : `https://${vendor.website}`}
+											href={
+												vendor.website.startsWith("http")
+													? vendor.website
+													: `https://${vendor.website}`
+											}
 											target="_blank"
 											rel="noopener noreferrer"
 											className="font-semibold text-[#10b981] hover:underline break-all"
@@ -240,13 +274,24 @@ function VendorProfile({ vendor }: { vendor: any }) {
 								)}
 								{vendor.scan_status && vendor.scan_status !== "NONE" && (
 									<div>
-										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">Scan Status</div>
-										<div className={`inline-flex items-center gap-1.5 text-sm font-semibold px-2.5 py-0.5 rounded-full ${
-											vendor.scan_status === "COMPLETE" ? "bg-[#10b981]/10 text-[#10b981]"
-											: vendor.scan_status === "SCANNING" ? "bg-blue-50 text-blue-600"
-											: "bg-[#f1f5f9] text-[#64748b]"
-										}`}>
-											{vendor.scan_status === "COMPLETE" ? "✓" : vendor.scan_status === "SCANNING" ? "⟳" : "–"} {vendor.scan_status}
+										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">
+											Scan Status
+										</div>
+										<div
+											className={`inline-flex items-center gap-1.5 text-sm font-semibold px-2.5 py-0.5 rounded-full ${
+												vendor.scan_status === "COMPLETE"
+													? "bg-[#10b981]/10 text-[#10b981]"
+													: vendor.scan_status === "SCANNING"
+														? "bg-blue-50 text-blue-600"
+														: "bg-[#f1f5f9] text-[#64748b]"
+											}`}
+										>
+											{vendor.scan_status === "COMPLETE"
+												? "✓"
+												: vendor.scan_status === "SCANNING"
+													? "⟳"
+													: "–"}{" "}
+											{vendor.scan_status}
 										</div>
 									</div>
 								)}
@@ -265,7 +310,13 @@ function VendorProfile({ vendor }: { vendor: any }) {
 											rel="noopener noreferrer"
 											className="inline-flex items-center gap-2 px-4 py-2.5 border border-[#e2e8f0] rounded-xl text-sm font-medium text-[#64748b] hover:border-[#0077b5] hover:text-[#0077b5] transition-colors"
 										>
-											<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+											<svg
+												className="w-4 h-4"
+												fill="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+											</svg>
 											LinkedIn
 										</a>
 									)}
@@ -287,27 +338,43 @@ function VendorProfile({ vendor }: { vendor: any }) {
 
 					{/* ── Right / Sidebar ── */}
 					<div className="space-y-5">
-
 						{/* Verification status card */}
-						<div className={`p-6 rounded-2xl border-2 ${vendor.verified ? "bg-[#10b981]/5 border-[#10b981]/30" : vendor.claimed ? "bg-[#f8fafc] border-[#e2e8f0]" : "bg-amber-50 border-amber-200"}`}>
+						<div
+							className={`p-6 rounded-2xl border-2 ${vendor.verified ? "bg-[#10b981]/5 border-[#10b981]/30" : vendor.claimed ? "bg-[#f8fafc] border-[#e2e8f0]" : "bg-amber-50 border-amber-200"}`}
+						>
 							{vendor.verified ? (
 								<>
 									<div className="flex items-center gap-2 mb-2">
 										<span className="text-2xl">✅</span>
-										<h3 className="font-bold text-[#0f172a]">Verified Vendor</h3>
+										<h3 className="font-bold text-[#0f172a]">
+											Verified Vendor
+										</h3>
 									</div>
-									<p className="text-sm text-[#64748b] mb-1">This company has passed Booppa&apos;s Vendor Proof check.</p>
+									<p className="text-sm text-[#64748b] mb-1">
+										This company has passed Booppa&apos;s Vendor Proof check.
+									</p>
 									{vendor.verified_at && (
-										<p className="text-xs text-[#94a3b8]">Verified {new Date(vendor.verified_at).toLocaleDateString("en-SG", { month: "long", year: "numeric" })}</p>
+										<p className="text-xs text-[#94a3b8]">
+											Verified{" "}
+											{new Date(vendor.verified_at).toLocaleDateString(
+												"en-SG",
+												{ month: "long", year: "numeric" },
+											)}
+										</p>
 									)}
 								</>
 							) : vendor.claimed ? (
 								<>
 									<div className="flex items-center gap-2 mb-2">
 										<span className="text-xl">🏢</span>
-										<h3 className="font-bold text-[#0f172a]">Profile Claimed</h3>
+										<h3 className="font-bold text-[#0f172a]">
+											Profile Claimed
+										</h3>
 									</div>
-									<p className="text-sm text-[#64748b] mb-4">This company has registered but hasn&apos;t completed Vendor Proof yet.</p>
+									<p className="text-sm text-[#64748b] mb-4">
+										This company has registered but hasn&apos;t completed Vendor
+										Proof yet.
+									</p>
 									<Link
 										href={`/vendor-proof?company=${encodeURIComponent(vendor.company_name)}&website=${encodeURIComponent(vendor.website || "")}`}
 										className="block w-full text-center py-2.5 px-4 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl text-sm transition-colors"
@@ -319,9 +386,14 @@ function VendorProfile({ vendor }: { vendor: any }) {
 								<>
 									<div className="flex items-center gap-2 mb-2">
 										<span className="text-xl">❓</span>
-										<h3 className="font-bold text-[#0f172a]">Is this your company?</h3>
+										<h3 className="font-bold text-[#0f172a]">
+											Is this your company?
+										</h3>
 									</div>
-									<p className="text-sm text-[#64748b] mb-4">Claim this profile to manage your trust score and respond to vendor proofs.</p>
+									<p className="text-sm text-[#64748b] mb-4">
+										Claim this profile to manage your trust score and respond to
+										vendor proofs.
+									</p>
 									<Link
 										href="/auth/register"
 										className="block w-full text-center py-2.5 px-4 bg-[#0f172a] hover:bg-[#1e293b] text-white font-bold rounded-xl text-sm transition-colors"
@@ -350,7 +422,11 @@ function VendorProfile({ vendor }: { vendor: any }) {
 								</Link>
 								{vendor.website && (
 									<a
-										href={vendor.website.startsWith("http") ? vendor.website : `https://${vendor.website}`}
+										href={
+											vendor.website.startsWith("http")
+												? vendor.website
+												: `https://${vendor.website}`
+										}
 										target="_blank"
 										rel="noopener noreferrer"
 										className="flex items-center gap-3 w-full py-3 px-4 border border-[#e2e8f0] text-[#64748b] font-medium rounded-xl text-sm hover:border-[#0f172a] hover:text-[#0f172a] transition-colors"
@@ -363,13 +439,14 @@ function VendorProfile({ vendor }: { vendor: any }) {
 
 						{/* Share */}
 						<div className="bg-white p-6 rounded-2xl border border-[#e2e8f0]">
-							<h3 className="font-bold text-[#0f172a] mb-2 text-sm">Share this profile</h3>
+							<h3 className="font-bold text-[#0f172a] mb-2 text-sm">
+								Share this profile
+							</h3>
 							<p className="text-xs text-[#94a3b8] font-mono break-all select-all">
 								https://www.booppa.io/vendors/{vendor.slug}
 							</p>
 						</div>
 					</div>
-
 				</div>
 			</section>
 		</main>
