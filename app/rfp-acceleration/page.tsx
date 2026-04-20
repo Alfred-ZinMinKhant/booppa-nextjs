@@ -17,6 +17,7 @@ function normalizeUrl(input: string): string {
 interface VendorForm {
   company_name: string;
   vendor_url: string;
+  email: string;
   rfp_description: string;
   uen: string;
   description: string;
@@ -37,6 +38,7 @@ interface VendorForm {
 const EMPTY_FORM: VendorForm = {
   company_name: '',
   vendor_url: '',
+  email: '',
   rfp_description: '',
   uen: '',
   description: '',
@@ -71,6 +73,7 @@ export default function RFPAccelerationPage() {
           ...prev,
           company_name: prev.company_name || data.company || '',
           vendor_url: prev.vendor_url || data.website || '',
+          email: prev.email || data.email || '',
         }));
       })
       .catch(() => setAuthed(false))
@@ -130,6 +133,7 @@ export default function RFPAccelerationPage() {
           productType,
           company_name: vendorForm.company_name.trim(),
           vendor_url: normalizeUrl(vendorForm.vendor_url),
+          prefill_email: vendorForm.email.trim(),
           rfp_description: vendorForm.rfp_description.trim(),
           intake_data: Object.keys(intake).length > 0 ? intake : undefined,
         }),
@@ -225,6 +229,16 @@ export default function RFPAccelerationPage() {
                   placeholder="https://acme.com"
                   value={form.vendor_url}
                   onChange={e => setForm(f => ({ ...f, vendor_url: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#0f172a] mb-1">Email <span className="text-[#94a3b8] font-normal">(for delivery)</span></label>
+                <input
+                  type="email"
+                  className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#10b981]"
+                  placeholder="you@company.com"
+                  value={form.email}
+                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                 />
               </div>
               <div>

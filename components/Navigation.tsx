@@ -116,6 +116,7 @@ const solutions = [
 
 const vendorLinks = [
 	{ name: "Dashboard", href: "/vendor/dashboard", icon: LayoutDashboard },
+	{ name: "My Profile", href: "/profile", icon: User },
 	{ name: "Vendor Proof", href: "/vendor-proof", icon: ShieldCheck },
 	{ name: "Notarization", href: "/notarization", icon: FileText },
 	{ name: "PDPA Scan", href: "/pdpa", icon: ShieldCheck },
@@ -124,6 +125,7 @@ const vendorLinks = [
 
 const procurementLinks = [
 	{ name: "Dashboard", href: "/procurement/dashboard", icon: LayoutDashboard },
+	{ name: "My Profile", href: "/profile", icon: User },
 	{ name: "Verify Vendor", href: "/verify", icon: ShieldCheck },
 	{ name: "Browse Vendors", href: "/vendors", icon: Search },
 	{ name: "Compare Vendors", href: "/compare", icon: FileText },

@@ -39,3 +39,27 @@ export async function GET(req: NextRequest) {
   }
   return response
 }
+
+export async function PATCH(req: NextRequest) {
+  const token = req.cookies.get('token')?.value
+  if (!token) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+  }
+
+  const body = await req.json()
+  const res = await fetch(`${config.apiUrl}/api/v1/auth/me`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  })
+
+  const data = await res.json()
+  if (!res.ok) {
+    return NextResponse.json(data, { status: res.status })
+  }
+
+  return NextResponse.json(data)
+}
