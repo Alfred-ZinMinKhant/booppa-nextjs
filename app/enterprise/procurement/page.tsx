@@ -21,6 +21,9 @@ interface VendorBreakdown {
 interface Vendor {
   slug: string;
   company: string | null;
+  website: string | null;
+  contactEmail: string | null;
+  domain: string | null;
   currentScore: number;
   breakdown: VendorBreakdown;
   verified: boolean;
@@ -168,7 +171,7 @@ function VendorCard({
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
             <span className="text-[11px] text-neutral-500">{vendor.slug}</span>
             <span className="text-neutral-700">&middot;</span>
             <span className={`text-[10px] font-medium ${traj.tw} inline-flex items-center gap-0.5`}>
@@ -176,6 +179,33 @@ function VendorCard({
               {traj.label}
             </span>
           </div>
+          {(vendor.website || vendor.contactEmail) && (
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              {vendor.website && (
+                <a
+                  href={vendor.website.startsWith("http") ? vendor.website : `https://${vendor.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-blue-400 hover:text-blue-300 truncate max-w-[140px]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {vendor.domain || vendor.website.replace(/^https?:\/\//, "")}
+                </a>
+              )}
+              {vendor.website && vendor.contactEmail && (
+                <span className="text-neutral-700">&middot;</span>
+              )}
+              {vendor.contactEmail && (
+                <a
+                  href={`mailto:${vendor.contactEmail}`}
+                  className="text-[10px] text-emerald-400 hover:text-emerald-300 truncate max-w-[160px]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {vendor.contactEmail}
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

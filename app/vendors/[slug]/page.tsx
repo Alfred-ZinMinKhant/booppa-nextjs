@@ -565,6 +565,19 @@ function VendorProfile({ vendor }: { vendor: any }) {
 										</a>
 									</div>
 								)}
+								{vendor.contact_email && (
+									<div>
+										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">
+											Contact Email
+										</div>
+										<a
+											href={`mailto:${vendor.contact_email}`}
+											className="font-semibold text-[#10b981] hover:underline break-all"
+										>
+											{vendor.contact_email}
+										</a>
+									</div>
+								)}
 								{vendor.scan_status && vendor.scan_status !== "NONE" && (
 									<div>
 										<div className="text-xs text-[#94a3b8] uppercase tracking-wider mb-1">
