@@ -57,9 +57,7 @@ export default function OpportunitiesPage() {
 				if (!r.ok) return;
 				setAuthed(true);
 				const me = await r.json();
-				// vendor_proof = verification_depth is DEEP or CERTIFIED
-				const depth: string = me?.verification_depth ?? "";
-				setIsVendorProof(["DEEP", "CERTIFIED"].includes(depth));
+				setIsVendorProof(!!me?.is_verified);
 			})
 			.catch(() => {});
 	}, []);

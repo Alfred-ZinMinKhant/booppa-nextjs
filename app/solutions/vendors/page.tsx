@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 function CheckItem({ text, color = 'text-[#10b981]' }: { text: string; color?: string }) {
@@ -32,6 +32,19 @@ async function startCheckout(productType: string): Promise<void> {
 
 export default function SolutionsVendorsPage() {
   const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
+  const [isVerified, setIsVerified] = useState(false);
+  const [hasClaimedProfile, setHasClaimedProfile] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return;
+        if (data.is_verified) setIsVerified(true);
+        if (data.has_claimed_profile) setHasClaimedProfile(true);
+      })
+      .catch(() => {});
+  }, []);
 
   async function handleCheckout(productType: string) {
     setLoadingProduct(productType);
@@ -73,18 +86,20 @@ export default function SolutionsVendorsPage() {
       </section>
 
       {/* Free plan banner */}
-      <section className="py-10 px-6 bg-white border-b border-[#e2e8f0]">
-        <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#64748b] mr-3">Always free</span>
-            <span className="text-lg font-bold text-[#0f172a]">Free Profile</span>
-            <span className="ml-3 text-[#64748b] text-sm">— Claim your company profile, appear in vendor search, access the GeBIZ opportunity feed &amp; Tender Win Probability calculator.</span>
+      {!hasClaimedProfile && (
+        <section className="py-10 px-6 bg-white border-b border-[#e2e8f0]">
+          <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#64748b] mr-3">Always free</span>
+              <span className="text-lg font-bold text-[#0f172a]">Free Profile</span>
+              <span className="ml-3 text-[#64748b] text-sm">— Claim your company profile, appear in vendor search, access the GeBIZ opportunity feed &amp; Tender Win Probability calculator.</span>
+            </div>
+            <Link href="/auth/register" className="shrink-0 px-6 py-3 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold rounded-xl transition text-sm whitespace-nowrap">
+              Claim Free Profile →
+            </Link>
           </div>
-          <Link href="/auth/register" className="shrink-0 px-6 py-3 border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold rounded-xl transition text-sm whitespace-nowrap">
-            Claim Free Profile →
-          </Link>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Paid Plans */}
       <section className="py-20 px-6">
@@ -121,9 +136,15 @@ export default function SolutionsVendorsPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/vendor-proof" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-[#10b981]/20">
-                Get Vendor Proof — SGD 149
-              </Link>
+              {isVerified ? (
+                <Link href="/vendor/dashboard" className="block w-full text-center bg-[#10b981]/20 border border-[#10b981]/40 text-[#10b981] font-bold py-3.5 rounded-xl transition">
+                  Verified — Go to Dashboard
+                </Link>
+              ) : (
+                <Link href="/vendor-proof" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-[#10b981]/20">
+                  Get Vendor Proof — SGD 149
+                </Link>
+              )}
             </div>
 
             {/* Vendor Trust Pack */}
@@ -223,11 +244,23 @@ export default function SolutionsVendorsPage() {
       {/* CTA */}
       <section className="py-20 px-6 bg-[#0f172a] text-white text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl lg:text-4xl font-black mb-4">Not sure where to start?</h2>
-          <p className="text-white/60 text-lg mb-10">Claim your free company profile. No credit card required.</p>
-          <Link href="/auth/register" className="inline-block px-10 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-black text-lg rounded-2xl transition-colors shadow-lg shadow-[#10b981]/20">
-            Claim your Company Profile (Free) →
-          </Link>
+          {hasClaimedProfile ? (
+            <>
+              <h2 className="text-3xl lg:text-4xl font-black mb-4">You're all set</h2>
+              <p className="text-white/60 text-lg mb-10">Manage your vendor profile and explore opportunities from your dashboard.</p>
+              <Link href="/vendor/dashboard" className="inline-block px-10 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-black text-lg rounded-2xl transition-colors shadow-lg shadow-[#10b981]/20">
+                Go to Dashboard →
+              </Link>
+            </>
+          ) : (
+            <>
+              <h2 className="text-3xl lg:text-4xl font-black mb-4">Not sure where to start?</h2>
+              <p className="text-white/60 text-lg mb-10">Claim your free company profile. No credit card required.</p>
+              <Link href="/auth/register" className="inline-block px-10 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-black text-lg rounded-2xl transition-colors shadow-lg shadow-[#10b981]/20">
+                Claim your Company Profile (Free) →
+              </Link>
+            </>
+          )}
         </div>
       </section>
 

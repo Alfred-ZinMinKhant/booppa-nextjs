@@ -24,6 +24,7 @@ function VendorProofContent() {
   const [error, setError] = useState("")
   const [consentValid, setConsentValid] = useState(false)
   const [authed, setAuthed] = useState<boolean | null>(null)
+  const [alreadyVerified, setAlreadyVerified] = useState(false)
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -37,6 +38,7 @@ function VendorProofContent() {
         if (!website && data.website) setWebsite(data.website);
         if (!company && data.company) setCompany(data.company);
         if (!email && data.email) setEmail(data.email);
+        if (data.is_verified) setAlreadyVerified(true);
       })
       .catch(() => setAuthed(false))
   }, [])
@@ -142,6 +144,40 @@ function VendorProofContent() {
     return (
       <main className="min-h-[70vh] flex items-center justify-center p-6">
         <div className="text-gray-500 text-sm">Loading…</div>
+      </main>
+    )
+  }
+
+  if (alreadyVerified) {
+    return (
+      <main className="min-h-[70vh] flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center">
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-10">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-7 h-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-bold text-white mb-2">You're already verified</h1>
+            <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+              Your Vendor Proof is active. Your blockchain-verified profile is visible to procurement agencies.
+            </p>
+            <div className="space-y-3">
+              <Link
+                href="/vendor/dashboard"
+                className="block w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition text-sm"
+              >
+                Go to Dashboard
+              </Link>
+              <Link
+                href="/opportunities"
+                className="block w-full py-3 border border-gray-700 text-white hover:bg-white/5 font-semibold rounded-xl transition text-sm"
+              >
+                Browse Opportunities
+              </Link>
+            </div>
+          </div>
+        </div>
       </main>
     )
   }

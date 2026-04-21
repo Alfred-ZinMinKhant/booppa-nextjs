@@ -267,6 +267,13 @@ export default function Navigation() {
 
 						{/* Desktop links */}
 						<div className="hidden lg:flex items-center gap-x-8">
+							<Link
+								href="/"
+								className={`text-sm font-medium transition-colors ${pathname === "/" ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
+							>
+								Home
+							</Link>
+
 							{/* For Vendors — direct link */}
 							<Link
 								href="/solutions/vendors"
@@ -490,6 +497,12 @@ export default function Navigation() {
 						</div>
 
 						<div className="space-y-1">
+							<MobileLink
+								href="/"
+								label="Home"
+								active={pathname === "/"}
+								close={() => setMobileOpen(false)}
+							/>
 							<MobileLink
 								href="/solutions/vendors"
 								label="For Vendors"
