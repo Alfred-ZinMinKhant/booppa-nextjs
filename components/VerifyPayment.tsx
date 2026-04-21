@@ -55,6 +55,9 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
     const isEnterprise = productType === 'enterprise_monthly';
     const isCompliance = productType?.startsWith('compliance_');
     const isVendorProof = productType === 'vendor_proof';
+    const isNotarization = productType?.startsWith('compliance_notarization') || productType?.startsWith('supply_chain');
+    const isPdpa = productType?.startsWith('pdpa');
+    const isRfp = productType?.startsWith('rfp_');
 
     content = (
       <>
