@@ -6,6 +6,8 @@ export interface User {
   name: string
   role?: string
   avatar?: string
+  has_claimed_profile?: boolean
+  is_verified?: boolean
 }
 
 export interface LoginRequest {

@@ -1,6 +1,8 @@
 import { config, endpoints } from "@/lib/config";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getServerSideUser } from "@/lib/auth";
+import { User } from "@/types";
 
 interface VendorPageProps {
 	params: { slug: string };
@@ -60,9 +62,10 @@ export async function generateMetadata({
 
 export default async function VendorSlugPage({ params }: VendorPageProps) {
 	const vendor = await getVendor(params.slug);
+	const user = await getServerSideUser();
 
 	if (vendor) {
-		return <VendorProfile vendor={vendor} />;
+		return <VendorProfile vendor={vendor} user={user} />;
 	}
 
 	const industry = await getIndustryData(params.slug);
@@ -156,7 +159,7 @@ function readinessBadge(p: string) {
 	);
 }
 
-function VendorProfile({ vendor }: { vendor: any }) {
+function VendorProfile({ vendor, user }: { vendor: any; user: User | null }) {
 	const initials =
 		vendor.company_name
 			?.split(" ")
@@ -440,12 +443,14 @@ function VendorProfile({ vendor }: { vendor: any }) {
 									>
 										🔍 Run Vendor Proof
 									</Link>
-									<Link
-										href="/auth/register"
-										className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#0f172a] text-[#0f172a] font-bold rounded-xl text-sm hover:bg-[#0f172a] hover:text-white transition-colors"
-									>
-										Claim this profile →
-									</Link>
+									{!user?.has_claimed_profile && (
+										<Link
+											href="/auth/register"
+											className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#0f172a] text-[#0f172a] font-bold rounded-xl text-sm hover:bg-[#0f172a] hover:text-white transition-colors"
+										>
+											Claim this profile →
+										</Link>
+									)}
 								</div>
 							</div>
 						)}
@@ -491,12 +496,14 @@ function VendorProfile({ vendor }: { vendor: any }) {
 										</div>
 									))}
 								</div>
-								<Link
-									href={`/vendor-proof?company=${encodeURIComponent(vendor.company_name)}&website=${encodeURIComponent(vendor.website || "")}`}
-									className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl text-sm transition-colors"
-								>
-									🔍 Complete Vendor Proof
-								</Link>
+								{!user?.is_verified && (
+									<Link
+										href={`/vendor-proof?company=${encodeURIComponent(vendor.company_name)}&website=${encodeURIComponent(vendor.website || "")}`}
+										className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl text-sm transition-colors"
+									>
+										🔍 Complete Vendor Proof
+									</Link>
+								)}
 							</div>
 						)}
 
@@ -681,12 +688,14 @@ function VendorProfile({ vendor }: { vendor: any }) {
 										This company has registered but hasn&apos;t completed Vendor
 										Proof yet.
 									</p>
-									<Link
-										href={`/vendor-proof?company=${encodeURIComponent(vendor.company_name)}&website=${encodeURIComponent(vendor.website || "")}`}
-										className="block w-full text-center py-2.5 px-4 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl text-sm transition-colors"
-									>
-										Get Vendor Proof →
-									</Link>
+									{!user?.is_verified && (
+										<Link
+											href={`/vendor-proof?company=${encodeURIComponent(vendor.company_name)}&website=${encodeURIComponent(vendor.website || "")}`}
+											className="block w-full text-center py-2.5 px-4 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl text-sm transition-colors"
+										>
+											Get Vendor Proof →
+										</Link>
+									)}
 								</>
 							) : (
 								<>
@@ -700,12 +709,14 @@ function VendorProfile({ vendor }: { vendor: any }) {
 										Claim this profile to manage your trust score and respond to
 										vendor proofs.
 									</p>
-									<Link
-										href="/auth/register"
-										className="block w-full text-center py-2.5 px-4 bg-[#0f172a] hover:bg-[#1e293b] text-white font-bold rounded-xl text-sm transition-colors"
-									>
-										Claim Profile →
-									</Link>
+									{!user?.has_claimed_profile && (
+										<Link
+											href="/auth/register"
+											className="block w-full text-center py-2.5 px-4 bg-[#0f172a] hover:bg-[#1e293b] text-white font-bold rounded-xl text-sm transition-colors"
+										>
+											Claim Profile →
+										</Link>
+									)}
 								</>
 							)}
 						</div>

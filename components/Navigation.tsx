@@ -144,6 +144,8 @@ export default function Navigation() {
 	const [authed, setAuthed] = useState<boolean | null>(null);
 	const [userEmail, setUserEmail] = useState<string | null>(null);
 	const [userRole, setUserRole] = useState<string | null>(null);
+	const [hasClaimedProfile, setHasClaimedProfile] = useState(false);
+	const [isVerified, setIsVerified] = useState(false);
 	const pathname = usePathname();
 	const router = useRouter();
 	const vendorsDropdownRef = useRef<HTMLDivElement>(null);
@@ -169,6 +171,8 @@ export default function Navigation() {
 					setAuthed(true);
 					setUserEmail(data.email || null);
 					setUserRole(data.role || "VENDOR");
+					setHasClaimedProfile(!!data.has_claimed_profile);
+					setIsVerified(!!data.is_verified);
 				} else {
 					setAuthed(false);
 					setUserEmail(null);
@@ -431,12 +435,14 @@ export default function Navigation() {
 									>
 										Sign In
 									</Link>
-									<Link
-										href="/auth/register"
-										className="px-4 py-2 bg-[#10b981] text-white text-sm font-semibold rounded-lg hover:bg-[#059669] transition-colors"
-									>
-										Claim your Profile
-									</Link>
+									{!hasClaimedProfile && (
+										<Link
+											href="/auth/register"
+											className="px-4 py-2 bg-[#10b981] text-white text-sm font-semibold rounded-lg hover:bg-[#059669] transition-colors"
+										>
+											Claim your Profile
+										</Link>
+									)}
 								</>
 							)}
 						</div>
@@ -580,13 +586,15 @@ export default function Navigation() {
 											active={pathname === "/login"}
 											close={() => setMobileOpen(false)}
 										/>
-										<MobileLink
-											href="/auth/register"
-											label="Claim your Profile"
-											active={false}
-											close={() => setMobileOpen(false)}
-											highlight
-										/>
+										{!hasClaimedProfile && (
+											<MobileLink
+												href="/auth/register"
+												label="Claim your Profile"
+												active={false}
+												close={() => setMobileOpen(false)}
+												highlight
+											/>
+										)}
 									</>
 								)}
 							</div>

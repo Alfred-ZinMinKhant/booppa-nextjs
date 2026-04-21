@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, FormEvent } from 'react'
-import { User, Mail, Building2, Hash, Save, Loader2, CheckCircle, AlertCircle, Factory, Globe } from 'lucide-react'
+import { User, Mail, Building2, Hash, Save, Loader2, CheckCircle, AlertCircle, Factory, Globe, ShieldCheck } from 'lucide-react'
 import { INDUSTRY_OPTIONS } from '@/lib/industries'
 
 interface Profile {
@@ -12,6 +12,8 @@ interface Profile {
   website: string | null
   industry: string | null
   role: string
+  is_verified?: boolean
+  has_claimed_profile?: boolean
 }
 
 export default function ProfilePage() {
@@ -116,6 +118,30 @@ export default function ProfilePage() {
               <div className="flex items-center gap-2 bg-neutral-800/50 rounded-lg px-4 py-2.5 border border-neutral-800">
                 <User className="h-3.5 w-3.5 text-neutral-500 flex-shrink-0" />
                 <span className="text-neutral-500 text-xs font-medium uppercase tracking-wide">{profile?.role}</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1.5">
+                Verification Status
+              </label>
+              <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 border ${profile?.is_verified ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-neutral-800/50 border-neutral-800'}`}>
+                <ShieldCheck className={`h-3.5 w-3.5 flex-shrink-0 ${profile?.is_verified ? 'text-emerald-500' : 'text-neutral-500'}`} />
+                <span className={`text-xs font-bold uppercase tracking-wide ${profile?.is_verified ? 'text-emerald-500' : 'text-neutral-500'}`}>
+                  {profile?.is_verified ? 'Verified' : 'Unverified'}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1.5">
+                Profile Claimed
+              </label>
+              <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 border ${profile?.has_claimed_profile ? 'bg-blue-500/10 border-blue-500/30' : 'bg-neutral-800/50 border-neutral-800'}`}>
+                <CheckCircle className={`h-3.5 w-3.5 flex-shrink-0 ${profile?.has_claimed_profile ? 'text-blue-500' : 'text-neutral-500'}`} />
+                <span className={`text-xs font-bold uppercase tracking-wide ${profile?.has_claimed_profile ? 'text-blue-500' : 'text-neutral-500'}`}>
+                  {profile?.has_claimed_profile ? 'Claimed' : 'Not Claimed'}
+                </span>
               </div>
             </div>
           </div>
