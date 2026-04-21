@@ -52,10 +52,10 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
       </>
     );
   } else if (status === 'success') {
-    const isPdpa = productType?.startsWith('pdpa');
-    const isNotarization = productType?.startsWith('compliance_notarization') || productType?.startsWith('supply_chain');
-    const isRfp = productType === 'rfp_express' || productType === 'rfp_complete';
+    const isEnterprise = productType === 'enterprise_monthly';
+    const isCompliance = productType?.startsWith('compliance_');
     const isVendorProof = productType === 'vendor_proof';
+
     content = (
       <>
         <CheckCircle className={`${iconClass} text-booppa-green`} />
@@ -78,7 +78,9 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                     ? 'Your RFP evidence package will be delivered to your email shortly.'
                     : isVendorProof
                       ? 'Your Vendor Proof certificate will be sent to your email within a few minutes.'
-                      : 'A confirmation and your deliverables will be sent to your email shortly.'}
+                      : isEnterprise || isCompliance
+                        ? 'Your Enterprise workspace has been activated. Details have been sent to your email.'
+                        : 'A confirmation and your deliverables will be sent to your email shortly.'}
             </p>
           </div>
         </div>
@@ -95,9 +97,9 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
           <Link href={`/rfp-acceleration/result?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             View RFP Kit
           </Link>
-        ) : isVendorProof ? (
-          <Link href="/vendor/dashboard" className="mt-4 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-            Go to Dashboard
+        ) : isEnterprise || isCompliance ? (
+          <Link href="/procurement/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            Go to Procurement Dashboard
           </Link>
         ) : (
           <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">

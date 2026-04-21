@@ -1,3 +1,5 @@
+import { COMPANY_NAME_SINGAPORE } from '@/lib/company';
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -298,7 +300,7 @@ export default function NotarizationPage() {
                       type="text"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      placeholder="Your Company Pte Ltd"
+                      placeholder={COMPANY_NAME_SINGAPORE}
                       className="w-full px-4 py-3 border border-[#e2e8f0] rounded-xl text-[#0f172a] focus:ring-2 focus:ring-[#10b981] focus:border-transparent transition-all"
                     />
                   </div>
@@ -398,7 +400,7 @@ export default function NotarizationPage() {
             )}
 
             <p className="text-center mt-12 text-[#64748b]">
-              Need 100+ documents per month? See <Link href="/enterprise" className="text-[#10b981] font-bold hover:underline">Enterprise Suite</Link> 
+              Need 100+ documents per month? See <Link href="/solutions/procurement" className="text-[#10b981] font-bold hover:underline">Enterprise Suite</Link> 
               (includes 5,000 notarizations/month).
             </p>
           </div>

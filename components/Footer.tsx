@@ -1,75 +1,218 @@
-import Link from 'next/link';
+import Link from "next/link";
+import { COMPANY_NAME } from "@/lib/company";
 
 export default function Footer() {
-  return (
-    <footer className="bg-white border-t border-[#e2e8f0] pt-16 pb-8">
-      <div className="max-w-[1400px] mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          <div className="footer-column">
-            <div className="flex items-center gap-2 mb-6">
-              <img src="/logo.png" alt="BOOPPA Logo" className="h-8 w-auto" />
-            </div>
-            <p className="text-[#64748b] text-sm max-w-xs">
-              Booppa is a Vendor Trust & Compliance Platform for procurement.
-            </p>
-            <p className="text-[#64748b] text-sm max-w-xs">
-              It turns compliance into verifiable, actionable trust.
-            </p>
-          </div>
-          <div className="footer-column">
-            <h4 className="font-bold text-[#0f172a] mb-6">Services</h4>
-            <ul className="space-y-4">
-              <li><Link href="/pdpa" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">PDPA Scan</Link></li>
-              <li><Link href="/notarization" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Notarization Express</Link></li>
-              <li><Link href="/rfp-acceleration#express" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">RFP Express</Link></li>
-              <li><Link href="/rfp-acceleration#complete" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">RFP Kit</Link></li>
-            </ul>
-          </div>
+	return (
+		<footer className="bg-white border-t border-[#e2e8f0] pt-16 pb-8">
+			<div className="max-w-[1400px] mx-auto px-6">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+					<div className="footer-column">
+						<div className="flex items-center gap-2 mb-6">
+							<img src="/logo.png" alt="BOOPPA Logo" className="h-8 w-auto" />
+						</div>
+						<p className="text-[#64748b] text-sm max-w-xs">
+							{COMPANY_NAME} is a Vendor Trust & Compliance Platform for
+							procurement.
+						</p>
+						<p className="text-[#64748b] text-sm max-w-xs">
+							It turns compliance into verifiable, actionable trust.
+						</p>
+					</div>
+					<div className="footer-column">
+						<h4 className="font-bold text-[#0f172a] mb-6">Services</h4>
+						<ul className="space-y-4">
+							<li>
+								<Link
+									href="/pdpa"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									PDPA Scan
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/notarization"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Notarization Express
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/rfp-acceleration#express"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									RFP Express
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/rfp-acceleration#complete"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									RFP Kit
+								</Link>
+							</li>
+						</ul>
+					</div>
 
-          <div className="footer-column">
-            <h4 className="font-bold text-[#0f172a] mb-6">Company</h4>
-            <ul className="space-y-4">
-              <li><Link href="/pricing" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Pricing</Link></li>
-              <li><Link href="/vendors" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Vendor Directory</Link></li>
-              <li><Link href="/rankings" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Rankings</Link></li>
-              <li><Link href="/blog" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Blog</Link></li>
-              <li><Link href="/support" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Support</Link></li>
-              <li><Link href="/enterprise" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Enterprise Access</Link></li>
-            </ul>
-          </div>
+					<div className="footer-column">
+						<h4 className="font-bold text-[#0f172a] mb-6">Company</h4>
+						<ul className="space-y-4">
+							<li>
+								<Link
+									href="/pricing"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Pricing
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/vendors"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Vendor Directory
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/rankings"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Rankings
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/blog"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Blog
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/support"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Support
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/solutions/procurement"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Enterprise Access
+								</Link>
+							</li>
+						</ul>
+					</div>
 
-          <div className="footer-column">
-            <h4 className="font-bold text-[#0f172a] mb-6">Tools</h4>
-            <ul className="space-y-4">
-              <li><Link href="/check-status" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Check Trust Status</Link></li>
-              <li><Link href="/verify" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Verify Evidence</Link></li>
-              <li><Link href="/compare" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Compare Vendors</Link></li>
-              <li><Link href="/resources" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Resources</Link></li>
-              <li><Link href="/support" className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm">Open Ticket</Link></li>
-            </ul>
-          </div>
-        </div>
+					<div className="footer-column">
+						<h4 className="font-bold text-[#0f172a] mb-6">Tools</h4>
+						<ul className="space-y-4">
+							<li>
+								<Link
+									href="/check-status"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Check Trust Status
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/verify"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Verify Evidence
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/compare"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Compare Vendors
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/resources"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Resources
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/support"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Open Ticket
+								</Link>
+							</li>
+						</ul>
+					</div>
+				</div>
 
-        <div className="border-t border-[#e2e8f0] pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-          <div className="footer-bottom-text">
-            <p className="text-[#94a3b8] text-xs mb-2">
-              BOOPPA provides evidence generation tools. Not regulatory certification or legal advice.
-            </p>
-            <p className="text-[#64748b] text-sm">
-              © 2026 BOOPPA. Vendor trust & compliance platform
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-4 text-xs text-[#94a3b8]">
-            <Link href="/privacy" className="hover:text-[#10b981] transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-[#10b981] transition-colors">Terms</Link>
-            <Link href="/cookies" className="hover:text-[#10b981] transition-colors">Cookies</Link>
-            <Link href="/acceptable-use" className="hover:text-[#10b981] transition-colors">Acceptable Use</Link>
-            <Link href="/disclaimer" className="hover:text-[#10b981] transition-colors">Disclaimer</Link>
-            <Link href="/dpo" className="hover:text-[#10b981] transition-colors">DPO</Link>
-            <Link href="/security" className="hover:text-[#10b981] transition-colors">Security</Link>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
+				<div className="border-t border-[#e2e8f0] pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+					<div className="footer-bottom-text">
+						<p className="text-[#94a3b8] text-xs mb-2">
+							BOOPPA provides evidence generation tools. Not regulatory
+							certification or legal advice.
+						</p>
+						<p className="text-[#64748b] text-sm">
+							© 2026 BOOPPA. Vendor trust & compliance platform
+						</p>
+					</div>
+					<div className="flex flex-wrap gap-4 text-xs text-[#94a3b8]">
+						<Link
+							href="/privacy"
+							className="hover:text-[#10b981] transition-colors"
+						>
+							Privacy
+						</Link>
+						<Link
+							href="/terms"
+							className="hover:text-[#10b981] transition-colors"
+						>
+							Terms
+						</Link>
+						<Link
+							href="/cookies"
+							className="hover:text-[#10b981] transition-colors"
+						>
+							Cookies
+						</Link>
+						<Link
+							href="/acceptable-use"
+							className="hover:text-[#10b981] transition-colors"
+						>
+							Acceptable Use
+						</Link>
+						<Link
+							href="/disclaimer"
+							className="hover:text-[#10b981] transition-colors"
+						>
+							Disclaimer
+						</Link>
+						<Link
+							href="/dpo"
+							className="hover:text-[#10b981] transition-colors"
+						>
+							DPO
+						</Link>
+						<Link
+							href="/security"
+							className="hover:text-[#10b981] transition-colors"
+						>
+							Security
+						</Link>
+					</div>
+				</div>
+			</div>
+		</footer>
+	);
 }

@@ -51,7 +51,7 @@ export default function Home() {
 							</span>
 						</Link>
 						<Link
-							href="/enterprise"
+							href="/solutions/procurement"
 							className="group flex flex-col p-8 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#10b981] hover:shadow-lg transition-all"
 						>
 							<div className="text-3xl mb-4">🏗️</div>

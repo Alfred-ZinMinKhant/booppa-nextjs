@@ -97,7 +97,7 @@ export default function CompliancePage() {
                 <h3 className="text-xl font-bold mb-6 text-[#0f172a]">Enterprise</h3>
                 <p className="text-[#64748b] mb-6">
                   Full compliance suite for regulated businesses — includes PDPA Monitor, Vendor Proof, and RFP tools.
-                  See <Link href="/enterprise" className="text-[#10b981] font-bold hover:underline">Enterprise Solutions</Link>.
+                  See <Link href="/solutions/procurement" className="text-[#10b981] font-bold hover:underline">Enterprise Solutions</Link>.
                 </p>
                 <p className="text-xs text-[#94a3b8] leading-relaxed">
                   Enterprise: SGD 299/mo<br />

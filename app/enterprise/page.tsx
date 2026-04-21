@@ -1,8 +1,31 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+interface UserInfo {
+  email: string;
+  role: string;
+  plan: string;
+  stripe_customer_id?: string;
+}
+
 export default function EnterprisePage() {
+  const [user, setUser] = useState<UserInfo | null>(null);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => setUser(data))
+      .catch(() => setUser(null));
+  }, []);
+
+  async function handleBillingPortal() {
+    window.location.href = '/api/stripe/portal';
+  }
+
+  const isEnterprise = ['enterprise', 'enterprise_pro', 'standard_compliance', 'pro_compliance'].includes(user?.plan || '');
+  const isVendor = user && user.role === 'VENDOR';
   return (
     <main className="bg-white">
       <section className="py-24 px-6 bg-[#0f172a] text-white">
@@ -19,9 +42,30 @@ export default function EnterprisePage() {
             Beyond PDPA monitoring — comprehensive compliance infrastructure for 
             regulated organizations, procurement teams, and multi-subsidiary operations.
           </p>
+          {isVendor && (
+            <div className="mb-8 rounded-xl bg-amber-500/10 border border-amber-500/20 px-6 py-4 text-sm text-amber-300 max-w-2xl mx-auto">
+              These plans are for procurement teams. Looking for vendor tools?{' '}
+              <Link href="/solutions/vendors" className="underline hover:no-underline font-semibold">
+                View Vendor Solutions →
+              </Link>
+            </div>
+          )}
           <div className="flex flex-wrap justify-center gap-6">
-            <Link href="/demo" className="btn btn-primary px-10 py-5 text-xl font-bold">Book Enterprise Demo</Link>
-            <a href="#pricing" className="btn btn-secondary border-white text-white px-10 py-5 text-xl font-bold hover:bg-white hover:text-[#0f172a] transition-all">View Pricing</a>
+            {isEnterprise ? (
+              <button
+                onClick={handleBillingPortal}
+                className="btn btn-primary px-10 py-5 text-xl font-bold bg-[#10b981] hover:bg-[#059669] text-white rounded-xl shadow-lg transition-all"
+              >
+                Manage Enterprise Billing
+              </button>
+            ) : (
+              <Link href="/demo" className="btn btn-primary px-10 py-5 text-xl font-bold bg-[#10b981] hover:bg-[#059669] text-white rounded-xl shadow-lg transition-all">
+                Book Enterprise Demo
+              </Link>
+            )}
+            <a href="#pricing" className="btn btn-secondary border border-white text-white px-10 py-5 text-xl font-bold hover:bg-white hover:text-[#0f172a] rounded-xl transition-all">
+              View Pricing
+            </a>
           </div>
         </div>
       </section>
@@ -36,11 +80,71 @@ export default function EnterprisePage() {
             </p>
           </div>
 
-          {/* Enterprise Pricing */}
-          <div id="pricing" className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
+          <div id="pricing" className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-24">
             <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
-              <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Standard Compliance Suite</h3>
-              <div className="text-3xl font-bold text-[#0f172a] mb-2">Contact Us</div>
+              <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Enterprise</h3>
+              <div className="text-4xl font-black text-[#0f172a] mb-2">SGD 499<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+              <p className="text-sm text-[#64748b] mb-8">For procurement teams evaluating vendors</p>
+              
+              <ul className="space-y-4 mb-10">
+                {[
+                  'Full procurement analytics dashboard',
+                  'Vendor comparison engine — weighted scores',
+                  'Configurable procurement presets',
+                  'Vendor risk signals & compliance posture',
+                  'Self-service billing portal',
+                  'Access to /api/procurement/* routes'
+                ].map((f, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
+                    <span className="text-[#10b981] font-bold">✓</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <Link href="/demo" className="block w-full text-center bg-[#0f172a] text-white font-bold py-4 rounded-xl hover:bg-[#1e293b] transition">
+                Book Demo
+              </Link>
+            </div>
+
+            <div className="bg-[#0f172a] p-10 rounded-[2.5rem] border border-white/10 shadow-2xl hover:translate-y-[-5px] transition-all text-white">
+              <h3 className="text-xl font-bold mb-4">Enterprise Pro</h3>
+              <div className="text-4xl font-black text-[#10b981] mb-2">SGD 1,499<span className="text-xl text-white/60 font-normal">/mo</span></div>
+              <p className="text-sm text-white/60 mb-8">Dedicated account + SLA + multi-sector</p>
+              
+              <ul className="space-y-4 mb-10">
+                <li className="font-bold text-white text-sm">Everything in Enterprise, plus:</li>
+                {[
+                  'Dedicated account manager + monthly review',
+                  'SLA on data freshness & report turnaround',
+                  'Multi-sector procurement views',
+                  'Exportable datasets & custom filters',
+                  'Historical trend analysis',
+                  'Priority support response'
+                ].map((f, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-white/80">
+                    <span className="text-[#10b981] font-bold">✓</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <Link href="/demo" className="block w-full text-center bg-[#10b981] text-white font-bold py-4 rounded-xl hover:bg-[#059669] transition">
+                Book Enterprise Pro Demo
+              </Link>
+            </div>
+          </div>
+
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black text-[#0f172a]">Compliance Suites</h2>
+            <p className="text-[#64748b] mt-4">Automated evidence & blockchain notarization infrastructure</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
+            <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] transition-all">
+              <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Standard Suite</h3>
+              <div className="text-4xl font-black text-[#0f172a] mb-2">SGD 1,299<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+              <p className="text-sm text-[#64748b] mb-8">MAS + MTCS operational workflows</p>
               <p className="text-sm text-[#64748b] mb-8">MAS + MTCS operational workflows</p>
               
               <ul className="space-y-4 mb-10">
@@ -64,13 +168,15 @@ export default function EnterprisePage() {
                 ))}
               </ul>
 
-              <Link href="/demo" className="btn btn-primary w-full shadow-lg">Book Standard Suite Demo</Link>
+              <Link href="/demo" className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] font-bold py-4 rounded-xl hover:bg-[#0f172a] hover:text-white transition">
+                Book Standard Suite Demo
+              </Link>
             </div>
 
             <div className="bg-white p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl relative scale-105 z-10 hover:translate-y-[-5px] transition-all">
-              <div className="absolute top-[-15px] right-10 bg-gradient-to-r from-[#0f172a] to-[#1e40af] text-white px-6 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Pro Suite</div>
-              <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Pro Compliance Suite</h3>
-              <div className="text-3xl font-bold text-[#0f172a] mb-2">Contact Us</div>
+              <div className="absolute top-[-15px] right-10 bg-gradient-to-r from-[#0f172a] to-[#1e40af] text-white px-6 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Recommended</div>
+              <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Pro Suite</h3>
+              <div className="text-4xl font-black text-[#0f172a] mb-2">SGD 2,499<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
               <p className="text-sm text-[#64748b] mb-8">Full enterprise evidence infrastructure</p>
               
               <ul className="space-y-4 mb-10">
@@ -95,7 +201,9 @@ export default function EnterprisePage() {
                 ))}
               </ul>
 
-              <Link href="/demo" className="btn btn-primary w-full shadow-lg">Book Pro Suite Demo</Link>
+              <Link href="/demo" className="block w-full text-center bg-[#10b981] text-white font-bold py-4 rounded-xl hover:bg-[#059669] transition shadow-lg shadow-[#10b981]/20">
+                Book Pro Suite Demo
+              </Link>
             </div>
 
             <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col justify-between hover:translate-y-[-5px] transition-all">
