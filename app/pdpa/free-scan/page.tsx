@@ -1,7 +1,6 @@
+"use client";
+
 import { COMPANY_NAME_SINGAPORE } from "@/lib/company";
-
-("use client");
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { config } from "@/lib/config";
