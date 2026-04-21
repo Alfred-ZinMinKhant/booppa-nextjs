@@ -383,10 +383,130 @@ export default function ProcurementDashboard() {
     ? Math.round(vendors.reduce((s, v) => s + v.currentScore, 0) / vendors.length)
     : 0;
 
+  const ENTERPRISE_PLANS = ["enterprise", "enterprise_pro", "standard_compliance", "pro_compliance"];
+  const hasEnterprise = user ? ENTERPRISE_PLANS.includes(user.plan) : false;
+
   if (!user) {
     return (
       <div className="min-h-screen bg-[#0a0e1a] flex items-center justify-center">
         <p className="text-white/40 text-sm">Loading...</p>
+      </div>
+    );
+  }
+
+  // Free procurement user — show preview with upgrade gate
+  if (!hasEnterprise && user.role !== "ADMIN") {
+    return (
+      <div className="min-h-screen bg-[#0a0e1a] text-white relative">
+        {/* Header */}
+        <div className="border-b border-white/10 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-40">
+          <div className="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold">Procurement Dashboard</h1>
+              <p className="text-white/40 text-xs mt-0.5">Vendor evaluation and compliance intelligence</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-lg border border-white/10 bg-white/5 text-white/40 hover:text-white transition"
+              title="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-6">
+          {/* Preview KPI Cards (blurred) */}
+          <div className="relative">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 filter blur-[6px] pointer-events-none select-none">
+              {[
+                { label: "Total Vendors", value: "1,247", sub: "342 verified (27%)", icon: Building2, iconColor: "text-blue-400", iconBg: "bg-blue-500/10" },
+                { label: "Avg Trust Score", value: "68/100", sub: "Across all vendors", icon: Shield, iconColor: "text-emerald-400", iconBg: "bg-emerald-500/10" },
+                { label: "Procurement Ready", value: "186", sub: "Vendors ready for shortlisting", icon: TrendingUp, iconColor: "text-emerald-400", iconBg: "bg-emerald-500/10" },
+                { label: "Risk Alerts", value: "23", sub: "Watch / Flagged / Critical", icon: AlertTriangle, iconColor: "text-amber-400", iconBg: "bg-amber-500/10" },
+              ].map((card, i) => (
+                <div key={i} className="rounded-xl border border-white/10 bg-[#0f172a] p-5">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-white/40 text-xs font-medium">{card.label}</p>
+                      <h3 className="text-2xl font-bold mt-1">{card.value}</h3>
+                    </div>
+                    <div className={`p-2 rounded-lg ${card.iconBg}`}>
+                      <card.icon className={`h-4 w-4 ${card.iconColor}`} />
+                    </div>
+                  </div>
+                  <p className="text-white/30 text-[10px] mt-2">{card.sub}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Preview vendor cards (blurred) */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6 filter blur-[6px] pointer-events-none select-none">
+              <div className="lg:col-span-2 space-y-3">
+                {[
+                  { name: "TechBridge Solutions Pte. Ltd.", score: 82, depth: "DEEP", risk: "Clean", readiness: 100 },
+                  { name: "Axiom Consulting Group", score: 74, depth: "STANDARD", risk: "Clean", readiness: 70 },
+                  { name: "NCS Digital Pte. Ltd.", score: 91, depth: "CERTIFIED", risk: "Clean", readiness: 100 },
+                  { name: "Greenline Logistics Pte. Ltd.", score: 61, depth: "BASIC", risk: "Watch", readiness: 40 },
+                ].map((v, i) => (
+                  <div key={i} className="rounded-xl border border-white/10 bg-[#0f172a] p-4">
+                    <div className="flex items-center gap-3">
+                      <ScoreRing score={v.score} />
+                      <div className="flex-1">
+                        <h3 className="text-sm font-bold text-white">{v.name}</h3>
+                        <div className="flex gap-1.5 mt-2">
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-white/5 text-white/50">{v.depth}</span>
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-white/5 text-emerald-400">{v.risk}</span>
+                        </div>
+                        <div className="h-1 bg-white/5 rounded-full overflow-hidden mt-2">
+                          <div className="h-full rounded-full bg-emerald-500" style={{ width: `${v.readiness}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-xl border border-white/10 bg-[#0f172a] p-5">
+                <h3 className="text-sm font-semibold text-white/80 mb-3">RFP Signals</h3>
+                {["tech.gov.sg", "mof.gov.sg", "dbs.com.sg"].map((d, i) => (
+                  <div key={i} className="py-2 border-b border-white/5 last:border-0">
+                    <p className="text-xs text-white/60">{d}</p>
+                    <p className="text-[10px] text-white/30">Intent: {85 - i * 10}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Upgrade overlay */}
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <div className="bg-[#0f172a]/95 border border-white/10 rounded-2xl p-10 max-w-lg text-center shadow-2xl backdrop-blur-sm">
+                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mx-auto mb-6">
+                  <Shield className="w-7 h-7 text-blue-400" />
+                </div>
+                <h2 className="text-2xl font-bold mb-3">Unlock Procurement Intelligence</h2>
+                <p className="text-white/50 text-sm mb-8 leading-relaxed">
+                  Get full access to vendor scoring, risk signals, compliance posture analysis,
+                  and procurement readiness data across the entire BOOPPA network.
+                </p>
+                <div className="space-y-3">
+                  <Link
+                    href="/solutions/procurement#pricing"
+                    className="block w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition text-sm"
+                  >
+                    Get Enterprise — SGD 499/mo
+                  </Link>
+                  <Link
+                    href="/demo"
+                    className="block w-full py-3 border border-white/20 text-white/60 hover:text-white hover:border-white/40 font-semibold rounded-xl transition text-sm"
+                  >
+                    Book a Demo
+                  </Link>
+                </div>
+                <p className="text-white/30 text-xs mt-6">Free tools available: <Link href="/vendors" className="text-blue-400 hover:underline">Browse Network</Link> · <Link href="/compare" className="text-blue-400 hover:underline">Compare Vendors</Link> · <Link href="/verify" className="text-blue-400 hover:underline">Verify Documents</Link></p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
