@@ -11,6 +11,7 @@ interface UserInfo {
 }
 
 export default function EnterprisePage() {
+  const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
   const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
@@ -19,6 +20,30 @@ export default function EnterprisePage() {
       .then(data => setUser(data))
       .catch(() => setUser(null));
   }, []);
+
+  async function startCheckout(productType: string): Promise<void> {
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productType, prefill_email: user?.email }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Unable to start checkout. Please try again.');
+      }
+    } catch {
+      alert('Unable to start checkout. Please try again.');
+    }
+  }
+
+  async function handleCheckout(productType: string) {
+    setLoadingProduct(productType);
+    await startCheckout(productType);
+    setLoadingProduct(null);
+  }
 
   async function handleBillingPortal() {
     window.location.href = '/api/stripe/portal';
@@ -102,9 +127,13 @@ export default function EnterprisePage() {
                 ))}
               </ul>
 
-              <Link href="/demo" className="block w-full text-center bg-[#0f172a] text-white font-bold py-4 rounded-xl hover:bg-[#1e293b] transition">
-                Book Demo
-              </Link>
+              <button
+                onClick={() => handleCheckout('enterprise_monthly')}
+                disabled={loadingProduct === 'enterprise_monthly'}
+                className="w-full bg-[#0f172a] text-white font-bold py-4 rounded-xl hover:bg-[#1e293b] transition disabled:opacity-50"
+              >
+                {loadingProduct === 'enterprise_monthly' ? 'Redirecting...' : 'Get Enterprise'}
+              </button>
             </div>
 
             <div className="bg-[#0f172a] p-10 rounded-[2.5rem] border border-white/10 shadow-2xl hover:translate-y-[-5px] transition-all text-white">
@@ -168,9 +197,13 @@ export default function EnterprisePage() {
                 ))}
               </ul>
 
-              <Link href="/demo" className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] font-bold py-4 rounded-xl hover:bg-[#0f172a] hover:text-white transition">
-                Book Standard Suite Demo
-              </Link>
+              <button
+                onClick={() => handleCheckout('compliance_standard')}
+                disabled={loadingProduct === 'compliance_standard'}
+                className="w-full border-2 border-[#0f172a] text-[#0f172a] font-bold py-4 rounded-xl hover:bg-[#0f172a] hover:text-white transition disabled:opacity-50"
+              >
+                {loadingProduct === 'compliance_standard' ? 'Redirecting...' : 'Get Standard Suite'}
+              </button>
             </div>
 
             <div className="bg-white p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl relative scale-105 z-10 hover:translate-y-[-5px] transition-all">
@@ -201,9 +234,13 @@ export default function EnterprisePage() {
                 ))}
               </ul>
 
-              <Link href="/demo" className="block w-full text-center bg-[#10b981] text-white font-bold py-4 rounded-xl hover:bg-[#059669] transition shadow-lg shadow-[#10b981]/20">
-                Book Pro Suite Demo
-              </Link>
+              <button
+                onClick={() => handleCheckout('compliance_pro')}
+                disabled={loadingProduct === 'compliance_pro'}
+                className="w-full bg-[#10b981] text-white font-bold py-4 rounded-xl hover:bg-[#059669] transition shadow-lg shadow-[#10b981]/20 disabled:opacity-50"
+              >
+                {loadingProduct === 'compliance_pro' ? 'Redirecting...' : 'Get Pro Suite'}
+              </button>
             </div>
 
             <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col justify-between hover:translate-y-[-5px] transition-all">
