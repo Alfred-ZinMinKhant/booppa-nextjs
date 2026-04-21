@@ -45,6 +45,15 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/enterprise',
+        destination: '/solutions/procurement',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

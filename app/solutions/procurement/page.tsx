@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+interface UserInfo {
+	email: string;
+	role: string;
+	plan: string;
+	stripe_customer_id?: string;
+}
+
 function CheckItem({
 	text,
 	color = "text-blue-500",
@@ -19,16 +26,53 @@ function CheckItem({
 }
 
 export default function SolutionsProcurementPage() {
-	const [isVendor, setIsVendor] = useState(false);
+	const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
+	const [user, setUser] = useState<UserInfo | null>(null);
 
 	useEffect(() => {
 		fetch("/api/auth/me")
 			.then((r) => (r.ok ? r.json() : null))
 			.then((data) => {
-				if (data?.role === "VENDOR") setIsVendor(true);
+				setUser(data);
 			})
 			.catch(() => {});
 	}, []);
+
+	async function startCheckout(productType: string): Promise<void> {
+		try {
+			const res = await fetch("/api/checkout", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ productType, prefill_email: user?.email }),
+			});
+			const data = await res.json();
+			if (data.url) {
+				window.location.href = data.url;
+			} else {
+				alert(data.error || "Unable to start checkout. Please try again.");
+			}
+		} catch {
+			alert("Unable to start checkout. Please try again.");
+		}
+	}
+
+	async function handleCheckout(productType: string) {
+		setLoadingProduct(productType);
+		await startCheckout(productType);
+		setLoadingProduct(null);
+	}
+
+	async function handleBillingPortal() {
+		window.location.href = "/api/stripe/portal";
+	}
+
+	const isVendor = user?.role === "VENDOR";
+	const isEnterprise = [
+		"enterprise",
+		"enterprise_pro",
+		"standard_compliance",
+		"pro_compliance",
+	].includes(user?.plan || "");
 
 	return (
 		<main className="bg-white min-h-screen overflow-x-hidden">
@@ -58,6 +102,29 @@ export default function SolutionsProcurementPage() {
 						team instant access to blockchain-verified vendor evidence &mdash;
 						so you can shortlist confidently and award faster.
 					</p>
+					{isEnterprise ? (
+						<button
+							onClick={handleBillingPortal}
+							className="btn btn-primary px-10 py-5 text-xl font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-lg transition-all"
+						>
+							Manage Enterprise Billing
+						</button>
+					) : (
+						<div className="flex flex-wrap justify-center gap-4">
+							<a
+								href="#pricing"
+								className="btn btn-primary px-10 py-4 text-lg font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-lg transition-all"
+							>
+								View Pricing
+							</a>
+							<Link
+								href="/demo"
+								className="btn btn-secondary border border-white text-white px-10 py-4 text-lg font-bold hover:bg-white hover:text-[#0f172a] rounded-xl transition-all"
+							>
+								Book a Demo
+							</Link>
+						</div>
+					)}
 				</div>
 			</section>
 
@@ -101,12 +168,15 @@ export default function SolutionsProcurementPage() {
 							<p className="text-xs text-[#94a3b8] mb-6 border-t border-[#e2e8f0] pt-4">
 								For institutional procurement teams, GLCs, statutory boards
 							</p>
-							<Link
-								href="/demo"
-								className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm"
+							<button
+								onClick={() => handleCheckout("enterprise_monthly")}
+								disabled={loadingProduct === "enterprise_monthly"}
+								className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm disabled:opacity-50"
 							>
-								Book Demo
-							</Link>
+								{loadingProduct === "enterprise_monthly"
+									? "Redirecting..."
+									: "Get Enterprise"}
+							</button>
 						</div>
 
 						{/* 2 — Enterprise Pro */}
@@ -230,7 +300,13 @@ export default function SolutionsProcurementPage() {
 									</li>
 								))}
 							</ul>
-							<Link href="/demo" className="block w-full btn btn-primary w-full shadow-lg">Book Standard Suite Demo</Link>
+							<button
+								onClick={() => handleCheckout("compliance_standard")}
+								disabled={loadingProduct === "compliance_standard"}
+								className="block w-full text-center bg-[#0f172a] text-white font-bold py-3 rounded-xl hover:bg-[#1e293b] transition text-sm disabled:opacity-50"
+							>
+								{loadingProduct === "compliance_standard" ? "Redirecting..." : "Get Standard Suite"}
+							</button>
 						</div>
 
 						<div className="bg-white p-10 rounded-[2.5rem] border-2 border-blue-500 shadow-2xl relative scale-105 z-10 hover:translate-y-[-5px] transition-all">
@@ -259,7 +335,13 @@ export default function SolutionsProcurementPage() {
 									</li>
 								))}
 							</ul>
-							<Link href="/demo" className="block w-full btn btn-primary w-full shadow-lg">Book Pro Suite Demo</Link>
+							<button
+								onClick={() => handleCheckout("compliance_pro")}
+								disabled={loadingProduct === "compliance_pro"}
+								className="block w-full text-center bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-600/20 text-sm disabled:opacity-50"
+							>
+								{loadingProduct === "compliance_pro" ? "Redirecting..." : "Get Pro Suite"}
+							</button>
 						</div>
 
 						<div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col justify-between hover:translate-y-[-5px] transition-all">
