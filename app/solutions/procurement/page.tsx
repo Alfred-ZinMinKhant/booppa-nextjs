@@ -173,6 +173,13 @@ export default function SolutionsProcurementPage() {
 								>
 									Manage Billing
 								</button>
+							) : isVendor ? (
+								<Link
+									href="/solutions/vendors"
+									className="block w-full text-center bg-gray-400 text-white font-semibold py-3 rounded-xl transition text-sm"
+								>
+									Vendor? View Vendor Solutions →
+								</Link>
 							) : (
 								<button
 									onClick={() => handleCheckout("enterprise_monthly")}
@@ -228,12 +235,21 @@ export default function SolutionsProcurementPage() {
 							<p className="text-xs text-white/40 mb-6 border-t border-white/10 pt-4">
 								For MNCs and government-linked companies
 							</p>
-							<Link
-								href="/demo"
-								className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/30"
-							>
-								Book Enterprise Pro Demo
-							</Link>
+							{isVendor ? (
+								<Link
+									href="/solutions/vendors"
+									className="block w-full text-center bg-gray-500 text-white font-semibold py-3 rounded-xl transition text-sm"
+								>
+									Vendor? View Vendor Solutions →
+								</Link>
+							) : (
+								<Link
+									href="/demo"
+									className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/30"
+								>
+									Book Enterprise Pro Demo
+								</Link>
+							)}
 						</div>
 
 						{/* 3 — Custom Enterprise */}
@@ -261,12 +277,21 @@ export default function SolutionsProcurementPage() {
 									<CheckItem key={f} text={f} />
 								))}
 							</ul>
-							<Link
-								href="/demo"
-								className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm mt-auto"
-							>
-								Contact Enterprise Sales
-							</Link>
+							{isVendor ? (
+								<Link
+									href="/solutions/vendors"
+									className="block w-full text-center bg-gray-400 text-white font-semibold py-3 rounded-xl transition text-sm mt-auto"
+								>
+									Vendor? View Vendor Solutions →
+								</Link>
+							) : (
+								<Link
+									href="/demo"
+									className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm mt-auto"
+								>
+									Contact Enterprise Sales
+								</Link>
+							)}
 						</div>
 					</div>
 				</div>
