@@ -520,17 +520,23 @@ export default function PricingPage() {
                 <ul className="space-y-3 mb-10">
                   {[
                     'Full procurement analytics dashboard',
-                    'Vendor comparison engine — weighted composite scoring',
-                    'Configurable procurement ordering presets',
-                    'Vendor risk signals and compliance posture',
+                    'Vendor comparison engine — weighted scoring',
+                    'Vendor risk signals & compliance posture',
+                    'Compliance health scoring (0-100)',
+                    'Audit trail export (PDF + CSV)',
                     'Self-service billing portal',
-                    'Access to /api/procurement/* routes',
+                    '5,000 blockchain notarizations/month',
+                    'Priority support (4h SLA)',
                   ].map((f) => <CheckItem key={f} text={f} />)}
                 </ul>
                 <p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">For institutional procurement teams, GLCs, statutory boards</p>
-                <Link href="/demo" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm">
-                  Book Demo
-                </Link>
+                <button
+                  onClick={() => handleCheckout('enterprise_monthly')}
+                  disabled={loadingProduct === 'enterprise_monthly'}
+                  className="block w-full text-center bg-[#0f172a] text-white hover:bg-[#1e293b] disabled:opacity-50 font-semibold py-3 rounded-xl transition text-sm"
+                >
+                  {loadingProduct === 'enterprise_monthly' ? 'Redirecting…' : 'Get Enterprise — SGD 499/mo'}
+                </button>
               </div>
 
               <div className="bg-[#0f172a] p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl hover:-translate-y-1 transition-all relative">
@@ -543,19 +549,22 @@ export default function PricingPage() {
                 <ul className="space-y-3 mb-10">
                   <li className="text-sm font-semibold text-white">Everything in Enterprise, plus:</li>
                   {[
-                    'Dedicated account manager with monthly review call',
-                    'SLA on data freshness and report turnaround',
-                    'Multi-sector procurement views simultaneously',
-                    'Advanced reporting — exportable datasets, custom filters',
+                    'Dedicated account manager + monthly review',
+                    'SLA on data freshness & report turnaround',
+                    'Multi-sector procurement views',
+                    'Exportable datasets & custom filters',
                     'Historical trend analysis',
-                    'Priority support response',
+                    'MAS TRM, Cyber Hygiene & Third-Party Risk workflows',
+                    'Unlimited blockchain notarizations',
+                    'White-label reports (your branding)',
+                    '24/7 priority support (2h SLA)',
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-white/80">
                       <span className="text-[#10b981] font-bold flex-shrink-0">✓</span>{f}
                     </li>
                   ))}
                 </ul>
-                <p className="pt-6 border-t border-white/10 text-xs text-white/40 mb-8">For MNCs and government-linked companies with structured supplier management obligations</p>
+                <p className="pt-6 border-t border-white/10 text-xs text-white/40 mb-8">For MNCs and government-linked companies</p>
                 <Link href="/demo" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/30">
                   Book Enterprise Pro Demo
                 </Link>
@@ -571,9 +580,10 @@ export default function PricingPage() {
                       'Custom compliance frameworks',
                       'Multi-subsidiary management',
                       'Dedicated infrastructure',
-                      'Custom SLAs',
+                      'Custom SLAs (e.g., 99.99% uptime)',
+                      'SSO integration (SAML/OAuth)',
                       'Compliance team training',
-                      'Regulatory filing assistance',
+                      'Government agency pricing',
                     ].map((f) => <CheckItem key={f} text={f} />)}
                   </ul>
                 </div>
