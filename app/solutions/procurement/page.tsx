@@ -313,10 +313,7 @@ export default function SolutionsProcurementPage() {
 						{/* Standard Suite */}
 						<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
 							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">Standard Suite</h3>
-							<div className="text-4xl font-black text-[#0f172a] mb-1">
-								SGD 1,299
-								<span className="text-lg text-[#64748b] font-normal">/mo</span>
-							</div>
+							<div className="text-4xl font-black text-[#0f172a] mb-1">Contact Us</div>
 							<p className="text-sm text-[#64748b] mb-6">MAS + MTCS operational workflows</p>
 							<ul className="space-y-3 mb-8 flex-1">
 								{[
@@ -357,10 +354,7 @@ export default function SolutionsProcurementPage() {
 								Recommended
 							</div>
 							<h3 className="text-xl font-bold mb-3 text-white">Pro Suite</h3>
-							<div className="text-4xl font-black text-blue-400 mb-1">
-								SGD 2,499
-								<span className="text-lg text-white/60 font-normal">/mo</span>
-							</div>
+							<div className="text-4xl font-black text-blue-400 mb-1">Contact Us</div>
 							<p className="text-sm text-white/60 mb-6">Full enterprise evidence infrastructure</p>
 							<ul className="space-y-3 mb-8 flex-1">
 								<li className="text-sm font-semibold text-white">

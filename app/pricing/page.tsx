@@ -611,7 +611,7 @@ export default function PricingPage() {
 
                   <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all">
                     <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Standard Suite</h3>
-                    <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 1,299<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                    <div className="text-4xl font-bold text-[#0f172a] mb-2">Contact Us</div>
                     <p className="text-sm text-[#64748b] mb-8">MAS + MTCS operational workflows</p>
                     <ul className="space-y-3 mb-10">
                       {[
@@ -637,7 +637,7 @@ export default function PricingPage() {
                       Recommended
                     </div>
                     <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Pro Suite</h3>
-                    <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 2,499<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                    <div className="text-4xl font-bold text-[#0f172a] mb-2">Contact Us</div>
                     <p className="text-sm text-[#64748b] mb-8">Full enterprise evidence infrastructure</p>
                     <ul className="space-y-3 mb-10">
                       <li className="text-sm font-semibold text-[#0f172a]">Everything in Standard Suite, plus:</li>
