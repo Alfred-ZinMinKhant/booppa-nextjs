@@ -627,13 +627,9 @@ export default function PricingPage() {
                         'Priority support (4h SLA)',
                       ].map((f) => <CheckItem key={f} text={f} />)}
                     </ul>
-                    <button
-                      onClick={() => handleCheckout('compliance_standard')}
-                      disabled={loadingProduct === 'compliance_standard'}
-                      className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white disabled:opacity-50 font-bold py-3 rounded-xl transition text-sm"
-                    >
-                      {loadingProduct === 'compliance_standard' ? 'Redirecting…' : 'Get Standard Suite — SGD 1,299/mo'}
-                    </button>
+                    <Link href="/demo" className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold py-3 rounded-xl transition text-sm">
+                      Book a Demo
+                    </Link>
                   </div>
 
                   <div className="bg-white p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl relative hover:-translate-y-1 transition-all">
@@ -658,13 +654,9 @@ export default function PricingPage() {
                         'Quarterly compliance strategy sessions',
                       ].map((f) => <CheckItem key={f} text={f} />)}
                     </ul>
-                    <button
-                      onClick={() => handleCheckout('compliance_pro')}
-                      disabled={loadingProduct === 'compliance_pro'}
-                      className="block w-full text-center bg-[#10b981] hover:bg-[#059669] disabled:opacity-50 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/20 text-sm"
-                    >
-                      {loadingProduct === 'compliance_pro' ? 'Redirecting…' : 'Get Pro Suite — SGD 2,499/mo'}
-                    </button>
+                    <Link href="/demo" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/20 text-sm">
+                      Book a Demo
+                    </Link>
                   </div>
 
                   <div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col justify-between">

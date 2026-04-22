@@ -342,13 +342,12 @@ export default function SolutionsProcurementPage() {
 									Vendor? View Vendor Solutions →
 								</Link>
 							) : (
-								<button
-									onClick={() => handleCheckout("compliance_standard")}
-									disabled={loadingProduct === "compliance_standard"}
-									className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold py-3 rounded-xl transition text-sm disabled:opacity-50"
+								<Link
+									href="/demo"
+									className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold py-3 rounded-xl transition text-sm"
 								>
-									{loadingProduct === "compliance_standard" ? "Redirecting..." : "Get Standard Suite — SGD 1,299/mo"}
-								</button>
+									Book a Demo
+								</Link>
 							)}
 						</div>
 
@@ -393,13 +392,12 @@ export default function SolutionsProcurementPage() {
 									Vendor? View Vendor Solutions →
 								</Link>
 							) : (
-								<button
-									onClick={() => handleCheckout("compliance_pro")}
-									disabled={loadingProduct === "compliance_pro"}
-									className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/30 disabled:opacity-50"
+								<Link
+									href="/demo"
+									className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/30"
 								>
-									{loadingProduct === "compliance_pro" ? "Redirecting..." : "Get Pro Suite — SGD 2,499/mo"}
-								</button>
+									Book a Demo
+								</Link>
 							)}
 						</div>
 
