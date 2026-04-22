@@ -84,8 +84,9 @@ export default function EnterprisePage() {
 						<span className="text-blue-400">Trust & Compliance.</span>
 					</h1>
 					<p className="text-xl text-white/70 mb-6 max-w-2xl mx-auto leading-relaxed">
-						Scale your procurement operations with blockchain-verified vendor evidence, 
-						automated compliance workflows, and institutional-grade risk management.
+						Scale your procurement operations with blockchain-verified vendor
+						evidence, automated compliance workflows, and institutional-grade
+						risk management.
 					</p>
 					{isEnterprise ? (
 						<button
@@ -118,10 +119,11 @@ export default function EnterprisePage() {
 				<div className="max-w-[1100px] mx-auto">
 					<div className="text-center mb-14">
 						<h2 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">
-							Enterprise Procurement
+							Enterprise Buyer
 						</h2>
 						<p className="text-lg text-[#64748b] max-w-2xl mx-auto">
-							Institutional-grade vendor evaluation and management solutions for organizations, GLCs, and statutory boards.
+							Institutional-grade vendor evaluation and management solutions for
+							organizations, GLCs, and statutory boards.
 						</p>
 					</div>
 
@@ -175,7 +177,9 @@ export default function EnterprisePage() {
 									disabled={loadingProduct === "enterprise_monthly"}
 									className="block w-full text-center bg-[#0f172a] text-white font-semibold py-3 rounded-xl hover:bg-[#1e293b] transition text-sm disabled:opacity-50"
 								>
-									{loadingProduct === "enterprise_monthly" ? "Redirecting..." : "Get Enterprise — SGD 499/mo"}
+									{loadingProduct === "enterprise_monthly"
+										? "Redirecting..."
+										: "Get Enterprise — SGD 499/mo"}
 								</button>
 							)}
 						</div>
@@ -294,16 +298,23 @@ export default function EnterprisePage() {
 							Compliance Suites
 						</h2>
 						<p className="text-lg text-[#64748b] max-w-2xl mx-auto">
-							Automated evidence & blockchain notarization infrastructure for regulated organizations.
+							Automated evidence & blockchain notarization infrastructure for
+							regulated organizations.
 						</p>
 					</div>
 
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 						{/* Standard Suite */}
 						<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
-							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">Standard Suite</h3>
-							<div className="text-4xl font-black text-[#0f172a] mb-1">Contact Us</div>
-							<p className="text-sm text-[#64748b] mb-6">MAS + MTCS operational workflows</p>
+							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">
+								Standard Suite
+							</h3>
+							<div className="text-4xl font-black text-[#0f172a] mb-1">
+								Contact Us
+							</div>
+							<p className="text-sm text-[#64748b] mb-6">
+								MAS + MTCS operational workflows
+							</p>
 							<ul className="space-y-3 mb-8 flex-1">
 								{[
 									"MAS Technology Risk Management (TRM) workflows",
@@ -343,8 +354,12 @@ export default function EnterprisePage() {
 								Recommended
 							</div>
 							<h3 className="text-xl font-bold mb-3 text-white">Pro Suite</h3>
-							<div className="text-4xl font-black text-blue-400 mb-1">Contact Us</div>
-							<p className="text-sm text-white/60 mb-6">Full enterprise evidence infrastructure</p>
+							<div className="text-4xl font-black text-blue-400 mb-1">
+								Contact Us
+							</div>
+							<p className="text-sm text-white/60 mb-6">
+								Full enterprise evidence infrastructure
+							</p>
 							<ul className="space-y-3 mb-8 flex-1">
 								<li className="text-sm font-semibold text-white">
 									Everything in Standard Suite, plus:
@@ -361,8 +376,13 @@ export default function EnterprisePage() {
 									"On-premise deployment option",
 									"Quarterly compliance strategy sessions",
 								].map((f) => (
-									<li key={f} className="flex items-start gap-2 text-sm text-white/80">
-										<span className="text-blue-400 font-bold flex-shrink-0">&#10003;</span>
+									<li
+										key={f}
+										className="flex items-start gap-2 text-sm text-white/80"
+									>
+										<span className="text-blue-400 font-bold flex-shrink-0">
+											&#10003;
+										</span>
 										{f}
 									</li>
 								))}
@@ -386,9 +406,15 @@ export default function EnterprisePage() {
 
 						{/* Custom Enterprise */}
 						<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
-							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">Custom Enterprise</h3>
-							<div className="text-4xl font-black text-[#0f172a] mb-1">Contact Us</div>
-							<p className="text-sm text-[#64748b] mb-6">Tailored compliance infrastructure</p>
+							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">
+								Custom Enterprise
+							</h3>
+							<div className="text-4xl font-black text-[#0f172a] mb-1">
+								Contact Us
+							</div>
+							<p className="text-sm text-[#64748b] mb-6">
+								Tailored compliance infrastructure
+							</p>
 							<ul className="space-y-3 mb-8 flex-1">
 								{[
 									"100,000+ notarizations/month",
@@ -421,7 +447,8 @@ export default function EnterprisePage() {
 						Ready for institutional trust?
 					</h2>
 					<p className="text-white/70 text-xl mb-10">
-						Join leading statutory boards and MNCs scaling their compliance with BOOPPA.
+						Join leading statutory boards and MNCs scaling their compliance with
+						BOOPPA.
 					</p>
 					<div className="flex flex-wrap justify-center gap-4">
 						<Link
