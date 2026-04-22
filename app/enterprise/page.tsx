@@ -118,10 +118,10 @@ export default function EnterprisePage() {
 				<div className="max-w-[1100px] mx-auto">
 					<div className="text-center mb-14">
 						<h2 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">
-							Procurement Plans
+							Enterprise Procurement
 						</h2>
 						<p className="text-lg text-[#64748b] max-w-2xl mx-auto">
-							For procurement teams evaluating and managing vendors
+							Institutional-grade vendor evaluation and management solutions for organizations, GLCs, and statutory boards.
 						</p>
 					</div>
 

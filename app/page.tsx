@@ -51,7 +51,7 @@ export default function Home() {
 							</span>
 						</Link>
 						<Link
-							href="/solutions/procurement"
+							href="/enterprise"
 							className="group flex flex-col p-8 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#10b981] hover:shadow-lg transition-all"
 						>
 							<div className="text-3xl mb-4">🏗️</div>
@@ -269,7 +269,7 @@ export default function Home() {
 							<h3 className="text-xl font-bold mb-2">Win Vendor Approval</h3>
 							<p className="text-white/80 text-sm">
 								Enterprise teams verify via QR code or blockchain hash.
-								Procurement-accepted format from day one.
+								Enterprise Procurement accepted format from day one.
 							</p>
 						</div>
 					</div>
@@ -300,9 +300,7 @@ export default function Home() {
 			<section className="py-24 px-6 bg-[#f8fafc]">
 				<div className="max-w-[1200px] mx-auto">
 					<div className="text-center mb-16">
-						<h2 className="text-3xl lg:text-5xl font-bold mb-4 text-[#0f172a]">
-							Transparent Pricing
-						</h2>
+						<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">Enterprise Procurement</h2>
 						<p className="text-xl text-[#64748b]">
 							No &quot;contact sales&quot; gatekeeping. Clear costs. Start free.
 						</p>
