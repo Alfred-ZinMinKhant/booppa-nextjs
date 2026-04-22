@@ -297,6 +297,142 @@ export default function SolutionsProcurementPage() {
 				</div>
 			</section>
 
+			{/* Compliance Suites */}
+			<section className="py-20 px-6">
+				<div className="max-w-[1100px] mx-auto">
+					<div className="text-center mb-14">
+						<h2 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">
+							Compliance Suites
+						</h2>
+						<p className="text-lg text-[#64748b] max-w-2xl mx-auto">
+							Automated evidence & blockchain notarization infrastructure for regulated organizations.
+						</p>
+					</div>
+
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+						{/* Standard Suite */}
+						<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">Standard Suite</h3>
+							<div className="text-4xl font-black text-[#0f172a] mb-1">
+								SGD 1,299
+								<span className="text-lg text-[#64748b] font-normal">/mo</span>
+							</div>
+							<p className="text-sm text-[#64748b] mb-6">MAS + MTCS operational workflows</p>
+							<ul className="space-y-3 mb-8 flex-1">
+								{[
+									"MAS Technology Risk Management (TRM) workflows",
+									"Cyber Hygiene monitoring (MAS Notice 644)",
+									"Third-party risk tracking (MAS Notice 655)",
+									"5,000 blockchain notarizations/month included",
+									"Enterprise dashboard (real-time)",
+									"Compliance health scoring (0-100)",
+									"Audit trail export (PDF + CSV)",
+									"Evidence archive (12 months retention)",
+									"API access (RESTful + webhooks)",
+									"Priority support (4h SLA)",
+								].map((f) => (
+									<CheckItem key={f} text={f} />
+								))}
+							</ul>
+							{isVendor ? (
+								<Link
+									href="/solutions/vendors"
+									className="block w-full text-center bg-gray-400 text-white font-semibold py-3 rounded-xl transition text-sm"
+								>
+									Vendor? View Vendor Solutions →
+								</Link>
+							) : (
+								<button
+									onClick={() => handleCheckout("compliance_standard")}
+									disabled={loadingProduct === "compliance_standard"}
+									className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold py-3 rounded-xl transition text-sm disabled:opacity-50"
+								>
+									{loadingProduct === "compliance_standard" ? "Redirecting..." : "Get Standard Suite — SGD 1,299/mo"}
+								</button>
+							)}
+						</div>
+
+						{/* Pro Suite */}
+						<div className="bg-[#0f172a] p-8 rounded-[2rem] border-2 border-blue-500 shadow-2xl hover:-translate-y-1 transition-all relative flex flex-col">
+							<div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#0f172a] to-[#1e40af] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+								Recommended
+							</div>
+							<h3 className="text-xl font-bold mb-3 text-white">Pro Suite</h3>
+							<div className="text-4xl font-black text-blue-400 mb-1">
+								SGD 2,499
+								<span className="text-lg text-white/60 font-normal">/mo</span>
+							</div>
+							<p className="text-sm text-white/60 mb-6">Full enterprise evidence infrastructure</p>
+							<ul className="space-y-3 mb-8 flex-1">
+								<li className="text-sm font-semibold text-white">
+									Everything in Standard Suite, plus:
+								</li>
+								{[
+									"Unlimited blockchain notarizations",
+									"Custom API endpoints & rate limits",
+									"Dedicated compliance manager (monthly calls)",
+									"24/7 priority support (2h SLA)",
+									"White-label reports (your company branding)",
+									"Multi-subsidiary management",
+									"Custom compliance frameworks",
+									"SSO integration (SAML/OAuth)",
+									"On-premise deployment option",
+									"Quarterly compliance strategy sessions",
+								].map((f) => (
+									<li key={f} className="flex items-start gap-2 text-sm text-white/80">
+										<span className="text-blue-400 font-bold flex-shrink-0">&#10003;</span>
+										{f}
+									</li>
+								))}
+							</ul>
+							{isVendor ? (
+								<Link
+									href="/solutions/vendors"
+									className="block w-full text-center bg-gray-500 text-white font-semibold py-3 rounded-xl transition text-sm"
+								>
+									Vendor? View Vendor Solutions →
+								</Link>
+							) : (
+								<button
+									onClick={() => handleCheckout("compliance_pro")}
+									disabled={loadingProduct === "compliance_pro"}
+									className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/30 disabled:opacity-50"
+								>
+									{loadingProduct === "compliance_pro" ? "Redirecting..." : "Get Pro Suite — SGD 2,499/mo"}
+								</button>
+							)}
+						</div>
+
+						{/* Custom Enterprise */}
+						<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">Custom Enterprise</h3>
+							<div className="text-4xl font-black text-[#0f172a] mb-1">Contact Us</div>
+							<p className="text-sm text-[#64748b] mb-6">Tailored compliance infrastructure</p>
+							<ul className="space-y-3 mb-8 flex-1">
+								{[
+									"100,000+ notarizations/month",
+									"On-premise infrastructure",
+									"Air-gapped deployment",
+									"Custom SLAs (e.g., 99.99% uptime)",
+									"Dedicated account team",
+									"Custom integration development",
+									"Compliance team training",
+									"Government agency pricing",
+								].map((f) => (
+									<CheckItem key={f} text={f} />
+								))}
+							</ul>
+							<Link
+								href="/demo"
+								className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm mt-auto"
+							>
+								Contact Enterprise Sales
+							</Link>
+						</div>
+					</div>
+				</div>
+			</section>
+
 			{/* Free Tools */}
 			<section className="py-20 px-6 bg-[#f8fafc]">
 				<div className="max-w-[1100px] mx-auto">
