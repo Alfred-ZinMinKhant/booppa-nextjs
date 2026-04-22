@@ -101,7 +101,7 @@ export default function Footer() {
 							</li>
 							<li>
 								<Link
-									href="/solutions/procurement"
+									href="/enterprise"
 									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
 								>
 									Enterprise Access

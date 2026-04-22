@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-type Tab = 'oneoff' | 'bundles' | 'subscriptions' | 'enterprise';
+type Tab = 'oneoff' | 'bundles' | 'subscriptions' | 'procurement' | 'enterprise';
 
 function CheckItem({ text, color = 'text-[#10b981]' }: { text: string; color?: string }) {
   return (
@@ -45,6 +45,7 @@ export default function PricingPage() {
     { id: 'oneoff',        label: 'One-Time' },
     { id: 'bundles',       label: 'Bundles' },
     { id: 'subscriptions', label: 'Subscriptions' },
+    { id: 'procurement',   label: 'Procurement' },
     { id: 'enterprise',    label: 'Enterprise' },
   ];
 
@@ -510,7 +511,8 @@ export default function PricingPage() {
           )}
 
           {/* ── ENTERPRISE ───────────────────────────────────────────────── */}
-          {activeTab === 'enterprise' && (
+          {/* ── PROCUREMENT ─────────────────────────────────────────────── */}
+          {activeTab === 'procurement' && (
             <div className="space-y-16">
               {/* Procurement Plans */}
               <div>
@@ -600,12 +602,17 @@ export default function PricingPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
 
+          {/* ── ENTERPRISE ───────────────────────────────────────────────── */}
+          {activeTab === 'enterprise' && (
+            <div className="space-y-16">
               {/* Compliance Suites */}
               <div>
                 <div className="text-center mb-10">
                   <h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">Compliance Suites</h2>
-                  <p className="text-[#64748b]">Automated evidence & blockchain notarization infrastructure</p>
+                  <p className="text-[#64748b]">Automated evidence & blockchain notarization infrastructure for regulated organizations</p>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -632,15 +639,15 @@ export default function PricingPage() {
                     </Link>
                   </div>
 
-                  <div className="bg-white p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl relative hover:-translate-y-1 transition-all">
-                    <div className="absolute top-[-14px] right-10 bg-gradient-to-r from-[#0f172a] to-[#1e40af] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
+                  <div className="bg-[#0f172a] p-10 rounded-[2.5rem] border-2 border-blue-500 shadow-2xl relative hover:-translate-y-1 transition-all">
+                    <div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#0f172a] to-[#1e40af] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
                       Recommended
                     </div>
-                    <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Pro Suite</h3>
-                    <div className="text-4xl font-bold text-[#0f172a] mb-2">Contact Us</div>
-                    <p className="text-sm text-[#64748b] mb-8">Full enterprise evidence infrastructure</p>
+                    <h3 className="text-xl font-bold mb-4 text-white">Pro Suite</h3>
+                    <div className="text-4xl font-bold text-blue-400 mb-2">Contact Us</div>
+                    <p className="text-sm text-white/60 mb-8">Full enterprise evidence infrastructure</p>
                     <ul className="space-y-3 mb-10">
-                      <li className="text-sm font-semibold text-[#0f172a]">Everything in Standard Suite, plus:</li>
+                      <li className="text-sm font-semibold text-white">Everything in Standard Suite, plus:</li>
                       {[
                         'Unlimited blockchain notarizations',
                         'Custom API endpoints & rate limits',
@@ -652,9 +659,13 @@ export default function PricingPage() {
                         'SSO integration (SAML/OAuth)',
                         'On-premise deployment option',
                         'Quarterly compliance strategy sessions',
-                      ].map((f) => <CheckItem key={f} text={f} />)}
+                      ].map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-sm text-white/80">
+                          <span className="text-blue-400 font-bold flex-shrink-0">✓</span>{f}
+                        </li>
+                      ))}
                     </ul>
-                    <Link href="/demo" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/20 text-sm">
+                    <Link href="/demo" className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/30">
                       Book a Demo
                     </Link>
                   </div>

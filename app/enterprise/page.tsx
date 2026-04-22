@@ -25,7 +25,7 @@ function CheckItem({
 	);
 }
 
-export default function SolutionsProcurementPage() {
+export default function EnterprisePage() {
 	const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
 	const [user, setUser] = useState<UserInfo | null>(null);
 
@@ -75,28 +75,17 @@ export default function SolutionsProcurementPage() {
 			{/* Hero */}
 			<section className="py-24 px-6 bg-[#0f172a] text-white">
 				<div className="max-w-[1200px] mx-auto text-center">
-					{isVendor && (
-						<div className="mb-8 rounded-xl bg-amber-500/10 border border-amber-500/20 px-6 py-4 text-sm text-amber-300 max-w-2xl mx-auto">
-							These plans are for procurement teams. Looking for vendor tools?{" "}
-							<Link href="/solutions/vendors" className="underline hover:no-underline font-semibold">
-								View Vendor Solutions →
-							</Link>
-						</div>
-					)}
 					<div className="inline-flex items-center gap-2 px-4 py-2 border border-blue-400 rounded-full text-sm font-medium text-blue-400 mb-8 bg-blue-500/10">
-						For Procurement / Buyers
+						Enterprise Solutions
 					</div>
 					<h1 className="text-4xl lg:text-6xl font-black mb-6 leading-tight">
-						Reduce vendor risk.
+						Enterprise-Grade
 						<br />
-						<span className="text-blue-400">Evaluate faster.</span>
-						<br />
-						Award confidently.
+						<span className="text-blue-400">Trust & Compliance.</span>
 					</h1>
 					<p className="text-xl text-white/70 mb-6 max-w-2xl mx-auto leading-relaxed">
-						Stop chasing vendors for compliance documents. BOOPPA gives your
-						team instant access to blockchain-verified vendor evidence &mdash;
-						so you can shortlist confidently and award faster.
+						Scale your procurement operations with blockchain-verified vendor evidence, 
+						automated compliance workflows, and institutional-grade risk management.
 					</p>
 					{isEnterprise ? (
 						<button
@@ -111,7 +100,7 @@ export default function SolutionsProcurementPage() {
 								href="#pricing"
 								className="btn btn-primary px-10 py-4 text-lg font-bold bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-lg transition-all"
 							>
-								View Pricing
+								View Enterprise Plans
 							</a>
 							<Link
 								href="/demo"
@@ -124,15 +113,15 @@ export default function SolutionsProcurementPage() {
 				</div>
 			</section>
 
-			{/* Pricing */}
+			{/* Pricing — Procurement Plans */}
 			<section id="pricing" className="py-20 px-6">
 				<div className="max-w-[1100px] mx-auto">
 					<div className="text-center mb-14">
 						<h2 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">
-							Choose Your Plan
+							Procurement Plans
 						</h2>
 						<p className="text-lg text-[#64748b] max-w-2xl mx-auto">
-							Transparent pricing for procurement teams. No hidden fees.
+							For procurement teams evaluating and managing vendors
 						</p>
 					</div>
 
@@ -297,56 +286,130 @@ export default function SolutionsProcurementPage() {
 				</div>
 			</section>
 
-
-
-			{/* Free Tools */}
+			{/* Compliance Suites */}
 			<section className="py-20 px-6 bg-[#f8fafc]">
 				<div className="max-w-[1100px] mx-auto">
-					<div className="text-center mb-10">
-						<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">
-							Free Procurement Tools
+					<div className="text-center mb-14">
+						<h2 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">
+							Compliance Suites
 						</h2>
-						<p className="text-[#64748b]">
-							Available to all procurement teams at no cost
+						<p className="text-lg text-[#64748b] max-w-2xl mx-auto">
+							Automated evidence & blockchain notarization infrastructure for regulated organizations.
 						</p>
 					</div>
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-						{[
-							{
-								title: "Vendor Network",
-								desc: "Browse the full directory of Singapore SMEs. Filter by compliance status, sector, and verification depth.",
-								href: "/vendors",
-								cta: "Browse Network \u2192",
-							},
-							{
-								title: "Vendor Comparison",
-								desc: "Compare up to 4 vendors side-by-side across compliance scores, evidence, and procurement readiness.",
-								href: "/compare",
-								cta: "Compare Vendors \u2192",
-							},
-							{
-								title: "Document Verify",
-								desc: "Verify any BOOPPA-issued document instantly. Paste a blockchain hash or scan a QR code to confirm authenticity.",
-								href: "/verify",
-								cta: "Verify a Document \u2192",
-							},
-						].map((t, i) => (
-							<div
-								key={i}
-								className="bg-white p-8 rounded-2xl border border-[#e2e8f0] hover:border-blue-400 hover:shadow-lg transition-all"
-							>
-								<h3 className="text-lg font-bold mb-2 text-[#0f172a]">
-									{t.title}
-								</h3>
-								<p className="text-sm text-[#64748b] mb-6">{t.desc}</p>
+
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+						{/* Standard Suite */}
+						<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">Standard Suite</h3>
+							<div className="text-4xl font-black text-[#0f172a] mb-1">Contact Us</div>
+							<p className="text-sm text-[#64748b] mb-6">MAS + MTCS operational workflows</p>
+							<ul className="space-y-3 mb-8 flex-1">
+								{[
+									"MAS Technology Risk Management (TRM) workflows",
+									"Cyber Hygiene monitoring (MAS Notice 644)",
+									"Third-party risk tracking (MAS Notice 655)",
+									"5,000 blockchain notarizations/month included",
+									"Enterprise dashboard (real-time)",
+									"Compliance health scoring (0-100)",
+									"Audit trail export (PDF + CSV)",
+									"Evidence archive (12 months retention)",
+									"API access (RESTful + webhooks)",
+									"Priority support (4h SLA)",
+								].map((f) => (
+									<CheckItem key={f} text={f} />
+								))}
+							</ul>
+							{isVendor ? (
 								<Link
-									href={t.href}
-									className="text-blue-600 font-bold text-sm hover:underline"
+									href="/solutions/vendors"
+									className="block w-full text-center bg-gray-400 text-white font-semibold py-3 rounded-xl transition text-sm"
 								>
-									{t.cta}
+									Vendor? View Vendor Solutions →
 								</Link>
+							) : (
+								<Link
+									href="/demo"
+									className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold py-3 rounded-xl transition text-sm"
+								>
+									Book a Demo
+								</Link>
+							)}
+						</div>
+
+						{/* Pro Suite */}
+						<div className="bg-[#0f172a] p-8 rounded-[2rem] border-2 border-blue-500 shadow-2xl hover:-translate-y-1 transition-all relative flex flex-col">
+							<div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#0f172a] to-[#1e40af] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+								Recommended
 							</div>
-						))}
+							<h3 className="text-xl font-bold mb-3 text-white">Pro Suite</h3>
+							<div className="text-4xl font-black text-blue-400 mb-1">Contact Us</div>
+							<p className="text-sm text-white/60 mb-6">Full enterprise evidence infrastructure</p>
+							<ul className="space-y-3 mb-8 flex-1">
+								<li className="text-sm font-semibold text-white">
+									Everything in Standard Suite, plus:
+								</li>
+								{[
+									"Unlimited blockchain notarizations",
+									"Custom API endpoints & rate limits",
+									"Dedicated compliance manager (monthly calls)",
+									"24/7 priority support (2h SLA)",
+									"White-label reports (your company branding)",
+									"Multi-subsidiary management",
+									"Custom compliance frameworks",
+									"SSO integration (SAML/OAuth)",
+									"On-premise deployment option",
+									"Quarterly compliance strategy sessions",
+								].map((f) => (
+									<li key={f} className="flex items-start gap-2 text-sm text-white/80">
+										<span className="text-blue-400 font-bold flex-shrink-0">&#10003;</span>
+										{f}
+									</li>
+								))}
+							</ul>
+							{isVendor ? (
+								<Link
+									href="/solutions/vendors"
+									className="block w-full text-center bg-gray-500 text-white font-semibold py-3 rounded-xl transition text-sm"
+								>
+									Vendor? View Vendor Solutions →
+								</Link>
+							) : (
+								<Link
+									href="/demo"
+									className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/30"
+								>
+									Book a Demo
+								</Link>
+							)}
+						</div>
+
+						{/* Custom Enterprise */}
+						<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">Custom Enterprise</h3>
+							<div className="text-4xl font-black text-[#0f172a] mb-1">Contact Us</div>
+							<p className="text-sm text-[#64748b] mb-6">Tailored compliance infrastructure</p>
+							<ul className="space-y-3 mb-8 flex-1">
+								{[
+									"100,000+ notarizations/month",
+									"On-premise infrastructure",
+									"Air-gapped deployment",
+									"Custom SLAs (e.g., 99.99% uptime)",
+									"Dedicated account team",
+									"Custom integration development",
+									"Compliance team training",
+									"Government agency pricing",
+								].map((f) => (
+									<CheckItem key={f} text={f} />
+								))}
+							</ul>
+							<Link
+								href="/demo"
+								className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm mt-auto"
+							>
+								Contact Enterprise Sales
+							</Link>
+						</div>
 					</div>
 				</div>
 			</section>
@@ -355,24 +418,23 @@ export default function SolutionsProcurementPage() {
 			<section className="py-20 px-6 bg-[#0f172a] text-white text-center">
 				<div className="max-w-2xl mx-auto">
 					<h2 className="text-3xl lg:text-5xl font-black mb-6">
-						Cut your vendor evaluation time in half.
+						Ready for institutional trust?
 					</h2>
 					<p className="text-white/70 text-xl mb-10">
-						Start browsing and verifying vendors now &mdash; free tools
-						included.
+						Join leading statutory boards and MNCs scaling their compliance with BOOPPA.
 					</p>
 					<div className="flex flex-wrap justify-center gap-4">
 						<Link
-							href="/vendors"
+							href="/demo"
 							className="inline-block px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black text-xl rounded-2xl transition-colors shadow-lg"
 						>
-							Browse Vendor Network
+							Book an Enterprise Demo
 						</Link>
 						<Link
-							href="/demo"
+							href="/vendors"
 							className="inline-block px-10 py-5 border border-white/30 hover:border-white/60 text-white font-black text-xl rounded-2xl transition-colors"
 						>
-							Book a Demo
+							Browse Vendor Network
 						</Link>
 					</div>
 				</div>
@@ -380,4 +442,3 @@ export default function SolutionsProcurementPage() {
 		</main>
 	);
 }
-

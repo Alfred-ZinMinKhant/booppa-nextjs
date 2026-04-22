@@ -83,6 +83,11 @@ const solutions = [
 		desc: "Reduce supplier risk with structured vendor due diligence",
 	},
 	{
+		name: "For Enterprise",
+		href: "/enterprise",
+		desc: "Institutional-grade compliance & evidence infrastructure",
+	},
+	{
 		name: "Vendor Proof",
 		href: "/vendor-proof",
 		desc: "Buyers filter by verified — without it, you are invisible to them",
