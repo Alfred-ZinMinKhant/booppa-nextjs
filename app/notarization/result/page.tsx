@@ -26,9 +26,12 @@ interface Verification {
 interface CertificateData {
   status: string;
   report_id: string;
+  document_descriptor: string | null;
   file_name: string | null;
   file_hash: string | null;
+  hash_algorithm: string | null;
   file_size: number | null;
+  mime_type: string | null;
   company_name: string | null;
   audit_hash: string | null;
   tx_hash: string | null;
@@ -219,6 +222,13 @@ function NotarizationResultContent() {
               {/* Document Info */}
               <section>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Document</h3>
+                {/* Document Descriptor — most prominent field */}
+                {cert.document_descriptor && (
+                  <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-xl px-4 py-3 mb-4">
+                    <p className="text-[10px] font-bold text-[#10b981] uppercase tracking-wider mb-1">Document Descriptor</p>
+                    <p className="text-[#0f172a] font-semibold text-base">{cert.document_descriptor}</p>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-[#94a3b8]">File Name</p>
@@ -226,18 +236,20 @@ function NotarizationResultContent() {
                   </div>
                   <div>
                     <p className="text-xs text-[#94a3b8]">File Size</p>
-                    <p className="text-[#0f172a] font-medium">{cert.file_size ? formatBytes(cert.file_size) : '—'}</p>
+                    <p className="text-[#0f172a] font-medium">
+                      {cert.file_size != null ? <>{formatBytes(cert.file_size)} <span className="text-[#94a3b8] text-xs">({cert.file_size.toLocaleString()} bytes)</span></> : '—'}
+                    </p>
                   </div>
-                  {cert.company_name && cert.company_name !== 'Notarization' && (
+                  {cert.mime_type && (
                     <div>
-                      <p className="text-xs text-[#94a3b8]">Company</p>
-                      <p className="text-[#0f172a] font-medium">{cert.company_name}</p>
+                      <p className="text-xs text-[#94a3b8]">File Type (MIME)</p>
+                      <p className="text-[#0f172a] font-medium font-mono text-sm">{cert.mime_type}</p>
                     </div>
                   )}
-                  {cert.plan && (
+                  {cert.company_name && cert.company_name !== 'Notarization' && cert.company_name !== 'Enterprise Notarization' && (
                     <div>
-                      <p className="text-xs text-[#94a3b8]">Package</p>
-                      <p className="text-[#0f172a] font-medium">{PLAN_LABELS[cert.plan] ?? cert.plan}</p>
+                      <p className="text-xs text-[#94a3b8]">Submitted By</p>
+                      <p className="text-[#0f172a] font-medium">{cert.company_name}</p>
                     </div>
                   )}
                 </div>
@@ -250,9 +262,14 @@ function NotarizationResultContent() {
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Cryptographic Proof</h3>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-[#94a3b8] mb-1">SHA-256 File Hash</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-xs text-[#94a3b8]">Evidence Hash</p>
+                      <span className="text-[10px] font-bold bg-[#0f172a] text-[#10b981] px-2 py-0.5 rounded font-mono">
+                        {cert.hash_algorithm ?? 'SHA-256'}
+                      </span>
+                    </div>
                     <p className="font-mono text-sm text-[#10b981] break-all bg-[#f0fdf4] p-3 rounded-lg border border-dashed border-[#bbf7d0]">
-                      {cert.file_hash}
+                      {cert.audit_hash ?? cert.file_hash}
                     </p>
                   </div>
                   {cert.audit_hash && cert.audit_hash !== cert.file_hash && (
@@ -371,6 +388,67 @@ function NotarizationResultContent() {
                 )}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── How to Verify ── */}
+        {cert?.pipeline.certificate_ready && (
+          <div className="bg-[#0f172a] rounded-3xl p-8 mb-8 text-white">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-[#10b981] mb-4">How to Verify This Certificate</h2>
+            <p className="text-white/60 text-xs mb-6">
+              Any third party — including lawyers, judges, or arbitrators — can independently verify this document
+              without accessing Booppa. Follow these steps using standard tools.
+            </p>
+            <ol className="space-y-5">
+              {[
+                {
+                  step: "Step 1 — Obtain the original file",
+                  detail: "Request the original document from the submitting party.",
+                },
+                {
+                  step: "Step 2 — Generate a SHA-256 hash",
+                  detail: null,
+                  code: [
+                    { os: "macOS / Linux", cmd: `shasum -a 256 filename` },
+                    { os: "Windows", cmd: `CertUtil -hashfile filename SHA256` },
+                    { os: "Online tool", cmd: `sha256file.com (runs locally in your browser)` },
+                  ],
+                },
+                {
+                  step: "Step 3 — Compare hashes",
+                  detail: `The resulting hash must exactly match the Evidence Hash printed above. Even a single byte difference will produce a completely different hash.`,
+                },
+                {
+                  step: "Step 4 — Confirm the blockchain anchor",
+                  detail: `Search the Transaction Hash on polygonscan.com. The block timestamp is the earliest possible existence date of the document. No login or account required.`,
+                  link: cert.verification?.polygonscan_url,
+                },
+              ].map((item, i) => (
+                <li key={i} className="flex gap-4">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-[#10b981]/20 text-[#10b981] flex items-center justify-center text-xs font-bold">{i + 1}</span>
+                  <div className="flex-1 pt-0.5">
+                    <p className="text-sm font-semibold text-white mb-1">{item.step}</p>
+                    {item.detail && <p className="text-xs text-white/60 leading-relaxed">{item.detail}</p>}
+                    {item.code && (
+                      <div className="mt-2 space-y-1.5">
+                        {item.code.map((c) => (
+                          <div key={c.os} className="flex items-baseline gap-2">
+                            <span className="text-[10px] text-white/40 w-28 flex-shrink-0">{c.os}:</span>
+                            <code className="text-xs font-mono text-[#10b981] bg-white/5 px-2 py-0.5 rounded">{c.cmd}</code>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {item.link && (
+                      <a href={item.link} target="_blank" rel="noopener noreferrer"
+                         className="inline-block mt-1.5 text-xs text-[#10b981] hover:underline">
+                        Open on Polygonscan →
+                      </a>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
         )}
 

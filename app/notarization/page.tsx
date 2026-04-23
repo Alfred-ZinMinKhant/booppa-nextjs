@@ -37,6 +37,7 @@ export default function NotarizationPage() {
   const [selectedPlan, setSelectedPlan] = useState<PlanKey>('single');
   const [email, setEmail] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [documentDescriptor, setDocumentDescriptor] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
@@ -74,6 +75,10 @@ export default function NotarizationPage() {
       setError('File too large. Maximum 50 MB.');
       return;
     }
+    if (!documentDescriptor.trim()) {
+      setError('Document description is required so the certificate is legally identifiable.');
+      return;
+    }
     if (!email.trim()) {
       setError('Email address is required so we can deliver your certificate.');
       return;
@@ -86,6 +91,7 @@ export default function NotarizationPage() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('plan', selectedPlan);
+      formData.append('document_descriptor', documentDescriptor.trim().slice(0, 120));
       if (email) formData.append('email', email);
       if (companyName) formData.append('company_name', companyName);
 
@@ -148,6 +154,7 @@ export default function NotarizationPage() {
     setError('');
     setEmail('');
     setCompanyName('');
+    setDocumentDescriptor('');
     if (fileRef.current) fileRef.current.value = '';
   };
 
@@ -266,6 +273,22 @@ export default function NotarizationPage() {
                 <div className="bg-white p-10 rounded-3xl border-2 border-[#10b981] shadow-xl">
                   <h3 className="text-2xl font-bold mb-2 text-[#0f172a]">Upload Your Document</h3>
                   <p className="text-[#64748b] mb-8">We&apos;ll compute a SHA-256 hash and store your file securely.</p>
+
+                  {/* Document Descriptor */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-bold text-[#0f172a] mb-2">
+                      Document Description *
+                      <span className="ml-2 text-xs font-normal text-[#94a3b8]">This appears on the certificate so any third party can identify what was notarized</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={documentDescriptor}
+                      onChange={(e) => setDocumentDescriptor(e.target.value.slice(0, 120))}
+                      placeholder='e.g. "Employment Contract — Jane Smith — 23 April 2026" or "Supplier Invoice #INV-2026-0042"'
+                      className="w-full px-4 py-3 border border-[#e2e8f0] rounded-xl text-[#0f172a] focus:ring-2 focus:ring-[#10b981] focus:border-transparent transition-all"
+                    />
+                    <p className="text-xs text-[#94a3b8] mt-1">{documentDescriptor.length}/120 characters</p>
+                  </div>
 
                   {/* File input */}
                   <div className="mb-6">
