@@ -5,6 +5,9 @@ import Link from "next/link";
 import HeroSection from "@/components/HeroSection";
 import ProcessPipeline from "@/components/home/ProcessPipeline";
 import SegmentationSections from "@/components/home/SegmentationSections";
+import ReportPreviewTop from "@/components/home/ReportPreviewTop";
+import BlockchainProofTop from "@/components/home/BlockchainProofTop";
+import MiniDashboardMock from "@/components/home/MiniDashboardMock";
 
 export default function Home() {
 	const [activePreview, setActivePreview] = useState<string | null>(null);
@@ -14,13 +17,22 @@ export default function Home() {
 			{/* 1. Hero (with segmentation + CTA) */}
 			<HeroSection />
 
-			{/* 2. Process Pipeline */}
+			{/* 2. Output Preview Layer (Sample Compliance Report) */}
+			<ReportPreviewTop />
+
+			{/* 3. Blockchain proof example (anchored sample) */}
+			<BlockchainProofTop />
+
+			{/* 4. Process Pipeline */}
 			<ProcessPipeline />
 
-			{/* 3. Vendor vs Buyer Sections */}
+			{/* 5. Mini Dashboard Preview (static mock) */}
+			<MiniDashboardMock />
+
+			{/* 6. Vendor vs Buyer Sections */}
 			<SegmentationSections />
 
-			{/* 4. Pricing / CTA with Integrated REAL Output Previews */}
+			{/* 6. Pricing / CTA with Integrated REAL Output Previews */}
 			<section className="py-24 px-6 bg-[#f8fafc]">
 				<div className="max-w-[1200px] mx-auto">
 					<div className="text-center mb-16">
@@ -221,7 +233,7 @@ export default function Home() {
 				</div>
 			</section>
 
-			{/* 5. Final CTA */}
+			{/* 8. Final CTA */}
 			<section className="py-24 px-6 bg-white">
 				<div className="max-w-[1200px] mx-auto bg-[#0f172a] rounded-[2.5rem] p-12 lg:p-24 text-center overflow-hidden relative">
 					<div className="absolute top-0 right-0 w-64 h-64 bg-[#10b981] opacity-10 rounded-full translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
