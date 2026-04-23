@@ -18,7 +18,7 @@ export default function ProcessPipeline() {
 			title: "Score",
 			desc: "Risk and compliance scoring",
 			icon: "📊",
-			detail: "AI-assisted metrics",
+			detail: "Automated metrics",
 		},
 		{
 			title: "Proof",
@@ -42,7 +42,8 @@ export default function ProcessPipeline() {
 						The Pipeline
 					</h2>
 					<p className="text-xl text-[#64748b] max-w-2xl mx-auto">
-						From raw data to verified trust in minutes. No manual intervention, no consultants, no waiting.
+						From raw data to verified trust in minutes. No manual intervention,
+						no consultants, no waiting.
 					</p>
 				</div>
 
@@ -54,14 +55,19 @@ export default function ProcessPipeline() {
 
 					<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 relative z-10">
 						{steps.map((step, index) => (
-							<div key={index} className="flex flex-col items-center text-center group">
+							<div
+								key={index}
+								className="flex flex-col items-center text-center group"
+							>
 								<div className="w-20 h-20 bg-white border-2 border-[#f1f5f9] group-hover:border-[#10b981] rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg relative">
 									{step.icon}
 									<div className="absolute -top-3 -right-3 w-8 h-8 bg-[#0f172a] text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
 										{index + 1}
 									</div>
 								</div>
-								<h3 className="text-xl font-black text-[#0f172a] mb-2">{step.title}</h3>
+								<h3 className="text-xl font-black text-[#0f172a] mb-2">
+									{step.title}
+								</h3>
 								<p className="text-sm font-bold text-[#10b981] mb-1 uppercase tracking-widest text-[10px]">
 									{step.detail}
 								</p>

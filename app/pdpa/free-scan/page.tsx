@@ -383,7 +383,7 @@ export default function PDPAFreeScan() {
 									</h3>
 									<p className="text-sm text-[#64748b]">
 										Receive a finding with specific legislation references and
-										recommended actions. Upgrade to unlock the full AI-powered
+										recommended actions. Upgrade to unlock the full automated
 										report with all findings.
 									</p>
 								</div>
@@ -664,7 +664,7 @@ export default function PDPAFreeScan() {
 							{/* Unlock CTA */}
 							<div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-8 rounded-3xl text-center">
 								<h3 className="text-xl font-bold text-white mb-2">
-									Unlock Full AI-Powered Report
+									Unlock Full Automated Report
 								</h3>
 								<p className="text-[#94a3b8] text-sm mb-6 max-w-md mx-auto">
 									Deep AI analysis across 8 PDPA obligations,
