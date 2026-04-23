@@ -4,6 +4,24 @@ import { useEffect, useState } from "react";
 import { config } from "@/lib/config";
 import Link from "next/link";
 
+type Finding = {
+  type?: string;
+  title?: string;
+  severity?: string;
+  description?: string;
+  evidence?: string;
+  penalty?: { amount?: string };
+  max_penalty?: string;
+  deadline?: string;
+  deadline_short?: string;
+  legislation_text?: string;
+  legislation_references?: string[];
+  owner?: string;
+  requirements?: string[];
+  acceptance_criteria?: string[];
+  recommended_tools?: string[];
+};
+
 type StructuredReport = {
   executive_summary?: string;
   risk_assessment?: {
@@ -11,14 +29,7 @@ type StructuredReport = {
     level?: string;
     description?: string;
   };
-  detailed_findings?: Array<{
-    type?: string;
-    severity?: string;
-    description?: string;
-    evidence?: string;
-    penalty?: { amount?: string };
-    deadline?: string;
-  }>;
+  detailed_findings?: Finding[];
   recommendations?: Array<{
     violation_type?: string;
     severity?: string;
@@ -29,26 +40,16 @@ type StructuredReport = {
   report_metadata?: { ai_model?: string; report_id?: string };
 };
 
-// Parse [KEY]: value blocks out of AI-formatted description strings
-function parseDescriptionFields(raw: string): Record<string, string> {
-  const result: Record<string, string> = {};
-  const lines = raw.split("\n");
-  const tagRe = /^\[([A-Z][A-Z _]+)\]:\s*(.*)$/;
-  let currentKey = "";
-  for (const line of lines) {
-    const m = line.match(tagRe);
-    if (m) {
-      currentKey = m[1];
-      result[currentKey] = m[2].trim();
-    } else if (currentKey && line.trim()) {
-      result[currentKey] = (result[currentKey] + " " + line.trim()).trim();
-    }
-  }
-  // If no tags parsed, treat the whole thing as VIOLATION text
-  if (Object.keys(result).length === 0 && raw.trim()) {
-    result["VIOLATION"] = raw.trim();
-  }
-  return result;
+/** Extract the first meaningful sentence from an AI description block */
+function extractViolationText(raw: string): string {
+  if (!raw) return "";
+  // Strip known AI template headers
+  const cleaned = raw
+    .replace(/^(CRITICAL|HIGH|MEDIUM|LOW) VIOLATION:[^\n]*\n*/i, "")
+    .replace(/^VIOLATION DETAILS:\s*/i, "")
+    .trim();
+  // Return up to the first double-newline or 300 chars
+  return (cleaned.split("\n\n")[0] || cleaned).slice(0, 300).trim();
 }
 
 const SEVERITY_CONFIG: Record<string, { label: string; bar: string; badge: string; border: string; text: string }> = {
@@ -64,42 +65,73 @@ const RISK_SCORE_CONFIG = (score: number) => {
   return               { label: "Low Risk",     color: "text-emerald-600", bar: "bg-emerald-500", bg: "bg-emerald-50 border-emerald-200" };
 };
 
-function FindingCard({ f, rec }: {
-  f: NonNullable<StructuredReport["detailed_findings"]>[number];
-  rec?: NonNullable<StructuredReport["recommendations"]>[number];
-}) {
+/** Section 2 — Audit Findings Summary card */
+function FindingSummaryCard({ f, index }: { f: Finding; index: number }) {
+  const sev = f.severity?.toUpperCase() ?? "LOW";
+  const cfg = SEVERITY_CONFIG[sev] ?? SEVERITY_CONFIG.LOW;
+  const title = f.title || (f.type ?? "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+  const violation = extractViolationText(f.description ?? "");
+  const legislation = f.legislation_text || (f.legislation_references ?? []).join("; ");
+  const penalty = f.max_penalty || f.penalty?.amount || "Up to S$1,000,000";
+  const evidence = f.evidence || "";
+
+  return (
+    <div className={`bg-white rounded-xl border border-[#e2e8f0] border-l-4 ${cfg.border} shadow-sm`}>
+      <div className={`flex items-center gap-2 px-5 py-3 border-b border-[#f1f5f9]`}>
+        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border flex-shrink-0 ${cfg.badge}`}>
+          {cfg.label} Severity
+        </span>
+        <span className="text-sm font-bold text-[#0f172a]">
+          FINDING {index} — {title}
+        </span>
+      </div>
+      <div className="divide-y divide-[#f1f5f9]">
+        {[
+          { label: "Violation", value: violation },
+          { label: "Legislation", value: legislation },
+          { label: "Max Penalty", value: penalty },
+          { label: "Evidence", value: evidence },
+        ].map(({ label, value }) => value ? (
+          <div key={label} className="grid grid-cols-[120px_1fr] px-5 py-3 gap-3">
+            <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide pt-0.5">{label}</p>
+            <p className={`text-sm leading-relaxed ${label === "Max Penalty" ? "font-semibold text-red-700" : "text-[#334155]"}`}>
+              {value}
+            </p>
+          </div>
+        ) : null)}
+      </div>
+    </div>
+  );
+}
+
+/** Section 3 — Developer Implementation Task card */
+function TaskCard({ f, index }: { f: Finding; index: number }) {
   const [open, setOpen] = useState(false);
   const sev = f.severity?.toUpperCase() ?? "LOW";
   const cfg = SEVERITY_CONFIG[sev] ?? SEVERITY_CONFIG.LOW;
-  const fields = parseDescriptionFields(f.description ?? "");
-
-  const violation   = fields["VIOLATION"] || fields["VIOLATION "] || "";
-  const legislation = fields["LEGISLATION"] || "";
-  const action      = fields["IMMEDIATE ACTION"] || "";
-  const penalty     = fields["MAX PENALTY"] || fields["PENALTY"] || f.penalty?.amount || "";
-  const deadline    = fields["COMPLIANCE DEADLINE"] || f.deadline || "";
-  const evidence    = fields["EVIDENCE"] || f.evidence || "";
-  
-  const requirements = fields["REQUIREMENTS"] || "";
-  const acceptance   = fields["ACCEPTANCE CRITERIA"] || "";
-  const tools        = fields["RECOMMENDED TOOLS"] || "";
+  const title = f.title || (f.type ?? "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+  const deadline = f.deadline_short || f.deadline || "7 days";
+  const owner = f.owner || "Development Team";
+  const penalty = f.max_penalty || f.penalty?.amount || "";
+  const requirements = f.requirements ?? [];
+  const acceptance = f.acceptance_criteria ?? [];
+  const tools = f.recommended_tools ?? [];
 
   return (
     <div className={`bg-white rounded-xl border border-[#e2e8f0] border-l-4 ${cfg.border} shadow-sm overflow-hidden`}>
-      {/* Header row */}
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-[#f8fafc] transition"
       >
         <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border flex-shrink-0 ${cfg.badge}`}>
-          {cfg.label}
+          {cfg.label} Priority
         </span>
-        <span className="text-sm font-semibold text-[#0f172a] flex-1 capitalize">
-          TASK — Implement {(f.type ?? "").replace(/_/g, " ")}
+        <span className="text-sm font-semibold text-[#0f172a] flex-1">
+          TASK {index} — Implement {title}
         </span>
         {penalty && (
-          <span className="text-xs text-[#94a3b8] hidden sm:block">Max Penalty: {penalty}</span>
+          <span className="text-xs text-[#94a3b8] hidden sm:block">Penalty: {penalty}</span>
         )}
         <svg
           className={`h-4 w-4 text-[#94a3b8] flex-shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
@@ -110,70 +142,66 @@ function FindingCard({ f, rec }: {
       </button>
 
       {open && (
-        <div className="px-5 pb-5 space-y-4 border-t border-[#f1f5f9]">
-          {/* Violation */}
-          {violation && (
-            <div className="pt-4">
-              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-1">Violation</p>
-              <p className="text-sm text-[#334155] leading-relaxed">{violation}</p>
+        <div className="px-5 pb-5 border-t border-[#f1f5f9] space-y-4 pt-4">
+          {/* Deadline + Owner */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+              <p className="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Deadline</p>
+              <p className="text-sm font-medium text-amber-700 mt-0.5">{deadline}</p>
             </div>
-          )}
-
-          {/* Evidence */}
-          {evidence && (
-            <div>
-              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-1">Evidence</p>
-              <p className="text-sm text-[#64748b]">{evidence}</p>
+            <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg px-3 py-2">
+              <p className="text-[10px] font-semibold text-[#94a3b8] uppercase tracking-wide">Owner</p>
+              <p className="text-sm text-[#334155] mt-0.5">{owner}</p>
             </div>
-          )}
-
-          {/* Legislation */}
-          {legislation && (
-            <div>
-              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-1">Legislation</p>
-              <p className="text-sm text-[#64748b]">{legislation}</p>
-            </div>
-          )}
+          </div>
 
           {/* Requirements */}
-          {requirements && (
+          {requirements.length > 0 && (
             <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg px-4 py-3">
-              <p className="text-xs font-semibold text-[#0f172a] uppercase tracking-wide mb-2">Technical Requirements</p>
-              <div className="text-sm text-[#334155] leading-relaxed whitespace-pre-line">{requirements}</div>
+              <p className="text-xs font-semibold text-[#0f172a] uppercase tracking-wide mb-2">Requirements</p>
+              <ol className="space-y-1.5 list-decimal list-inside">
+                {requirements.map((r, i) => (
+                  <li key={i} className="text-sm text-[#334155] leading-relaxed">{r}</li>
+                ))}
+              </ol>
             </div>
           )}
 
           {/* Acceptance Criteria */}
-          {acceptance && (
+          {acceptance.length > 0 && (
             <div className="bg-[#f0fdf4] border border-[#10b981]/20 rounded-lg px-4 py-3">
               <p className="text-xs font-semibold text-[#10b981] uppercase tracking-wide mb-2">Acceptance Criteria</p>
-              <div className="text-sm text-[#334155] leading-relaxed whitespace-pre-line">{acceptance}</div>
+              <ul className="space-y-1.5">
+                {acceptance.map((a, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-[#334155]">
+                    <span className="text-[#10b981] mt-0.5 flex-shrink-0">✓</span>
+                    {a}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
           {/* Recommended Tools */}
-          {tools && (
+          {tools.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-1">Recommended Tools</p>
-              <div className="text-sm text-[#64748b] whitespace-pre-line">{tools}</div>
+              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-2">Recommended Tools / Libraries</p>
+              <ul className="space-y-1">
+                {tools.map((t, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-[#64748b]">
+                    <span className="text-[#10b981] flex-shrink-0">•</span>
+                    {t}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
-          {/* Penalty + Deadline row */}
-          {(penalty || deadline) && (
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              {penalty && (
-                <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2">
-                  <p className="text-[10px] font-semibold text-red-400 uppercase tracking-wide">Max Penalty</p>
-                  <p className="text-sm font-bold text-red-700 mt-0.5">{penalty}</p>
-                </div>
-              )}
-              {deadline && (
-                <div className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-                  <p className="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Deadline</p>
-                  <p className="text-sm font-medium text-amber-700 mt-0.5">{deadline}</p>
-                </div>
-              )}
+          {/* Max Penalty */}
+          {penalty && (
+            <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              <p className="text-[10px] font-semibold text-red-400 uppercase tracking-wide">Max Penalty</p>
+              <p className="text-sm font-bold text-red-700 mt-0.5">{penalty}</p>
             </div>
           )}
         </div>
@@ -357,11 +385,7 @@ export default function ReportClient() {
   const riskScore  = report?.risk_assessment?.score ?? 0;
   const riskLevel  = report?.risk_assessment?.level ?? "";
   const findings   = report?.detailed_findings ?? [];
-  const recs       = report?.recommendations ?? [];
   const riskCfg    = RISK_SCORE_CONFIG(riskScore);
-
-  // Map recommendations by violation_type for inline display
-  const recByType  = Object.fromEntries(recs.map(r => [r.violation_type ?? "", r]));
 
   const highCount   = findings.filter(f => f.severity === "HIGH" || f.severity === "CRITICAL").length;
   const medCount    = findings.filter(f => f.severity === "MEDIUM").length;
@@ -507,28 +531,32 @@ export default function ReportClient() {
           </div>
         )}
 
-        {/* ── Executive summary ───────────────────────────── */}
-        {report?.executive_summary && (
-          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
-            {!report.executive_summary.includes("1. Context") && (
-              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-3">Executive Summary</p>
-            )}
-            <div className="text-sm text-[#0f172a] leading-relaxed space-y-4">
-              {report.executive_summary.split("\n\n").map((p, i) => {
-                const isHeader = /^\d+\./.test(p);
-                return (
-                  <div key={i} className={isHeader ? "border-b border-[#e2e8f0] pb-2 mt-4 first:mt-0" : ""}>
-                    <p className={isHeader ? "text-sm font-bold text-[#0f172a]" : "text-[#64748b] whitespace-pre-line"}>
-                      {p}
-                    </p>
-                  </div>
-                );
-              })}
+        {/* ── 1. Context & Purpose ────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+          <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-3">1. Context &amp; Purpose of This Document</p>
+          <p className="text-sm text-[#334155] leading-relaxed">
+            This document summarizes a PDPA Quick Scan compliance audit performed by Booppa, translated into English
+            and enriched with developer implementation tasks. It is intended to be forwarded directly to the development team.
+            The audit was anchored on the Polygon PoS blockchain for evidentiary integrity.
+          </p>
+        </div>
+
+        {/* ── 2. Audit Findings Summary ───────────────────── */}
+        {findings.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3 border-b border-[#e2e8f0] pb-2">
+              <p className="text-sm font-bold text-[#0f172a]">2. Audit Findings Summary</p>
+              <p className="text-xs text-[#94a3b8]">{findings.length} issue{findings.length !== 1 ? "s" : ""} found</p>
+            </div>
+            <div className="space-y-4 mt-4">
+              {findings.map((f, i) => (
+                <FindingSummaryCard key={i} f={f} index={i + 1} />
+              ))}
             </div>
           </div>
         )}
 
-        {/* ── Findings (accordion, with remediation inline) ─ */}
+        {/* ── 3. Developer Implementation Tasks ──────────── */}
         {findings.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-3 border-b border-[#e2e8f0] pb-2">
@@ -537,17 +565,13 @@ export default function ReportClient() {
             </div>
             <div className="space-y-4 mt-4">
               {findings.map((f, i) => (
-                <FindingCard
-                  key={i}
-                  f={f}
-                  rec={recByType[f.type ?? ""]}
-                />
+                <TaskCard key={i} f={f} index={i + 1} />
               ))}
             </div>
           </div>
         )}
 
-        {/* ── Timeline Summary ────────────────────────────── */}
+        {/* ── 6. Compliance Timeline Summary ─────────────── */}
         {findings.length > 0 && (
           <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
             <p className="text-sm font-bold text-[#0f172a] mb-4">6. Compliance Timeline Summary</p>
@@ -557,25 +581,25 @@ export default function ReportClient() {
                   <tr className="bg-[#0f172a] text-white">
                     <th className="px-4 py-3 font-semibold rounded-tl-xl">Deadline</th>
                     <th className="px-4 py-3 font-semibold">Task</th>
-                    <th className="px-4 py-3 font-semibold">Priority</th>
-                    <th className="px-4 py-3 font-semibold rounded-tr-xl text-right">Status</th>
+                    <th className="px-4 py-3 font-semibold">Action Required</th>
+                    <th className="px-4 py-3 font-semibold rounded-tr-xl">Priority</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#e2e8f0]">
                   {findings.map((f, i) => {
                     const sev = f.severity?.toUpperCase() ?? "LOW";
                     const cfg = SEVERITY_CONFIG[sev] ?? SEVERITY_CONFIG.LOW;
+                    const title = f.title || (f.type ?? "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                    const dl = f.deadline_short || f.deadline || "7 days";
                     return (
                       <tr key={i} className="hover:bg-[#f8fafc]">
-                        <td className="px-4 py-4 text-[#64748b]">{f.deadline || "7 days"}</td>
-                        <td className="px-4 py-4 font-medium text-[#0f172a]">Implement {(f.type ?? "").replace(/_/g, " ")}</td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-3 text-[#64748b] whitespace-nowrap">{dl}</td>
+                        <td className="px-4 py-3 font-medium text-[#0f172a]">Implement {title}</td>
+                        <td className="px-4 py-3 text-[#64748b]">Deploy compliant {title}</td>
+                        <td className="px-4 py-3">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${cfg.badge}`}>
                             {cfg.label}
                           </span>
-                        </td>
-                        <td className="px-4 py-4 text-right">
-                          <span className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full uppercase">Pending</span>
                         </td>
                       </tr>
                     );
@@ -628,10 +652,10 @@ export default function ReportClient() {
           </p>
         </div>
 
-        {/* ── Legal references ────────────────────────────── */}
+        {/* ── 7. Legal References ─────────────────────────── */}
         {report?.legal_references && report.legal_references.length > 0 && (
           <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
-            <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-3">Legal References</p>
+            <p className="text-sm font-bold text-[#0f172a] mb-3">7. Legal References</p>
             <ul className="space-y-2">
               {report.legal_references.map((ref, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm">

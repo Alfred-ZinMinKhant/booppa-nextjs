@@ -37,6 +37,7 @@ export const metadata: Metadata = {
   },
   other: {
     "booppa-compliance-verification": "pdpa-compliant-v1",
+    "cookie-consent": "booppa-cookie-banner pdpa-compliant",
   },
 };
 
