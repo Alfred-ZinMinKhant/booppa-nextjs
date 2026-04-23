@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import GebizTicker from "@/components/GebizTicker";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
+import CookieSettingsTrigger from "@/components/CookieSettingsTrigger";
 import TrackerGate from "@/components/TrackerGate";
 import FunnelTracker from "@/components/FunnelTracker";
 import StickyClaimCTA from "@/components/StickyClaimCTA";
@@ -51,6 +52,7 @@ export default function RootLayout({
         <StickyClaimCTA />
         <TrackerGate />
         <CookieBanner />
+        <CookieSettingsTrigger />
         <FunnelTracker />
       </body>
     </html>

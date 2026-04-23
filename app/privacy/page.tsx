@@ -70,7 +70,7 @@ export default function PrivacyPage() {
 
             <Section title="5. How We Use Your Data">
               <p>We use personal data to: deliver products and services you have purchased; process payments and send transaction confirmations; generate compliance reports, certificates, and procurement documentation; calculate vendor trust scores and probability estimates; send operational notifications; improve platform security and functionality; and comply with legal obligations.</p>
-              <p>Marketing communications are sent only where you have opted in or where permitted by applicable law.</p>
+              <p>Marketing communications are sent only where you have opted in or where permitted by applicable law. In accordance with Singapore's PDPA, we respect the <strong>Do Not Call (DNC) Registry</strong> and will not send marketing messages to numbers registered therein without explicit consent.</p>
             </Section>
 
             <Section title="6. Data Sharing — Sub-Processors">
