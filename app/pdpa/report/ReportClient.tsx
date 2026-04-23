@@ -76,8 +76,13 @@ function FindingCard({ f, rec }: {
   const violation   = fields["VIOLATION"] || fields["VIOLATION "] || "";
   const legislation = fields["LEGISLATION"] || "";
   const action      = fields["IMMEDIATE ACTION"] || "";
-  const penalty     = fields["PENALTY"] || f.penalty?.amount || "";
+  const penalty     = fields["MAX PENALTY"] || fields["PENALTY"] || f.penalty?.amount || "";
   const deadline    = fields["COMPLIANCE DEADLINE"] || f.deadline || "";
+  const evidence    = fields["EVIDENCE"] || f.evidence || "";
+  
+  const requirements = fields["REQUIREMENTS"] || "";
+  const acceptance   = fields["ACCEPTANCE CRITERIA"] || "";
+  const tools        = fields["RECOMMENDED TOOLS"] || "";
 
   return (
     <div className={`bg-white rounded-xl border border-[#e2e8f0] border-l-4 ${cfg.border} shadow-sm overflow-hidden`}>
@@ -91,10 +96,10 @@ function FindingCard({ f, rec }: {
           {cfg.label}
         </span>
         <span className="text-sm font-semibold text-[#0f172a] flex-1 capitalize">
-          {(f.type ?? "").replace(/_/g, " ")}
+          TASK — Implement {(f.type ?? "").replace(/_/g, " ")}
         </span>
         {penalty && (
-          <span className="text-xs text-[#94a3b8] hidden sm:block">Penalty: {penalty}</span>
+          <span className="text-xs text-[#94a3b8] hidden sm:block">Max Penalty: {penalty}</span>
         )}
         <svg
           className={`h-4 w-4 text-[#94a3b8] flex-shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
@@ -115,10 +120,10 @@ function FindingCard({ f, rec }: {
           )}
 
           {/* Evidence */}
-          {f.evidence && (
+          {evidence && (
             <div>
               <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-1">Evidence</p>
-              <p className="text-sm text-[#64748b]">{f.evidence}</p>
+              <p className="text-sm text-[#64748b]">{evidence}</p>
             </div>
           )}
 
@@ -130,9 +135,33 @@ function FindingCard({ f, rec }: {
             </div>
           )}
 
+          {/* Requirements */}
+          {requirements && (
+            <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg px-4 py-3">
+              <p className="text-xs font-semibold text-[#0f172a] uppercase tracking-wide mb-2">Technical Requirements</p>
+              <div className="text-sm text-[#334155] leading-relaxed whitespace-pre-line">{requirements}</div>
+            </div>
+          )}
+
+          {/* Acceptance Criteria */}
+          {acceptance && (
+            <div className="bg-[#f0fdf4] border border-[#10b981]/20 rounded-lg px-4 py-3">
+              <p className="text-xs font-semibold text-[#10b981] uppercase tracking-wide mb-2">Acceptance Criteria</p>
+              <div className="text-sm text-[#334155] leading-relaxed whitespace-pre-line">{acceptance}</div>
+            </div>
+          )}
+
+          {/* Recommended Tools */}
+          {tools && (
+            <div>
+              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-1">Recommended Tools</p>
+              <div className="text-sm text-[#64748b] whitespace-pre-line">{tools}</div>
+            </div>
+          )}
+
           {/* Penalty + Deadline row */}
           {(penalty || deadline) && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 pt-2">
               {penalty && (
                 <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2">
                   <p className="text-[10px] font-semibold text-red-400 uppercase tracking-wide">Max Penalty</p>
@@ -144,32 +173,6 @@ function FindingCard({ f, rec }: {
                   <p className="text-[10px] font-semibold text-amber-500 uppercase tracking-wide">Deadline</p>
                   <p className="text-sm font-medium text-amber-700 mt-0.5">{deadline}</p>
                 </div>
-              )}
-            </div>
-          )}
-
-          {/* Immediate action */}
-          {action && (
-            <div className="bg-[#f0fdf4] border border-[#10b981]/20 rounded-lg px-4 py-3">
-              <p className="text-xs font-semibold text-[#10b981] uppercase tracking-wide mb-1">Immediate Action</p>
-              <p className="text-sm text-[#334155] leading-relaxed">{action}</p>
-            </div>
-          )}
-
-          {/* Remediation steps from recommendations */}
-          {rec?.actions && rec.actions.length > 0 && (
-            <div>
-              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-2">Remediation Steps</p>
-              <ol className="space-y-1.5">
-                {rec.actions.map((a, j) => (
-                  <li key={j} className="flex items-start gap-2 text-sm text-[#64748b]">
-                    <span className="text-[#10b981] font-bold flex-shrink-0 mt-0.5">{j + 1}.</span>
-                    {a}
-                  </li>
-                ))}
-              </ol>
-              {rec.timeline && (
-                <p className="mt-2 text-xs text-[#94a3b8]">Timeline: {rec.timeline}</p>
               )}
             </div>
           )}
@@ -507,11 +510,20 @@ export default function ReportClient() {
         {/* ── Executive summary ───────────────────────────── */}
         {report?.executive_summary && (
           <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
-            <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-3">Executive Summary</p>
-            <div className="text-sm text-[#64748b] leading-relaxed space-y-3">
-              {report.executive_summary.split("\n\n").map((p, i) => (
-                <p key={i} className="whitespace-pre-line">{p}</p>
-              ))}
+            {!report.executive_summary.includes("1. Context") && (
+              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-3">Executive Summary</p>
+            )}
+            <div className="text-sm text-[#0f172a] leading-relaxed space-y-4">
+              {report.executive_summary.split("\n\n").map((p, i) => {
+                const isHeader = /^\d+\./.test(p);
+                return (
+                  <div key={i} className={isHeader ? "border-b border-[#e2e8f0] pb-2 mt-4 first:mt-0" : ""}>
+                    <p className={isHeader ? "text-sm font-bold text-[#0f172a]" : "text-[#64748b] whitespace-pre-line"}>
+                      {p}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -519,11 +531,11 @@ export default function ReportClient() {
         {/* ── Findings (accordion, with remediation inline) ─ */}
         {findings.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-bold text-[#0f172a]">Findings</p>
-              <p className="text-xs text-[#94a3b8]">Click a row to expand</p>
+            <div className="flex items-center justify-between mb-3 border-b border-[#e2e8f0] pb-2">
+              <p className="text-sm font-bold text-[#0f172a]">3. Developer Implementation Tasks</p>
+              <p className="text-xs text-[#94a3b8]">Organized by priority and timeline</p>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-4 mt-4">
               {findings.map((f, i) => (
                 <FindingCard
                   key={i}
@@ -534,6 +546,87 @@ export default function ReportClient() {
             </div>
           </div>
         )}
+
+        {/* ── Timeline Summary ────────────────────────────── */}
+        {findings.length > 0 && (
+          <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+            <p className="text-sm font-bold text-[#0f172a] mb-4">6. Compliance Timeline Summary</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm border-collapse">
+                <thead>
+                  <tr className="bg-[#0f172a] text-white">
+                    <th className="px-4 py-3 font-semibold rounded-tl-xl">Deadline</th>
+                    <th className="px-4 py-3 font-semibold">Task</th>
+                    <th className="px-4 py-3 font-semibold">Priority</th>
+                    <th className="px-4 py-3 font-semibold rounded-tr-xl text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#e2e8f0]">
+                  {findings.map((f, i) => {
+                    const sev = f.severity?.toUpperCase() ?? "LOW";
+                    const cfg = SEVERITY_CONFIG[sev] ?? SEVERITY_CONFIG.LOW;
+                    return (
+                      <tr key={i} className="hover:bg-[#f8fafc]">
+                        <td className="px-4 py-4 text-[#64748b]">{f.deadline || "7 days"}</td>
+                        <td className="px-4 py-4 font-medium text-[#0f172a]">Implement {(f.type ?? "").replace(/_/g, " ")}</td>
+                        <td className="px-4 py-4">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${cfg.badge}`}>
+                            {cfg.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 text-right">
+                          <span className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full uppercase">Pending</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        {/* ── Blockchain Evidence Anchoring (Booppa) ───────── */}
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
+          <p className="text-sm font-bold text-[#0f172a] mb-4">4. Blockchain Evidence Anchoring (Booppa)</p>
+          <p className="text-sm text-[#64748b] mb-4">
+            The following artifacts are recommended for anchoring on the Polygon PoS blockchain for evidentiary integrity:
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr className="bg-[#f8fafc] text-[#0f172a]">
+                  <th className="px-4 py-3 font-semibold border-b border-[#e2e8f0]">Artifact to Anchor</th>
+                  <th className="px-4 py-3 font-semibold border-b border-[#e2e8f0]">When</th>
+                  <th className="px-4 py-3 font-semibold border-b border-[#e2e8f0]">Responsible</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e2e8f0]">
+                <tr>
+                  <td className="px-4 py-3 text-[#64748b]">Consent banner deployment timestamp</td>
+                  <td className="px-4 py-3 text-[#64748b]">Within 48h of implementation</td>
+                  <td className="px-4 py-3 text-[#64748b]">Developer / DevOps</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3 text-[#64748b]">Privacy Policy update hash</td>
+                  <td className="px-4 py-3 text-[#64748b]">Within 7 days of implementation</td>
+                  <td className="px-4 py-3 text-[#64748b]">Developer / Legal</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* ── Important Limitations ────────────────────────── */}
+        <div className="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] p-6">
+          <p className="text-sm font-bold text-[#0f172a] mb-2">5. Important Limitations of This Scan</p>
+          <p className="text-sm text-[#64748b] leading-relaxed">
+            The development team should be aware that this Quick Scan has limitations and does not cover DPO appointment verification, cross-border data transfer compliance, internal data handling, or data breach notification procedures.
+          </p>
+          <p className="mt-4 text-xs font-bold text-[#0f172a]">Legal disclaimer:</p>
+          <p className="text-xs text-[#94a3b8] italic">
+            This report is provided for informational purposes only. It does not constitute legal advice, certification, or regulatory approval. Booppa does not certify vendors or issue regulatory determinations.
+          </p>
+        </div>
 
         {/* ── Legal references ────────────────────────────── */}
         {report?.legal_references && report.legal_references.length > 0 && (
