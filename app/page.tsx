@@ -3,10 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import HeroSection from "@/components/HeroSection";
-import ReportPreview from "@/components/home/ReportPreview";
-import BlockchainProof from "@/components/home/BlockchainProof";
 import ProcessPipeline from "@/components/home/ProcessPipeline";
-import DashboardPreview from "@/components/home/DashboardPreview";
 import SegmentationSections from "@/components/home/SegmentationSections";
 
 export default function Home() {
@@ -17,22 +14,13 @@ export default function Home() {
 			{/* 1. Hero (with segmentation + CTA) */}
 			<HeroSection />
 
-			{/* 2. Output Preview (Report) */}
-			<ReportPreview />
-
-			{/* 3. Blockchain Proof Block */}
-			<BlockchainProof />
-
-			{/* 4. Process Pipeline */}
+			{/* 2. Process Pipeline */}
 			<ProcessPipeline />
 
-			{/* 5. Mini Dashboard Preview */}
-			<DashboardPreview />
-
-			{/* 6. Vendor vs Buyer Sections */}
+			{/* 3. Vendor vs Buyer Sections */}
 			<SegmentationSections />
 
-			{/* 7. Pricing / CTA with Integrated Previews */}
+			{/* 4. Pricing / CTA with Integrated REAL Output Previews */}
 			<section className="py-24 px-6 bg-[#f8fafc]">
 				<div className="max-w-[1200px] mx-auto">
 					<div className="text-center mb-16">
@@ -69,16 +57,10 @@ export default function Home() {
 								</li>
 							</ul>
 
-							{/* Preview Trigger */}
-							<button
-								onClick={() => setActivePreview(activePreview === "pdpa" ? null : "pdpa")}
-								className="text-[#10b981] text-xs font-bold uppercase tracking-widest mb-4 hover:underline text-left flex items-center gap-2"
-							>
-								{activePreview === "pdpa" ? "Close Preview" : "See Sample Report →"}
-							</button>
-
-							{activePreview === "pdpa" && (
-								<div className="mb-6 p-4 bg-[#f1f5f9] rounded-2xl border border-[#e2e8f0] animate-fade-in">
+							{/* REAL OUTPUT PREVIEW: PDPA */}
+							<div className="mb-6 p-4 bg-[#f1f5f9] rounded-2xl border border-[#e2e8f0]">
+								<p className="text-[10px] font-black text-[#94a3b8] uppercase mb-3 tracking-widest">Report Preview (Sample)</p>
+								<div className="bg-white rounded-xl p-4 shadow-sm border border-[#e2e8f0]">
 									<div className="flex justify-between items-center mb-3">
 										<span className="text-[10px] font-black text-[#0f172a]">PDPA SNAPSHOT</span>
 										<span className="text-[10px] font-bold text-[#10b981]">SCORE: 87/100</span>
@@ -97,7 +79,7 @@ export default function Home() {
 										<span className="text-[10px] text-[#0f172a] font-medium">Downloadable PDF</span>
 									</div>
 								</div>
-							)}
+							</div>
 
 							<Link href="/pdpa" className="btn btn-outline w-full py-3">
 								Get Report
@@ -128,29 +110,21 @@ export default function Home() {
 								</li>
 							</ul>
 
-							{/* Preview Trigger */}
-							<button
-								onClick={() => setActivePreview(activePreview === "notarization" ? null : "notarization")}
-								className="text-[#10b981] text-xs font-bold uppercase tracking-widest mb-4 hover:underline text-left flex items-center gap-2"
-							>
-								{activePreview === "notarization" ? "Close Preview" : "View Example Proof →"}
-							</button>
-
-							{activePreview === "notarization" && (
-								<div className="mb-6 p-4 bg-[#0f172a] rounded-2xl border border-white/10 animate-fade-in text-white">
-									<div className="flex items-center gap-3 mb-4">
-										<div className="w-8 h-8 bg-[#10b981] rounded-lg flex items-center justify-center text-lg">⛓️</div>
-										<div>
-											<p className="text-[10px] font-black tracking-widest text-[#10b981]">POLYGON ANCHOR</p>
-											<p className="text-[8px] text-white/50 font-mono">0x8f3a...91c2</p>
-										</div>
+							{/* REAL OUTPUT PREVIEW: NOTARIZATION */}
+							<div className="mb-6 p-4 bg-[#0f172a] rounded-2xl border border-white/10 text-white">
+								<p className="text-[10px] font-black text-white/30 uppercase mb-3 tracking-widest">Blockchain-anchored proof (example)</p>
+								<div className="flex items-center gap-3 mb-4">
+									<div className="w-8 h-8 bg-[#10b981] rounded-lg flex items-center justify-center text-lg shadow-[0_0_15px_rgba(16,185,129,0.4)]">⛓️</div>
+									<div>
+										<p className="text-[10px] font-black tracking-widest text-[#10b981]">POLYGON MAINNET</p>
+										<p className="text-[8px] text-white/50 font-mono">0x8f3a...91c2</p>
 									</div>
-									<div className="bg-white p-2 rounded-lg mb-3">
-										<img src="/4-QR_Container.jpg" alt="QR Code" className="w-full h-auto rounded" />
-									</div>
-									<p className="text-[8px] text-white/40 text-center font-bold tracking-widest uppercase">Verified on Polygon mainnet</p>
 								</div>
-							)}
+								<div className="bg-white p-2 rounded-xl mb-3">
+									<img src="/4-QR_Container.jpg" alt="QR Code" className="w-full h-auto rounded-lg" />
+								</div>
+								<p className="text-[8px] text-[#10b981] text-center font-black tracking-widest uppercase">Verified & Immutable</p>
+							</div>
 
 							<Link
 								href="/notarization"
@@ -183,26 +157,19 @@ export default function Home() {
 								</li>
 							</ul>
 
-							{/* Preview Trigger */}
-							<button
-								onClick={() => setActivePreview(activePreview === "vendor-proof" ? null : "vendor-proof")}
-								className="text-[#10b981] text-xs font-bold uppercase tracking-widest mb-4 hover:underline text-left flex items-center gap-2"
-							>
-								{activePreview === "vendor-proof" ? "Close Preview" : "View Vendor Badge →"}
-							</button>
-
-							{activePreview === "vendor-proof" && (
-								<div className="mb-6 p-6 bg-gradient-to-br from-[#10b981] to-[#059669] rounded-2xl animate-fade-in text-white text-center shadow-lg border-2 border-white/20">
-									<div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
-										<span className="text-3xl">🛡️</span>
+							{/* REAL OUTPUT PREVIEW: VENDOR PROOF BADGE */}
+							<div className="mb-6 p-4 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0]">
+								<p className="text-[10px] font-black text-[#94a3b8] uppercase mb-3 tracking-widest">Vendor Proof Badge (Example)</p>
+								<div className="bg-gradient-to-br from-[#10b981] to-[#059669] rounded-xl p-6 text-white text-center shadow-lg border-2 border-white/20">
+									<div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-md">
+										<span className="text-2xl">🛡️</span>
 									</div>
-									<h4 className="text-sm font-black uppercase tracking-tighter mb-1">Booppa Verified</h4>
-									<p className="text-[10px] font-bold text-white/80">TRUST SCORE: 87</p>
-									<div className="mt-4 py-2 px-3 bg-black/20 rounded-lg text-[8px] font-mono border border-white/10">
+									<h4 className="text-xs font-black uppercase tracking-tighter mb-1">Booppa Verified</h4>
+									<div className="py-1.5 px-3 bg-black/20 rounded-lg text-[7px] font-mono border border-white/10 inline-block">
 										VERIFIED VENDOR 2026
 									</div>
 								</div>
-							)}
+							</div>
 
 							<Link
 								href="/rfp-acceleration#express"
@@ -239,7 +206,9 @@ export default function Home() {
 								</li>
 							</ul>
 							
-							<div className="h-8" /> {/* Spacer instead of preview */}
+							<div className="h-32 flex items-center justify-center bg-white/5 rounded-2xl mb-6 border border-white/5">
+								<p className="text-[10px] font-black text-white/20 uppercase tracking-widest italic">RFP Content - No Preview</p>
+							</div>
 
 							<Link
 								href="/rfp-acceleration#complete"
@@ -252,7 +221,7 @@ export default function Home() {
 				</div>
 			</section>
 
-			{/* 8. Final CTA */}
+			{/* 5. Final CTA */}
 			<section className="py-24 px-6 bg-white">
 				<div className="max-w-[1200px] mx-auto bg-[#0f172a] rounded-[2.5rem] p-12 lg:p-24 text-center overflow-hidden relative">
 					<div className="absolute top-0 right-0 w-64 h-64 bg-[#10b981] opacity-10 rounded-full translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
@@ -275,7 +244,7 @@ export default function Home() {
 								Get your report
 							</Link>
 							<Link
-								href="#sample-report"
+								href="/pdpa"
 								className="btn btn-secondary bg-white text-[#0f172a] px-10 py-5 text-xl font-black hover:bg-white/90 border-0 transition-colors"
 							>
 								See sample output
