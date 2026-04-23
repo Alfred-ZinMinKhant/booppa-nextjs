@@ -35,6 +35,9 @@ export const metadata: Metadata = {
     icon: '/favicon_io/favicon.ico',
     shortcut: '/favicon_io/favicon.ico',
   },
+  other: {
+    "booppa-compliance-verification": "pdpa-compliant-v1",
+  },
 };
 
 export default function RootLayout({
