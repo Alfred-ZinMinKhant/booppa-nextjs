@@ -383,32 +383,56 @@ function CompareTable({ vendors, onRemove }: { vendors: Vendor[]; onRemove: (v: 
   );
 }
 
-// ── Landing Page ──────────────────────────────────────────────────────────────
-function LandingPage({ onEnter }: { onEnter: () => void }) {
-  const [email,       setEmail]       = useState("");
-  const [submitted,   setSubmitted]   = useState(false);
-  const [emailError,  setEmailError]  = useState("");
+// ── Auth form (register / login) ──────────────────────────────────────────────
+function AuthForm({ onEnter }: { onEnter: (email: string) => void }) {
+  const [mode,      setMode]      = useState<"login" | "register">("login");
+  const [email,     setEmail]     = useState("");
+  const [password,  setPassword]  = useState("");
+  const [fullName,  setFullName]  = useState("");
+  const [agency,    setAgency]    = useState("");
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState("");
 
-  const handleSubmit = () => {
-    if (!email.endsWith(".gov.sg")) {
-      setEmailError("Access is restricted to Singapore government email addresses (.gov.sg)");
-      return;
+  const submit = async () => {
+    if (!email || !password) { setError("Email and password are required."); return; }
+    setLoading(true);
+    setError("");
+    try {
+      const endpoint = mode === "register" ? "/api/government/register" : "/api/government/login";
+      const body = mode === "register"
+        ? { email, password, full_name: fullName || undefined, agency: agency || undefined }
+        : { email, password };
+
+      const res  = await fetch(`${API}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.detail ?? "Something went wrong."); return; }
+
+      localStorage.setItem("gov_token",    data.access_token);
+      localStorage.setItem("gov_refresh",  data.refresh_token);
+      localStorage.setItem("gov_email",    data.email);
+      localStorage.setItem("gov_agency",   data.agency ?? "");
+      onEnter(data.email);
+    } catch {
+      setError("Network error — please try again.");
+    } finally {
+      setLoading(false);
     }
-    setEmailError("");
-    setSubmitted(true);
-    setTimeout(() => onEnter(), 1200);
   };
 
-  const AGENCIES = [
-    "Ministry of Finance", "GovTech", "EDB", "JTC Corporation", "HDB",
-    "Ministry of Health", "Land Transport Authority", "CPF Board",
-    "IMDA", "NEA", "MOM", "CSA",
-  ];
   const STATS = [
     { n: "30,578", label: "Singapore vendors indexed" },
     { n: "847",    label: "Booppa-verified entities" },
     { n: "142",    label: "GeBIZ tenders tracked" },
     { n: "S$0",    label: "Cost to government agencies" },
+  ];
+  const AGENCIES = [
+    "Ministry of Finance", "GovTech", "EDB", "JTC Corporation", "HDB",
+    "Ministry of Health", "Land Transport Authority", "CPF Board",
+    "IMDA", "NEA", "MOM", "CSA",
   ];
 
   return (
@@ -428,21 +452,11 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
             <span style={{ fontSize: 10, color: T.slate, display: "block", lineHeight: 1 }}>Government Procurement Portal</span>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-          {["About", "Features", "Contact"].map(l => (
-            <span key={l} style={{ fontSize: 12, color: T.slate, cursor: "pointer" }}>{l}</span>
-          ))}
-          <button onClick={onEnter} style={{
-            padding: "8px 18px", borderRadius: 5, border: `1.5px solid ${T.ink}`,
-            background: "transparent", color: T.ink, fontSize: 12, fontWeight: 600, cursor: "pointer",
-          }}>
-            Access Dashboard →
-          </button>
-        </div>
       </nav>
 
-      {/* Hero */}
-      <div style={{ padding: "80px 48px 64px", maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }}>
+      {/* Hero + form */}
+      <div style={{ padding: "80px 48px 64px", maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "start" }}>
+        {/* Left: copy */}
         <div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, border: `1px solid ${T.inkLight}30`, borderRadius: 4, padding: "5px 12px", marginBottom: 24 }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.coral }} />
@@ -453,61 +467,83 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
             <span style={{ color: T.inkLight }}>for Singapore's</span><br />
             Procurement Officers
           </h1>
-          <p style={{ fontSize: 15, color: T.slate, lineHeight: 1.75, marginBottom: 32, maxWidth: 480 }}>
+          <p style={{ fontSize: 15, color: T.slate, lineHeight: 1.75, marginBottom: 40, maxWidth: 480 }}>
             Verify vendor credentials, compare procurement readiness, and generate
             AGO-auditable evaluation records — at no cost to government agencies.
           </p>
-          {!submitted ? (
-            <div>
-              <div style={{ display: "flex", gap: 0, maxWidth: 440 }}>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => { setEmail(e.target.value); setEmailError(""); }}
-                  placeholder="your.name@agency.gov.sg"
-                  onKeyDown={e => e.key === "Enter" && handleSubmit()}
-                  style={{
-                    flex: 1, padding: "13px 16px",
-                    border: `1.5px solid ${emailError ? T.coral : T.inkLight}`,
-                    borderRight: "none", borderRadius: "6px 0 0 6px",
-                    fontSize: 13, color: T.ink, background: T.white, outline: "none",
-                  }}
-                />
-                <button onClick={handleSubmit} style={{
-                  padding: "13px 22px", background: T.ink, color: T.white,
-                  border: "none", borderRadius: "0 6px 6px 0",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap",
-                }}>
-                  Request Access
-                </button>
+
+          {/* Stats */}
+          <div style={{ background: T.ink, borderRadius: 12, padding: 32, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            {STATS.map(s => (
+              <div key={s.n}>
+                <div style={{ fontSize: 26, fontWeight: 700, color: T.white }}>{s.n}</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 3, lineHeight: 1.5 }}>{s.label}</div>
               </div>
-              {emailError && <p style={{ fontSize: 11, color: T.coral, marginTop: 8 }}>{emailError}</p>}
-              <p style={{ fontSize: 10, color: T.slate, marginTop: 8 }}>
-                Access is reserved for Singapore government email addresses. Verification link sent instantly.
+            ))}
+            <div style={{ gridColumn: "1/-1", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
+                All data sourced from ACRA, GeBIZ, and Polygon blockchain.<br />
+                Reports are AGO-auditable and include blockchain provenance.
               </p>
             </div>
-          ) : (
-            <div style={{ padding: "14px 18px", borderRadius: 6, background: "rgba(26,107,69,0.07)", border: "1px solid rgba(26,107,69,0.25)" }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: T.verified }}>✓ Verification link sent to {email}</p>
-              <p style={{ fontSize: 11, color: T.slate, marginTop: 4 }}>Loading your dashboard…</p>
-            </div>
-          )}
+          </div>
         </div>
 
-        {/* Stats panel */}
-        <div style={{ background: T.ink, borderRadius: 12, padding: 36, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-          {STATS.map(s => (
-            <div key={s.n}>
-              <div style={{ fontSize: 28, fontWeight: 700, color: T.white }}>{s.n}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 4, lineHeight: 1.5 }}>{s.label}</div>
-            </div>
-          ))}
-          <div style={{ gridColumn: "1/-1", paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-            <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
-              All data sourced from ACRA, GeBIZ, and Polygon blockchain.<br />
-              Reports are AGO-auditable and include blockchain provenance.
-            </p>
+        {/* Right: auth card */}
+        <div style={{ background: T.white, borderRadius: 12, padding: 36, border: `1.5px solid ${T.creamDark}`, boxShadow: "0 4px 32px rgba(10,15,30,0.06)" }}>
+          {/* Toggle */}
+          <div style={{ display: "flex", gap: 2, background: T.cream, borderRadius: 7, padding: 4, marginBottom: 28 }}>
+            {(["login", "register"] as const).map(m => (
+              <button key={m} onClick={() => { setMode(m); setError(""); }}
+                style={{ flex: 1, padding: "8px 0", borderRadius: 5, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600,
+                  background: mode === m ? T.ink : "transparent", color: mode === m ? T.white : T.slate, transition: "all 0.15s" }}>
+                {m === "login" ? "Sign In" : "Register"}
+              </button>
+            ))}
           </div>
+
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ fontSize: 9, fontWeight: 700, color: T.slate, letterSpacing: "0.08em", display: "block", marginBottom: 4 }}>EMAIL</label>
+            <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError(""); }}
+              placeholder="officer@agency.gov.sg" onKeyDown={e => e.key === "Enter" && submit()}
+              style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${T.creamDark}`, borderRadius: 6, fontSize: 12, color: T.ink, background: T.cream, outline: "none", boxSizing: "border-box" }} />
+          </div>
+
+          <div style={{ marginBottom: mode === "register" ? 14 : 20 }}>
+            <label style={{ fontSize: 9, fontWeight: 700, color: T.slate, letterSpacing: "0.08em", display: "block", marginBottom: 4 }}>PASSWORD</label>
+            <input type="password" value={password} onChange={e => { setPassword(e.target.value); setError(""); }}
+              placeholder="••••••••" onKeyDown={e => e.key === "Enter" && submit()}
+              style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${T.creamDark}`, borderRadius: 6, fontSize: 12, color: T.ink, background: T.cream, outline: "none", boxSizing: "border-box" }} />
+          </div>
+
+          {mode === "register" && (
+            <>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ fontSize: 9, fontWeight: 700, color: T.slate, letterSpacing: "0.08em", display: "block", marginBottom: 4 }}>FULL NAME <span style={{ fontWeight: 400, color: T.slate }}>(optional)</span></label>
+                <input value={fullName} onChange={e => setFullName(e.target.value)}
+                  placeholder="e.g. Chan Wei Ling"
+                  style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${T.creamDark}`, borderRadius: 6, fontSize: 12, color: T.ink, background: T.cream, outline: "none", boxSizing: "border-box" }} />
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontSize: 9, fontWeight: 700, color: T.slate, letterSpacing: "0.08em", display: "block", marginBottom: 4 }}>AGENCY <span style={{ fontWeight: 400, color: T.slate }}>(optional)</span></label>
+                <input value={agency} onChange={e => setAgency(e.target.value)}
+                  placeholder="e.g. Ministry of Finance"
+                  style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${T.creamDark}`, borderRadius: 6, fontSize: 12, color: T.ink, background: T.cream, outline: "none", boxSizing: "border-box" }} />
+              </div>
+            </>
+          )}
+
+          {error && <p style={{ fontSize: 11, color: T.coral, marginBottom: 12 }}>{error}</p>}
+
+          <button onClick={submit} disabled={loading}
+            style={{ width: "100%", padding: 12, borderRadius: 6, border: "none", cursor: loading ? "default" : "pointer",
+              background: T.ink, color: T.white, fontWeight: 600, fontSize: 13, opacity: loading ? 0.7 : 1 }}>
+            {loading ? "Please wait…" : mode === "login" ? "Sign In →" : "Create Account →"}
+          </button>
+
+          <p style={{ fontSize: 10, color: T.slate, textAlign: "center", marginTop: 14 }}>
+            Free for all government agencies · No credit card required
+          </p>
         </div>
       </div>
 
@@ -518,9 +554,9 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
           <h2 style={{ fontSize: 28, fontWeight: 700, color: T.ink, marginBottom: 40 }}>Three tools. One dashboard. Zero cost.</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
             {[
-              { n: "01", title: "Verify Vendor",     desc: "Confirm any Singapore company's compliance credentials via blockchain.", tag: "Blockchain-anchored · Polygon" },
-              { n: "02", title: "Browse & Filter",   desc: "Search 30,578 Singapore vendors by industry, verification depth, and procurement readiness.", tag: "ACRA-sourced · Real-time" },
-              { n: "03", title: "Compare & Export",  desc: "Select up to 4 vendors for side-by-side comparison across 6 dimensions. Export AGO-auditable shortlist.", tag: "AGO-auditable · PDF export" },
+              { n: "01", title: "Verify Vendor",    desc: "Confirm any Singapore company's compliance credentials via blockchain.", tag: "Blockchain-anchored · Polygon" },
+              { n: "02", title: "Browse & Filter",  desc: "Search 30,578 Singapore vendors by industry, verification depth, and procurement readiness.", tag: "ACRA-sourced · Real-time" },
+              { n: "03", title: "Compare & Export", desc: "Select up to 4 vendors for side-by-side comparison across 6 dimensions. Export AGO-auditable shortlist.", tag: "AGO-auditable · TXT export" },
             ].map(f => (
               <div key={f.n} style={{ padding: 28, border: `1.5px solid ${T.creamDark}`, borderRadius: 8 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: T.slate, letterSpacing: "0.1em", marginBottom: 8 }}>{f.n}</div>
@@ -556,14 +592,17 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
 }
 
 // ── Buyer Dashboard ───────────────────────────────────────────────────────────
-function BuyerDashboard() {
+function BuyerDashboard({ onLogout }: { onLogout: () => void }) {
+  const govEmail  = typeof window !== "undefined" ? localStorage.getItem("gov_email")  ?? "" : "";
+  const govAgency = typeof window !== "undefined" ? localStorage.getItem("gov_agency") ?? "" : "";
+
   const [tab,        setTab]        = useState<"browse" | "compare">("browse");
   const [selected,   setSelected]   = useState<Vendor[]>([]);
   const [query,      setQuery]       = useState("");
   const [industry,   setIndustry]   = useState("All");
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [showExport, setShowExport] = useState(false);
-  const [officer,    setOfficer]    = useState("");
+  const [officer,    setOfficer]    = useState(govEmail);
   const [tenderRef,  setTenderRef]  = useState("");
 
   const [vendors,   setVendors]   = useState<Vendor[]>([]);
@@ -686,7 +725,8 @@ function BuyerDashboard() {
           </div>
           <div style={{ width: 1, height: 28, background: T.creamDark, margin: "0 8px" }} />
           <span style={{ fontSize: 10, color: T.slate }}>
-            Logged in as&nbsp;<strong style={{ color: T.ink }}>procurement officer</strong>
+            {govAgency && <><strong style={{ color: T.ink }}>{govAgency}</strong> · </>}
+            <strong style={{ color: T.ink }}>{govEmail || "procurement officer"}</strong>
           </span>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -698,6 +738,9 @@ function BuyerDashboard() {
               ↓ Export Shortlist ({selected.length})
             </button>
           )}
+          <button onClick={onLogout} style={{ padding: "7px 14px", borderRadius: 5, cursor: "pointer", border: `1.5px solid ${T.mist}`, background: "transparent", color: T.slate, fontSize: 11 }}>
+            Sign Out
+          </button>
         </div>
       </div>
 
@@ -810,7 +853,23 @@ function BuyerDashboard() {
 
 // ── Root component ────────────────────────────────────────────────────────────
 export default function GovernmentPortal() {
-  const [view, setView] = useState<"landing" | "dashboard">("landing");
+  const [view, setView] = useState<"auth" | "dashboard">("auth");
+
+  // Restore session on mount
+  useEffect(() => {
+    if (typeof window !== "undefined" && localStorage.getItem("gov_token")) {
+      setView("dashboard");
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("gov_token");
+    localStorage.removeItem("gov_refresh");
+    localStorage.removeItem("gov_email");
+    localStorage.removeItem("gov_agency");
+    setView("auth");
+  };
+
   return (
     <>
       <style>{`
@@ -821,9 +880,9 @@ export default function GovernmentPortal() {
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #d4dde8; border-radius: 2px; }
       `}</style>
-      {view === "landing"
-        ? <LandingPage onEnter={() => setView("dashboard")} />
-        : <BuyerDashboard />
+      {view === "auth"
+        ? <AuthForm onEnter={() => setView("dashboard")} />
+        : <BuyerDashboard onLogout={handleLogout} />
       }
     </>
   );
