@@ -411,8 +411,8 @@ function AuthForm({ onEnter }: { onEnter: (email: string) => void }) {
 
   useEffect(() => {
     fetch(`${API}/api/government/stats`)
-      .then(r => r.json())
-      .then(d => setStats(d))
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && typeof d.total_vendors === "number") setStats(d); })
       .catch(() => {});
   }, []);
 
@@ -976,8 +976,8 @@ export default function GovernmentPortal() {
   };
 
   return (
-    <>
-      <style>{`
+    <div suppressHydrationWarning>
+      <style suppressHydrationWarning>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'IBM Plex Sans', sans-serif; }
         button, input, select { font-family: 'IBM Plex Sans', sans-serif; }
@@ -989,6 +989,6 @@ export default function GovernmentPortal() {
         ? <AuthForm onEnter={() => setView("dashboard")} />
         : <BuyerDashboard onLogout={handleLogout} />
       }
-    </>
+    </div>
   );
 }
