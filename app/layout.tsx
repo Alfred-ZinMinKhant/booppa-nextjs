@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Space_Mono } from "next/font/google";
 import "./globals.css";
 import LayoutChrome from "@/components/LayoutChrome";
-import Footer from "@/components/Footer";
+import ConditionalFooter from "@/components/ConditionalFooter";
 import CookieBanner from "@/components/CookieBanner";
 import CookieSettingsTrigger from "@/components/CookieSettingsTrigger";
 import TrackerGate from "@/components/TrackerGate";
@@ -55,7 +55,7 @@ export default function RootLayout({
 			<body className="antialiased bg-white text-[#1e293b]">
 				<LayoutChrome />
 				{children}
-				<Footer />
+				<ConditionalFooter />
 				<TrackerGate />
 				<CookieBanner />
 				<CookieSettingsTrigger />

@@ -437,6 +437,19 @@ function AuthForm({ onEnter }: { onEnter: (email: string) => void }) {
 
   return (
     <div style={{ minHeight: "100vh", background: T.cream, fontFamily: "'IBM Plex Sans', sans-serif" }}>
+      {/* Back link */}
+      <div style={{ padding: "12px 48px", borderBottom: `1px solid ${T.creamDark}`, background: T.cream, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <a href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = "0.75")}
+          onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+          <img src="/logo.png" alt="Booppa" style={{ height: 24, width: "auto" }} />
+        </a>
+        <a href="/" style={{ fontSize: 11, color: T.slate, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}
+          onMouseEnter={e => (e.currentTarget.style.color = T.ink)}
+          onMouseLeave={e => (e.currentTarget.style.color = T.slate)}>
+          ← Back to booppa.io
+        </a>
+      </div>
       {/* Hero + form */}
       <div style={{ padding: "80px 48px 64px", maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "start" }}>
         {/* Left: copy */}
@@ -699,13 +712,18 @@ function BuyerDashboard({ onLogout }: { onLogout: () => void }) {
       {/* Top bar */}
       <div style={{ padding: "14px 32px", background: T.white, borderBottom: `1px solid ${T.creamDark}`, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 28, height: 28, background: T.ink, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: T.white, fontSize: 13, fontWeight: 700 }}>B</span>
-          </div>
+          <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+            <img src="/logo.png" alt="Booppa" style={{ height: 26, width: "auto" }} />
+          </a>
           <div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: T.ink, display: "block" }}>Booppa</span>
             <span style={{ fontSize: 9, color: T.slate, display: "block", lineHeight: 1 }}>Government Procurement Intelligence</span>
           </div>
+          <div style={{ width: 1, height: 28, background: T.creamDark, margin: "0 8px" }} />
+          <a href="/" style={{ fontSize: 10, color: T.slate, textDecoration: "none" }}
+            onMouseEnter={e => (e.currentTarget.style.color = T.ink)}
+            onMouseLeave={e => (e.currentTarget.style.color = T.slate)}>
+            ← booppa.io
+          </a>
           <div style={{ width: 1, height: 28, background: T.creamDark, margin: "0 8px" }} />
           <span style={{ fontSize: 10, color: T.slate }}>
             {govAgency && <><strong style={{ color: T.ink }}>{govAgency}</strong> · </>}
