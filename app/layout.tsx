@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import { DM_Sans, Space_Mono } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
-import GebizTicker from "@/components/GebizTicker";
-import Footer from "@/components/Footer";
+import LayoutChrome from "@/components/LayoutChrome";
 import CookieBanner from "@/components/CookieBanner";
 import CookieSettingsTrigger from "@/components/CookieSettingsTrigger";
 import TrackerGate from "@/components/TrackerGate";
 import FunnelTracker from "@/components/FunnelTracker";
-import StickyClaimCTA from "@/components/StickyClaimCTA";
 
 const dmSans = DM_Sans({ 
   subsets: ["latin"],
@@ -49,11 +46,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${dmSans.variable} ${spaceMono.variable}`}>
       <body className="antialiased bg-white text-[#1e293b]">
-        <Navigation />
-        <GebizTicker />
+        <LayoutChrome />
         {children}
-        <Footer />
-        <StickyClaimCTA />
         <TrackerGate />
         <CookieBanner />
         <CookieSettingsTrigger />

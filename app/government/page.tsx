@@ -437,23 +437,6 @@ function AuthForm({ onEnter }: { onEnter: (email: string) => void }) {
 
   return (
     <div style={{ minHeight: "100vh", background: T.cream, fontFamily: "'IBM Plex Sans', sans-serif" }}>
-      {/* Nav */}
-      <nav style={{
-        padding: "18px 48px", display: "flex", alignItems: "center", justifyContent: "space-between",
-        borderBottom: `1px solid ${T.creamDark}`, background: T.cream,
-        position: "sticky", top: 0, zIndex: 50,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 32, height: 32, background: T.ink, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: T.white, fontSize: 14, fontWeight: 700 }}>B</span>
-          </div>
-          <div>
-            <span style={{ fontSize: 14, fontWeight: 600, color: T.ink, display: "block" }}>Booppa</span>
-            <span style={{ fontSize: 10, color: T.slate, display: "block", lineHeight: 1 }}>Government Procurement Portal</span>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero + form */}
       <div style={{ padding: "80px 48px 64px", maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "start" }}>
         {/* Left: copy */}
