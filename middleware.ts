@@ -15,6 +15,7 @@ const publicRoutes = [
   '/tender-check', '/vendor-proof', '/opportunities',
   '/insights', '/resources', '/check-status',
   '/compliance-notarization',
+  '/government',
 ]
 const publicPrefixes = ['/verify', '/vendors', '/blog', '/solutions', '/auth']
 
