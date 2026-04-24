@@ -10,6 +10,7 @@ interface Profile {
   full_name: string | null
   company: string | null
   website: string | null
+  company_description: string | null
   industry: string | null
   role: string
   is_verified?: boolean
@@ -18,11 +19,12 @@ interface Profile {
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null)
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [company, setCompany] = useState('')
-  const [website, setWebsite] = useState('')
-  const [industry, setIndustry] = useState('')
+  const [fullName,     setFullName]     = useState('')
+  const [email,        setEmail]        = useState('')
+  const [company,      setCompany]      = useState('')
+  const [website,      setWebsite]      = useState('')
+  const [industry,     setIndustry]     = useState('')
+  const [description,  setDescription]  = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
@@ -39,6 +41,7 @@ export default function ProfilePage() {
           setCompany(data.company || '')
           setWebsite(data.website || '')
           setIndustry(data.industry || '')
+          setDescription(data.company_description || '')
         }
       })
       .catch(() => {})
@@ -54,12 +57,13 @@ export default function ProfilePage() {
       const res = await fetch('/api/auth/me', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          full_name: fullName, 
-          email, 
-          company, 
-          website, 
-          industry: industry || undefined 
+        body: JSON.stringify({
+          full_name: fullName,
+          email,
+          company,
+          website,
+          industry: industry || undefined,
+          company_description: description || undefined,
         }),
       })
       const data = await res.json()
@@ -237,6 +241,23 @@ export default function ProfilePage() {
                     <div className="w-4 h-4 border-b-2 border-r-2 border-neutral-500 rotate-45 -translate-y-1" />
                   </div>
                 </div>
+              </div>
+            )}
+
+            {!isProcurement && (
+              <div>
+                <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+                  Company Description
+                  <span className="ml-2 text-xs font-normal text-neutral-500">shown to government procurement officers</span>
+                </label>
+                <textarea
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  placeholder="Briefly describe what your company does, your key capabilities, and what makes you a reliable government vendor…"
+                  rows={4}
+                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all resize-none"
+                />
+                <p className="text-xs text-neutral-500 mt-1">{description.length}/500 characters</p>
               </div>
             )}
 

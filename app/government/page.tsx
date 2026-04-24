@@ -35,7 +35,7 @@ interface Vendor {
   depth:       DepthKey;
   risk:        RiskKey;
   readiness:   ReadinessKey;
-  percentile:  number;
+  percentile:  number | null;
   description: string;
   verified:    boolean;
   website:     string;
@@ -338,8 +338,16 @@ function VerifyModal({ onClose }: { onClose: () => void }) {
 // ── CompareTable ──────────────────────────────────────────────────────────────
 function CompareTable({ vendors, onRemove }: { vendors: Vendor[]; onRemove: (v: Vendor) => void }) {
   if (vendors.length < 2) return (
-    <div style={{ textAlign: "center", padding: "48px 0", color: T.slate }}>
-      <p style={{ fontSize: 14 }}>Select at least 2 vendors from Browse to compare.</p>
+    <div style={{ textAlign: "center", padding: "64px 32px" }}>
+      <p style={{ fontSize: 32, marginBottom: 16 }}>⚖️</p>
+      <p style={{ fontSize: 15, fontWeight: 600, color: T.ink, marginBottom: 8 }}>
+        {vendors.length === 0 ? "No vendors selected" : "Select one more vendor"}
+      </p>
+      <p style={{ fontSize: 12, color: T.slate, lineHeight: 1.7, maxWidth: 320, margin: "0 auto" }}>
+        {vendors.length === 0
+          ? "Go to Browse and tick the checkbox on at least 2 vendors to compare them side-by-side."
+          : `You have ${vendors.length} vendor selected. Tick one more from Browse to start comparing.`}
+      </p>
     </div>
   );
 
@@ -348,7 +356,7 @@ function CompareTable({ vendors, onRemove }: { vendors: Vendor[]; onRemove: (v: 
     { key: "depth",       label: "Verification Depth",    render: v => { const d = DEPTH_CFG[v.depth] ?? DEPTH_CFG.UNVERIFIED; return <span style={{ color: d.color, fontWeight: 700, fontSize: 11 }}>{d.label}</span>; } },
     { key: "risk",        label: "Risk Signal",           render: v => { const r = RISK_CFG[v.risk] ?? RISK_CFG.CLEAN;  return <span style={{ color: r.color, fontWeight: 700, fontSize: 11 }}>{r.label}</span>; } },
     { key: "readiness",   label: "Procurement Readiness", render: v => { const rd = READY_CFG[v.readiness] ?? READY_CFG.NEEDS_ATTENTION; return <span style={{ color: rd.color, fontWeight: 700, fontSize: 11 }}>{rd.label}</span>; } },
-    { key: "percentile",  label: "Sector Percentile",     render: v => <span style={{ fontSize: 11, color: T.ink }}>{v.percentile}th</span> },
+    { key: "percentile",  label: "Sector Percentile",     render: v => <span style={{ fontSize: 11, color: T.ink }}>{v.percentile != null ? `${v.percentile}th` : "—"}</span> },
     { key: "verified",    label: "Booppa Verified",       render: v => <span style={{ fontWeight: 700, fontSize: 11, color: v.verified ? T.verified : T.slate }}>{v.verified ? "✓ Yes" : "No"}</span> },
   ];
 
@@ -384,6 +392,13 @@ function CompareTable({ vendors, onRemove }: { vendors: Vendor[]; onRemove: (v: 
 }
 
 // ── Auth form (register / login) ──────────────────────────────────────────────
+interface PortalStats {
+  total_vendors:    number;
+  verified_vendors: number;
+  open_tenders:     number;
+  discovered:       number;
+}
+
 function AuthForm({ onEnter }: { onEnter: (email: string) => void }) {
   const [mode,      setMode]      = useState<"login" | "register">("login");
   const [email,     setEmail]     = useState("");
@@ -392,6 +407,14 @@ function AuthForm({ onEnter }: { onEnter: (email: string) => void }) {
   const [agency,    setAgency]    = useState("");
   const [loading,   setLoading]   = useState(false);
   const [error,     setError]     = useState("");
+  const [stats,     setStats]     = useState<PortalStats | null>(null);
+
+  useEffect(() => {
+    fetch(`${API}/api/government/stats`)
+      .then(r => r.json())
+      .then(d => setStats(d))
+      .catch(() => {});
+  }, []);
 
   const submit = async () => {
     if (!email || !password) { setError("Email and password are required."); return; }
@@ -424,10 +447,10 @@ function AuthForm({ onEnter }: { onEnter: (email: string) => void }) {
   };
 
   const STATS = [
-    { n: "30,578", label: "Singapore vendors indexed" },
-    { n: "847",    label: "Booppa-verified entities" },
-    { n: "142",    label: "GeBIZ tenders tracked" },
-    { n: "S$0",    label: "Cost to government agencies" },
+    { n: stats ? (stats.total_vendors + stats.discovered).toLocaleString() : "—", label: "Singapore vendors indexed" },
+    { n: stats ? stats.verified_vendors.toLocaleString()                        : "—", label: "Booppa-verified entities" },
+    { n: stats ? stats.open_tenders.toLocaleString()                            : "—", label: "Open GeBIZ tenders" },
+    { n: "S$0",                                                                        label: "Cost to government agencies" },
   ];
   const AGENCIES = [
     "Ministry of Finance", "GovTech", "EDB", "JTC Corporation", "HDB",
@@ -551,7 +574,7 @@ function AuthForm({ onEnter }: { onEnter: (email: string) => void }) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
             {[
               { n: "01", title: "Verify Vendor",    desc: "Confirm any Singapore company's compliance credentials via blockchain.", tag: "Blockchain-anchored · Polygon" },
-              { n: "02", title: "Browse & Filter",  desc: "Search 30,578 Singapore vendors by industry, verification depth, and procurement readiness.", tag: "ACRA-sourced · Real-time" },
+              { n: "02", title: "Browse & Filter",  desc: `Search ${stats ? (stats.total_vendors + stats.discovered).toLocaleString() : "thousands of"} Singapore vendors by industry, verification depth, and procurement readiness.`, tag: "ACRA-sourced · Real-time" },
               { n: "03", title: "Compare & Export", desc: "Select up to 4 vendors for side-by-side comparison across 6 dimensions. Export AGO-auditable shortlist.", tag: "AGO-auditable · TXT export" },
             ].map(f => (
               <div key={f.n} style={{ padding: 28, border: `1.5px solid ${T.creamDark}`, borderRadius: 8 }}>
@@ -587,10 +610,32 @@ function AuthForm({ onEnter }: { onEnter: (email: string) => void }) {
   );
 }
 
+// ── Skeleton card ─────────────────────────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div style={{ background: T.white, border: `1.5px solid ${T.creamDark}`, borderRadius: 8, padding: 18 }}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
+        <div style={{ width: 48, height: 48, borderRadius: "50%", background: T.creamDark, flexShrink: 0 }} />
+        <div style={{ flex: 1 }}>
+          <div style={{ height: 12, background: T.creamDark, borderRadius: 4, marginBottom: 8, width: "70%" }} />
+          <div style={{ height: 10, background: T.creamDark, borderRadius: 4, width: "50%" }} />
+        </div>
+      </div>
+      <div style={{ height: 10, background: T.creamDark, borderRadius: 4, marginBottom: 6 }} />
+      <div style={{ height: 10, background: T.creamDark, borderRadius: 4, width: "80%", marginBottom: 14 }} />
+      <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+        <div style={{ height: 18, width: 56, background: T.creamDark, borderRadius: 3 }} />
+        <div style={{ height: 18, width: 44, background: T.creamDark, borderRadius: 3 }} />
+      </div>
+      <div style={{ height: 3, background: T.creamDark, borderRadius: 2 }} />
+    </div>
+  );
+}
+
 // ── Buyer Dashboard ───────────────────────────────────────────────────────────
 function BuyerDashboard({ onLogout }: { onLogout: () => void }) {
-  const govEmail  = typeof window !== "undefined" ? localStorage.getItem("gov_email")  ?? "" : "";
-  const govAgency = typeof window !== "undefined" ? localStorage.getItem("gov_agency") ?? "" : "";
+  const [govEmail,  setGovEmail]  = useState("");
+  const [govAgency, setGovAgency] = useState("");
 
   const [tab,        setTab]        = useState<"browse" | "compare">("browse");
   const [selected,   setSelected]   = useState<Vendor[]>([]);
@@ -598,14 +643,24 @@ function BuyerDashboard({ onLogout }: { onLogout: () => void }) {
   const [industry,   setIndustry]   = useState("All");
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [showExport, setShowExport] = useState(false);
-  const [officer,    setOfficer]    = useState(govEmail);
+  const [officer,    setOfficer]    = useState("");
   const [tenderRef,  setTenderRef]  = useState("");
 
-  const [vendors,   setVendors]   = useState<Vendor[]>([]);
-  const [tenders,   setTenders]   = useState<Tender[]>([]);
+  const [vendors,      setVendors]      = useState<Vendor[]>([]);
+  const [tenders,      setTenders]      = useState<Tender[]>([]);
   const [totalVendors, setTotalVendors] = useState(0);
-  const [page,      setPage]      = useState(1);
-  const [loading,   setLoading]   = useState(false);
+  const [totalPages,   setTotalPages]   = useState(1);
+  const [page,         setPage]         = useState(1);
+  const [loading,      setLoading]      = useState(false);
+
+  // Hydrate from localStorage safely on client
+  useEffect(() => {
+    const email  = localStorage.getItem("gov_email")  ?? "";
+    const agency = localStorage.getItem("gov_agency") ?? "";
+    setGovEmail(email);
+    setGovAgency(agency);
+    setOfficer(email);
+  }, []);
 
   // Fetch tenders once on mount
   useEffect(() => {
@@ -624,7 +679,11 @@ function BuyerDashboard({ onLogout }: { onLogout: () => void }) {
 
     fetch(`${API}/api/government/vendors?${params}`)
       .then(r => r.json())
-      .then(d => { setVendors(d.vendors ?? []); setTotalVendors(d.total ?? 0); })
+      .then(d => {
+        setVendors(d.vendors ?? []);
+        setTotalVendors(d.total ?? 0);
+        setTotalPages(d.pages ?? 1);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [query, industry, page]);
@@ -755,16 +814,22 @@ function BuyerDashboard({ onLogout }: { onLogout: () => void }) {
               <span style={{ fontSize: 10, color: T.slate }}>{tenders.length} open tenders</span>
             </div>
             <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
-              {tenders.map(t => (
-                <div key={t.ref} style={{ background: T.white, border: `1px solid ${T.creamDark}`, borderRadius: 8, padding: "14px 16px", minWidth: 220, flexShrink: 0 }}>
-                  <p style={{ fontSize: 9, color: T.slate, fontWeight: 600, letterSpacing: "0.07em", marginBottom: 4 }}>{t.agency}</p>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: T.ink, lineHeight: 1.4, marginBottom: 8 }}>{t.title}</p>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 10, color: T.verified, fontWeight: 700 }}>{t.value}</span>
-                    <span style={{ fontSize: 9, color: T.slate }}>Closes {t.closing}</span>
-                  </div>
-                </div>
-              ))}
+              {tenders.map(t => {
+                const Wrap = t.url ? "a" : "div";
+                return (
+                  <Wrap key={t.ref} {...(t.url ? { href: t.url, target: "_blank", rel: "noreferrer" } : {})}
+                    style={{ background: T.white, border: `1px solid ${T.creamDark}`, borderRadius: 8, padding: "14px 16px", minWidth: 220, flexShrink: 0, textDecoration: "none", display: "block",
+                      borderLeft: `3px solid ${T.inkLight}`, cursor: t.url ? "pointer" : "default" }}>
+                    <p style={{ fontSize: 9, color: T.slate, fontWeight: 600, letterSpacing: "0.07em", marginBottom: 4 }}>{t.agency}</p>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: T.ink, lineHeight: 1.4, marginBottom: 8 }}>{t.title}</p>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: 10, color: T.verified, fontWeight: 700 }}>{t.value}</span>
+                      <span style={{ fontSize: 9, color: T.slate }}>Closes {t.closing}</span>
+                    </div>
+                    {t.url && <p style={{ fontSize: 9, color: T.inkLight, marginTop: 6, fontWeight: 600 }}>View on GeBIZ →</p>}
+                  </Wrap>
+                );
+              })}
             </div>
           </div>
         )}
@@ -803,20 +868,59 @@ function BuyerDashboard({ onLogout }: { onLogout: () => void }) {
               )}
             </div>
 
-            <p style={{ fontSize: 10, color: T.slate, marginBottom: 14 }}>
-              {loading ? "Loading…" : `${totalVendors.toLocaleString()} vendors · Select up to 4 to compare · Click Verify for blockchain certificate`}
-            </p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <p style={{ fontSize: 10, color: T.slate }}>
+                {loading ? "Loading…" : `${totalVendors.toLocaleString()} vendors · Select up to 4 to compare`}
+              </p>
+              {totalPages > 1 && (
+                <p style={{ fontSize: 10, color: T.slate }}>Page {page} of {totalPages}</p>
+              )}
+            </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
-              {vendors.map(v => (
-                <VendorCard key={v.id} v={v} selected={!!selected.find(x => x.id === v.id)} onSelect={toggleSelect} />
-              ))}
+              {loading
+                ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+                : vendors.map(v => (
+                    <VendorCard key={v.id} v={v} selected={!!selected.find(x => x.id === v.id)} onSelect={toggleSelect} />
+                  ))
+              }
               {!loading && vendors.length === 0 && (
-                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "48px 0", color: T.slate }}>
-                  <p style={{ fontSize: 14 }}>No vendors found matching your search.</p>
+                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "64px 0" }}>
+                  <p style={{ fontSize: 28, marginBottom: 12 }}>🔍</p>
+                  <p style={{ fontSize: 14, color: T.ink, fontWeight: 600, marginBottom: 6 }}>No vendors found</p>
+                  <p style={{ fontSize: 12, color: T.slate }}>Try adjusting your search or industry filter.</p>
                 </div>
               )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && !loading && (
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginTop: 24 }}>
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  style={{ padding: "7px 16px", borderRadius: 6, border: `1.5px solid ${T.creamDark}`, background: T.white, color: page === 1 ? T.mist : T.ink, fontSize: 12, cursor: page === 1 ? "default" : "pointer", fontWeight: 600 }}>
+                  ← Prev
+                </button>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const pg = totalPages <= 5 ? i + 1 : Math.max(1, Math.min(page - 2, totalPages - 4)) + i;
+                  return (
+                    <button key={pg} onClick={() => setPage(pg)}
+                      style={{ width: 32, height: 32, borderRadius: 6, border: `1.5px solid ${pg === page ? T.ink : T.creamDark}`,
+                        background: pg === page ? T.ink : T.white, color: pg === page ? T.white : T.slate,
+                        fontSize: 12, cursor: "pointer", fontWeight: pg === page ? 700 : 400 }}>
+                      {pg}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  style={{ padding: "7px 16px", borderRadius: 6, border: `1.5px solid ${T.creamDark}`, background: T.white, color: page === totalPages ? T.mist : T.ink, fontSize: 12, cursor: page === totalPages ? "default" : "pointer", fontWeight: 600 }}>
+                  Next →
+                </button>
+              </div>
+            )}
           </div>
         )}
 
