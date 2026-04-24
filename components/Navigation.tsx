@@ -349,24 +349,10 @@ export default function Navigation() {
 							</Link>
 
 							<Link
-								href="/vendors"
-								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/vendors") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
-							>
-								Network
-							</Link>
-
-							<Link
 								href="/resources"
 								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/resources") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
 							>
 								Resources
-							</Link>
-
-							<Link
-								href="/insights"
-								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/insights") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
-							>
-								Insights
 							</Link>
 
 							<Link
@@ -554,24 +540,14 @@ export default function Navigation() {
 								active={pathname === "/pricing"}
 								close={() => setMobileOpen(false)}
 							/>
-							<MobileLink
-								href="/vendors"
-								label="Network"
-								active={pathname?.startsWith("/vendors")}
-								close={() => setMobileOpen(false)}
-							/>
+
 							<MobileLink
 								href="/resources"
 								label="Resources"
 								active={pathname?.startsWith("/resources")}
 								close={() => setMobileOpen(false)}
 							/>
-							<MobileLink
-								href="/insights"
-								label="Insights"
-								active={pathname?.startsWith("/insights")}
-								close={() => setMobileOpen(false)}
-							/>
+
 							<MobileLink
 								href="/government"
 								label="Gov Portal"
@@ -586,7 +562,9 @@ export default function Navigation() {
 											<p className="text-xs text-white/40">Signed in as</p>
 											<p className="text-sm text-white font-medium truncate">
 												{userEmail ||
-													(userRole === "PROCUREMENT" ? "Procurement" : "Vendor")}
+													(userRole === "PROCUREMENT"
+														? "Procurement"
+														: "Vendor")}
 											</p>
 										</div>
 										{menuLinks.map(({ name, href }) => (

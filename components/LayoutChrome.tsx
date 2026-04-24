@@ -10,14 +10,13 @@ import StickyClaimCTA from "./StickyClaimCTA";
 const STANDALONE = ["/government"];
 
 export default function LayoutChrome() {
-  const pathname = usePathname();
-  if (STANDALONE.some((r) => pathname?.startsWith(r))) return null;
-  return (
-    <>
-      <Navigation />
-      <GebizTicker />
-      <Footer />
-      <StickyClaimCTA />
-    </>
-  );
+	const pathname = usePathname();
+	if (STANDALONE.some((r) => pathname?.startsWith(r))) return null;
+	return (
+		<>
+			<Navigation />
+			<GebizTicker />
+			<StickyClaimCTA />
+		</>
+	);
 }
