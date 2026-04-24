@@ -77,14 +77,17 @@ export default function SolutionsProcurementPage() {
 				<div className="max-w-[1200px] mx-auto text-center">
 					{isVendor && (
 						<div className="mb-8 rounded-xl bg-amber-500/10 border border-amber-500/20 px-6 py-4 text-sm text-amber-300 max-w-2xl mx-auto">
-							These plans are for procurement teams. Looking for vendor tools?{" "}
-							<Link href="/solutions/vendors" className="underline hover:no-underline font-semibold">
+							These plans are for buyer teams. Looking for vendor tools?{" "}
+							<Link
+								href="/solutions/vendors"
+								className="underline hover:no-underline font-semibold"
+							>
 								View Vendor Solutions →
 							</Link>
 						</div>
 					)}
 					<div className="inline-flex items-center gap-2 px-4 py-2 border border-blue-400 rounded-full text-sm font-medium text-blue-400 mb-8 bg-blue-500/10">
-						For Procurement / Buyers
+						For Buyers
 					</div>
 					<h1 className="text-4xl lg:text-6xl font-black mb-6 leading-tight">
 						Reduce vendor risk.
@@ -132,7 +135,7 @@ export default function SolutionsProcurementPage() {
 							Choose Your Plan
 						</h2>
 						<p className="text-lg text-[#64748b] max-w-2xl mx-auto">
-							Transparent pricing for procurement teams. No hidden fees.
+							Transparent pricing for buyer teams. No hidden fees.
 						</p>
 					</div>
 
@@ -147,7 +150,7 @@ export default function SolutionsProcurementPage() {
 								<span className="text-lg text-[#64748b] font-normal">/mo</span>
 							</div>
 							<p className="text-sm text-[#64748b] mb-6">
-								For procurement teams evaluating vendors
+								For buyer teams evaluating vendors
 							</p>
 							<ul className="space-y-3 mb-8 flex-1">
 								{[
@@ -164,7 +167,7 @@ export default function SolutionsProcurementPage() {
 								))}
 							</ul>
 							<p className="text-xs text-[#94a3b8] mb-6 border-t border-[#e2e8f0] pt-4">
-								For institutional procurement teams, GLCs, statutory boards
+								For institutional buyer teams, GLCs, statutory boards
 							</p>
 							{isEnterprise ? (
 								<button
@@ -186,7 +189,9 @@ export default function SolutionsProcurementPage() {
 									disabled={loadingProduct === "enterprise_monthly"}
 									className="block w-full text-center bg-[#0f172a] text-white font-semibold py-3 rounded-xl hover:bg-[#1e293b] transition text-sm disabled:opacity-50"
 								>
-									{loadingProduct === "enterprise_monthly" ? "Redirecting..." : "Get Enterprise — SGD 499/mo"}
+									{loadingProduct === "enterprise_monthly"
+										? "Redirecting..."
+										: "Get Enterprise — SGD 499/mo"}
 								</button>
 							)}
 						</div>
@@ -297,17 +302,15 @@ export default function SolutionsProcurementPage() {
 				</div>
 			</section>
 
-
-
 			{/* Free Tools */}
 			<section className="py-20 px-6 bg-[#f8fafc]">
 				<div className="max-w-[1100px] mx-auto">
 					<div className="text-center mb-10">
 						<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">
-							Free Procurement Tools
+							Free Buyer Tools
 						</h2>
 						<p className="text-[#64748b]">
-							Available to all procurement teams at no cost
+							Available to all buyer teams at no cost
 						</p>
 					</div>
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -380,4 +383,3 @@ export default function SolutionsProcurementPage() {
 		</main>
 	);
 }
-

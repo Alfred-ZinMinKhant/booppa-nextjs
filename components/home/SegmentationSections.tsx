@@ -40,7 +40,7 @@ export default function SegmentationSections() {
 						<div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mb-8 shadow-sm group-hover:scale-110 transition-transform">
 							🔍
 						</div>
-						<h2 className="text-3xl font-black mb-4 text-white">For Procurement Teams</h2>
+						<h2 className="text-3xl font-black mb-4 text-white">For Buyer Teams</h2>
 						<p className="text-lg text-white/70 mb-8 flex-1">
 							Reduce evaluation risk and eliminate manual compliance document chasing. Access verified vendor data with immutable proof.
 						</p>

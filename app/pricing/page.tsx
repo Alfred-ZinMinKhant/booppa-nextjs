@@ -872,10 +872,10 @@ export default function PricingPage() {
 							<div>
 								<div className="text-center mb-10">
 									<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">
-										Procurement Plans
+										Buyer Plans
 									</h2>
 									<p className="text-[#64748b]">
-										For procurement teams evaluating and managing vendors
+										For Buyer teams evaluating and managing vendors
 									</p>
 								</div>
 								<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -890,7 +890,7 @@ export default function PricingPage() {
 											</span>
 										</div>
 										<p className="text-sm text-[#64748b] mb-8">
-											For procurement teams evaluating vendors
+											For buyer teams evaluating vendors
 										</p>
 										<ul className="space-y-3 mb-10">
 											{[
@@ -907,7 +907,7 @@ export default function PricingPage() {
 											))}
 										</ul>
 										<p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">
-											For institutional procurement teams, GLCs, statutory
+											For institutional buyer teams, GLCs, statutory
 											boards
 										</p>
 										<button
@@ -1035,7 +1035,7 @@ export default function PricingPage() {
 											</span>
 										</div>
 										<p className="text-sm text-[#64748b] mb-8">
-											For procurement teams evaluating vendors
+											For buyer teams evaluating vendors
 										</p>
 										<ul className="space-y-3 mb-10">
 											{[
@@ -1052,7 +1052,7 @@ export default function PricingPage() {
 											))}
 										</ul>
 										<p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">
-											For institutional procurement teams, GLCs, statutory
+											For institutional buyer teams, GLCs, statutory
 											boards
 										</p>
 										<button

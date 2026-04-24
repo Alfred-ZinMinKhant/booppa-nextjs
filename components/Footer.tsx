@@ -72,7 +72,7 @@ export default function Footer() {
 									href="/vendors"
 									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
 								>
-									Vendor Directory
+									Network
 								</Link>
 							</li>
 							<li>
@@ -89,6 +89,14 @@ export default function Footer() {
 									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
 								>
 									Blog
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="/insights"
+									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
+								>
+									Insights
 								</Link>
 							</li>
 							<li>

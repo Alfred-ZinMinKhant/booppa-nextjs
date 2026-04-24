@@ -19,7 +19,7 @@ export default function BlockchainProof() {
 								Blockchain-anchored proof (example)
 							</h2>
 							<p className="text-xl text-white/70 mb-8 leading-relaxed">
-								Every compliance report and document is notarized on the Polygon mainnet. This creates an immutable, timestamped record that procurement teams can verify independently.
+								Every compliance report and document is notarized on the Polygon mainnet. This creates an immutable, timestamped record that buyer teams can verify independently.
 							</p>
 
 							<div className="space-y-4">

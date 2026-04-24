@@ -3,7 +3,7 @@ import { config } from '@/lib/config';
 
 export const metadata = {
   title: 'Resources — Guides, Blog & Compliance Tips | BOOPPA',
-  description: 'Guides, blog posts, RFP tips, and PDPA compliance education for Singapore vendors and procurement teams.',
+  description: 'Guides, blog posts, RFP tips, and PDPA compliance education for Singapore vendors and buyer teams.',
 };
 
 interface BlogPost {
@@ -48,7 +48,7 @@ const FALLBACK_GUIDES: GuideSection[] = [
     items: [
       { title: 'How to Win Government Tenders in Singapore', desc: 'A practical guide to GeBIZ submission requirements, common disqualification reasons, and how to prepare procurement-ready evidence.', href: '/blog' },
       { title: 'PDPA Compliance Checklist for SMEs', desc: 'The 8 PDPA obligations every Singapore SME must address before submitting to enterprise procurement portals.', href: '/pdpa' },
-      { title: 'RFP Compliance Section: What Procurement Teams Actually Check', desc: 'Inside view of what procurement evaluators look for in vendor compliance sections — and how to pass every time.', href: '/blog' },
+      { title: 'RFP Compliance Section: What Buyer Teams Actually Check', desc: 'Inside view of what procurement evaluators look for in vendor compliance sections — and how to pass every time.', href: '/blog' },
     ],
   },
   {

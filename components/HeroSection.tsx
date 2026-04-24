@@ -29,7 +29,7 @@ export default function HeroSection() {
 								: "text-[#64748b] hover:text-[#0f172a]"
 						}`}
 					>
-						For Procurement Teams
+						For Buyer Teams
 					</button>
 				</div>
 

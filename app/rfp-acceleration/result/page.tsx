@@ -219,7 +219,7 @@ function RFPResultContent() {
                 </div>
                 <p className="text-xs text-gray-400 mb-4 leading-relaxed">
                   Your RFP evidence certificate has been cryptographically anchored on the Polygon blockchain.
-                  This creates an immutable, tamper-proof timestamp that procurement teams can independently verify
+                  This creates an immutable, tamper-proof timestamp that buyer teams can independently verify
                   — without needing to contact BOOPPA.
                 </p>
                 <div className="space-y-2.5">
@@ -310,7 +310,15 @@ function RFPResultContent() {
               </div>
             )}
 
-            <p className="text-gray-600 text-xs mt-6 text-center">
+            {/* Scope of Assessment note */}
+            <div className="mt-6 rounded-xl border border-gray-700/40 bg-gray-900/40 px-4 py-3 text-xs text-gray-400 leading-relaxed">
+              <span className="font-semibold text-gray-300">Scope of Assessment: </span>
+              This compliance pack is based on information provided by the company&apos;s authorised representative
+              and automated website assessment conducted by Booppa on the date indicated. UEN field and all evidence
+              sections are included in the PDF certificate.
+            </div>
+
+            <p className="text-gray-600 text-xs mt-4 text-center">
               PDF valid for 7 days · Fact-backed answers use information you provided · AI-generated answers are based on your website and best practices
             </p>
           </>

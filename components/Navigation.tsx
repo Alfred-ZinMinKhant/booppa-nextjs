@@ -287,12 +287,12 @@ export default function Navigation() {
 								For Vendors
 							</Link>
 
-							{/* For Procurements — direct link */}
+							{/* For Buyers — direct link */}
 							<Link
 								href="/solutions/procurement"
 								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/solutions/procurement") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
 							>
-								For Procurements
+								For Buyers
 							</Link>
 
 							{/* Solutions dropdown */}
@@ -367,6 +367,13 @@ export default function Navigation() {
 								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/insights") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
 							>
 								Insights
+							</Link>
+
+							<Link
+								href="/government"
+								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/government") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
+							>
+								Gov Portal
 							</Link>
 						</div>
 
@@ -516,7 +523,7 @@ export default function Navigation() {
 							/>
 							<MobileLink
 								href="/solutions/procurement"
-								label="For Procurements"
+								label="For Buyers"
 								active={pathname?.startsWith("/solutions/procurement")}
 								close={() => setMobileOpen(false)}
 							/>
@@ -563,6 +570,12 @@ export default function Navigation() {
 								href="/insights"
 								label="Insights"
 								active={pathname?.startsWith("/insights")}
+								close={() => setMobileOpen(false)}
+							/>
+							<MobileLink
+								href="/government"
+								label="Gov Portal"
+								active={pathname?.startsWith("/government")}
 								close={() => setMobileOpen(false)}
 							/>
 

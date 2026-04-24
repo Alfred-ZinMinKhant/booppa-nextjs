@@ -58,7 +58,7 @@ function deriveInsights(entries: LeaderboardEntry[], industries: IndustryItem[])
       title: `${unverifiedPct}% of vendors have no verification`,
       description:
         `${unverifiedCount} out of ${totalVendors} vendors on the network remain unverified. ` +
-        `Without verification, procurement teams cannot assess vendor risk — and unverified vendors ` +
+        `Without verification, buyer teams cannot assess vendor risk — and unverified vendors ` +
         `are significantly less likely to be shortlisted for government tenders.`,
       cta: { label: 'Start your verification', href: '/auth/register' },
     });
@@ -104,7 +104,7 @@ function deriveInsights(entries: LeaderboardEntry[], industries: IndustryItem[])
         title: `Low vendor coverage in ${underserved.length} industries`,
         description:
           `${names} ${underserved.length === 1 ? 'has' : 'have'} fewer than 5 verified vendors. ` +
-          `Procurement teams sourcing in these sectors face limited options. ` +
+          `Buyer teams sourcing in these sectors face limited options. ` +
           `If you operate in these industries, claiming your profile gives you early visibility.`,
         cta: { label: 'Claim your profile', href: '/auth/register' },
       });
@@ -119,7 +119,7 @@ function deriveInsights(entries: LeaderboardEntry[], industries: IndustryItem[])
       title: `Network compliance average: ${avgScore}/100`,
       description:
         `The BOOPPA vendor network is still in its early stages. Vendors who complete their profiles and ` +
-        `upload compliance evidence now will have a head start when procurement teams begin evaluating.`,
+        `upload compliance evidence now will have a head start when buyer teams begin evaluating.`,
       cta: { label: 'Get started free', href: '/auth/register' },
     });
   }

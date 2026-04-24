@@ -9,7 +9,7 @@ export default function ReportPreview() {
 						Sample Compliance Report
 					</h2>
 					<p className="text-xl text-[#64748b] max-w-2xl mx-auto">
-						Tangible proof of output. See exactly what procurement teams receive when you share your Booppa profile.
+						Tangible proof of output. See exactly what buyer teams receive when you share your Booppa profile.
 					</p>
 				</div>
 

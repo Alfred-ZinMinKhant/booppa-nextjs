@@ -478,7 +478,7 @@ export default function RFPAccelerationPage() {
           </h1>
           <p className="text-xl text-[#64748b] mb-12 max-w-2xl mx-auto leading-relaxed">
             Stop manually answering the same security and compliance questions.
-            BOOPPA generates blockchain-verified evidence that procurement teams trust.
+            BOOPPA generates blockchain-verified evidence that buyer teams trust.
           </p>
           <div className="flex flex-wrap justify-center gap-6">
             <button
@@ -561,7 +561,7 @@ export default function RFPAccelerationPage() {
         <div className="max-w-[800px] mx-auto text-center">
           <h2 className="text-3xl font-black text-[#0f172a] mb-8">Reduce Submission Friction</h2>
           <p className="text-lg text-[#64748b] mb-12">
-            Procurement teams are tired of vague answers. By providing
+            Buyer teams are tired of vague answers. By providing
             <span className="font-bold text-[#0f172a]"> verifiable evidence</span> up front,
             you move to the top of the pile and close deals faster.
           </p>
@@ -578,7 +578,7 @@ export default function RFPAccelerationPage() {
             <h2 className="text-3xl font-black text-[#0f172a] mb-4">Blockchain-Verified PDPA Evidence</h2>
             <p className="text-lg text-[#64748b] max-w-2xl mx-auto">
               Every RFP Kit includes a cryptographic proof anchored to the Polygon blockchain — the same
-              infrastructure used for our PDPA and notarization products. Procurement teams can verify
+              infrastructure used for our PDPA and notarization products. Buyer teams can verify
               your evidence independently, without contacting BOOPPA.
             </p>
           </div>

@@ -138,7 +138,7 @@ export default function EnterprisePage() {
 								<span className="text-lg text-[#64748b] font-normal">/mo</span>
 							</div>
 							<p className="text-sm text-[#64748b] mb-6">
-								For procurement teams evaluating vendors
+								For Buyer teams evaluating vendors
 							</p>
 							<ul className="space-y-3 mb-8 flex-1">
 								{[
@@ -155,7 +155,7 @@ export default function EnterprisePage() {
 								))}
 							</ul>
 							<p className="text-xs text-[#94a3b8] mb-6 border-t border-[#e2e8f0] pt-4">
-								For institutional procurement teams, GLCs, statutory boards
+								For institutional buyer teams, GLCs, statutory boards
 							</p>
 							{isEnterprise ? (
 								<button

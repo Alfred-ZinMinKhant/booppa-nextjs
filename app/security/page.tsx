@@ -20,7 +20,7 @@ export default function SecurityCompliancePage() {
         </p>
         
         <p className="text-lg text-gray-400 text-center mb-16">
-          This page outlines Booppa’s security posture, regulatory alignment, and technical approach for enterprise customers, procurement teams, and compliance reviewers.
+          This page outlines Booppa’s security posture, regulatory alignment, and technical approach for enterprise customers, buyer teams, and compliance reviewers.
         </p>
 
         {/* Information Security */}
