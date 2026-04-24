@@ -836,7 +836,7 @@ export default function ReportClient() {
                   ["Transaction Hash", <a key="tx" href={verification.polygonscan_url || `https://polygonscan.com/tx/${verification.tx_hash}`} target="_blank" rel="noreferrer" className="font-mono text-xs text-[#10b981] hover:underline break-all">{verification.tx_hash}</a>],
                   ["Evidence Hash",    <span key="hash" className="font-mono text-xs text-[#64748b] break-all">{verification.audit_hash ?? report?.report_metadata?.report_id ?? "—"}</span>],
                   ["Hash Algorithm",   <span key="alg" className="text-sm text-[#334155]">SHA-256</span>],
-                  ["Verification URL", verification.verify_url ? <a key="url" href={verification.verify_url} target="_blank" rel="noreferrer" className="text-sm text-[#10b981] hover:underline">{verification.verify_url}</a> : <span key="url2" className="text-sm text-[#64748b]">—</span>],
+                  ["Verification URL", verification.verify_url ? <a key="url" href={verification.verify_url} target="_blank" rel="noreferrer" className="text-sm text-[#10b981] hover:underline break-all">{verification.verify_url}</a> : <span key="url2" className="text-sm text-[#64748b]">—</span>],
                   ["Anchored On",      <span key="anch" className="text-sm text-[#334155]">Polygon PoS · Immutable blockchain record</span>],
                 ].map(([label, val], i) => (
                   <div key={i} className="flex items-start gap-3">
