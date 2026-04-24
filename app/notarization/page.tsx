@@ -38,6 +38,7 @@ export default function NotarizationPage() {
   const [email, setEmail] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [documentDescriptor, setDocumentDescriptor] = useState('');
+  const [regulationTag, setRegulationTag] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
@@ -92,6 +93,7 @@ export default function NotarizationPage() {
       formData.append('file', file);
       formData.append('plan', selectedPlan);
       formData.append('document_descriptor', documentDescriptor.trim().slice(0, 120));
+      if (regulationTag) formData.append('regulation_tag', regulationTag);
       if (email) formData.append('email', email);
       if (companyName) formData.append('company_name', companyName);
 
@@ -290,6 +292,25 @@ export default function NotarizationPage() {
                     <p className="text-xs text-[#94a3b8] mt-1">{documentDescriptor.length}/120 characters</p>
                   </div>
 
+                  {/* Regulation Tag — links this notarization to the Compliance Locker */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-bold text-[#0f172a] mb-2">
+                      Tag to Singapore Regulation
+                      <span className="ml-2 text-xs font-normal text-[#94a3b8]">Optional — adds this certificate to your Compliance Locker</span>
+                    </label>
+                    <select
+                      value={regulationTag}
+                      onChange={(e) => setRegulationTag(e.target.value)}
+                      className="w-full px-4 py-3 border border-[#e2e8f0] rounded-xl text-[#0f172a] focus:ring-2 focus:ring-[#10b981] focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">— None / Not applicable —</option>
+                      <option value="PDPA">PDPA — Personal Data Protection Act</option>
+                      <option value="ACRA">ACRA — Registration & Annual Filing</option>
+                      <option value="GEBIZ">GeBIZ — Government Procurement</option>
+                      <option value="MAS">MAS — Technology Risk Guidelines</option>
+                    </select>
+                  </div>
+
                   {/* File input */}
                   <div className="mb-6">
                     <label className="block text-sm font-bold text-[#0f172a] mb-2">Document File *</label>
@@ -396,6 +417,19 @@ export default function NotarizationPage() {
                       ))}
                     </ol>
                   </div>
+
+                  {regulationTag && (
+                    <div className="mb-5 p-4 bg-violet-50 border border-violet-200 rounded-xl flex items-start gap-3">
+                      <span className="text-violet-600 text-lg flex-shrink-0">🔒</span>
+                      <p className="text-sm text-violet-700">
+                        This certificate will be tagged to your <strong>{regulationTag}</strong> regulation.
+                        After notarization it will appear in your{' '}
+                        <a href="/compliance/locker" className="underline font-semibold hover:text-violet-900">
+                          Compliance Locker
+                        </a>.
+                      </p>
+                    </div>
+                  )}
 
                   <div className="mb-6 p-4 rounded-xl border border-[#e2e8f0] bg-[#f8fafc]">
                     <HardenedClickwrap onValidityChange={setConsentValid} variant="light" />

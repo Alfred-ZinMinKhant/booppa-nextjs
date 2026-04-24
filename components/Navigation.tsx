@@ -10,6 +10,8 @@ import {
 	Search,
 	LogOut,
 	User,
+	Lock,
+	Network,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -20,6 +22,11 @@ const forVendors = [
 		name: "Vendor Dashboard",
 		href: "/vendor/dashboard",
 		desc: "Track your trust score, activation ladder, and procurement visibility",
+	},
+	{
+		name: "Compliance Locker",
+		href: "/compliance/locker",
+		desc: "Your Singapore compliance evidence — PDPA, ACRA, GeBIZ, MAS in one place",
 	},
 	{
 		name: "Vendor Proof — S$149",
@@ -55,6 +62,11 @@ const forProcurements = [
 		desc: "Evaluate, compare, and shortlist vendors with structured trust data",
 	},
 	{
+		name: "Supply Chain Risk",
+		href: "/supply-chain",
+		desc: "Monitor compliance risk across your vendor portfolio in one place",
+	},
+	{
 		name: "Verify Vendor",
 		href: "/verify",
 		desc: "Check if a vendor is verified and audit their compliance posture",
@@ -78,7 +90,7 @@ const solutions = [
 		desc: "Build procurement trust — from verification to tender-ready dossiers",
 	},
 	{
-		name: "For Procurement",
+		name: "For Buyers",
 		href: "/solutions/procurement",
 		desc: "Reduce supplier risk with structured vendor due diligence",
 	},
@@ -122,6 +134,7 @@ const solutions = [
 const vendorLinks = [
 	{ name: "Dashboard", href: "/vendor/dashboard", icon: LayoutDashboard },
 	{ name: "My Profile", href: "/profile", icon: User },
+	{ name: "Compliance Locker", href: "/compliance/locker", icon: Lock },
 	{ name: "Vendor Proof", href: "/vendor-proof", icon: ShieldCheck },
 	{ name: "Notarization", href: "/notarization", icon: FileText },
 	{ name: "PDPA Scan", href: "/pdpa", icon: ShieldCheck },
@@ -131,6 +144,8 @@ const vendorLinks = [
 const procurementLinks = [
 	{ name: "Dashboard", href: "/procurement/dashboard", icon: LayoutDashboard },
 	{ name: "My Profile", href: "/profile", icon: User },
+	{ name: "Supply Chain Risk", href: "/supply-chain", icon: Network },
+	{ name: "Compliance Locker", href: "/compliance/locker", icon: Lock },
 	{ name: "Verify Vendor", href: "/verify", icon: ShieldCheck },
 	{ name: "Browse Vendors", href: "/vendors", icon: Search },
 	{ name: "Compare Vendors", href: "/compare", icon: FileText },
