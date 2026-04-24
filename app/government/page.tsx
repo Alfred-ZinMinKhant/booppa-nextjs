@@ -664,7 +664,7 @@ function BuyerDashboard({ onLogout }: { onLogout: () => void }) {
 
   // Fetch tenders once on mount
   useEffect(() => {
-    fetch(`${API}/api/government/tenders?limit=6`)
+    fetch(`${API}/api/government/tenders?limit=50`)
       .then(r => r.json())
       .then(d => setTenders(d.tenders ?? []))
       .catch(() => {});
@@ -811,7 +811,10 @@ function BuyerDashboard({ onLogout }: { onLogout: () => void }) {
           <div style={{ marginBottom: 28 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <p style={{ fontSize: 10, color: T.slate, fontWeight: 600, letterSpacing: "0.08em" }}>LIVE GeBIZ TENDERS — UPDATED DAILY</p>
-              <span style={{ fontSize: 10, color: T.slate }}>{tenders.length} open tenders</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ fontSize: 10, color: T.slate }}>{tenders.length} open tenders</span>
+                <a href="/opportunities" style={{ fontSize: 10, color: T.verified, fontWeight: 700, textDecoration: "none" }}>View all →</a>
+              </div>
             </div>
             <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
               {tenders.map(t => {
