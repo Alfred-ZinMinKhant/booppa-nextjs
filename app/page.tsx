@@ -132,8 +132,8 @@ export default function Home() {
 										<p className="text-[8px] text-white/50 font-mono">0x8f3a...91c2</p>
 									</div>
 								</div>
-								<div className="bg-white p-2 rounded-xl mb-3">
-									<img src="/4-QR_Container.jpg" alt="QR Code" className="w-full h-auto rounded-lg" />
+								<div className="bg-white p-2 rounded-xl mb-3 flex items-center justify-center">
+									<img src="/4-QR_Container.jpg" alt="QR Code" className="w-20 h-20 object-contain rounded-lg" />
 								</div>
 								<p className="text-[8px] text-[#10b981] text-center font-black tracking-widest uppercase">Verified & Immutable</p>
 							</div>
@@ -169,17 +169,21 @@ export default function Home() {
 								</li>
 							</ul>
 
-							{/* REAL OUTPUT PREVIEW: VENDOR PROOF BADGE */}
+							{/* REAL OUTPUT PREVIEW: RFP Q&A SAMPLE */}
 							<div className="mb-6 p-4 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0]">
-								<p className="text-[10px] font-black text-[#94a3b8] uppercase mb-3 tracking-widest">Vendor Proof Badge (Example)</p>
-								<div className="bg-gradient-to-br from-[#10b981] to-[#059669] rounded-xl p-6 text-white text-center shadow-lg border-2 border-white/20">
-									<div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-md">
-										<span className="text-2xl">🛡️</span>
-									</div>
-									<h4 className="text-xs font-black uppercase tracking-tighter mb-1">Booppa Verified</h4>
-									<div className="py-1.5 px-3 bg-black/20 rounded-lg text-[7px] font-mono border border-white/10 inline-block">
-										VERIFIED VENDOR 2026
-									</div>
+								<p className="text-[10px] font-black text-[#94a3b8] uppercase mb-3 tracking-widest">RFP Q&A Sample</p>
+								<div className="space-y-2">
+									{[
+										{ q: "Data security measures?", a: "ISO 27001-aligned controls…" },
+										{ q: "Uptime SLA?", a: "99.9% guaranteed SLA…" },
+										{ q: "PDPA compliance?", a: "Fully PDPA-compliant…" },
+									].map((item, i) => (
+										<div key={i} className="bg-white rounded-lg p-2.5 border border-[#e2e8f0]">
+											<p className="text-[8px] font-black text-[#64748b] uppercase tracking-wide mb-0.5">Q{i + 1}</p>
+											<p className="text-[9px] font-semibold text-[#0f172a] leading-tight mb-1">{item.q}</p>
+											<p className="text-[8px] text-[#64748b] leading-tight">{item.a}</p>
+										</div>
+									))}
 								</div>
 							</div>
 

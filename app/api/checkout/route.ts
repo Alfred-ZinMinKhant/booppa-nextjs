@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchWithAuth } from '@/lib/auth'
+import { fetchWithAuth, getServerSideUser } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
+    // Inject the logged-in user's email so the Stripe webhook always has it
+    // for fulfillment (plan activation, email sending) even on subscriptions
+    // where customer_details may be absent for returning Stripe customers.
+    let enrichedBody = body
+    if (!body.prefill_email && !body.customerEmail) {
+      const user = await getServerSideUser()
+      if (user?.email) {
+        enrichedBody = { ...body, prefill_email: user.email }
+      }
+    }
+
     const res = await fetchWithAuth('/api/v1/stripe/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(enrichedBody),
     })
 
     const data = await res.json()

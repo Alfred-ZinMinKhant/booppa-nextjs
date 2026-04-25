@@ -56,7 +56,12 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
     const isCompliance = productType?.startsWith('compliance_');
     const isVendorProof = productType === 'vendor_proof';
     const isNotarization = productType?.startsWith('compliance_notarization') || productType?.startsWith('supply_chain');
-    const isPdpa = productType?.startsWith('pdpa');
+    // pdpa_quick_scan / pdpa_snapshot → report page; pdpa_monitor_* → subscription, go to dashboard
+    const isPdpa = productType === 'pdpa_quick_scan' || productType === 'pdpa_snapshot';
+    const isPdpaMonitor = productType === 'pdpa_monitor_monthly' || productType === 'pdpa_monitor_annual';
+    // vendor_active_* → subscription, go to dashboard
+    const isVendorActive = productType === 'vendor_active_monthly' || productType === 'vendor_active_annual';
+    const isSubscription = isPdpaMonitor || isVendorActive;
     const isRfp = productType?.startsWith('rfp_');
 
     content = (
@@ -77,13 +82,17 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                 ? 'Your notarization certificate and blockchain proof will be delivered to your email shortly.'
                 : isPdpa
                   ? 'Your PDPA compliance report will be sent to your email shortly.'
-                  : isRfp
-                    ? 'Your RFP evidence package will be delivered to your email shortly.'
-                    : isVendorProof
-                      ? 'Your Vendor Proof certificate will be sent to your email within a few minutes.'
-                      : isEnterprise || isCompliance
-                        ? 'Your Enterprise workspace has been activated. Details have been sent to your email.'
-                        : 'A confirmation and your deliverables will be sent to your email shortly.'}
+                  : isPdpaMonitor
+                    ? 'Your PDPA Monitor subscription is active. Quarterly re-scans and monthly regulatory alerts are now enabled. A confirmation has been sent to your email.'
+                    : isVendorActive
+                      ? 'Your Vendor Active subscription is active. Monthly health checks, competitor alerts, and shortlist priority are now enabled. A confirmation has been sent to your email.'
+                      : isRfp
+                        ? 'Your RFP evidence package will be delivered to your email shortly.'
+                        : isVendorProof
+                          ? 'Your Vendor Proof certificate will be sent to your email within a few minutes.'
+                          : isEnterprise || isCompliance
+                            ? 'Your Enterprise workspace has been activated. Details have been sent to your email.'
+                            : 'A confirmation and your deliverables will be sent to your email shortly.'}
             </p>
           </div>
         </div>
@@ -106,7 +115,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
           </Link>
         ) : (
           <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-            Go to Dashboard
+            {isSubscription ? 'View Subscription Dashboard →' : 'Go to Dashboard'}
           </Link>
         )}
       </>

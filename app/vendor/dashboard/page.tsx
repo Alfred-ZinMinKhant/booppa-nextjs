@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Shield, Eye, TrendingUp, ArrowRight, Zap, Building, CheckCircle2, Copy, Check, LogOut } from 'lucide-react';
+import { Shield, Eye, TrendingUp, ArrowRight, Zap, Building, CheckCircle2, Copy, Check, LogOut, AlertTriangle } from 'lucide-react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import VendorStatusBadge from '@/components/vendor/VendorStatusBadge';
 import SectorPressureWidget from '@/components/vendor/SectorPressureWidget';
@@ -143,8 +143,20 @@ export default function VendorDashboard() {
                   <span className="text-xs text-slate-500">UEN {vendorState.uen}</span>
                 )}
                 <span className="text-xs text-slate-500">{vendorState.sector}</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
-                  {vendorState.plan} plan
+                <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${
+                  vendorState.plan === 'vendor_active'
+                    ? 'text-emerald-400 bg-emerald-500/10'
+                    : vendorState.plan === 'pdpa_monitor'
+                    ? 'text-blue-400 bg-blue-500/10'
+                    : vendorState.plan === 'enterprise' || vendorState.plan === 'enterprise_pro'
+                    ? 'text-violet-400 bg-violet-500/10'
+                    : 'text-slate-400 bg-slate-800'
+                }`}>
+                  {vendorState.plan === 'vendor_active' ? 'Vendor Active' :
+                   vendorState.plan === 'pdpa_monitor' ? 'PDPA Monitor' :
+                   vendorState.plan === 'enterprise' ? 'Enterprise' :
+                   vendorState.plan === 'enterprise_pro' ? 'Enterprise Pro' :
+                   vendorState.plan + ' plan'}
                 </span>
               </div>
               <div className="mt-2">
@@ -283,6 +295,131 @@ export default function VendorDashboard() {
             </div>
           </div>
         </div>
+
+        {/* ── Vendor Active Subscription Panel ───────────────────────── */}
+        {vendorState?.plan === "vendor_active" && (
+          <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-5">
+            <div className="flex items-center gap-3 mb-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-emerald-400" />
+                <span className="text-sm font-bold text-white">Vendor Active</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Subscription Active</span>
+              </div>
+              <span className="ml-auto text-xs text-neutral-500">Health check runs on the 1st of each month</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {/* Health check */}
+              <div className="flex items-start gap-2.5 bg-neutral-900/50 rounded-lg p-3">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium text-xs">Profile health check</div>
+                  <div className="text-neutral-500 text-[11px] mt-0.5">Auto re-scores monthly</div>
+                  <div className="text-emerald-400 text-[11px] font-semibold mt-1">
+                    Current score: {vendorState.trustScore}/100
+                  </div>
+                </div>
+              </div>
+              {/* Competitor alert */}
+              <div className="flex items-start gap-2.5 bg-neutral-900/50 rounded-lg p-3">
+                {vendorState.competitorElevated
+                  ? <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                  : <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                }
+                <div>
+                  <div className="text-white font-medium text-xs">Competitor alert</div>
+                  <div className="text-neutral-500 text-[11px] mt-0.5">Sector peer activity</div>
+                  <div className={`text-[11px] font-semibold mt-1 ${vendorState.competitorElevated ? 'text-amber-400' : 'text-neutral-400'}`}>
+                    {vendorState.elevatedPeers > 0
+                      ? `${vendorState.elevatedPeers} peers elevated`
+                      : 'No changes this cycle'}
+                  </div>
+                </div>
+              </div>
+              {/* Shortlist priority */}
+              <div className="flex items-start gap-2.5 bg-neutral-900/50 rounded-lg p-3">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium text-xs">Shortlist priority</div>
+                  <div className="text-neutral-500 text-[11px] mt-0.5">Strategy 1 &amp; 6</div>
+                  <div className="text-emerald-400 text-[11px] font-semibold mt-1">
+                    Ahead of STANDARD vendors
+                  </div>
+                </div>
+              </div>
+              {/* Monthly metrics */}
+              <div className="flex items-start gap-2.5 bg-neutral-900/50 rounded-lg p-3">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium text-xs">Monthly metrics</div>
+                  <div className="text-neutral-500 text-[11px] mt-0.5">Sector rank &amp; views</div>
+                  <div className="text-emerald-400 text-[11px] font-semibold mt-1">
+                    {vendorState.sectorPercentile}th percentile · {vendorState.enterpriseViews7d} views
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── PDPA Monitor Subscription Panel ────────────────────────── */}
+        {vendorState?.plan === "pdpa_monitor" && (
+          <div className="rounded-xl border border-blue-500/20 bg-blue-950/20 p-5">
+            <div className="flex items-center gap-3 mb-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-blue-400" />
+                <span className="text-sm font-bold text-white">PDPA Monitor</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full">Subscription Active</span>
+              </div>
+              <span className="ml-auto text-xs text-neutral-500">Quarterly re-scans on 1 Jan, Apr, Jul, Oct</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {/* Quarterly re-scan */}
+              <div className="flex items-start gap-2.5 bg-neutral-900/50 rounded-lg p-3">
+                <CheckCircle2 className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium text-xs">Quarterly re-scan</div>
+                  <div className="text-neutral-500 text-[11px] mt-0.5">Auto PDPA scan · SGD 79 value</div>
+                  <div className="text-blue-400 text-[11px] font-semibold mt-1">
+                    {vendorState.pdpaLastScan
+                      ? `Last: ${new Date(vendorState.pdpaLastScan).toLocaleDateString('en-SG', { month: 'short', year: 'numeric' })}`
+                      : 'Runs next quarter'}
+                  </div>
+                </div>
+              </div>
+              {/* Monthly regulatory alert */}
+              <div className="flex items-start gap-2.5 bg-neutral-900/50 rounded-lg p-3">
+                <CheckCircle2 className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium text-xs">Regulatory alerts</div>
+                  <div className="text-neutral-500 text-[11px] mt-0.5">Monthly PDPC updates</div>
+                  <div className="text-blue-400 text-[11px] font-semibold mt-1">Delivered by email</div>
+                </div>
+              </div>
+              {/* Score trending */}
+              <div className="flex items-start gap-2.5 bg-neutral-900/50 rounded-lg p-3">
+                <TrendingUp className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium text-xs">Score trending</div>
+                  <div className="text-neutral-500 text-[11px] mt-0.5">Compliance over time</div>
+                  <div className="text-blue-400 text-[11px] font-semibold mt-1">
+                    Current: {vendorState.trustScore}/100
+                  </div>
+                </div>
+              </div>
+              {/* PDF download */}
+              <div className="flex items-start gap-2.5 bg-neutral-900/50 rounded-lg p-3">
+                <CheckCircle2 className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="text-white font-medium text-xs">PDF report</div>
+                  <div className="text-neutral-500 text-[11px] mt-0.5">Always current</div>
+                  <div className="text-blue-400 text-[11px] font-semibold mt-1">
+                    {vendorState.pdpaLastScan ? 'Download from Reports' : 'Available after first scan'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── Vendor Proof Activation Panel ─────────────────────────── */}
         {badge?.active && (
