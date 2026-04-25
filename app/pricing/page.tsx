@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 type Tab =
@@ -49,6 +49,21 @@ async function startCheckout(productType: string): Promise<void> {
 export default function PricingPage() {
 	const [activeTab, setActiveTab] = useState<Tab>("oneoff");
 	const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
+	const [loggedIn, setLoggedIn] = useState(false);
+	const [userPlan, setUserPlan] = useState<string | null>(null);
+
+	// Check auth on mount so we can swap CTAs for logged-in users and hide active subscription buttons
+	useEffect(() => {
+		fetch("/api/auth/me")
+			.then((r) => r.ok ? r.json() : null)
+			.then((d) => {
+				if (d && !d.error) {
+					setLoggedIn(true);
+					if (d.plan) setUserPlan(d.plan);
+				}
+			})
+			.catch(() => {});
+	}, []);
 
 	// Find My Plan wizard
 	const [wizardOpen, setWizardOpen] = useState(false);
@@ -262,9 +277,15 @@ export default function PricingPage() {
 												<CheckItem key={f} text={f} />
 											))}
 										</ul>
-										<Link href="/auth/register" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm">
-											Claim Profile
-										</Link>
+										{loggedIn ? (
+											<Link href="/vendor/dashboard" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm">
+												Go to Dashboard →
+											</Link>
+										) : (
+											<Link href="/auth/register" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm">
+												Claim Profile
+											</Link>
+										)}
 									</div>
 
 									<div className="bg-[#0f172a] p-8 rounded-[2rem] border-2 border-[#10b981] shadow-2xl relative hover:-translate-y-1 transition-all">
@@ -933,26 +954,37 @@ export default function PricingPage() {
 											Vendor Proof (SGD 149) is the entry credential. Vendor
 											Active is the ongoing monitoring layer. Both can coexist.
 										</p>
-										<div className="flex flex-col gap-3">
-											<button
-												onClick={() => handleCheckout("vendor_active_monthly")}
-												disabled={loadingProduct === "vendor_active_monthly"}
-												className="block w-full text-center bg-[#10b981] hover:bg-[#059669] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
-											>
-												{loadingProduct === "vendor_active_monthly"
-													? "Redirecting…"
-													: "Start Monthly — SGD 39/mo"}
-											</button>
-											<button
-												onClick={() => handleCheckout("vendor_active_annual")}
-												disabled={loadingProduct === "vendor_active_annual"}
-												className="block w-full text-center border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/5 disabled:opacity-60 font-semibold py-3 rounded-xl transition text-sm"
-											>
-												{loadingProduct === "vendor_active_annual"
-													? "Redirecting…"
-													: "Annual — SGD 390/yr (save SGD 78)"}
-											</button>
-										</div>
+										{userPlan === "vendor_active" ? (
+											<div className="flex flex-col gap-3">
+												<div className="w-full text-center bg-[#10b981]/10 border border-[#10b981]/30 text-[#10b981] font-bold py-3 rounded-xl text-sm">
+													✓ Subscription Active
+												</div>
+												<Link href="/vendor/dashboard" className="block w-full text-center border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/5 font-semibold py-3 rounded-xl transition text-sm">
+													Manage Subscription →
+												</Link>
+											</div>
+										) : (
+											<div className="flex flex-col gap-3">
+												<button
+													onClick={() => handleCheckout("vendor_active_monthly")}
+													disabled={loadingProduct === "vendor_active_monthly"}
+													className="block w-full text-center bg-[#10b981] hover:bg-[#059669] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
+												>
+													{loadingProduct === "vendor_active_monthly"
+														? "Redirecting…"
+														: "Start Monthly — SGD 39/mo"}
+												</button>
+												<button
+													onClick={() => handleCheckout("vendor_active_annual")}
+													disabled={loadingProduct === "vendor_active_annual"}
+													className="block w-full text-center border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/5 disabled:opacity-60 font-semibold py-3 rounded-xl transition text-sm"
+												>
+													{loadingProduct === "vendor_active_annual"
+														? "Redirecting…"
+														: "Annual — SGD 390/yr (save SGD 78)"}
+												</button>
+											</div>
+										)}
 									</div>
 								</div>
 
@@ -1001,26 +1033,37 @@ export default function PricingPage() {
 											plan: SGD 490. For vendors in healthcare, fintech, HR
 											tech, or professional services.
 										</p>
-										<div className="flex flex-col gap-3">
-											<button
-												onClick={() => handleCheckout("pdpa_monitor_monthly")}
-												disabled={loadingProduct === "pdpa_monitor_monthly"}
-												className="block w-full text-center bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
-											>
-												{loadingProduct === "pdpa_monitor_monthly"
-													? "Redirecting…"
-													: "Start Monthly — SGD 49/mo"}
-											</button>
-											<button
-												onClick={() => handleCheckout("pdpa_monitor_annual")}
-												disabled={loadingProduct === "pdpa_monitor_annual"}
-												className="block w-full text-center border border-blue-400 text-blue-600 hover:bg-blue-50 disabled:opacity-60 font-semibold py-3 rounded-xl transition text-sm"
-											>
-												{loadingProduct === "pdpa_monitor_annual"
-													? "Redirecting…"
-													: "Annual — SGD 490/yr (save SGD 98)"}
-											</button>
-										</div>
+										{userPlan === "pdpa_monitor" ? (
+											<div className="flex flex-col gap-3">
+												<div className="w-full text-center bg-blue-500/10 border border-blue-400/30 text-blue-600 font-bold py-3 rounded-xl text-sm">
+													✓ Subscription Active
+												</div>
+												<Link href="/vendor/dashboard" className="block w-full text-center border border-blue-400 text-blue-600 hover:bg-blue-50 font-semibold py-3 rounded-xl transition text-sm">
+													Manage Subscription →
+												</Link>
+											</div>
+										) : (
+											<div className="flex flex-col gap-3">
+												<button
+													onClick={() => handleCheckout("pdpa_monitor_monthly")}
+													disabled={loadingProduct === "pdpa_monitor_monthly"}
+													className="block w-full text-center bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
+												>
+													{loadingProduct === "pdpa_monitor_monthly"
+														? "Redirecting…"
+														: "Start Monthly — SGD 49/mo"}
+												</button>
+												<button
+													onClick={() => handleCheckout("pdpa_monitor_annual")}
+													disabled={loadingProduct === "pdpa_monitor_annual"}
+													className="block w-full text-center border border-blue-400 text-blue-600 hover:bg-blue-50 disabled:opacity-60 font-semibold py-3 rounded-xl transition text-sm"
+												>
+													{loadingProduct === "pdpa_monitor_annual"
+														? "Redirecting…"
+														: "Annual — SGD 490/yr (save SGD 98)"}
+												</button>
+											</div>
+										)}
 									</div>
 								</div>
 							</div>
