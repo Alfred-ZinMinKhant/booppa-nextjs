@@ -996,9 +996,12 @@ export default function PricingPage() {
 												PDPA Monitor
 											</h3>
 											<span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-600">
-												Compliance
+												Optional
 											</span>
 										</div>
+										<p className="text-sm text-[#64748b] mb-3">
+											Your PDPA scan will expire — keep it current automatically
+										</p>
 										<div className="flex items-end gap-4">
 											<div>
 												<span className="text-4xl font-black text-[#0f172a]">
@@ -1015,6 +1018,10 @@ export default function PricingPage() {
 										</div>
 									</div>
 									<div className="p-8">
+										<p className="text-xs text-[#94a3b8] mb-4 leading-relaxed">
+											Buyers check scan dates. A scan older than 6 months raises flags.
+											PDPA Monitor re-scans quarterly so your report is always fresh.
+										</p>
 										<p className="text-sm font-semibold text-[#0f172a] mb-4">
 											What you receive every month:
 										</p>
@@ -1023,7 +1030,7 @@ export default function PricingPage() {
 												"Quarterly automatic re-scan — full PDPA Snapshot every 3 months (SGD 79 value each)",
 												"Monthly regulatory alert — plain-language summary of new PDPC guidelines relevant to your sector",
 												"Score trending — running chart of complianceScore over time on your dashboard",
-												"Current PDF report available for download and sharing with buyers at any time",
+												"Shareable PDF report — always current, ready to send to any buyer on demand",
 											].map((f) => (
 												<CheckItem key={f} text={f} color="text-blue-500" />
 											))}

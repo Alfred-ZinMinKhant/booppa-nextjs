@@ -59,6 +59,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // ── Government Buyer routes ───────────────────────────────────────────────
+  // /buyer/dashboard requires a GOV_BUYER role cookie
+  if (pathname.startsWith('/buyer')) {
+    const govBuyerToken = request.cookies.get('gov_buyer_token')?.value
+    if (!govBuyerToken) {
+      const redirectUrl = new URL('/government', request.url)
+      redirectUrl.searchParams.set('from', pathname)
+      return NextResponse.redirect(redirectUrl)
+    }
+    return NextResponse.next()
+  }
+
   // Protected route — must have token
   if (!token) {
     const loginUrl = new URL('/login', request.url)
