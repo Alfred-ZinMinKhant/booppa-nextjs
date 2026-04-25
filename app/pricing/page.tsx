@@ -63,6 +63,30 @@ export default function PricingPage() {
 				}
 			})
 			.catch(() => {});
+
+		// Fetch subscription families + dashboard alerts to detect active subscriptions by price ID.
+		Promise.all([
+			fetch('/api/v1/subscription-families').then(r => r.ok ? r.json() : {}),
+			fetch('/api/v1/vendor/dashboard-alerts').then(r => r.ok ? r.json() : {}),
+		])
+			.then(([families = {}, alerts = {}]) => {
+				try {
+					const subs = alerts?.subscriptions || [];
+					const pdpaPrices = new Set((families.pdpa_family || []).filter(Boolean));
+					const vendorPrices = new Set((families.vendor_family || []).filter(Boolean));
+					const enterprisePrices = new Set((families.enterprise_family || []).filter(Boolean));
+
+					if (subs.some((s: any) => {
+						const priceId = (s.price_id || s.priceId || (s.metadata && s.metadata.price_id) || '').toString();
+						const productType = (s.tier || s.plan || s.product_type || '').toString().toLowerCase();
+						if (!priceId) return /pdpa|pdpa_monitor|vendor|enterprise/.test(productType);
+						return pdpaPrices.has(priceId) || vendorPrices.has(priceId) || enterprisePrices.has(priceId);
+					})) {
+						setUserPlan('pdpa_monitor');
+					}
+				} catch (e) {}
+			})
+			.catch(() => {});
 	}, []);
 
 	// Find My Plan wizard
