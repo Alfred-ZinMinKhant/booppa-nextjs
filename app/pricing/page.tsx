@@ -77,8 +77,8 @@ export default function PricingPage() {
 
 		// Fetch dashboard alerts to get activeSubscriptions from the Subscription table
 		fetch('/api/v1/vendor/dashboard-alerts')
-			.then(r => r.ok ? r.json() : {})
-			.then((alerts) => {
+			.then(r => r.ok ? r.json() : null)
+			.then((alerts: any) => {
 				const subs: string[] = alerts?.activeSubscriptions || [];
 				if (subs.length > 0) setActiveSubs(subs);
 			})
