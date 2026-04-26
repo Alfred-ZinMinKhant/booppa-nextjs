@@ -50,41 +50,23 @@ export default function PricingPage() {
 	const [activeTab, setActiveTab] = useState<Tab>("oneoff");
 	const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
 	const [loggedIn, setLoggedIn] = useState(false);
-	const [userPlan, setUserPlan] = useState<string | null>(null);
+	const [activeSubs, setActiveSubs] = useState<string[]>([]);
 
-	// Check auth on mount so we can swap CTAs for logged-in users and hide active subscription buttons
+	// Check auth on mount so we can swap CTAs for logged-in users and detect active subscriptions
 	useEffect(() => {
 		fetch("/api/auth/me")
 			.then((r) => r.ok ? r.json() : null)
 			.then((d) => {
-				if (d && !d.error) {
-					setLoggedIn(true);
-					if (d.plan) setUserPlan(d.plan);
-				}
+				if (d && !d.error) setLoggedIn(true);
 			})
 			.catch(() => {});
 
-		// Fetch subscription families + dashboard alerts to detect active subscriptions by price ID.
-		Promise.all([
-			fetch('/api/v1/subscription-families').then(r => r.ok ? r.json() : {}),
-			fetch('/api/v1/vendor/dashboard-alerts').then(r => r.ok ? r.json() : {}),
-		])
-			.then(([families = {}, alerts = {}]) => {
-				try {
-					const subs = alerts?.subscriptions || [];
-					const pdpaPrices = new Set((families.pdpa_family || []).filter(Boolean));
-					const vendorPrices = new Set((families.vendor_family || []).filter(Boolean));
-					const enterprisePrices = new Set((families.enterprise_family || []).filter(Boolean));
-
-					if (subs.some((s: any) => {
-						const priceId = (s.price_id || s.priceId || (s.metadata && s.metadata.price_id) || '').toString();
-						const productType = (s.tier || s.plan || s.product_type || '').toString().toLowerCase();
-						if (!priceId) return /pdpa|pdpa_monitor|vendor|enterprise/.test(productType);
-						return pdpaPrices.has(priceId) || vendorPrices.has(priceId) || enterprisePrices.has(priceId);
-					})) {
-						setUserPlan('pdpa_monitor');
-					}
-				} catch (e) {}
+		// Fetch dashboard alerts to get activeSubscriptions from the Subscription table
+		fetch('/api/v1/vendor/dashboard-alerts')
+			.then(r => r.ok ? r.json() : {})
+			.then((alerts) => {
+				const subs: string[] = alerts?.activeSubscriptions || [];
+				if (subs.length > 0) setActiveSubs(subs);
 			})
 			.catch(() => {});
 	}, []);
@@ -978,7 +960,7 @@ export default function PricingPage() {
 											Vendor Proof (SGD 149) is the entry credential. Vendor
 											Active is the ongoing monitoring layer. Both can coexist.
 										</p>
-										{userPlan === "vendor_active" ? (
+										{activeSubs.includes("vendor_active") ? (
 											<div className="flex flex-col gap-3">
 												<div className="w-full text-center bg-[#10b981]/10 border border-[#10b981]/30 text-[#10b981] font-bold py-3 rounded-xl text-sm">
 													✓ Subscription Active
@@ -1064,7 +1046,7 @@ export default function PricingPage() {
 											plan: SGD 490. For vendors in healthcare, fintech, HR
 											tech, or professional services.
 										</p>
-										{userPlan === "pdpa_monitor" ? (
+										{activeSubs.includes("pdpa_monitor") ? (
 											<div className="flex flex-col gap-3">
 												<div className="w-full text-center bg-blue-500/10 border border-blue-400/30 text-blue-600 font-bold py-3 rounded-xl text-sm">
 													✓ Subscription Active

@@ -5,6 +5,8 @@ export interface VendorState {
   trustScore: number;
   verificationDepth: string;
   pdpaLastScan: string | null;
+  pdpaReportUrl: string | null;
+  pdpaReportId: string | null;
   notarizationCount: number;
   rfpCount: number;
   lastTenderCheck: string | null;
@@ -16,6 +18,7 @@ export interface VendorState {
   competitorElevated: boolean;
   elevatedPeers: number;
   daysToRenewal: number | null;
+  activeSubscriptions: string[];
   subscriptions: string[];
 }
 

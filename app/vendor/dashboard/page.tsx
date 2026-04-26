@@ -204,28 +204,21 @@ export default function VendorDashboard() {
 								<span className="text-xs text-slate-500">
 									{vendorState.sector}
 								</span>
-								<span
-									className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${
-										vendorState.plan === "vendor_active"
-											? "text-emerald-400 bg-emerald-500/10"
-											: vendorState.plan === "pdpa_monitor"
-												? "text-blue-400 bg-blue-500/10"
-												: vendorState.plan === "enterprise" ||
-														vendorState.plan === "enterprise_pro"
-													? "text-violet-400 bg-violet-500/10"
-													: "text-slate-400 bg-slate-800"
-									}`}
-								>
-									{vendorState.plan === "vendor_active"
-										? "Vendor Active"
-										: vendorState.plan === "pdpa_monitor"
-											? "PDPA Monitor"
-											: vendorState.plan === "enterprise"
-												? "Enterprise"
-												: vendorState.plan === "enterprise_pro"
-													? "Enterprise Pro"
-													: vendorState.plan + " plan"}
-								</span>
+								{(() => {
+									const subs: string[] = vendorState.activeSubscriptions || [];
+									const p = vendorState.plan || "";
+									const badges: { label: string; cls: string }[] = [];
+									if (subs.includes("vendor_active")) badges.push({ label: "Vendor Active", cls: "text-emerald-400 bg-emerald-500/10" });
+									if (subs.includes("pdpa_monitor")) badges.push({ label: "PDPA Monitor", cls: "text-blue-400 bg-blue-500/10" });
+									if (subs.includes("enterprise_pro")) badges.push({ label: "Enterprise Pro", cls: "text-violet-400 bg-violet-500/10" });
+									else if (subs.includes("enterprise")) badges.push({ label: "Enterprise", cls: "text-violet-400 bg-violet-500/10" });
+									if (badges.length === 0) badges.push({ label: (p || "free").replace("free", "Free") + " plan", cls: "text-slate-400 bg-slate-800" });
+									return badges.map(b => (
+										<span key={b.label} className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${b.cls}`}>
+											{b.label}
+										</span>
+									));
+								})()}
 							</div>
 							<div className="mt-2">
 								<DepthLadder current={vendorState.verificationDepth} />
@@ -399,7 +392,7 @@ export default function VendorDashboard() {
 				</div>
 
 				{/* ── Vendor Active Subscription Panel ───────────────────────── */}
-				{vendorState?.plan === "vendor_active" && (
+				{vendorState?.activeSubscriptions?.includes("vendor_active") && (
 					<div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-5">
 						<div className="flex items-center gap-3 mb-4 flex-wrap">
 							<div className="flex items-center gap-2">
@@ -525,7 +518,7 @@ export default function VendorDashboard() {
 				)}
 
 				{/* ── PDPA Monitor Subscription Panel ────────────────────────── */}
-				{vendorState?.plan === "pdpa_monitor" && (
+				{vendorState?.activeSubscriptions?.includes("pdpa_monitor") && (
 					<div className="rounded-xl border border-blue-500/20 bg-blue-950/20 p-5">
 						<div className="flex items-center gap-3 mb-4 flex-wrap">
 							<div className="flex items-center gap-2">
@@ -600,9 +593,22 @@ export default function VendorDashboard() {
 										Always current
 									</div>
 									<div className="text-blue-400 text-[11px] font-semibold mt-1">
-										{vendorState.pdpaLastScan
-											? "Download from Reports"
-											: "Available after first scan"}
+										{vendorState.pdpaReportUrl ? (
+											<a
+												href={vendorState.pdpaReportUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="underline hover:text-blue-300"
+											>
+												Download PDF &darr;
+											</a>
+										) : vendorState.pdpaLastScan ? (
+											<Link href="/compliance/locker" className="underline hover:text-blue-300">
+												View in Compliance Locker
+											</Link>
+										) : (
+											"Available after first scan"
+										)}
 									</div>
 								</div>
 							</div>
