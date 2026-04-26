@@ -61,10 +61,16 @@ const JOURNEY_STEPS = [
   { n: '4', label: 'Go Enterprise',      color: '#d97706', bg: '#fffbeb' },
 ];
 
+function formatNumber(n: number): string {
+  if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k+';
+  return n.toLocaleString();
+}
+
 export default function SolutionsVendorsPage() {
   const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState(false);
   const [hasClaimedProfile, setHasClaimedProfile] = useState(false);
+  const [stats, setStats] = useState({ vendorsIndexed: 0, verifiedEntities: 0, openTenders: 0 });
 
   // Wizard state
   const [wizardOpen, setWizardOpen]   = useState(false);
@@ -79,6 +85,11 @@ export default function SolutionsVendorsPage() {
         if (data.is_verified) setIsVerified(true);
         if (data.has_claimed_profile) setHasClaimedProfile(true);
       })
+      .catch(() => {});
+
+    fetch('/api/platform-stats')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setStats(data); })
       .catch(() => {});
   }, []);
 
@@ -117,11 +128,12 @@ export default function SolutionsVendorsPage() {
           <p className="text-lg text-white/60 mb-12 max-w-xl mx-auto leading-relaxed">
             Stop losing RFPs because of missing paperwork. Become procurement-ready in hours — not weeks.
           </p>
-          <div className="grid grid-cols-3 gap-6 max-w-xl mx-auto">
+          <div className="grid grid-cols-4 gap-6 max-w-2xl mx-auto">
             {[
-              { value: '30,000+', label: 'Vendors listed' },
-              { value: '1,000+',  label: 'Live tenders' },
-              { value: 'SGD 0',   label: 'To get started' },
+              { value: stats.vendorsIndexed ? formatNumber(stats.vendorsIndexed) : '...', label: 'Singapore vendors indexed' },
+              { value: stats.verifiedEntities ? formatNumber(stats.verifiedEntities) : '...', label: 'Booppa-verified entities' },
+              { value: stats.openTenders ? formatNumber(stats.openTenders) : '...', label: 'GeBIZ tenders tracked live' },
+              { value: 'S$0', label: 'Cost to government agencies' },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <div className="text-2xl lg:text-3xl font-black text-[#10b981]">{s.value}</div>
@@ -244,6 +256,10 @@ export default function SolutionsVendorsPage() {
 
           {/* Step 1: Get Verified */}
           <div className="mb-4">
+            <div className="bg-[#f0fdf4] border border-[#10b981]/20 rounded-xl px-5 py-4 mb-4 text-center">
+              <p className="text-[#0f172a] font-bold text-sm">Most vendors are invisible to buyers.</p>
+              <p className="text-[#10b981] font-semibold text-sm">Get verified and start appearing in procurement searches.</p>
+            </div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-7 h-7 rounded-full bg-[#10b981] flex items-center justify-center text-white text-xs font-black flex-shrink-0">1</div>
               <div>
@@ -295,10 +311,14 @@ export default function SolutionsVendorsPage() {
                   Get Verified →
                 </Link>
               )}
+              <p className="text-center text-xs text-white/40 mt-3">Next step → <a href="#vendor-trust-pack" className="text-[#10b981] hover:underline">Build Trust</a></p>
             </div>
 
             {/* Vendor Trust Pack */}
             <div id="vendor-trust-pack" className="bg-white p-8 rounded-3xl border-2 border-[#10b981] shadow-lg flex flex-col">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5 mb-4">
+                <p className="text-amber-800 text-xs font-semibold">Without compliance proof, buyers are unlikely to shortlist you.</p>
+              </div>
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/10 text-[#10b981]">Step 1+2 · Bundle · 32% off</span>
@@ -329,6 +349,7 @@ export default function SolutionsVendorsPage() {
               >
                 {loadingProduct === 'vendor_trust_pack' ? 'Redirecting…' : 'Build Trust →'}
               </button>
+              <p className="text-center text-xs text-[#94a3b8] mt-3">Next step → <a href="#rfp-accelerator" className="text-violet-500 hover:underline">Win Tenders</a></p>
             </div>
           </div>
 
@@ -365,6 +386,9 @@ export default function SolutionsVendorsPage() {
               <div className="absolute top-[-13px] left-8 bg-violet-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                 Most Popular
               </div>
+              <div className="bg-violet-50 border border-violet-200 rounded-lg px-4 py-2.5 mb-4 mt-2">
+                <p className="text-violet-800 text-xs font-semibold">Most vendors lose tenders because they are not prepared. This gives you a real advantage.</p>
+              </div>
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet-50 text-violet-600">Step 1→3 · Bundle · 27% off</span>
@@ -395,6 +419,7 @@ export default function SolutionsVendorsPage() {
               >
                 {loadingProduct === 'rfp_accelerator' ? 'Redirecting…' : 'Win More Tenders →'}
               </button>
+              <p className="text-center text-xs text-[#94a3b8] mt-3">Next step → <a href="#enterprise-bid-kit" className="text-amber-500 hover:underline">Go Enterprise</a></p>
             </div>
 
             {/* Enterprise Bid Kit */}
@@ -403,7 +428,7 @@ export default function SolutionsVendorsPage() {
                 <div>
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-600">Step 1→4 · Bundle · 31% off</span>
                   <h3 className="text-2xl font-black text-[#0f172a] mt-3">Enterprise Bid Kit</h3>
-                  <p className="text-[#64748b] text-sm mt-1">Best for: Enterprise vendors targeting high-value contracts of SGD 100k+</p>
+                  <p className="text-[#64748b] text-sm mt-1">Win larger contracts with full procurement support and certification-grade documentation.</p>
                 </div>
                 <div className="text-right flex-shrink-0 ml-4">
                   <div className="text-4xl font-black text-[#0f172a]">899</div>
@@ -432,10 +457,13 @@ export default function SolutionsVendorsPage() {
             </div>
           </div>
 
-          {/* Progression note */}
-          <p className="text-center text-xs text-[#94a3b8] mt-6">
-            Start small → upgrade as you grow. Every plan builds on the previous one.
-          </p>
+          {/* Social proof + progression note */}
+          <div className="text-center mt-8 space-y-2">
+            <p className="text-sm font-semibold text-[#0f172a]">Used by {stats.vendorsIndexed ? formatNumber(stats.vendorsIndexed) : '1,000+'} vendors across Singapore</p>
+            <p className="text-xs text-[#94a3b8]">
+              Start small → upgrade as you grow. Every plan builds on the previous one.
+            </p>
+          </div>
 
         </div>
       </section>

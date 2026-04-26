@@ -58,6 +58,7 @@ export default function PricingPage() {
 	const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [activeSubs, setActiveSubs] = useState<string[]>([]);
+	const [platformStats, setPlatformStats] = useState({ vendorsIndexed: 0, verifiedEntities: 0, openTenders: 0 });
 
 	// Check auth on mount so we can swap CTAs for logged-in users and detect active subscriptions
 	useEffect(() => {
@@ -66,6 +67,12 @@ export default function PricingPage() {
 			.then((d) => {
 				if (d && !d.error) setLoggedIn(true);
 			})
+			.catch(() => {});
+
+		// Fetch platform stats for real numbers
+		fetch('/api/platform-stats')
+			.then(r => r.ok ? r.json() : null)
+			.then(data => { if (data) setPlatformStats(data); })
 			.catch(() => {});
 
 		// Fetch dashboard alerts to get activeSubscriptions from the Subscription table
@@ -171,6 +178,13 @@ export default function PricingPage() {
 					{activeTab === "oneoff" && (
 						<div className="space-y-8">
 
+							{/* Social proof */}
+							<p className="text-center text-sm font-semibold text-[#0f172a] mb-4">
+							{platformStats.vendorsIndexed > 0
+								? `${platformStats.vendorsIndexed.toLocaleString()}+ vendors indexed across Singapore`
+								: "Used by 1,000+ vendors across Singapore"}
+						</p>
+
 							{/* ── Journey Path ── */}
 							<div className="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] px-6 py-5">
 								<p className="text-[10px] font-black text-[#94a3b8] uppercase tracking-widest mb-4 text-center">Your compliance journey — start small, upgrade as you grow</p>
@@ -263,6 +277,10 @@ export default function PricingPage() {
 
 							{/* ── Step 1: Get Verified ── */}
 							<div>
+								<div className="bg-[#f0fdf4] border border-[#10b981]/20 rounded-xl px-5 py-4 mb-4 text-center">
+									<p className="text-[#0f172a] font-bold text-sm">Most vendors are invisible to buyers.</p>
+									<p className="text-[#10b981] font-semibold text-sm">Get verified and start appearing in procurement searches.</p>
+								</div>
 								<div className="flex items-center gap-3 mb-4">
 									<div className="w-7 h-7 rounded-full bg-[#10b981] flex items-center justify-center text-white text-xs font-black flex-shrink-0">1</div>
 									<div>
@@ -343,6 +361,9 @@ export default function PricingPage() {
 
 							{/* ── Step 2: Build Credibility ── */}
 							<div>
+								<div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-3 mb-4 text-center">
+									<p className="text-blue-800 font-semibold text-sm">Without compliance proof, buyers are unlikely to shortlist you.</p>
+								</div>
 								<div className="flex items-center gap-3 mb-4">
 									<div className="w-7 h-7 rounded-full bg-[#3b82f6] flex items-center justify-center text-white text-xs font-black flex-shrink-0">2</div>
 									<div>
@@ -353,7 +374,7 @@ export default function PricingPage() {
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 									<div className="bg-white p-7 rounded-[2rem] border-2 border-blue-200 shadow-sm hover:-translate-y-1 hover:border-[#3b82f6] transition-all">
 										<h3 className="text-lg font-bold mb-1 text-[#0f172a]">PDPA Snapshot</h3>
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: Vendors who need documented PDPA evidence for buyer due diligence</p>
+										<p className="text-xs text-[#94a3b8] mb-3">Best for: Vendors preparing for compliance checks before tenders</p>
 										<div className="text-3xl font-black text-[#0f172a] mb-1">SGD 79</div>
 										<p className="text-xs text-[#64748b] mb-5">One-time scan</p>
 										<ul className="space-y-2 mb-6">
@@ -375,7 +396,7 @@ export default function PricingPage() {
 
 									<div className="bg-white p-7 rounded-[2rem] border-2 border-blue-200 shadow-sm hover:-translate-y-1 hover:border-[#3b82f6] transition-all">
 										<h3 className="text-lg font-bold mb-1 text-[#0f172a]">Notarization</h3>
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: Vendors certifying existing ISO, security or compliance documents on-chain</p>
+										<p className="text-xs text-[#94a3b8] mb-3">Best for: Proving document integrity to buyers and auditors</p>
 										<div className="text-3xl font-black text-[#0f172a] mb-1">SGD 69</div>
 										<p className="text-xs text-[#64748b] mb-5">Per document</p>
 										<ul className="space-y-2 mb-3">
@@ -406,6 +427,9 @@ export default function PricingPage() {
 
 							{/* ── Step 3 + 4: Win Tenders & Enterprise ── */}
 							<div>
+								<div className="bg-violet-50 border border-violet-200 rounded-xl px-5 py-3 mb-4 text-center">
+									<p className="text-violet-800 font-semibold text-sm">Most vendors lose tenders because they are not prepared. This gives you a real advantage.</p>
+								</div>
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
 									<div className="flex items-center gap-3">
 										<div className="w-7 h-7 rounded-full bg-[#7c3aed] flex items-center justify-center text-white text-xs font-black flex-shrink-0">3</div>
@@ -426,7 +450,7 @@ export default function PricingPage() {
 									<div className="bg-white p-7 rounded-[2rem] border-2 border-violet-300 shadow-xl relative hover:-translate-y-1 transition-all">
 										<div className="absolute top-[-12px] right-5 bg-violet-500 text-white px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">GeBIZ Ready</div>
 										<h3 className="text-lg font-bold mb-1 text-[#0f172a]">RFP Express</h3>
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: Vendors with an active GeBIZ tender who need a fast, structured bid package</p>
+										<p className="text-xs text-[#94a3b8] mb-3">Best for: Fast tender submissions</p>
 										<div className="text-3xl font-black text-[#0f172a] mb-1">SGD 249</div>
 										<p className="text-xs text-[#64748b] mb-5">Per RFP, delivered in minutes</p>
 										<ul className="space-y-2 mb-6">
@@ -451,7 +475,7 @@ export default function PricingPage() {
 									<div className="bg-white p-7 rounded-[2rem] border-2 border-amber-300 shadow-xl relative hover:-translate-y-1 transition-all">
 										<div className="absolute top-[-12px] right-5 bg-amber-500 text-white px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">High-Value Bids</div>
 										<h3 className="text-lg font-bold mb-1 text-[#0f172a]">RFP Complete</h3>
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: Enterprise vendors targeting contracts over SGD 100k who need a full dossier</p>
+										<p className="text-xs text-[#94a3b8] mb-3">Best for: Full submissions on high-value contracts</p>
 										<div className="text-3xl font-black text-[#0f172a] mb-1">SGD 599</div>
 										<p className="text-xs text-[#64748b] mb-5">Per RFP, full procurement dossier</p>
 										<ul className="space-y-2 mb-6">
@@ -492,8 +516,9 @@ export default function PricingPage() {
 									<p className="text-xs font-black text-[#10b981] uppercase tracking-widest mb-2">How it works</p>
 									<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a]">Three steps. One complete bid.</h2>
 									<p className="text-[#64748b] mt-2 max-w-xl mx-auto text-sm">
-										Each tool covers a different decision point. Used together, they turn a bare profile into a submission that procurement officers trust.
+										1. Run a compliance check &nbsp;→&nbsp; 2. Notarize your documents &nbsp;→&nbsp; 3. Submit stronger bids
 									</p>
+									<p className="text-[#94a3b8] mt-1 text-xs">Or start directly with RFP if you are ready.</p>
 								</div>
 
 								<div className="grid grid-cols-1 md:grid-cols-3 gap-0 relative">

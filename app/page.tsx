@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import HeroSection from "@/components/HeroSection";
 import ProcessPipeline from "@/components/home/ProcessPipeline";
@@ -11,6 +11,16 @@ import MiniDashboardMock from "@/components/home/MiniDashboardMock";
 
 export default function Home() {
 	const [activePreview, setActivePreview] = useState<string | null>(null);
+	const [vendorCount, setVendorCount] = useState("30,000+");
+
+	useEffect(() => {
+		fetch("/api/platform-stats")
+			.then(r => r.ok ? r.json() : null)
+			.then(data => {
+				if (data?.vendorsIndexed > 0) setVendorCount(data.vendorsIndexed.toLocaleString() + "+");
+			})
+			.catch(() => {});
+	}, []);
 
 	return (
 		<main className="overflow-x-hidden">
@@ -250,7 +260,7 @@ export default function Home() {
 							compliance report?
 						</h2>
 						<p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto">
-							Join 30,000+ vendors already using Booppa to prove their compliance and win more contracts.
+							Join {vendorCount} vendors already using Booppa to prove their compliance and win more contracts.
 						</p>
 						<div className="flex flex-wrap justify-center gap-6 mb-6">
 							<Link
