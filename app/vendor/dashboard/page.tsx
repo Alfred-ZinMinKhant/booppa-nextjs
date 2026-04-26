@@ -593,9 +593,9 @@ export default function VendorDashboard() {
 										Always current
 									</div>
 									<div className="text-blue-400 text-[11px] font-semibold mt-1">
-										{vendorState.pdpaReportUrl ? (
+										{vendorState.pdpaReportId ? (
 											<a
-												href={vendorState.pdpaReportUrl}
+												href={`${process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL || "https://api.booppa.io"}/api/v1/reports/${vendorState.pdpaReportId}/download`}
 												target="_blank"
 												rel="noopener noreferrer"
 												className="underline hover:text-blue-300"

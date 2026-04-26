@@ -172,7 +172,7 @@ export default function SolutionsProcurementPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 border border-blue-400 rounded-full text-sm font-medium text-blue-400 mb-8 bg-blue-500/10">
             For Buyers
           </div>
-          <h1 className="text-4xl lg:text-6xl font-black mb-6 leading-tight">
+          <h1 className="text-4xl lg:text-6xl font-black text-white mb-6 leading-tight">
             Reduce vendor risk.
             <br />
             <span className="text-blue-400">Evaluate faster.</span>
@@ -639,7 +639,7 @@ export default function SolutionsProcurementPage() {
       {/* CTA */}
       <section className="py-20 px-6 bg-[#0f172a] text-white text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl lg:text-5xl font-black mb-6">
+          <h2 className="text-3xl lg:text-5xl font-black text-white mb-6">
             Cut your vendor evaluation time in half.
           </h2>
           <p className="text-white/70 text-xl mb-10">

@@ -109,7 +109,7 @@ export default function SolutionsVendorsPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#10b981]/50 rounded-full text-sm font-medium text-[#10b981] mb-8 bg-[#10b981]/10">
             For Vendors &amp; SMEs
           </div>
-          <h1 className="text-4xl lg:text-6xl font-black mb-6 leading-tight">
+          <h1 className="text-4xl lg:text-6xl font-black  text-white mb-6 leading-tight">
             Verify your company.<br />
             <span className="text-[#10b981]">Prove your compliance.</span><br />
             Win more contracts.
@@ -445,7 +445,7 @@ export default function SolutionsVendorsPage() {
         <div className="max-w-2xl mx-auto">
           {hasClaimedProfile ? (
             <>
-              <h2 className="text-3xl lg:text-4xl font-black mb-4">You're all set</h2>
+              <h2 className="text-3xl lg:text-4xl font-black text-white mb-4">You're all set</h2>
               <p className="text-white/60 text-lg mb-10">Manage your vendor profile and explore opportunities from your dashboard.</p>
               <Link href="/vendor/dashboard" className="inline-block px-10 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-black text-lg rounded-2xl transition-colors shadow-lg shadow-[#10b981]/20">
                 Go to Dashboard →
@@ -453,7 +453,7 @@ export default function SolutionsVendorsPage() {
             </>
           ) : (
             <>
-              <h2 className="text-3xl lg:text-4xl font-black mb-4">Start with a free profile. Upgrade when you're ready.</h2>
+              <h2 className="text-3xl lg:text-4xl font-black text-white mb-4">Start with a free profile. Upgrade when you're ready.</h2>
               <p className="text-white/60 text-lg mb-10">No credit card required. Every step is self-serve and instant.</p>
               <Link href="/auth/register" className="inline-block px-10 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-black text-lg rounded-2xl transition-colors shadow-lg shadow-[#10b981]/20">
                 Claim your Company Profile (Free) →

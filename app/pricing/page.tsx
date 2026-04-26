@@ -25,19 +25,26 @@ function CheckItem({
 	);
 }
 
-async function startCheckout(productType: string): Promise<void> {
+async function startCheckout(productType: string, extraBody?: Record<string, string>): Promise<void> {
 	try {
 		const res = await fetch("/api/checkout", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ productType }),
+			body: JSON.stringify({ productType, ...extraBody }),
 		});
 		const data = await res.json();
 		if (data.url) {
 			window.location.href = data.url;
 		} else if (res.status === 409) {
-			// Already subscribed — redirect to dashboard instead of showing an error
 			window.location.href = "/vendor/dashboard";
+		} else if (res.status === 422 && /website/i.test(data.error || "")) {
+			// Backend needs a website URL for PDPA Monitor initial scan
+			const website = prompt(
+				"We need your website URL to run your first PDPA scan.\n\nEnter your website (e.g. https://example.com):"
+			);
+			if (website?.trim()) {
+				await startCheckout(productType, { website: website.trim() });
+			}
 		} else {
 			alert(data.error || "Unable to start checkout. Please try again.");
 		}

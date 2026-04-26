@@ -16,6 +16,29 @@ function normalizeUrl(input: string): string {
 	return url;
 }
 
+async function startPdpaCheckout(productType: string, extra?: Record<string, string>): Promise<void> {
+	const res = await fetch("/api/checkout", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ productType, ...extra }),
+	});
+	const data = await res.json();
+	if (data.url) {
+		window.location.href = data.url;
+	} else if (res.status === 422 && /website/i.test(data.error || "")) {
+		const website = prompt(
+			"We need your website URL to run your first PDPA scan.\n\nEnter your website (e.g. https://example.com):"
+		);
+		if (website?.trim()) {
+			await startPdpaCheckout(productType, { website: website.trim() });
+		}
+	} else if (res.status === 409) {
+		window.location.href = "/vendor/dashboard";
+	} else if (data.error) {
+		alert(data.error);
+	}
+}
+
 export default function PDPAPage() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [prefill, setPrefill] = useState<{
@@ -40,32 +63,15 @@ export default function PDPAPage() {
 			.catch(() => {});
 		// Check vendor subscriptions to hide upsell if already active
 		fetch("/api/v1/vendor/dashboard-alerts")
-			.then((r) => (r.ok ? r.json() : null))
-			// Check vendor subscriptions to hide upsell if already active.
-			// Use canonical families endpoint to match by Stripe price IDs when possible.
-			Promise.all([
-				fetch('/api/v1/subscription-families').then(r => r.ok ? r.json() : {}),
-				fetch('/api/v1/vendor/dashboard-alerts').then(r => r.ok ? r.json() : {}),
-			])
-				.then(([families = {}, alerts = {}]) => {
-					try {
-						const subs = alerts?.subscriptions || [];
-						const pdpaPrices = new Set((families.pdpa_family || []).filter(Boolean));
-						const vendorPrices = new Set((families.vendor_family || []).filter(Boolean));
-						const enterprisePrices = new Set((families.enterprise_family || []).filter(Boolean));
-
-						const has = subs.some((s: any) => {
-							const priceId = (s.price_id || s.priceId || (s.metadata && s.metadata.price_id) || '').toString();
-							const productType = (s.tier || s.plan || s.product_type || '').toString().toLowerCase();
-							if (!priceId) {
-								return /pdpa|pdpa_monitor|vendor|enterprise/.test(productType);
-							}
-							return pdpaPrices.has(priceId) || vendorPrices.has(priceId) || enterprisePrices.has(priceId);
-						});
-						setHasPdpaSubscription(Boolean(has));
-					} catch (e) {}
-				})
-				.catch(() => {});
+			.then((r) => (r.ok ? r.json() : {}))
+			.then((alerts) => {
+				const activeSubs: string[] = alerts?.activeSubscriptions || [];
+				if (activeSubs.includes("pdpa_monitor")) {
+					setHasPdpaSubscription(true);
+				}
+			})
+			.catch(() => {});
+	}, []);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -293,42 +299,14 @@ export default function PDPAPage() {
 								<>
 									<button
 										type="button"
-										onClick={async () => {
-											try {
-												const res = await fetch("/api/checkout", {
-													method: "POST",
-													headers: { "Content-Type": "application/json" },
-													body: JSON.stringify({
-														productType: "pdpa_monitor_monthly",
-													}),
-												});
-												const data = await res.json();
-												if (data.url) window.location.href = data.url;
-											} catch {
-												/* silent */
-											}
-										}}
+										onClick={() => startPdpaCheckout("pdpa_monitor_monthly")}
 										className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition text-sm whitespace-nowrap"
 									>
 										Subscribe — SGD 49/mo
 									</button>
 									<button
 										type="button"
-										onClick={async () => {
-											try {
-												const res = await fetch("/api/checkout", {
-													method: "POST",
-													headers: { "Content-Type": "application/json" },
-													body: JSON.stringify({
-														productType: "pdpa_monitor_annual",
-													}),
-												});
-												const data = await res.json();
-												if (data.url) window.location.href = data.url;
-											} catch {
-												/* silent */
-											}
-										}}
+										onClick={() => startPdpaCheckout("pdpa_monitor_annual")}
 										className="px-6 py-3 border border-blue-400 text-blue-600 hover:bg-blue-100 font-semibold rounded-xl transition text-sm whitespace-nowrap"
 									>
 										Annual — SGD 490/yr
