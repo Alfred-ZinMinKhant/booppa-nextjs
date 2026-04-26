@@ -63,8 +63,8 @@ export default function PDPAPage() {
 			.catch(() => {});
 		// Check vendor subscriptions to hide upsell if already active
 		fetch("/api/v1/vendor/dashboard-alerts")
-			.then((r) => (r.ok ? r.json() : {}))
-			.then((alerts) => {
+			.then((r) => (r.ok ? r.json() : null))
+			.then((alerts: any) => {
 				const activeSubs: string[] = alerts?.activeSubscriptions || [];
 				if (activeSubs.includes("pdpa_monitor")) {
 					setHasPdpaSubscription(true);
