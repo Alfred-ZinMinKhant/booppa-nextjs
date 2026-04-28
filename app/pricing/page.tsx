@@ -76,13 +76,17 @@ export default function PricingPage() {
 			.catch(() => {});
 
 		// Fetch dashboard alerts to get activeSubscriptions from the Subscription table
-		fetch('/api/v1/vendor/dashboard-alerts')
+		fetch(`/api/vendor/dashboard-alerts?t=${Date.now()}`)
 			.then(r => r.ok ? r.json() : null)
 			.then((alerts: any) => {
-				const subs: string[] = alerts?.activeSubscriptions || [];
-				if (subs.length > 0) setActiveSubs(subs);
+				const subs = alerts?.activeSubscriptions || [];
+				console.log("Pricing Page - Active Subscriptions:", subs);
+				setActiveSubs(subs);
 			})
-			.catch(() => {});
+			.catch(err => {
+				console.error("Pricing Page - Subscription Check Failed:", err);
+				setActiveSubs([]);
+			});
 	}, []);
 
 	// Find My Plan wizard

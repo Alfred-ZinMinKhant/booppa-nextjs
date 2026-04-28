@@ -62,15 +62,21 @@ export default function PDPAPage() {
 			})
 			.catch(() => {});
 		// Check vendor subscriptions to hide upsell if already active
-		fetch("/api/v1/vendor/dashboard-alerts")
+		fetch(`/api/vendor/dashboard-alerts?t=${Date.now()}`)
 			.then((r) => (r.ok ? r.json() : null))
 			.then((alerts: any) => {
 				const activeSubs: string[] = alerts?.activeSubscriptions || [];
+				console.log("PDPA Page - Active Subscriptions:", activeSubs);
 				if (activeSubs.some((s: string) => s.startsWith("pdpa_monitor"))) {
 					setHasPdpaSubscription(true);
+				} else {
+					setHasPdpaSubscription(false);
 				}
 			})
-			.catch(() => {});
+			.catch((err) => {
+				console.error("PDPA Page - Subscription Check Failed:", err);
+				setHasPdpaSubscription(false);
+			});
 	}, []);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -86,7 +86,7 @@ export default function VendorDashboard() {
 			})
 			.catch(() => {});
 
-		fetch("/api/vendor/dashboard-alerts")
+		fetch(`/api/vendor/dashboard-alerts?t=${Date.now()}`)
 			.then((res) => (res.ok ? res.json() : null))
 			.then((d) => {
 				if (d && !d.error) setVendorState(d);
