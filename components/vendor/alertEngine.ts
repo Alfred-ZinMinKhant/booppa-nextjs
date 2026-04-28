@@ -20,6 +20,7 @@ export interface VendorState {
   daysToRenewal: number | null;
   activeSubscriptions: string[];
   subscriptions: string[];
+  website: string | null;
 }
 
 export interface Alert {
