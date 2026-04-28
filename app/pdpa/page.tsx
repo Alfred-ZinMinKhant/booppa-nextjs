@@ -66,7 +66,7 @@ export default function PDPAPage() {
 			.then((r) => (r.ok ? r.json() : null))
 			.then((alerts: any) => {
 				const activeSubs: string[] = alerts?.activeSubscriptions || [];
-				if (activeSubs.includes("pdpa_monitor")) {
+				if (activeSubs.some((s: string) => s.startsWith("pdpa_monitor"))) {
 					setHasPdpaSubscription(true);
 				}
 			})

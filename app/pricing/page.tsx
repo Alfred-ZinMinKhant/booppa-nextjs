@@ -992,7 +992,7 @@ export default function PricingPage() {
 											Vendor Proof (SGD 149) is the entry credential. Vendor
 											Active is the ongoing monitoring layer. Both can coexist.
 										</p>
-										{activeSubs.includes("vendor_active") ? (
+										{activeSubs.some(s => s.startsWith("vendor_active")) ? (
 											<div className="flex flex-col gap-3">
 												<div className="w-full text-center bg-[#10b981]/10 border border-[#10b981]/30 text-[#10b981] font-bold py-3 rounded-xl text-sm">
 													✓ Subscription Active
@@ -1078,7 +1078,7 @@ export default function PricingPage() {
 											plan: SGD 490. For vendors in healthcare, fintech, HR
 											tech, or professional services.
 										</p>
-										{activeSubs.includes("pdpa_monitor") ? (
+										{activeSubs.some(s => s.startsWith("pdpa_monitor")) ? (
 											<div className="flex flex-col gap-3">
 												<div className="w-full text-center bg-blue-500/10 border border-blue-400/30 text-blue-600 font-bold py-3 rounded-xl text-sm">
 													✓ Subscription Active

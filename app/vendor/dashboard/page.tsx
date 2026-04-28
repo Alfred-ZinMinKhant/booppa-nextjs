@@ -208,10 +208,11 @@ export default function VendorDashboard() {
 									const subs: string[] = vendorState.activeSubscriptions || [];
 									const p = vendorState.plan || "";
 									const badges: { label: string; cls: string }[] = [];
-									if (subs.includes("vendor_active")) badges.push({ label: "Vendor Active", cls: "text-emerald-400 bg-emerald-500/10" });
-									if (subs.includes("pdpa_monitor")) badges.push({ label: "PDPA Monitor", cls: "text-blue-400 bg-blue-500/10" });
-									if (subs.includes("enterprise_pro")) badges.push({ label: "Enterprise Pro", cls: "text-violet-400 bg-violet-500/10" });
-									else if (subs.includes("enterprise")) badges.push({ label: "Enterprise", cls: "text-violet-400 bg-violet-500/10" });
+									if (subs.some(s => s.startsWith("vendor_active"))) badges.push({ label: "Vendor Active", cls: "text-emerald-400 bg-emerald-500/10" });
+									if (subs.some(s => s.startsWith("pdpa_monitor"))) badges.push({ label: "PDPA Monitor", cls: "text-blue-400 bg-blue-500/10" });
+									if (subs.some(s => s === "pro" || s.startsWith("intel_pro"))) badges.push({ label: "Intel Pro", cls: "text-blue-400 bg-blue-500/10 shadow-[0_0_10px_rgba(37,99,235,0.2)]" });
+									if (subs.some(s => s.startsWith("enterprise_pro"))) badges.push({ label: "Enterprise Pro", cls: "text-violet-400 bg-violet-500/10" });
+									else if (subs.some(s => s.startsWith("enterprise"))) badges.push({ label: "Enterprise", cls: "text-violet-400 bg-violet-500/10" });
 									if (badges.length === 0) badges.push({ label: (p || "free").replace("free", "Free") + " plan", cls: "text-slate-400 bg-slate-800" });
 									return badges.map(b => (
 										<span key={b.label} className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${b.cls}`}>
@@ -392,7 +393,7 @@ export default function VendorDashboard() {
 				</div>
 
 				{/* ── Vendor Active Subscription Panel ───────────────────────── */}
-				{vendorState?.activeSubscriptions?.includes("vendor_active") && (
+				{vendorState?.activeSubscriptions?.some(s => s.startsWith("vendor_active")) && (
 					<div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-5">
 						<div className="flex items-center gap-3 mb-4 flex-wrap">
 							<div className="flex items-center gap-2">
@@ -482,43 +483,10 @@ export default function VendorDashboard() {
 					</div>
 				)}
 
-				{/* List raw subscription records if available (from dashboard-alerts) */}
-				{vendorState?.subscriptions && vendorState.subscriptions.length > 0 && (
-					<div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">
-						<h3 className="text-sm text-neutral-300 font-semibold mb-3">
-							Active Subscriptions
-						</h3>
-						<div className="space-y-2">
-							{vendorState.subscriptions.map((s: any, idx: number) => (
-								<div
-									key={idx}
-									className="flex items-center justify-between bg-neutral-800/20 p-3 rounded"
-								>
-									<div>
-										<div className="text-sm font-medium text-white">
-											{s.tier || s.plan || s.price_id || "Subscription"}
-										</div>
-										{s.status && (
-											<div className="text-xs text-neutral-400">
-												Status: {s.status}
-											</div>
-										)}
-										{s.current_period_end && (
-											<div className="text-xs text-neutral-400">
-												Renews:{" "}
-												{new Date(s.current_period_end).toLocaleDateString()}
-											</div>
-										)}
-									</div>
-									<div className="text-xs text-neutral-400">{s.id || ""}</div>
-								</div>
-							))}
-						</div>
-					</div>
-				)}
+
 
 				{/* ── PDPA Monitor Subscription Panel ────────────────────────── */}
-				{vendorState?.activeSubscriptions?.includes("pdpa_monitor") && (
+				{vendorState?.activeSubscriptions?.some(s => s.startsWith("pdpa_monitor")) && (
 					<div className="rounded-xl border border-blue-500/20 bg-blue-950/20 p-5">
 						<div className="flex items-center gap-3 mb-4 flex-wrap">
 							<div className="flex items-center gap-2">
@@ -870,6 +838,110 @@ export default function VendorDashboard() {
 							</div>
 						</div>
 					</div>
+				</div>
+
+				{/* ── Subscription Management ─────────────────────────────── */}
+				<div className="pt-6 border-t border-neutral-800">
+					<h2 className="text-sm font-semibold text-neutral-400 mb-6">
+						Subscription Management
+					</h2>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+						{/* Vendor Active Card */}
+						<div className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden flex flex-col">
+							<div className="p-6 border-b border-neutral-800 flex items-start justify-between">
+								<div>
+									<h3 className="text-lg font-bold text-white">Vendor Active</h3>
+									<p className="text-xs text-neutral-500 mt-1">Ongoing monitoring layer</p>
+								</div>
+								{vendorState?.activeSubscriptions?.some(s => s.startsWith("vendor_active")) ? (
+									<span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Active</span>
+								) : (
+									<span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 bg-neutral-800 px-2 py-1 rounded">Available</span>
+								)}
+							</div>
+							<div className="p-6 flex-1 flex flex-col">
+								<ul className="space-y-3 mb-6 flex-1">
+									{[
+										"Profile health check — auto re-evaluation",
+										"Competitor alert — sector peer tracking",
+										"Shortlist priority — Strategy 1 & 6",
+										"Monthly metrics — search & sector views"
+									].map(f => (
+										<li key={f} className="flex items-start gap-2 text-xs text-neutral-400">
+											<CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
+											{f}
+										</li>
+									))}
+								</ul>
+								{!vendorState?.activeSubscriptions?.some(s => s.startsWith("vendor_active")) && (
+									<Link href="/pricing" className="w-full text-center py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-bold transition">
+										Upgrade — S$39/mo
+									</Link>
+								)}
+							</div>
+						</div>
+
+						{/* PDPA Monitor Card */}
+						<div className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden flex flex-col">
+							<div className="p-6 border-b border-neutral-800 flex items-start justify-between">
+								<div>
+									<h3 className="text-lg font-bold text-white">PDPA Monitor</h3>
+									<p className="text-xs text-neutral-500 mt-1">Automated quarterly re-scans</p>
+								</div>
+								{vendorState?.activeSubscriptions?.some(s => s.startsWith("pdpa_monitor")) ? (
+									<span className="text-[10px] font-bold uppercase tracking-widest text-blue-400 bg-blue-500/10 px-2 py-1 rounded">Active</span>
+								) : (
+									<span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 bg-neutral-800 px-2 py-1 rounded">Available</span>
+								)}
+							</div>
+							<div className="p-6 flex-1 flex flex-col">
+								<ul className="space-y-3 mb-6 flex-1">
+									{[
+										"Quarterly automatic re-scan (S$79 value)",
+										"Monthly regulatory alerts (PDPC)",
+										"Score trending chart on dashboard",
+										"Shareable PDF report — always current"
+									].map(f => (
+										<li key={f} className="flex items-start gap-2 text-xs text-neutral-400">
+											<CheckCircle2 className="h-3.5 w-3.5 text-blue-500 mt-0.5 flex-shrink-0" />
+											{f}
+										</li>
+									))}
+								</ul>
+								{!vendorState?.activeSubscriptions?.some(s => s.startsWith("pdpa_monitor")) && (
+									<Link href="/pdpa" className="w-full text-center py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold transition">
+										Activate — S$49/mo
+									</Link>
+								)}
+							</div>
+						</div>
+					</div>
+
+					{/* Raw Subscription List (Polished) */}
+					{vendorState?.subscriptions && vendorState.subscriptions.length > 0 && (
+						<div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 mb-8">
+							<p className="text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-3 px-1">Billing Records</p>
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+								{vendorState.subscriptions.map((s: any, idx: number) => (
+									<div key={idx} className="bg-neutral-800/30 p-3 rounded-lg border border-neutral-800/50">
+										<div className="flex items-center justify-between mb-1">
+											<span className="text-xs font-bold text-white capitalize">{s.tier || s.plan || s.price_id || "Subscription"}</span>
+											<span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${s.status === "active" ? "bg-emerald-500/10 text-emerald-400" : "bg-neutral-700 text-neutral-400"}`}>
+												{s.status}
+											</span>
+										</div>
+										<div className="text-[10px] text-neutral-500 font-mono mb-2">{s.id}</div>
+										{s.current_period_end && (
+											<div className="text-[10px] text-neutral-400 flex items-center justify-between">
+												<span>Renews:</span>
+												<span className="font-medium text-neutral-300">{new Date(s.current_period_end).toLocaleDateString()}</span>
+											</div>
+										)}
+									</div>
+								))}
+							</div>
+						</div>
+					)}
 				</div>
 
 				{/* ── V8 Trust & Activation Layer ─────────────────────────── */}
