@@ -488,19 +488,22 @@ export default function VendorDashboard() {
 				{/* ── PDPA Monitor Subscription Panel ────────────────────────── */}
 				{vendorState?.activeSubscriptions?.some(s => s.startsWith("pdpa_monitor")) && (
 					<div className="rounded-xl border border-blue-500/20 bg-blue-950/20 p-5">
-						<div className="flex items-center gap-3 mb-4 flex-wrap">
-							<div className="flex items-center gap-2">
-								<Shield className="h-4 w-4 text-blue-400" />
-								<span className="text-sm font-bold text-white">
-									PDPA Monitor
-								</span>
-								<span className="text-[10px] font-bold uppercase tracking-widest text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full">
-									Subscription Active
-								</span>
+						<div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+							<div className="flex items-center gap-3">
+								<div className="flex items-center gap-2">
+									<Shield className="h-4 w-4 text-blue-400" />
+									<span className="text-sm font-bold text-white uppercase tracking-tight">
+										PDPA Monitor Active
+									</span>
+								</div>
+								<div className="h-4 w-[1px] bg-neutral-800"></div>
+								<div className="text-xs text-blue-400 font-medium">
+									Monitoring: {vendorState.website || "Your Profile Website"}
+								</div>
 							</div>
-							<span className="ml-auto text-xs text-neutral-500">
+							<div className="text-[10px] text-neutral-500 bg-neutral-900 px-2 py-1 rounded border border-neutral-800">
 								Quarterly re-scans on 1 Jan, Apr, Jul, Oct
-							</span>
+							</div>
 						</div>
 						<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 							{/* Quarterly re-scan */}
@@ -558,7 +561,7 @@ export default function VendorDashboard() {
 										PDF report
 									</div>
 									<div className="text-neutral-500 text-[11px] mt-0.5">
-										Always current
+										{vendorState.pdpaReportWebsite || "Latest Report"}
 									</div>
 									<div className="text-blue-400 text-[11px] font-semibold mt-1">
 										{vendorState.pdpaReportId ? (
