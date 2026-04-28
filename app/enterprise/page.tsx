@@ -115,7 +115,7 @@ export default function EnterprisePage() {
 			</section>
 
 			{/* Pricing — Procurement Plans */}
-			<section id="pricing" className="py-20 px-6">
+			{/* <section id="pricing" className="py-20 px-6">
 				<div className="max-w-[1100px] mx-auto">
 					<div className="text-center mb-14">
 						<h2 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">
@@ -128,7 +128,7 @@ export default function EnterprisePage() {
 					</div>
 
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-						{/* 1 — Enterprise */}
+						
 						<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
 							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">
 								Enterprise
@@ -184,7 +184,7 @@ export default function EnterprisePage() {
 							)}
 						</div>
 
-						{/* 2 — Enterprise Pro */}
+					
 						<div className="bg-[#0f172a] p-8 rounded-[2rem] border-2 border-blue-500 shadow-2xl hover:-translate-y-1 transition-all relative flex flex-col">
 							<div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-blue-600 text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
 								Recommended
@@ -245,7 +245,7 @@ export default function EnterprisePage() {
 							)}
 						</div>
 
-						{/* 3 — Custom Enterprise */}
+					
 						<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
 							<h3 className="text-xl font-bold mb-3 text-[#0f172a]">
 								Custom Enterprise
@@ -288,7 +288,7 @@ export default function EnterprisePage() {
 						</div>
 					</div>
 				</div>
-			</section>
+			</section> */}
 
 			{/* Compliance Suites */}
 			<section className="py-20 px-6 bg-[#f8fafc]">

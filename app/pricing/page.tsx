@@ -1333,7 +1333,7 @@ export default function PricingPage() {
 					{activeTab === "enterprise" && (
 						<div className="space-y-16">
 							{/* Procurement Plans */}
-							<div>
+							{/* <div>
 								<div className="text-center mb-10">
 									<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">
 										Enterprise Buyer
@@ -1470,7 +1470,7 @@ export default function PricingPage() {
 										</Link>
 									</div>
 								</div>
-							</div>
+							</div> */}
 
 							{/* Compliance Suites */}
 							<div>
