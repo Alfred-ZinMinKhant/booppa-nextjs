@@ -21,6 +21,7 @@ export interface VendorState {
   activeSubscriptions: string[];
   subscriptions: string[];
   website: string | null;
+  pdpaReportWebsite: string | null;
 }
 
 export interface Alert {
