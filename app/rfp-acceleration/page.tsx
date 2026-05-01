@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { config } from '@/lib/config';
-import { POLYGON_NETWORK_NAME } from '@/lib/blockchain';
+import { POLYGON_NETWORK_NAME, POLYGON_EXPLORER_HOST } from '@/lib/blockchain';
 import HardenedClickwrap from '@/components/legal/HardenedClickwrap';
 
 function normalizeUrl(input: string): string {
@@ -606,7 +606,7 @@ export default function RFPAccelerationPage() {
               {
                 n: 4,
                 t: 'Independent, self-service verification',
-                d: 'No login required. Your buyer visits polygonscan.com, searches your TX ID, and sees the exact timestamp the evidence was anchored. This proves your PDPA assertions existed before your RFP submission.',
+                d: `No login required. Your buyer visits ${POLYGON_EXPLORER_HOST}, searches your TX ID, and sees the exact timestamp the evidence was anchored. This proves your PDPA assertions existed before your RFP submission.`,
               },
             ].map((step) => (
               <div key={step.n} className="flex gap-6">

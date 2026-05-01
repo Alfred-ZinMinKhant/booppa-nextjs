@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { config } from "@/lib/config";
+import { polygonscanTxUrl, POLYGON_NETWORK_NAME, POLYGON_EXPLORER_HOST } from "@/lib/blockchain";
 import Link from "next/link";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -447,8 +448,8 @@ function HowToVerify({ verification }: { verification: VerificationData | null }
      "macOS / Linux: shasum -a 256 filename.pdf\nWindows: CertUtil -hashfile filename.pdf SHA256"],
     ["Step 3 — Compare against the Evidence Hash on the certificate.",
      `The output must exactly match: ${auditHash}`],
-    ["Step 4 — Confirm the Transaction Hash on polygonscan.com.",
-     `Search ${txHash} on polygonscan.com. The block timestamp proves the earliest possible existence date. No login required.`],
+    [`Step 4 — Confirm the Transaction Hash on ${POLYGON_EXPLORER_HOST}.`,
+     `Search ${txHash} on ${POLYGON_EXPLORER_HOST}. The block timestamp proves the earliest possible existence date. No login required.`],
   ];
 
   return (
@@ -744,7 +745,7 @@ export default function ReportClient() {
             This document summarises a PDPA Quick Scan compliance audit performed by Booppa,
             translated into English and enriched with developer implementation tasks.
             It is intended to be forwarded directly to the development team.
-            The audit was anchored on the Polygon PoS blockchain for evidentiary integrity.
+            The audit was anchored on the Polygon Amoy Testnet blockchain for evidentiary integrity.
           </p>
         </div>
 
@@ -803,7 +804,7 @@ export default function ReportClient() {
           {findings.length > 0 ? (
             <>
               <p className="text-sm text-[#64748b] mb-4">
-                The following artifacts must be anchored on the Polygon PoS blockchain to create an immutable, court-admissible compliance trail:
+                The following artifacts must be anchored on the Polygon Amoy Testnet blockchain to create an immutable, court-admissible compliance trail:
               </p>
               <div className="overflow-x-auto rounded-xl border border-[#e2e8f0] mb-4">
                 <table className="w-full text-left text-sm border-collapse">
@@ -833,11 +834,11 @@ export default function ReportClient() {
             <div className="bg-[#f8fafc] rounded-xl border border-[#e2e8f0] p-5 mb-4">
               <div className="space-y-3">
                 {[
-                  ["Transaction Hash", <a key="tx" href={verification.polygonscan_url || `https://polygonscan.com/tx/${verification.tx_hash}`} target="_blank" rel="noreferrer" className="font-mono text-xs text-[#10b981] hover:underline break-all">{verification.tx_hash}</a>],
+                  ["Transaction Hash", <a key="tx" href={verification.polygonscan_url || polygonscanTxUrl(verification.tx_hash)} target="_blank" rel="noreferrer" className="font-mono text-xs text-[#10b981] hover:underline break-all">{verification.tx_hash}</a>],
                   ["Evidence Hash",    <span key="hash" className="font-mono text-xs text-[#64748b] break-all">{verification.audit_hash ?? report?.report_metadata?.report_id ?? "—"}</span>],
                   ["Hash Algorithm",   <span key="alg" className="text-sm text-[#334155]">SHA-256</span>],
                   ["Verification URL", verification.verify_url ? <a key="url" href={verification.verify_url} target="_blank" rel="noreferrer" className="text-sm text-[#10b981] hover:underline break-all">{verification.verify_url}</a> : <span key="url2" className="text-sm text-[#64748b]">—</span>],
-                  ["Anchored On",      <span key="anch" className="text-sm text-[#334155]">Polygon PoS · Immutable blockchain record</span>],
+                  ["Anchored On",      <span key="anch" className="text-sm text-[#334155]">Polygon Amoy Testnet · Immutable blockchain record</span>],
                 ].map(([label, val], i) => (
                   <div key={i} className="flex items-start gap-3">
                     <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide w-36 flex-shrink-0 pt-0.5">{label as string}</p>

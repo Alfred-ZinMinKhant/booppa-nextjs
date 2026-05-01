@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { POLYGON_NETWORK_NAME } from '@/lib/blockchain';
+import { POLYGON_NETWORK_NAME, polygonscanTxUrl } from '@/lib/blockchain';
 import {
   CheckCircle, Loader2, AlertTriangle, Download, ExternalLink,
   Shield, Copy, Check, FileText, ArrowUpRight,
@@ -260,7 +260,7 @@ function RFPResultContent() {
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500 w-36 shrink-0">Transaction Hash:</span>
                     <a
-                      href={result.polygonscan_url || `https://polygonscan.com/tx/${result.tx_hash}`}
+                      href={result.polygonscan_url || polygonscanTxUrl(result.tx_hash)}
                       target="_blank"
                       rel="noreferrer"
                       className="font-mono text-sky-400 hover:text-sky-300 transition flex items-center gap-1 break-all"
@@ -272,7 +272,7 @@ function RFPResultContent() {
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500 w-36 shrink-0">Verify on-chain:</span>
                     <a
-                      href={result.polygonscan_url || `https://polygonscan.com/tx/${result.tx_hash}`}
+                      href={result.polygonscan_url || polygonscanTxUrl(result.tx_hash)}
                       target="_blank"
                       rel="noreferrer"
                       className="text-emerald-400 hover:text-emerald-300 transition"

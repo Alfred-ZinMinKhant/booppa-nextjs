@@ -872,7 +872,7 @@ export default function PricingPage() {
 										</button>
 									</div>
 								</div>
-							</div>
+						</div>
 
 							{/* Savings table */}
 							<div className="overflow-x-auto rounded-2xl border border-[#e2e8f0]">
@@ -1331,8 +1331,235 @@ export default function PricingPage() {
 
 					{/* ── ENTERPRISE ───────────────────────────────────────────────── */}
 					{activeTab === "enterprise" && (
-						<div className="space-y-16">
-							{/* Procurement Plans */}
+						<div className="space-y-12">
+							{/* Header */}
+							<div className="text-center max-w-3xl mx-auto space-y-3">
+								<p className="text-xs font-bold tracking-widest uppercase text-[#10b981]">Singapore compliance infrastructure</p>
+								<h2 className="text-3xl lg:text-4xl font-black text-[#0f172a]">Everything Booppa offers</h2>
+								<p className="text-base text-[#64748b]">From a first compliance check to full enterprise infrastructure — one platform, blockchain-anchored evidence at every tier.</p>
+							</div>
+
+							{/* 6-card grid */}
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+								{/* Card 1 — PDPA Quick Scan */}
+								<div className="bg-white rounded-[2rem] border-2 border-[#10b981]/30 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:border-[#10b981] transition-all flex flex-col">
+									<div className="px-7 pt-7 pb-5">
+										<div className="flex items-center justify-between mb-5">
+											<div className="w-11 h-11 rounded-2xl bg-[#f0fdf4] border border-[#10b981]/20 flex items-center justify-center">
+												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#10b981" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="9" r="7.5" stroke="#10b981" strokeWidth="1"/></svg>
+											</div>
+											<span className="text-[10px] font-bold uppercase tracking-wider bg-[#f0fdf4] text-[#10b981] px-2.5 py-1 rounded-full border border-[#10b981]/20">Available now</span>
+										</div>
+										<h3 className="text-xl font-black text-[#0f172a] mb-1">PDPA Quick Scan</h3>
+										<p className="text-sm text-[#64748b] leading-relaxed mb-5">Automated PDPA compliance check for any Singapore website. Score 0–100 with blockchain-anchored proof in minutes.</p>
+										<div className="flex items-baseline gap-2 mb-5">
+											<span className="text-3xl font-black text-[#0f172a]">SGD 199</span>
+											<span className="text-sm text-[#94a3b8]">one-time</span>
+										</div>
+										<ul className="space-y-2.5 mb-6">
+											{["Public-facing compliance check", "Score + findings report (PDF)", "Polygon Amoy Testnet timestamp", "Independent hash verification"].map((f) => (
+												<li key={f} className="flex gap-2 items-start text-sm text-[#475569]"><span className="text-[#10b981] flex-shrink-0 font-bold">✓</span>{f}</li>
+											))}
+										</ul>
+									</div>
+									<div className="mt-auto px-7 pb-7 pt-4 border-t border-[#f1f5f9]">
+										<p className="text-xs text-[#94a3b8] mb-3">Best for: SMEs, awareness, first-step compliance</p>
+										<button
+											onClick={() => handleCheckout("pdpa_quick_scan")}
+											disabled={loadingProduct === "pdpa_quick_scan"}
+											className="block w-full text-center bg-[#10b981] hover:bg-[#059669] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/20 text-sm"
+										>
+											{loadingProduct === "pdpa_quick_scan" ? "Redirecting…" : "Run My Scan — SGD 199 →"}
+										</button>
+									</div>
+								</div>
+
+								{/* Card 2 — Compliance Bundle */}
+								<div className="bg-white rounded-[2rem] border-2 border-blue-200 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:border-blue-400 transition-all flex flex-col">
+									<div className="px-7 pt-7 pb-5">
+										<div className="flex items-center justify-between mb-5">
+											<div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center">
+												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="1.5" stroke="#3b82f6" strokeWidth="1.3"/><path d="M6 7h6M6 10h4" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round"/></svg>
+											</div>
+											<span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full border border-blue-200">3-doc pack</span>
+										</div>
+										<h3 className="text-xl font-black text-[#0f172a] mb-1">Compliance Bundle</h3>
+										<p className="text-sm text-[#64748b] leading-relaxed mb-5">Three-document procurement pack — PDPA scan + RFP Complete + Cover Sheet — blockchain anchored. Ready in 24 hours.</p>
+										<div className="flex items-baseline gap-2 mb-5">
+											<span className="text-3xl font-black text-[#0f172a]">SGD 599</span>
+											<span className="text-sm text-[#94a3b8]">one-time</span>
+										</div>
+										<ul className="space-y-2.5 mb-6">
+											{["PDPA Quick Scan included", "RFP Complete — 15 Q&A", "Compliance Cover Sheet v3", "All 3 documents on Amoy Testnet"].map((f) => (
+												<li key={f} className="flex gap-2 items-start text-sm text-[#475569]"><span className="text-[#10b981] flex-shrink-0 font-bold">✓</span>{f}</li>
+											))}
+										</ul>
+									</div>
+									<div className="mt-auto px-7 pb-7 pt-4 border-t border-[#f1f5f9]">
+										<p className="text-xs text-[#94a3b8] mb-3">Best for: tender response, vendor onboarding</p>
+										<button
+											onClick={() => handleCheckout("compliance_evidence_pack")}
+											disabled={loadingProduct === "compliance_evidence_pack"}
+											className="block w-full text-center bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/20 text-sm"
+										>
+											{loadingProduct === "compliance_evidence_pack" ? "Redirecting…" : "Get Bundle — SGD 599 →"}
+										</button>
+									</div>
+								</div>
+
+								{/* Card 3 — Standard Suite */}
+								<div className="bg-white rounded-[2rem] border-2 border-amber-200 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:border-amber-400 transition-all flex flex-col">
+									<div className="px-7 pt-7 pb-5">
+										<div className="flex items-center justify-between mb-5">
+											<div className="w-11 h-11 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center">
+												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M9 2l1.5 4.5H15l-3.75 2.7 1.5 4.5L9 11.1l-3.75 2.6 1.5-4.5L3 6.5h4.5L9 2z" stroke="#f59e0b" strokeWidth="1.3" strokeLinejoin="round"/></svg>
+											</div>
+											<span className="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full border border-amber-200">Suite</span>
+										</div>
+										<h3 className="text-xl font-black text-[#0f172a] mb-1">Standard Suite</h3>
+										<p className="text-sm text-[#64748b] leading-relaxed mb-5">MAS TRM 2021 workflows automated across all 13 domains. AI gap analysis. Blockchain evidence archive. API + webhooks.</p>
+										<div className="flex items-baseline gap-2 mb-5">
+											<span className="text-3xl font-black text-[#0f172a]">SGD 1,800</span>
+											<span className="text-sm text-[#94a3b8]">/month</span>
+										</div>
+										<ul className="space-y-2.5 mb-6">
+											{["MAS TRM — all 13 domains", "AI gap analysis (Claude Haiku)", "5,000 notarizations/month", "RESTful API + webhooks"].map((f) => (
+												<li key={f} className="flex gap-2 items-start text-sm text-[#475569]"><span className="text-[#10b981] flex-shrink-0 font-bold">✓</span>{f}</li>
+										))}
+										</ul>
+									</div>
+									<div className="mt-auto px-7 pb-7 pt-4 border-t border-[#f1f5f9]">
+										<p className="text-xs text-[#94a3b8] mb-3">Best for: banks, fintechs, healthcare — MAS regulated</p>
+										<button
+											onClick={() => handleCheckout("compliance_standard")}
+											disabled={loadingProduct === "compliance_standard"}
+											className="block w-full text-center bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-amber-500/20 text-sm"
+										>
+											{loadingProduct === "compliance_standard" ? "Redirecting…" : "Subscribe — SGD 1,800/mo →"}
+										</button>
+									</div>
+								</div>
+
+								{/* Card 4 — Pro Suite (Most Popular) */}
+								<div className="bg-[#0f172a] rounded-[2rem] border-2 border-blue-500 shadow-2xl overflow-hidden hover:-translate-y-1 transition-all flex flex-col relative">
+									<div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-500 to-violet-500 text-white text-center py-1.5 text-[10px] font-bold uppercase tracking-widest">
+										★ Most Popular
+									</div>
+									<div className="px-7 pt-12 pb-5">
+										<div className="flex items-center justify-between mb-5">
+											<div className="w-11 h-11 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center">
+												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="2" stroke="#60a5fa" strokeWidth="1.3"/><path d="M5 9h8M9 5v8" stroke="#60a5fa" strokeWidth="1.5" strokeLinecap="round"/></svg>
+											</div>
+											<span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 px-2.5 py-1 rounded-full border border-blue-500/30">Enterprise</span>
+										</div>
+										<h3 className="text-xl font-black text-white mb-1">Pro Suite</h3>
+										<p className="text-sm text-white/60 leading-relaxed mb-5">Full enterprise evidence infrastructure. SSO, white-label reports, multi-subsidiary management and unlimited notarizations.</p>
+										<div className="flex items-baseline gap-2 mb-5">
+											<span className="text-3xl font-black text-blue-400">SGD 4,500</span>
+											<span className="text-sm text-white/50">/month</span>
+										</div>
+										<ul className="space-y-2.5 mb-6">
+											<li className="text-xs font-bold text-white/80 uppercase tracking-wider">Everything in Standard, plus:</li>
+											{["SSO — SAML 2.0 + OIDC", "White-label reports", "Multi-subsidiary management", "Unlimited notarizations"].map((f) => (
+												<li key={f} className="flex gap-2 items-start text-sm text-white/80"><span className="text-blue-400 flex-shrink-0 font-bold">✓</span>{f}</li>
+											))}
+										</ul>
+									</div>
+									<div className="mt-auto px-7 pb-7 pt-4 border-t border-white/10">
+										<p className="text-xs text-white/40 mb-3">Best for: groups, GLC subsidiaries, corporate procurement</p>
+										<button
+											onClick={() => handleCheckout("compliance_pro")}
+											disabled={loadingProduct === "compliance_pro"}
+											className="block w-full text-center bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-500/40 text-sm"
+										>
+											{loadingProduct === "compliance_pro" ? "Redirecting…" : "Subscribe — SGD 4,500/mo →"}
+										</button>
+									</div>
+								</div>
+
+								{/* Card 5 — Custom Enterprise */}
+								<div className="bg-white rounded-[2rem] border-2 border-[#e2e8f0] shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:border-[#0f172a] transition-all flex flex-col">
+									<div className="px-7 pt-7 pb-5">
+										<div className="flex items-center justify-between mb-5">
+											<div className="w-11 h-11 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] flex items-center justify-center">
+												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M3 9a6 6 0 1 0 12 0A6 6 0 0 0 3 9z" stroke="#475569" strokeWidth="1.3"/><path d="M9 6v3l2 2" stroke="#475569" strokeWidth="1.5" strokeLinecap="round"/></svg>
+											</div>
+											<span className="text-[10px] font-bold uppercase tracking-wider bg-[#f8fafc] text-[#64748b] px-2.5 py-1 rounded-full border border-[#e2e8f0]">Custom</span>
+										</div>
+										<h3 className="text-xl font-black text-[#0f172a] mb-1">Custom Enterprise</h3>
+										<p className="text-sm text-[#64748b] leading-relaxed mb-5">On-premise deployment, 99.99% uptime SLA, 100,000+ notarizations/month, government agency pricing.</p>
+										<div className="flex items-baseline gap-2 mb-5">
+											<span className="text-3xl font-black text-[#0f172a]">Contact Us</span>
+										</div>
+										<ul className="space-y-2.5 mb-6">
+											{["Everything in Pro Suite", "On-premise infrastructure", "99.99% uptime SLA (multi-AZ)", "GeBIZ-ready documentation"].map((f) => (
+												<li key={f} className="flex gap-2 items-start text-sm text-[#475569]"><span className="text-[#10b981] flex-shrink-0 font-bold">✓</span>{f}</li>
+											))}
+										</ul>
+									</div>
+									<div className="mt-auto px-7 pb-7 pt-4 border-t border-[#f1f5f9]">
+										<p className="text-xs text-[#94a3b8] mb-3">Best for: government agencies, statutory boards</p>
+										<Link
+											href="/demo"
+											className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold py-3 rounded-xl transition text-sm"
+										>
+											Contact Sales →
+										</Link>
+									</div>
+								</div>
+
+								{/* Card 6 — Intent Intelligence Agent */}
+								<div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] rounded-[2rem] border-2 border-violet-500/40 shadow-2xl overflow-hidden hover:-translate-y-1 hover:border-violet-500 transition-all flex flex-col">
+									<div className="px-7 pt-7 pb-5">
+										<div className="flex items-center justify-between mb-5">
+											<div className="w-11 h-11 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center">
+												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2" fill="#a78bfa"/><circle cx="3" cy="5" r="1.5" stroke="#a78bfa" strokeWidth="1"/><circle cx="15" cy="5" r="1.5" stroke="#a78bfa" strokeWidth="1"/><circle cx="3" cy="13" r="1.5" stroke="#a78bfa" strokeWidth="1"/><circle cx="15" cy="13" r="1.5" stroke="#a78bfa" strokeWidth="1"/><path d="M4.2 5.8L7.5 7.5M10.5 7.5L13.8 5.8M4.2 12.2L7.5 10.5M10.5 10.5L13.8 12.2" stroke="#a78bfa" strokeWidth="0.8"/></svg>
+											</div>
+											<span className="text-[10px] font-bold uppercase tracking-wider bg-violet-500/20 text-violet-300 px-2.5 py-1 rounded-full border border-violet-500/30">Add-on · AI</span>
+										</div>
+										<h3 className="text-xl font-black text-white mb-1">Intent Intelligence Agent</h3>
+										<p className="text-sm text-white/60 leading-relaxed mb-5">Identifies which companies are visiting your site, scores their buying intent, and delivers a ranked lead list every morning.</p>
+										<div className="flex items-baseline gap-2 mb-5">
+											<span className="text-3xl font-black text-violet-400">Contact Us</span>
+										</div>
+										<ul className="space-y-2.5 mb-6">
+											{["Company-level IP identification", "Intent score + buying stage AI", "Real-time sales dashboard", "PDPA-compliant (IP anonymized)"].map((f) => (
+												<li key={f} className="flex gap-2 items-start text-sm text-white/80"><span className="text-violet-400 flex-shrink-0 font-bold">✓</span>{f}</li>
+											))}
+										</ul>
+									</div>
+									<div className="mt-auto px-7 pb-7 pt-4 border-t border-white/10">
+										<p className="text-xs text-white/40 mb-3">Available as add-on to any suite plan</p>
+										<Link
+											href="/demo"
+											className="block w-full text-center bg-violet-500 hover:bg-violet-400 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-violet-500/40 text-sm"
+										>
+											Request Access →
+										</Link>
+									</div>
+								</div>
+
+							</div>
+
+							{/* Stats bar */}
+							<div className="bg-[#f8fafc] rounded-[2rem] border border-[#e2e8f0] p-8">
+								<div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+									{[
+										{ value: "S$37", label: "Infrastructure floor cost / mo" },
+										{ value: "Minutes", label: "Time to first compliance output" },
+										{ value: "Polygon", label: "Amoy Testnet — blockchain anchoring" },
+										{ value: "MAS TRM", label: "2021 — all 13 domains covered" },
+									].map((stat) => (
+										<div key={stat.label} className="text-center">
+											<p className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-1">{stat.value}</p>
+											<p className="text-xs text-[#64748b] leading-relaxed">{stat.label}</p>
+										</div>
+									))}
+								</div>
+							</div>
+
+							{/* Legacy commented section kept for reference */}
 							{/* <div>
 								<div className="text-center mb-10">
 									<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">
@@ -1471,133 +1698,6 @@ export default function PricingPage() {
 									</div>
 								</div>
 							</div> */}
-
-							{/* Compliance Suites */}
-							<div>
-								<div className="text-center mb-10">
-									<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">
-										Compliance Suites
-									</h2>
-									<p className="text-[#64748b]">
-										Automated evidence & blockchain notarization infrastructure
-										for regulated organizations
-									</p>
-								</div>
-								<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-									<div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all">
-										<h3 className="text-xl font-bold mb-4 text-[#0f172a]">
-											Standard Suite
-										</h3>
-										<div className="text-4xl font-bold text-[#0f172a] mb-2">
-											Contact Us
-										</div>
-										<p className="text-sm text-[#64748b] mb-8">
-											MAS + MTCS operational workflows
-										</p>
-										<ul className="space-y-3 mb-10">
-											{[
-												"MAS Technology Risk Management (TRM) workflows",
-												"Cyber Hygiene monitoring (MAS Notice 644)",
-												"Third-party risk tracking (MAS Notice 655)",
-												"5,000 blockchain notarizations/month included",
-												"Enterprise dashboard (real-time)",
-												"Compliance health scoring (0-100)",
-												"Audit trail export (PDF + CSV)",
-												"Evidence archive (12 months retention)",
-												"API access (RESTful + webhooks)",
-												"Priority support (4h SLA)",
-											].map((f) => (
-												<CheckItem key={f} text={f} />
-											))}
-										</ul>
-										<Link
-											href="/demo"
-											className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold py-3 rounded-xl transition text-sm"
-										>
-											Book a Demo
-										</Link>
-									</div>
-
-									<div className="bg-[#0f172a] p-10 rounded-[2.5rem] border-2 border-blue-500 shadow-2xl relative hover:-translate-y-1 transition-all">
-										<div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#0f172a] to-[#1e40af] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
-											Recommended
-										</div>
-										<h3 className="text-xl font-bold mb-4 text-white">
-											Pro Suite
-										</h3>
-										<div className="text-4xl font-bold text-blue-400 mb-2">
-											Contact Us
-										</div>
-										<p className="text-sm text-white/60 mb-8">
-											Full enterprise evidence infrastructure
-										</p>
-										<ul className="space-y-3 mb-10">
-											<li className="text-sm font-semibold text-white">
-												Everything in Standard Suite, plus:
-											</li>
-											{[
-												"Unlimited blockchain notarizations",
-												"Custom API endpoints & rate limits",
-												"Dedicated compliance manager (monthly calls)",
-												"24/7 priority support (2h SLA)",
-												"White-label reports (your company branding)",
-												"Multi-subsidiary management",
-												"Custom compliance frameworks",
-												"SSO integration (SAML/OAuth)",
-												"On-premise deployment option",
-												"Quarterly compliance strategy sessions",
-											].map((f) => (
-												<li
-													key={f}
-													className="flex items-start gap-2 text-sm text-white/80"
-												>
-													<span className="text-blue-400 font-bold flex-shrink-0">
-														✓
-													</span>
-													{f}
-												</li>
-											))}
-										</ul>
-										<Link
-											href="/demo"
-											className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/30"
-										>
-											Book a Demo
-										</Link>
-									</div>
-
-									<div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col justify-between">
-										<div>
-											<h3 className="text-xl font-bold mb-6 text-[#0f172a]">
-												Custom Enterprise
-											</h3>
-											<div className="text-3xl font-bold text-[#0f172a] mb-8">
-												Contact Us
-											</div>
-											<ul className="space-y-3 mb-8">
-												{[
-													"100,000+ notarizations/month",
-													"On-premise infrastructure",
-													"Air-gapped deployment",
-													"Custom SLAs (e.g., 99.99% uptime)",
-													"Dedicated account team",
-													"Custom integration development",
-													"Compliance team training",
-													"Government agency pricing",
-												].map((f) => (
-													<CheckItem key={f} text={f} />
-												))}
-											</ul>
-										</div>
-										<Link
-											href="/demo"
-											className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm mt-auto"
-										>
-											Contact Enterprise Sales
-										</Link>
-									</div>
-								</div>
-							</div>
 						</div>
 					)}
 

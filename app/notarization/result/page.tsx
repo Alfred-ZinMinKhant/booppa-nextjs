@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { config } from '@/lib/config';
+import { POLYGON_EXPLORER_HOST } from '@/lib/blockchain';
 
 /* ── Types ── */
 interface Pipeline {
@@ -420,7 +421,7 @@ function NotarizationResultContent() {
                 },
                 {
                   step: "Step 4 — Confirm the blockchain anchor",
-                  detail: `Search the Transaction Hash on polygonscan.com. The block timestamp is the earliest possible existence date of the document. No login or account required.`,
+                  detail: `Search the Transaction Hash on ${POLYGON_EXPLORER_HOST}. The block timestamp is the earliest possible existence date of the document. No login or account required.`,
                   link: cert.verification?.polygonscan_url,
                 },
               ].map((item, i) => (
