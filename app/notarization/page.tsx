@@ -45,6 +45,7 @@ export default function NotarizationPage() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [error, setError] = useState('');
   const [consentValid, setConsentValid] = useState(false);
+  const [creditBalance, setCreditBalance] = useState(0);
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -56,6 +57,22 @@ export default function NotarizationPage() {
       })
       .catch(() => {});
   }, []);
+
+  // Fetch bundle-granted notarization credits whenever the email changes
+  useEffect(() => {
+    if (!email || !email.includes('@')) {
+      setCreditBalance(0);
+      return;
+    }
+    const ctrl = new AbortController();
+    fetch(`${apiBase}/api/v1/notarize/credits?email=${encodeURIComponent(email)}`, { signal: ctrl.signal })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && typeof data.balance === 'number') setCreditBalance(data.balance);
+      })
+      .catch(() => {});
+    return () => ctrl.abort();
+  }, [email, apiBase]);
 
   const handleSelectPlan = (plan: PlanKey) => {
     setSelectedPlan(plan);
@@ -108,8 +125,14 @@ export default function NotarizationPage() {
         throw new Error(data.detail || 'Upload failed');
       }
 
-      const result: UploadResult = await res.json();
+      const result: UploadResult & { skip_checkout?: boolean; credits_remaining?: number } = await res.json();
       setUploadResult(result);
+      // If a bundle credit was redeemed, fulfillment is already queued — go straight to result
+      if (result.skip_checkout) {
+        if (typeof result.credits_remaining === 'number') setCreditBalance(result.credits_remaining);
+        window.location.href = `/notarization/result?report_id=${encodeURIComponent(result.report_id)}&credit_redeemed=1`;
+        return;
+      }
       setStep('checkout');
     } catch (err: any) {
       setError(err.message || 'Upload failed. Please try again.');
@@ -176,10 +199,27 @@ export default function NotarizationPage() {
           <div className="bg-[#f8fafc] p-10 rounded-3xl border-2 border-[#10b981] mb-12 shadow-sm">
             <h3 className="text-2xl font-bold mb-4 text-[#0f172a]">⛓️ Why Blockchain Notarization?</h3>
             <p className="text-[#64748b]">
-              Traditional timestamps can be manipulated. Blockchain provides cryptographic proof 
+              Traditional timestamps can be manipulated. Blockchain provides cryptographic proof
               that a document existed at a specific date and time — independently verifiable by anyone.
             </p>
           </div>
+
+          {creditBalance > 0 && (
+            <div className="bg-gradient-to-r from-sky-50 to-blue-50 p-6 rounded-2xl border-2 border-sky-300 mb-12 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="text-3xl">🎟️</div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-sky-900 mb-1">
+                    You have {creditBalance} included notarization{creditBalance === 1 ? '' : 's'}
+                  </h3>
+                  <p className="text-sky-800 text-sm">
+                    These were granted by your bundle purchase. Upload any compliance document below —
+                    one credit will be applied automatically, no payment required.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Step 1: Select Plan */}
           <div className="mb-20">

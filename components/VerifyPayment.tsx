@@ -52,8 +52,9 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
       </>
     );
   } else if (status === 'success') {
-    const isEnterprise = productType === 'enterprise_monthly';
-    const isCompliance = productType?.startsWith('compliance_');
+    const isEnterprise = productType === 'enterprise_monthly' || productType === 'enterprise_pro_monthly';
+    const isCompliance = productType === 'compliance_standard' || productType === 'compliance_pro';
+    const isBundle = productType === 'vendor_trust_pack' || productType === 'rfp_accelerator' || productType === 'enterprise_bid_kit' || productType === 'compliance_evidence_pack';
     const isVendorProof = productType === 'vendor_proof';
     const isNotarization = productType?.startsWith('compliance_notarization') || productType?.startsWith('supply_chain');
     // pdpa_quick_scan / pdpa_snapshot → report page; pdpa_monitor_* → subscription, go to dashboard
@@ -90,9 +91,13 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                         ? 'Your RFP evidence package will be delivered to your email shortly.'
                         : isVendorProof
                           ? 'Your Vendor Proof certificate will be sent to your email within a few minutes.'
-                          : isEnterprise || isCompliance
-                            ? 'Your Enterprise workspace has been activated. Details have been sent to your email.'
-                            : 'A confirmation and your deliverables will be sent to your email shortly.'}
+                          : isBundle
+                            ? (productType === 'compliance_evidence_pack'
+                                ? 'Your Compliance Evidence Pack is being generated — Vendor Proof, PDPA Quick Scan, 3 notarizations, and your Summary Cover Sheet will arrive by email shortly.'
+                                : 'Your bundle is being processed — each component will arrive by email shortly.')
+                            : isEnterprise || isCompliance
+                              ? 'Your Enterprise workspace has been activated. Details have been sent to your email.'
+                              : 'A confirmation and your deliverables will be sent to your email shortly.'}
             </p>
           </div>
         </div>
@@ -108,6 +113,10 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
         ) : isRfp ? (
           <Link href={`/rfp-acceleration/result?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             View RFP Kit
+          </Link>
+        ) : isBundle ? (
+          <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            Go to Dashboard
           </Link>
         ) : isEnterprise || isCompliance ? (
           <Link href="/procurement/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
