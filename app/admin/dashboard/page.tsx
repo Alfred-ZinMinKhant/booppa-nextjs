@@ -116,6 +116,12 @@ export default function AdminDashboard() {
 						>
 							Intelligence
 						</Link>
+						<Link
+							href="/admin/agent-dashboard"
+							className="px-4 py-2 border border-[#1e2d4a] bg-[#0a0f1e] text-blue-400 font-medium rounded-lg hover:bg-[#111827] transition-colors text-sm"
+						>
+							Intent Agent
+						</Link>
 						<button
 							onClick={handleLogout}
 							className="text-sm text-[#64748b] hover:text-red-500 transition-colors"
