@@ -644,7 +644,7 @@ export default function PricingPage() {
 								<p className="text-sm font-bold text-[#0f172a]">Start small → upgrade as you grow: <span className="text-[#10b981]">Get Verified</span> → <span className="text-violet-600">Win Tenders</span> → <span className="text-amber-600">Scale to Enterprise</span></p>
 							</div>
 
-							<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-5">
+							<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 pt-5">
 								{/* Vendor Trust Pack */}
 								<div className="bg-white rounded-[2rem] border-2 border-[#10b981] shadow-xl overflow-hidden hover:-translate-y-1 transition-all">
 									<div className="bg-[#10b981] px-7 py-5">
@@ -872,6 +872,79 @@ export default function PricingPage() {
 										</button>
 									</div>
 								</div>
+
+								{/* Compliance Bundle */}
+								<div className="bg-white rounded-[2rem] border-2 border-sky-400 shadow-xl overflow-hidden hover:-translate-y-1 transition-all">
+									<div className="bg-sky-500 px-7 py-5">
+										<p className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1">
+											Bundle · Compliance Evidence
+										</p>
+										<h3 className="text-2xl font-black text-white">
+											Compliance Bundle
+										</h3>
+										<p className="text-white/90 text-sm mt-1">PDPA + Vendor Proof + Cover Sheet</p>
+										<p className="text-white/60 text-xs mt-1">Best for: Vendors who need a single court-admissible evidence pack for buyers, regulators, or audits</p>
+									</div>
+									<div className="p-7">
+										<div className="flex items-end gap-3 mb-1">
+											<span className="text-4xl font-black text-[#0f172a]">
+												SGD 599
+											</span>
+										</div>
+										<p className="text-sm text-sky-600 font-semibold mb-6">
+											Anchored on-chain · Delivered in minutes
+										</p>
+
+										<div className="space-y-3 mb-6">
+											<div className="rounded-lg bg-sky-50 border border-sky-200 px-4 py-3">
+												<p className="text-sm font-semibold text-[#0f172a]">
+													✓ Vendor Proof Certificate
+												</p>
+												<p className="text-xs text-[#64748b]">
+													ACRA-verified, signed PDF, blockchain-anchored
+												</p>
+											</div>
+											<div className="rounded-lg bg-sky-50 border border-sky-200 px-4 py-3">
+												<p className="text-sm font-semibold text-[#0f172a]">
+													✓ PDPA Quick Scan Report
+												</p>
+												<p className="text-xs text-[#64748b]">
+													8-dimension scan, AI-assisted gap analysis
+												</p>
+											</div>
+											<div className="rounded-lg bg-sky-50 border border-sky-200 px-4 py-3">
+												<p className="text-sm font-semibold text-[#0f172a]">
+													✓ 3 Notarizations
+												</p>
+												<p className="text-xs text-[#64748b]">
+													SHA-256 anchors for any compliance document
+												</p>
+											</div>
+											<div className="rounded-lg bg-sky-50 border border-sky-200 px-4 py-3">
+												<p className="text-sm font-semibold text-[#0f172a]">
+													✓ Summary Cover Sheet
+												</p>
+												<p className="text-xs text-[#64748b]">
+													9-section regulator-ready PDF
+												</p>
+											</div>
+										</div>
+
+										<p className="text-xs text-[#94a3b8] mb-5">
+											One-time payment. All components fan out automatically and arrive by email.
+										</p>
+
+										<button
+											onClick={() => handleCheckout("compliance_evidence_pack")}
+											disabled={loadingProduct === "compliance_evidence_pack"}
+											className="block w-full text-center bg-sky-500 hover:bg-sky-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-sky-500/20"
+										>
+											{loadingProduct === "compliance_evidence_pack"
+												? "Redirecting…"
+												: "Get Compliance Bundle — SGD 599"}
+										</button>
+									</div>
+								</div>
 						</div>
 
 							{/* Savings table */}
@@ -917,6 +990,13 @@ export default function PricingPage() {
 												separate: "SGD 1,310",
 												bundle: "SGD 899",
 												saving: "SGD 411 (31%)",
+											},
+											{
+												name: "Compliance Bundle",
+												includes: "Vendor Proof + PDPA Scan + 3 Notarizations + Cover Sheet",
+												separate: "—",
+												bundle: "SGD 599",
+												saving: "Evidence pack",
 											},
 										].map((row) => (
 											<tr key={row.name} className="hover:bg-[#f8fafc]">
