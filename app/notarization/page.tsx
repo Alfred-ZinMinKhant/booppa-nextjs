@@ -1,6 +1,7 @@
 'use client';
 
 import { COMPANY_NAME_SINGAPORE } from '@/lib/company';
+import { POLYGON_NETWORK_NAME } from '@/lib/blockchain';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { config } from '@/lib/config';
@@ -216,7 +217,7 @@ export default function NotarizationPage() {
                 <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 69</div>
                 <p className="text-sm text-[#64748b] mb-8">One-time notarization</p>
                 <ul className="space-y-4 mb-8">
-                  {['SHA-256 hash generation', 'Polygon Amoy testnet timestamp', 'QR verification link', 'Polygonscan proof URL', 'Certificate of notarization (PDF)', '12-month evidence retention'].map((f, i) => (
+                  {['SHA-256 hash generation', `${POLYGON_NETWORK_NAME} timestamp`, 'QR verification link', 'Polygonscan proof URL', 'Certificate of notarization (PDF)', '12-month evidence retention'].map((f, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
                       <span className="text-[#10b981] font-bold">✓</span>
                       {f}
@@ -469,7 +470,7 @@ export default function NotarizationPage() {
               {[
                 { n: 1, t: 'Upload Document', d: 'Upload your PDF, image, or document file. We support: PDF, DOCX, PNG, JPG, TXT.' },
                 { n: 2, t: 'Generate SHA-256 Hash', d: 'We create a unique cryptographic fingerprint of your document. Even 1-byte change would produce a completely different hash.', code: '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7...' },
-                { n: 3, t: 'Anchor to Polygon Blockchain', d: 'Hash is written to Polygon Amoy testnet (Layer 2 Ethereum). This creates an immutable, public timestamp that cannot be altered.', note: 'Why Polygon? Low cost (~ $0.01 per transaction), high security (Ethereum-backed), and public verifiability. Currently on Amoy testnet.' },
+                { n: 3, t: 'Anchor to Polygon Blockchain', d: `Hash is written to the ${POLYGON_NETWORK_NAME} (Layer 2 Ethereum). This creates an immutable, public timestamp that cannot be altered.`, note: 'Why Polygon? Low cost (~ $0.01 per transaction), high security (Ethereum-backed), and public verifiability.' },
                 { n: 4, t: 'Receive Certificate + QR Code', d: 'You get a notarization certificate (PDF) with:', list: ['Document hash', 'Blockchain transaction ID', 'Timestamp (SGT)', 'Polygonscan verification URL', 'QR code for mobile scanning'] },
                 { n: 5, t: 'Independent Verification', d: 'Anyone can verify your notarization on Polygonscan.com or via our public verification portal. No login required.' }
               ].map((item) => (
@@ -523,7 +524,7 @@ export default function NotarizationPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
                 { l: 'Hashing Algorithm:', v: 'SHA-256 (FIPS 180-4)' },
-                { l: 'Blockchain Network:', v: 'Polygon Amoy Testnet' },
+                { l: 'Blockchain Network:', v: POLYGON_NETWORK_NAME },
                 { l: 'Timestamp Precision:', v: 'Block timestamp (± 30 seconds)' },
                 { l: 'File Size Limit:', v: '50 MB per file' },
                 { l: 'Supported Formats:', v: 'PDF, DOCX, XLSX, PNG, JPG, TXT, CSV, ZIP' },

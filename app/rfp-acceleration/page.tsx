@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { config } from '@/lib/config';
+import { POLYGON_NETWORK_NAME } from '@/lib/blockchain';
 import HardenedClickwrap from '@/components/legal/HardenedClickwrap';
 
 function normalizeUrl(input: string): string {
@@ -573,7 +574,7 @@ export default function RFPAccelerationPage() {
         <div className="max-w-[900px] mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#10b981] rounded-full text-sm font-medium text-[#059669] mb-6 bg-[#f0fdf4]">
-              ⛓️ Polygon Amoy Testnet
+              ⛓️ {POLYGON_NETWORK_NAME}
             </div>
             <h2 className="text-3xl font-black text-[#0f172a] mb-4">Blockchain-Verified PDPA Evidence</h2>
             <p className="text-lg text-[#64748b] max-w-2xl mx-auto">
@@ -594,7 +595,7 @@ export default function RFPAccelerationPage() {
               {
                 n: 2,
                 t: 'Hash anchored on Polygon blockchain',
-                d: 'The hash is written to our deployed EvidenceAnchorV3 smart contract on Polygon Amoy testnet. This creates an immutable, public timestamp that cannot be modified or deleted.',
+                d: `The hash is written to our deployed EvidenceAnchorV3 smart contract on ${POLYGON_NETWORK_NAME}. This creates an immutable, public timestamp that cannot be modified or deleted.`,
                 note: 'Why Polygon? Low gas fees (~$0.01 per anchor), Ethereum-backed security, and publicly queryable via Polygonscan.',
               },
               {
@@ -627,10 +628,8 @@ export default function RFPAccelerationPage() {
           </div>
 
           <div className="mt-16 bg-[#f0fdf4] border border-[#bbf7d0] rounded-[2rem] p-10 text-center">
-            <p className="text-sm text-[#065f46] font-semibold mb-2">Testnet Notice</p>
             <p className="text-[#047857] text-sm leading-relaxed max-w-lg mx-auto">
-              RFP Kit anchors are currently on <strong>Polygon Amoy testnet</strong> — fully public and immutable,
-              at near-zero cost. Mainnet migration is planned for the enterprise tier.
+              RFP Kit anchors are currently on <strong>{POLYGON_NETWORK_NAME}</strong> — fully public and immutable.
             </p>
           </div>
         </div>

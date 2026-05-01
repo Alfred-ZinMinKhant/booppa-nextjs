@@ -21,7 +21,7 @@ const securityHeaders = [
   },
   {
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: api.qrserver.com polygonscan.com amoy.polygonscan.com assets.calendly.com cms.booppa.io 13.229.135.184; font-src 'self' fonts.gstatic.com; connect-src 'self' api.booppa.io cms.booppa.io 13.229.135.184; frame-src 'self' calendly.com;",
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: api.qrserver.com polygonscan.com assets.calendly.com cms.booppa.io 13.229.135.184; font-src 'self' fonts.gstatic.com; connect-src 'self' api.booppa.io cms.booppa.io 13.229.135.184; frame-src 'self' calendly.com;",
   },
 ];
 
@@ -47,11 +47,6 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'polygonscan.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'amoy.polygonscan.com',
         pathname: '/**',
       },
       {

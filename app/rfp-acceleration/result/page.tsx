@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
+import { POLYGON_NETWORK_NAME } from '@/lib/blockchain';
 import {
   CheckCircle, Loader2, AlertTriangle, Download, ExternalLink,
   Shield, Copy, Check, FileText, ArrowUpRight,
@@ -247,7 +248,7 @@ function RFPResultContent() {
                   <span className="text-base">⛓️</span>
                   <h3 className="text-sm font-semibold text-white">Blockchain Evidence Record</h3>
                   <span className="ml-auto text-[10px] px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full font-medium">
-                    Polygon Amoy Testnet
+                    {POLYGON_NETWORK_NAME}
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mb-4 leading-relaxed">
@@ -259,7 +260,7 @@ function RFPResultContent() {
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500 w-36 shrink-0">Transaction Hash:</span>
                     <a
-                      href={result.polygonscan_url || `https://amoy.polygonscan.com/tx/${result.tx_hash}`}
+                      href={result.polygonscan_url || `https://polygonscan.com/tx/${result.tx_hash}`}
                       target="_blank"
                       rel="noreferrer"
                       className="font-mono text-sky-400 hover:text-sky-300 transition flex items-center gap-1 break-all"
@@ -271,7 +272,7 @@ function RFPResultContent() {
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500 w-36 shrink-0">Verify on-chain:</span>
                     <a
-                      href={result.polygonscan_url || `https://amoy.polygonscan.com/tx/${result.tx_hash}`}
+                      href={result.polygonscan_url || `https://polygonscan.com/tx/${result.tx_hash}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-emerald-400 hover:text-emerald-300 transition"
@@ -281,8 +282,7 @@ function RFPResultContent() {
                   </div>
                 </div>
                 <p className="text-[10px] text-slate-600 mt-4 border-t border-white/8 pt-3">
-                  Testnet notice: Anchored on Polygon Amoy testnet (public &amp; immutable) for cost efficiency.
-                  Mainnet migration is planned for the enterprise tier.
+                  Anchored on {POLYGON_NETWORK_NAME} (public &amp; immutable) for cost efficiency.
                 </p>
               </div>
             )}

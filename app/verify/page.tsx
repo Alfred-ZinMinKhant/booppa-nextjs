@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { POLYGON_NETWORK_NAME, polygonscanTxUrl } from '@/lib/blockchain';
 
 export default function VerifyPage() {
   const [hash, setHash] = useState('');
@@ -43,8 +44,8 @@ export default function VerifyPage() {
           ? txHash.substring(0, 10) + '...' + txHash.substring(txHash.length - 8)
           : txHash,
         status: record.anchored ? 'Anchored on-chain' : 'Pending anchor',
-        polygonscanUrl: `https://amoy.polygonscan.com/tx/${txHash}`,
-        network: 'Polygon Amoy Testnet',
+        polygonscanUrl: polygonscanTxUrl(txHash),
+        network: POLYGON_NETWORK_NAME,
       });
     } catch {
       setError('Network error — please try again.');
@@ -124,8 +125,8 @@ export default function VerifyPage() {
                   <h3 className="text-2xl font-black text-[#059669]">Evidence Verified</h3>
                 </div>
 
-                <div className="mb-6 px-4 py-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-800 text-sm font-medium">
-                  🔶 Testnet Notice: This blockchain anchor is on <strong>Polygon Amoy testnet</strong>, not mainnet.
+                <div className="mb-6 px-4 py-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-800 text-sm font-medium">
+                  ✓ Blockchain Record: This blockchain anchor is on the <strong>{POLYGON_NETWORK_NAME}</strong>.
                 </div>
 
                 <div className="space-y-4 mb-8">
@@ -149,7 +150,7 @@ export default function VerifyPage() {
                   rel="noopener noreferrer"
                   className="btn btn-outline w-full py-4 text-[#0f172a] border-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all font-bold"
                 >
-                  View on Amoy Polygonscan (Testnet) →
+                  View on Polygonscan →
                 </a>
               </div>
             )}

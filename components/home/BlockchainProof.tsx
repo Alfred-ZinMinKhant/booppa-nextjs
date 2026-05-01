@@ -1,5 +1,7 @@
 "use client";
 
+import { POLYGON_NETWORK_NAME } from '@/lib/blockchain';
+
 export default function BlockchainProof() {
 	return (
 		<section className="py-24 px-6 bg-[#f8fafc]">
@@ -72,7 +74,7 @@ export default function BlockchainProof() {
 										<label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">
 											Network
 										</label>
-										<div className="text-lg font-bold">Polygon Mainnet</div>
+										<div className="text-lg font-bold">{POLYGON_NETWORK_NAME}</div>
 									</div>
 									<div>
 										<label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">
