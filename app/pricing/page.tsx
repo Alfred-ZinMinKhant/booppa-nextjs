@@ -172,11 +172,19 @@ export default function PricingPage() {
 
 	async function submitBundleForm() {
 		if (!bundleModal) return;
-		const website = bundleForm.website.trim();
+		let website = bundleForm.website.trim();
 		const company = bundleForm.company.trim();
 		if (!website) { setBundleError("Website URL is required."); return; }
-		if (!/^https?:\/\//i.test(website)) { setBundleError("Website must start with http:// or https://"); return; }
 		if (!company) { setBundleError("Company name is required."); return; }
+		// Normalize: prepend https:// if scheme missing, then validate it parses as a URL.
+		if (!/^https?:\/\//i.test(website)) website = `https://${website}`;
+		try {
+			const u = new URL(website);
+			if (!u.hostname.includes(".")) throw new Error("invalid host");
+		} catch {
+			setBundleError("Please enter a valid website (e.g. yourcompany.com).");
+			return;
+		}
 		setBundleError(null);
 		const productType = bundleModal.productType;
 		setLoadingProduct(productType);
@@ -1887,9 +1895,9 @@ export default function PricingPage() {
 							<div>
 								<label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Website URL</label>
 								<input
-									type="url"
+									type="text"
 									autoFocus
-									placeholder="https://yourcompany.com"
+									placeholder="yourcompany.com"
 									value={bundleForm.website}
 									onChange={(e) => setBundleForm((f) => ({ ...f, website: e.target.value }))}
 									className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
