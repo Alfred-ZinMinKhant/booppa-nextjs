@@ -34,23 +34,7 @@ const BUNDLE_TYPES = new Set([
 
 async function startCheckout(productType: string, extraBody?: Record<string, string>): Promise<void> {
 	try {
-		// Bundles need website + company name upfront so the included PDPA scan
-		// and Vendor Proof checks have something to work with. Collect once before
-		// the first POST so we don't bounce off the 422 unnecessarily.
-		let mergedExtra = extraBody;
-		if (BUNDLE_TYPES.has(productType) && !extraBody?.vendor_url) {
-			const website = prompt(
-				"To activate the PDPA scan and Vendor Proof check in this bundle, we need your website URL.\n\nEnter your website (e.g. https://example.com):"
-			);
-			if (!website?.trim()) return;
-			const company = prompt("Company name (as it should appear on your reports):");
-			if (!company?.trim()) return;
-			mergedExtra = {
-				...(extraBody || {}),
-				vendor_url: website.trim(),
-				company_name: company.trim(),
-			};
-		}
+		const mergedExtra = extraBody;
 
 		const res = await fetch("/api/checkout", {
 			method: "POST",
@@ -160,9 +144,44 @@ export default function PricingPage() {
 		setWizardStep(0);
 	}
 
+	const [bundleModal, setBundleModal] = useState<{ productType: string } | null>(null);
+	const [bundleForm, setBundleForm] = useState({ website: "", company: "" });
+	const [bundleError, setBundleError] = useState<string | null>(null);
+
 	async function handleCheckout(productType: string) {
+		if (BUNDLE_TYPES.has(productType)) {
+			// Try to prefill from /api/auth/me
+			try {
+				const meRes = await fetch("/api/auth/me");
+				if (meRes.ok) {
+					const me = await meRes.json();
+					setBundleForm({
+						website: me?.website || me?.vendor_url || "",
+						company: me?.company_name || me?.company || "",
+					});
+				}
+			} catch {}
+			setBundleError(null);
+			setBundleModal({ productType });
+			return;
+		}
 		setLoadingProduct(productType);
 		await startCheckout(productType);
+		setLoadingProduct(null);
+	}
+
+	async function submitBundleForm() {
+		if (!bundleModal) return;
+		const website = bundleForm.website.trim();
+		const company = bundleForm.company.trim();
+		if (!website) { setBundleError("Website URL is required."); return; }
+		if (!/^https?:\/\//i.test(website)) { setBundleError("Website must start with http:// or https://"); return; }
+		if (!company) { setBundleError("Company name is required."); return; }
+		setBundleError(null);
+		const productType = bundleModal.productType;
+		setLoadingProduct(productType);
+		setBundleModal(null);
+		await startCheckout(productType, { vendor_url: website, company_name: company });
 		setLoadingProduct(null);
 	}
 
@@ -1856,6 +1875,59 @@ export default function PricingPage() {
 					</div>
 				</div>
 			</section>
+
+			{bundleModal && (
+				<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => setBundleModal(null)}>
+					<div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+						<h3 className="text-xl font-black text-[#0f172a] mb-2">Activate your bundle</h3>
+						<p className="text-sm text-[#64748b] mb-6 leading-relaxed">
+							We need your website URL and company name so the included PDPA Quick Scan and Vendor Proof can run on the right entity.
+						</p>
+						<div className="space-y-4">
+							<div>
+								<label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Website URL</label>
+								<input
+									type="url"
+									autoFocus
+									placeholder="https://yourcompany.com"
+									value={bundleForm.website}
+									onChange={(e) => setBundleForm((f) => ({ ...f, website: e.target.value }))}
+									className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
+								/>
+							</div>
+							<div>
+								<label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Company name</label>
+								<input
+									type="text"
+									placeholder="As it should appear on your reports"
+									value={bundleForm.company}
+									onChange={(e) => setBundleForm((f) => ({ ...f, company: e.target.value }))}
+									className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
+								/>
+							</div>
+							{bundleError && (
+								<p className="text-sm text-red-600 font-semibold">{bundleError}</p>
+							)}
+						</div>
+						<div className="flex gap-3 mt-6">
+							<button
+								type="button"
+								onClick={() => setBundleModal(null)}
+								className="flex-1 py-3 rounded-xl border-2 border-[#e2e8f0] text-[#475569] font-bold text-sm hover:bg-[#f8fafc] transition"
+							>
+								Cancel
+							</button>
+							<button
+								type="button"
+								onClick={submitBundleForm}
+								className="flex-1 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-bold text-sm shadow-lg shadow-[#10b981]/20 transition"
+							>
+								Continue to checkout →
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</main>
 	);
 }
