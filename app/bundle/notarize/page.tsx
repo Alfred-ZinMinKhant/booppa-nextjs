@@ -46,6 +46,12 @@ function BundleNotarizeInner() {
   const [error, setError] = useState('')
   const [generatingCoverSheet, setGeneratingCoverSheet] = useState(false)
   const [coverSheetQueued, setCoverSheetQueued] = useState(false)
+  const [coverSheetStatus, setCoverSheetStatus] = useState<{
+    cover_sheet: { ready: boolean; pending?: boolean; generated_at?: string | null; download_url?: string | null; tx_hash?: string | null }
+    pdpa: { status: string; score: number | null; completed_at: string | null } | null
+    vendor_proof: { status: string; completed_at: string | null } | null
+    notarizations: { anchored: number; total: number }
+  } | null>(null)
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -60,9 +66,10 @@ function BundleNotarizeInner() {
   const refreshState = async (currentEmail: string) => {
     if (!currentEmail) return
     try {
-      const [creditsRes, reportsRes] = await Promise.all([
+      const [creditsRes, reportsRes, statusRes] = await Promise.all([
         fetch(`${apiBase}/api/v1/notarize/credits?email=${encodeURIComponent(currentEmail)}`),
         fetch(`${apiBase}/api/v1/notarize/bundle/notarizations?email=${encodeURIComponent(currentEmail)}`),
+        fetch(`${apiBase}/api/v1/notarize/bundle/cover-sheet/status?email=${encodeURIComponent(currentEmail)}`),
       ])
       if (creditsRes.ok) {
         const d = await creditsRes.json()
@@ -72,6 +79,9 @@ function BundleNotarizeInner() {
       if (reportsRes.ok) {
         const d = await reportsRes.json()
         if (Array.isArray(d.reports)) setReports(d.reports)
+      }
+      if (statusRes.ok) {
+        setCoverSheetStatus(await statusRes.json())
       }
     } catch {}
   }
@@ -305,6 +315,110 @@ function BundleNotarizeInner() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Cover sheet ready — render the result card with download link */}
+        {coverSheetStatus?.cover_sheet?.ready && coverSheetStatus.cover_sheet.download_url && (
+          <div className="bg-gradient-to-r from-emerald-50 to-sky-50 border-2 border-emerald-300 rounded-2xl p-6 mb-6">
+            <div className="flex items-start gap-4">
+              <CheckCircle className="w-8 h-8 text-emerald-600 flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h2 className="font-black text-[#0f172a] text-xl mb-1">Compliance Cover Sheet Ready</h2>
+                <p className="text-sm text-[#475569] mb-4">
+                  9-section regulator-ready PDF with PDPA score, Vendor Proof status, and SHA-256 anchored evidence for every document.
+                  {coverSheetStatus.cover_sheet.generated_at && (
+                    <span className="block text-xs text-[#94a3b8] mt-1">
+                      Generated {new Date(coverSheetStatus.cover_sheet.generated_at).toLocaleString()}
+                    </span>
+                  )}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <a
+                    href={coverSheetStatus.cover_sheet.download_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-700 inline-flex items-center gap-2"
+                  >
+                    Download PDF <ExternalLink className="w-4 h-4" />
+                  </a>
+                  {coverSheetStatus.cover_sheet.tx_hash && (
+                    <a
+                      href={polygonscanTxUrl(coverSheetStatus.cover_sheet.tx_hash)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="bg-white border border-emerald-300 text-emerald-700 px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-50 inline-flex items-center gap-2"
+                    >
+                      View Anchor <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Component status grid — visible whenever cover sheet not yet ready or just informational */}
+        {coverSheetStatus && !coverSheetStatus.cover_sheet.ready && bundleParam === 'compliance_evidence_pack' && (
+          <div className="bg-white border-2 border-[#e2e8f0] rounded-2xl p-6 mb-6">
+            <h2 className="font-bold text-[#0f172a] mb-4">Bundle progress</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* PDPA */}
+              <div className="border border-[#e2e8f0] rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  {coverSheetStatus.pdpa?.status === 'completed' ? (
+                    <CheckCircle className="w-5 h-5 text-emerald-600" />
+                  ) : (
+                    <Loader2 className="w-5 h-5 text-sky-600 animate-spin" />
+                  )}
+                  <p className="font-bold text-[#0f172a] text-sm">PDPA Quick Scan</p>
+                </div>
+                <p className="text-xs text-[#64748b]">
+                  {coverSheetStatus.pdpa?.status === 'completed'
+                    ? `Score: ${coverSheetStatus.pdpa.score ?? '—'}/100`
+                    : coverSheetStatus.pdpa?.status
+                      ? `Status: ${coverSheetStatus.pdpa.status}`
+                      : 'Queued'}
+                </p>
+              </div>
+              {/* Vendor Proof */}
+              <div className="border border-[#e2e8f0] rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  {coverSheetStatus.vendor_proof?.status === 'completed' ? (
+                    <CheckCircle className="w-5 h-5 text-emerald-600" />
+                  ) : (
+                    <Loader2 className="w-5 h-5 text-sky-600 animate-spin" />
+                  )}
+                  <p className="font-bold text-[#0f172a] text-sm">Vendor Proof</p>
+                </div>
+                <p className="text-xs text-[#64748b]">
+                  {coverSheetStatus.vendor_proof?.status === 'completed'
+                    ? 'Verified'
+                    : coverSheetStatus.vendor_proof?.status
+                      ? `Status: ${coverSheetStatus.vendor_proof.status}`
+                      : 'Queued'}
+                </p>
+              </div>
+              {/* Notarizations */}
+              <div className="border border-[#e2e8f0] rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  {coverSheetStatus.notarizations.anchored === coverSheetStatus.notarizations.total && coverSheetStatus.notarizations.total > 0 ? (
+                    <CheckCircle className="w-5 h-5 text-emerald-600" />
+                  ) : (
+                    <Loader2 className="w-5 h-5 text-sky-600 animate-spin" />
+                  )}
+                  <p className="font-bold text-[#0f172a] text-sm">Anchoring</p>
+                </div>
+                <p className="text-xs text-[#64748b]">
+                  {coverSheetStatus.notarizations.anchored} of {coverSheetStatus.notarizations.total} on-chain
+                </p>
+              </div>
+            </div>
+            {(coverSheetStatus.pdpa?.status !== 'completed' || coverSheetStatus.vendor_proof?.status !== 'completed') && (
+              <p className="text-xs text-[#94a3b8] mt-4">
+                Cover Sheet generates automatically once PDPA and Vendor Proof complete. Page refreshes every 8 seconds.
+              </p>
+            )}
           </div>
         )}
 
