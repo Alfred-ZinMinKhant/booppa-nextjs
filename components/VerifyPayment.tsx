@@ -95,7 +95,11 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                           : isBundle
                             ? (productType === 'compliance_evidence_pack'
                                 ? 'Your Compliance Evidence Pack is activated — Vendor Proof and PDPA Quick Scan are running now. Click below to upload your 3 compliance documents; once anchored, your 9-section regulator-ready Cover Sheet PDF will be emailed automatically.'
-                                : 'Your bundle is being processed — each component will arrive by email shortly.')
+                                : productType === 'enterprise_bid_kit'
+                                  ? 'Your Enterprise Bid Kit is activated — Vendor Proof, PDPA Quick Scan, and RFP Complete are running now. Click below to notarize your 7 included bundle documents.'
+                                  : productType === 'rfp_accelerator'
+                                    ? 'Your RFP Accelerator is activated — Vendor Proof, PDPA Quick Scan, and RFP Express are running now. Click below to notarize your 2 included bundle documents.'
+                                    : 'Your Vendor Trust Pack is activated — Vendor Proof and PDPA Quick Scan are running now. Click below to notarize your 2 included bundle documents.')
                             : isEnterprise || isCompliance
                               ? 'Your Enterprise workspace has been activated. Details have been sent to your email.'
                               : 'A confirmation and your deliverables will be sent to your email shortly.'}
@@ -115,13 +119,14 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
           <Link href={`/rfp-acceleration/result?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             View RFP Kit
           </Link>
-        ) : isComplianceEvidencePack ? (
-          <Link href="/compliance-evidence-pack/upload" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-            Upload Your 3 Compliance Documents →
-          </Link>
         ) : isBundle ? (
-          <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-            Go to Dashboard
+          <Link
+            href={`/bundle/notarize?bundle=${productType}${sessionId ? `&session_id=${sessionId}` : ''}`}
+            className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition"
+          >
+            {isComplianceEvidencePack ? 'Upload Your 3 Compliance Documents →' :
+              productType === 'enterprise_bid_kit' ? 'Notarize Your 7 Bundle Documents →' :
+              'Notarize Your 2 Bundle Documents →'}
           </Link>
         ) : isEnterprise || isCompliance ? (
           <Link href="/procurement/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
