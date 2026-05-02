@@ -3,6 +3,8 @@ import { cookies } from 'next/headers'
 import { config, endpoints } from '@/lib/config'
 import type { RefreshTokenResponse } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST() {
   try {
     const refreshToken = cookies().get('refreshToken')?.value

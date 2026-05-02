@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * Questa route restituisce un token SHORT-LIVED usabile dal client
  * per autenticare la connessione WebSocket.

@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 // Legacy route — redirect to the unified bundle notarize page.
-export default function LegacyComplianceEvidencePackUploadPage() {
+function RedirectInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   useEffect(() => {
@@ -14,4 +14,12 @@ export default function LegacyComplianceEvidencePackUploadPage() {
     router.replace(`/bundle/notarize?${qs.toString()}`)
   }, [router, searchParams])
   return null
+}
+
+export default function LegacyComplianceEvidencePackUploadPage() {
+  return (
+    <Suspense fallback={null}>
+      <RedirectInner />
+    </Suspense>
+  )
 }

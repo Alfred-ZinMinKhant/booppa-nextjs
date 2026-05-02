@@ -3,6 +3,8 @@ import { cookies } from 'next/headers'
 import { config, endpoints } from '@/lib/config'
 import type { LoginRequest, LoginResponse } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   try {
     const body: LoginRequest = await request.json()

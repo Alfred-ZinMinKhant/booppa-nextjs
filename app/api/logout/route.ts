@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { config, endpoints } from '@/lib/config'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST() {
   try {
     const token = cookies().get('token')?.value

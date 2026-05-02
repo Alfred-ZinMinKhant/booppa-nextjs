@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchWithAuth } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/referrals?user_id=... — list my referrals
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('user_id');

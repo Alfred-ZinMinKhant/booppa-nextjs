@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { fetchWithAuth } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   const res = await fetchWithAuth('/api/v1/vendor/sector-pressure')
   if (!res.ok) return NextResponse.json({ error: 'Failed to fetch sector pressure' }, { status: res.status })

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchWithAuth } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   const body = await request.json()
   const res = await fetchWithAuth('/api/v1/supply-chain/vendors', {
