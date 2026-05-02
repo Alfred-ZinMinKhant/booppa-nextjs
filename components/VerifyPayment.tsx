@@ -55,6 +55,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
     const isEnterprise = productType === 'enterprise_monthly' || productType === 'enterprise_pro_monthly';
     const isCompliance = productType === 'compliance_standard' || productType === 'compliance_pro';
     const isBundle = productType === 'vendor_trust_pack' || productType === 'rfp_accelerator' || productType === 'enterprise_bid_kit' || productType === 'compliance_evidence_pack';
+    const isComplianceEvidencePack = productType === 'compliance_evidence_pack';
     const isVendorProof = productType === 'vendor_proof';
     const isNotarization = productType?.startsWith('compliance_notarization') || productType?.startsWith('supply_chain');
     // pdpa_quick_scan / pdpa_snapshot → report page; pdpa_monitor_* → subscription, go to dashboard
@@ -93,7 +94,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                           ? 'Your Vendor Proof certificate will be sent to your email within a few minutes.'
                           : isBundle
                             ? (productType === 'compliance_evidence_pack'
-                                ? 'Your Compliance Evidence Pack is being generated — Vendor Proof, PDPA Quick Scan, 3 notarizations, and your Summary Cover Sheet will arrive by email shortly.'
+                                ? 'Your Compliance Evidence Pack is activated — Vendor Proof and PDPA Quick Scan are running now. Click below to upload your 3 compliance documents; once anchored, your 9-section regulator-ready Cover Sheet PDF will be emailed automatically.'
                                 : 'Your bundle is being processed — each component will arrive by email shortly.')
                             : isEnterprise || isCompliance
                               ? 'Your Enterprise workspace has been activated. Details have been sent to your email.'
@@ -113,6 +114,10 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
         ) : isRfp ? (
           <Link href={`/rfp-acceleration/result?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             View RFP Kit
+          </Link>
+        ) : isComplianceEvidencePack ? (
+          <Link href="/compliance-evidence-pack/upload" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            Upload Your 3 Compliance Documents →
           </Link>
         ) : isBundle ? (
           <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">

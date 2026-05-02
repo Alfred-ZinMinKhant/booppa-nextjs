@@ -25,12 +25,37 @@ function CheckItem({
 	);
 }
 
+const BUNDLE_TYPES = new Set([
+	"vendor_trust_pack",
+	"rfp_accelerator",
+	"enterprise_bid_kit",
+	"compliance_evidence_pack",
+]);
+
 async function startCheckout(productType: string, extraBody?: Record<string, string>): Promise<void> {
 	try {
+		// Bundles need website + company name upfront so the included PDPA scan
+		// and Vendor Proof checks have something to work with. Collect once before
+		// the first POST so we don't bounce off the 422 unnecessarily.
+		let mergedExtra = extraBody;
+		if (BUNDLE_TYPES.has(productType) && !extraBody?.vendor_url) {
+			const website = prompt(
+				"To activate the PDPA scan and Vendor Proof check in this bundle, we need your website URL.\n\nEnter your website (e.g. https://example.com):"
+			);
+			if (!website?.trim()) return;
+			const company = prompt("Company name (as it should appear on your reports):");
+			if (!company?.trim()) return;
+			mergedExtra = {
+				...(extraBody || {}),
+				vendor_url: website.trim(),
+				company_name: company.trim(),
+			};
+		}
+
 		const res = await fetch("/api/checkout", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ productType, ...extraBody }),
+			body: JSON.stringify({ productType, ...mergedExtra }),
 		});
 		const data = await res.json();
 		if (data.url) {
@@ -38,12 +63,17 @@ async function startCheckout(productType: string, extraBody?: Record<string, str
 		} else if (res.status === 409) {
 			window.location.href = "/vendor/dashboard";
 		} else if (res.status === 422 && /website/i.test(data.error || "")) {
-			// Backend needs a website URL for PDPA Monitor initial scan
+			// Fallback prompt (e.g. for PDPA Monitor or any product missing website)
 			const website = prompt(
-				"We need your website URL to run your first PDPA scan.\n\nEnter your website (e.g. https://example.com):"
+				"We need your website URL to run your first scan.\n\nEnter your website (e.g. https://example.com):"
 			);
 			if (website?.trim()) {
-				await startCheckout(productType, { website: website.trim() });
+				await startCheckout(productType, { ...(mergedExtra || {}), website: website.trim() });
+			}
+		} else if (res.status === 422 && /company/i.test(data.error || "")) {
+			const company = prompt("We need your company name to generate your bundle reports.\n\nEnter your company name:");
+			if (company?.trim()) {
+				await startCheckout(productType, { ...(mergedExtra || {}), company_name: company.trim() });
 			}
 		} else {
 			alert(data.error || "Unable to start checkout. Please try again.");
