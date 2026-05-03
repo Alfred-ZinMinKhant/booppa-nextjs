@@ -13,8 +13,7 @@ import {
   Mail, 
   UserPlus,
   ArrowUpRight,
-  ArrowDownRight,
-  Clock
+  ArrowDownRight
 } from 'lucide-react';
 import { 
   AreaChart, 
@@ -73,18 +72,18 @@ export default function AgentDashboard() {
     const fetchData = async () => {
       try {
         const [leadsRes, statsRes, activityRes] = await Promise.all([
-          fetch('/api/leads'),
-          fetch('/api/stats'),
-          fetch('/api/activity')
+          fetch('/api/v1/leads/'),
+          fetch('/api/v1/leads/stats'),
+          fetch('/api/v1/leads/activity'),
         ]);
 
-        const leadsData = await leadsRes.json();
-        const statsData = await statsRes.json();
-        const activityData = await activityRes.json();
+        const leadsData = leadsRes.ok ? await leadsRes.json() : [];
+        const statsData = statsRes.ok ? await statsRes.json() : null;
+        const activityData = activityRes.ok ? await activityRes.json() : [];
 
-        setLeads(leadsData);
+        setLeads(Array.isArray(leadsData) ? leadsData : leadsData?.results || []);
         setStats(statsData);
-        setActivity(activityData);
+        setActivity(Array.isArray(activityData) ? activityData : []);
         
         if (leadsData.length > 0 && !selectedDomain) {
           setSelectedDomain(leadsData[0].domain);
@@ -136,29 +135,11 @@ export default function AgentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-[#e2e8f0] font-['Space_Grotesk',sans-serif] relative overflow-hidden">
+    <>
       {/* Grid Background Effect */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-0" 
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-0"
            style={{ backgroundImage: 'linear-gradient(#2563eb 1px, transparent 1px), linear-gradient(90deg, #2563eb 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
       </div>
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0a0f1e]/90 backdrop-blur-xl border-b border-[#1e2d4a] px-8 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(37,99,235,0.8)]"></div>
-          <h1 className="text-xl font-bold tracking-tight">BOOPPA <span className="text-[#94a3b8] font-normal">· Intent Intelligence</span></h1>
-        </div>
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/30 rounded-full text-green-400 text-xs font-semibold">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
-            LIVE
-          </div>
-          <div className="text-xs text-[#64748b] font-mono flex items-center gap-1.5">
-            <Clock className="w-3 h-3" />
-            Last run: {stats?.last_run ? timeAgo(stats.last_run) : 'pending'}
-          </div>
-        </div>
-      </header>
 
       <main className="relative z-10 p-8 max-w-[1600px] mx-auto space-y-8">
         
@@ -451,7 +432,7 @@ export default function AgentDashboard() {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e2d4a; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #243357; }
       `}</style>
-    </div>
+    </>
   );
 }
 

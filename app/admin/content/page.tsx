@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 const CMS_BASE =
 	process.env.NEXT_PUBLIC_CMS_BASE ||
@@ -66,44 +65,8 @@ export default function AdminContentPage() {
 			});
 	}, [activeType]);
 
-	const handleLogout = async () => {
-		await fetch("/api/admin/logout", { method: "POST" });
-		router.replace("/admin/login");
-	};
-
 	return (
-		<main className="min-h-screen bg-[#f8fafc]">
-			{/* Header */}
-			<section className="py-4 px-6 bg-white border-b border-[#e2e8f0]">
-				<div className="max-w-[1200px] mx-auto flex items-center justify-between">
-					<h1 className="text-2xl font-bold text-[#0f172a]">
-						Content Management
-					</h1>
-					<div className="flex items-center gap-3">
-						<Link
-							href="/admin/dashboard"
-							className="px-4 py-2 border border-[#e2e8f0] text-[#64748b] font-medium rounded-lg hover:border-[#10b981] transition-colors text-sm"
-						>
-							← Dashboard
-						</Link>
-						<a
-							href={`${CMS_BASE}/django-admin/`}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="px-4 py-2 bg-[#10b981] text-white font-medium rounded-lg hover:bg-[#059669] transition-colors text-sm"
-						>
-							Open CMS Editor ↗
-						</a>
-						<button
-							onClick={handleLogout}
-							className="text-sm text-[#64748b] hover:text-red-500 transition-colors"
-						>
-							Logout
-						</button>
-					</div>
-				</div>
-			</section>
-
+		<>
 			<section className="py-8 px-6">
 				<div className="max-w-[1200px] mx-auto">
 					{/* Type tabs */}
@@ -236,6 +199,6 @@ export default function AdminContentPage() {
 					</div>
 				</div>
 			</section>
-		</main>
+		</>
 	);
 }

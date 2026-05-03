@@ -47,14 +47,7 @@ export default function AdminImportPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8fafc]">
-      <section className="py-16 px-6 bg-[#0f172a] text-white">
-        <div className="max-w-[800px] mx-auto">
-          <h1 className="text-3xl font-bold mb-2">Import Vendors</h1>
-          <p className="text-[#94a3b8]">Upload a CSV file to import vendors into the marketplace directory.</p>
-        </div>
-      </section>
-
+    <>
       <section className="py-12 px-6">
         <div className="max-w-[800px] mx-auto">
           {/* Upload Card */}
@@ -150,6 +143,6 @@ export default function AdminImportPage() {
           </div>
         </div>
       </section>
-    </main>
+    </>
   )
 }

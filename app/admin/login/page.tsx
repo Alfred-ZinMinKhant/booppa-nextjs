@@ -1,119 +1,118 @@
-"use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+'use client'
+
+import { useState, FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
+import { Lock, User, Eye, EyeOff, AlertCircle, Loader2, Shield } from 'lucide-react'
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const router = useRouter()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
     try {
-      const res = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
+      const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        throw new Error(data.error || "Login failed");
+        setError(data.detail || data.error || 'Invalid admin credentials')
+        return
       }
-      router.push("/admin/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Login failed");
+      router.push('/admin/dashboard')
+      router.refresh()
+    } catch {
+      setError('Network error — please try again')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-6">
-      <div className="w-full max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        <div className="hidden md:flex flex-col items-start justify-center text-left px-6">
-          <div className="mb-6">
-            <h1 className="text-4xl font-extrabold text-white">Booppa Admin</h1>
-            <p className="text-gray-300 mt-2">Manage users, reports and subscription access.</p>
-          </div>
-          <div className="bg-white/5 p-6 rounded-lg border border-white/5">
-            <h3 className="text-white font-semibold mb-2">Quick Actions</h3>
-            <ul className="text-gray-300 text-sm space-y-2">
-              <li>• View audit reports</li>
-              <li>• Manage subscriptions</li>
-              <li>• Support & user management</li>
-            </ul>
+    <div className="min-h-screen bg-neutral-950 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-500/10 rounded-xl">
+              <Shield className="h-8 w-8 text-amber-400" />
+            </div>
+            <span className="text-2xl font-bold text-white tracking-tight">BOOPPA · ADMIN</span>
           </div>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-auto"
-          aria-label="Admin login form"
-        >
-          <div className="flex items-center justify-center mb-6">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-              <rect width="24" height="24" rx="6" fill="#0ea5a4" />
-              <path d="M7 12h10M7 16h6M7 8h10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
+        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8">
+          <h1 className="text-xl font-semibold text-white mb-1">Admin sign in</h1>
+          <p className="text-neutral-400 text-sm mb-6">Restricted area. Authorized personnel only.</p>
 
-          <h2 className="text-2xl font-bold mb-2 text-center">Admin Login</h2>
-          <p className="text-sm text-center text-gray-500 mb-6">Sign in to manage the Booppa workspace</p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="admin-username" className="block text-sm font-medium text-neutral-300 mb-1.5">Username</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                <input
+                  id="admin-username"
+                  type="text"
+                  required
+                  autoFocus
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                  placeholder="admin"
+                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500"
+                />
+              </div>
+            </div>
 
-          {error && (
-            <div className="mb-4 text-red-600 text-center font-medium">{error}</div>
-          )}
+            <div>
+              <label htmlFor="admin-password" className="block text-sm font-medium text-neutral-300 mb-1.5">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                <input
+                  id="admin-password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  maxLength={128}
+                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-10 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(s => !s)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
 
-          <div className="mb-4">
-            <label htmlFor="email" className="block mb-1 font-medium text-gray-700">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-teal-400"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              autoFocus
-            />
-          </div>
+            {error && (
+              <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2.5">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
 
-          <div className="mb-4">
-            <label htmlFor="password" className="block mb-1 font-medium text-gray-700">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-teal-400"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="flex items-center justify-between mb-6 text-sm">
-            <label className="inline-flex items-center">
-              <input type="checkbox" className="form-checkbox h-4 w-4 text-teal-500" />
-              <span className="ml-2 text-gray-600">Remember me</span>
-            </label>
-            <a href="/admin/forgot" className="text-teal-600 hover:underline">Forgot password?</a>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-teal-600 text-white py-2 rounded font-semibold hover:bg-teal-700 transition disabled:opacity-70"
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-
-          <p className="text-xs text-gray-500 mt-4 text-center">By signing in you agree to the admin Terms of Service.</p>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-amber-600 hover:bg-amber-500 disabled:bg-amber-800 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2 text-sm"
+            >
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {loading ? 'Signing in…' : 'Sign in to admin'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
-  );
+  )
 }

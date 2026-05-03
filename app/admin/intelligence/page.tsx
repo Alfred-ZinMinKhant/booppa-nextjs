@@ -30,23 +30,8 @@ export default function AdminIntelligence() {
   if (loading) return null;
 
   return (
-    <div className="min-h-screen bg-neutral-100 p-8 text-neutral-900">
+    <>
       <div className="max-w-7xl mx-auto space-y-8">
-        
-        <div className="flex justify-between items-end border-b border-neutral-200 pb-6">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-neutral-900">Ecosystem Intelligence</h1>
-            <p className="text-neutral-500 mt-2">Macro trends across vendor compliance and enterprise procurement signals.</p>
-          </div>
-          <div className="flex gap-2">
-            <button className="px-4 py-2 bg-white text-neutral-700 rounded-md border border-neutral-300 shadow-sm text-sm font-medium hover:bg-neutral-50 transition">
-              Export PDF Report
-            </button>
-            <button className="px-4 py-2 bg-neutral-900 text-white rounded-md shadow-sm text-sm font-medium hover:bg-neutral-800 transition">
-              Refresh Data
-            </button>
-          </div>
-        </div>
 
         {/* Global KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -197,6 +182,6 @@ export default function AdminIntelligence() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

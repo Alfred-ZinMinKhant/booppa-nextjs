@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { endpoints } from "@/lib/config";
 
 interface FeatureFlag {
@@ -58,11 +57,6 @@ export default function AdminDashboard() {
 			.catch(() => setLoading(false));
 	}, [router]);
 
-	const handleLogout = async () => {
-		await fetch("/api/admin/logout", { method: "POST" });
-		router.replace("/admin/login");
-	};
-
 	const toggleFlag = async (flagName: string, currentValue: boolean) => {
 		try {
 			const res = await fetch(`/api/v1${endpoints.features.set(flagName)}`, {
@@ -92,46 +86,7 @@ export default function AdminDashboard() {
 	}
 
 	return (
-		<main className="min-h-screen bg-[#f8fafc]">
-			{/* Header */}
-			<section className="py-4 px-6 bg-white border-b border-[#e2e8f0]">
-				<div className="max-w-[1200px] mx-auto flex items-center justify-between">
-					<h1 className="text-2xl font-bold text-[#0f172a]">Admin Dashboard</h1>
-					<div className="flex items-center gap-4">
-						<Link
-							href="/admin/import"
-							className="px-4 py-2 bg-[#10b981] text-white font-medium rounded-lg hover:bg-[#059669] transition-colors text-sm"
-						>
-							Import Vendors
-						</Link>
-						<Link
-							href="/admin/content"
-							className="px-4 py-2 border border-[#e2e8f0] text-[#64748b] font-medium rounded-lg hover:border-[#10b981] transition-colors text-sm"
-						>
-							Content
-						</Link>
-						<Link
-							href="/admin/intelligence"
-							className="px-4 py-2 border border-[#e2e8f0] text-[#64748b] font-medium rounded-lg hover:border-[#10b981] transition-colors text-sm"
-						>
-							Intelligence
-						</Link>
-						<Link
-							href="/admin/agent-dashboard"
-							className="px-4 py-2 border border-[#1e2d4a] bg-[#0a0f1e] text-blue-400 font-medium rounded-lg hover:bg-[#111827] transition-colors text-sm"
-						>
-							Intent Agent
-						</Link>
-						<button
-							onClick={handleLogout}
-							className="text-sm text-[#64748b] hover:text-red-500 transition-colors"
-						>
-							Logout
-						</button>
-					</div>
-				</div>
-			</section>
-
+		<>
 			{error && (
 				<div className="max-w-[1200px] mx-auto px-6 pt-4">
 					<div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm">
@@ -264,6 +219,6 @@ export default function AdminDashboard() {
 					</div>
 				</div>
 			</section>
-		</main>
+		</>
 	);
 }

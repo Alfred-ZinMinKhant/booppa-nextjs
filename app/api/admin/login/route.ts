@@ -1,49 +1,39 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { config } from '@/lib/config';
+import { NextRequest, NextResponse } from 'next/server'
+import { config } from '@/lib/config'
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const body = await req.json()
+    const username = body.username || body.email
+    const password = body.password
+    if (!username || !password) {
+      return NextResponse.json({ error: 'Username and password are required.' }, { status: 400 })
+    }
 
-    const formBody = new URLSearchParams({ username: email, password });
-    const res = await fetch(`${config.apiUrl}/api/v1/auth/token`, {
+    const res = await fetch(`${config.apiUrl}/api/v1/admin/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formBody.toString(),
-    });
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    })
 
-    const data = await res.json();
-
+    const data = await res.json().catch(() => ({}))
     if (!res.ok) {
       return NextResponse.json(
-        { error: data.detail || 'Login failed' },
+        { error: data.detail || 'Invalid admin credentials' },
         { status: res.status }
-      );
+      )
     }
 
-    const isProduction = process.env.NODE_ENV === 'production';
-    const response = NextResponse.json({ ok: true });
-
+    const response = NextResponse.json({ ok: true })
     response.cookies.set('admin_token', data.access_token, {
       httpOnly: true,
-      path: '/admin',
-      secure: isProduction,
-      maxAge: config.tokenMaxAge,
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 12,
       sameSite: 'lax',
-    });
-
-    if (data.refresh_token) {
-      response.cookies.set('admin_refresh_token', data.refresh_token, {
-        httpOnly: true,
-        path: '/admin',
-        secure: isProduction,
-        maxAge: config.refreshTokenMaxAge,
-        sameSite: 'lax',
-      });
-    }
-
-    return response;
+    })
+    return response
   } catch {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 }
