@@ -72,10 +72,12 @@ const nextConfig = {
   },
   async rewrites() {
     const backend = process.env.BACKEND_BASE_URL || 'https://api.booppa.io';
+    const cms = process.env.CMS_BASE || 'https://cms.booppa.io';
     return [
       { source: '/api/v1/:path*', destination: `${backend}/api/v1/:path*` },
       { source: '/api/admin/intelligence', destination: `${backend}/api/v1/admin/intelligence` },
       { source: '/api/admin/intelligence/:path*', destination: `${backend}/api/v1/admin/intelligence/:path*` },
+      { source: '/api/public/:path*', destination: `${cms}/api/public/:path*` },
     ];
   },
   async headers() {

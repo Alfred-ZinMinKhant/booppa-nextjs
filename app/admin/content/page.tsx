@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const CMS_BASE =
-	process.env.NEXT_PUBLIC_CMS_BASE ||
-	process.env.NEXT_PUBLIC_API_Backend ||
-	"https://cms.booppa.io";
+const CMS_BASE = "";
 
 const CONTENT_TYPES = [
 	{ key: "blogs", label: "Blog Posts", api: "/api/public/blogs/" },
