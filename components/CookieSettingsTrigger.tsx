@@ -5,6 +5,7 @@ import { ShieldCheck } from "lucide-react";
 
 export default function CookieSettingsTrigger() {
 	const [show, setShow] = useState(false);
+	const [atBottom, setAtBottom] = useState(false);
 
 	useEffect(() => {
 		// Only show the trigger if consent has already been given
@@ -22,13 +23,27 @@ export default function CookieSettingsTrigger() {
 			window.removeEventListener("consent:changed", handleConsentChange);
 	}, []);
 
+	useEffect(() => {
+		const onScroll = () => {
+			const distFromBottom = document.documentElement.scrollHeight - (window.innerHeight + window.scrollY);
+			setAtBottom(distFromBottom < 240);
+		};
+		onScroll();
+		window.addEventListener("scroll", onScroll, { passive: true });
+		window.addEventListener("resize", onScroll);
+		return () => {
+			window.removeEventListener("scroll", onScroll);
+			window.removeEventListener("resize", onScroll);
+		};
+	}, []);
+
 	const openSettings = () => {
 		// Clear local storage briefly or just dispatch a custom event that CookieBanner listens to
 		// For simplicity, we'll tell CookieBanner to show up again
 		window.dispatchEvent(new CustomEvent("consent:open-settings"));
 	};
 
-	if (!show) return null;
+	if (!show || atBottom) return null;
 
 	return (
 		<button

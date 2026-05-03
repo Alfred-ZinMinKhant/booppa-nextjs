@@ -21,7 +21,7 @@ const securityHeaders = [
   },
   {
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: api.qrserver.com polygonscan.com assets.calendly.com cms.booppa.io 13.229.135.184; font-src 'self' fonts.gstatic.com; connect-src 'self' api.booppa.io cms.booppa.io 13.229.135.184; frame-src 'self' calendly.com;",
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: https://api.qrserver.com https://polygonscan.com https://assets.calendly.com https://cms.booppa.io http://13.229.135.184; font-src 'self' fonts.gstatic.com; connect-src 'self' https://api.booppa.io https://cms.booppa.io http://13.229.135.184; frame-src 'self' https://calendly.com;",
   },
 ];
 

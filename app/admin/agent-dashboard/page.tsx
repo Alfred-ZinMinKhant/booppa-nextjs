@@ -63,6 +63,7 @@ export default function AgentDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [activity, setActivity] = useState<any[]>([]);
+  const [logs, setLogs] = useState<{ ts: string | null; level: string; msg: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [filter, setFilter] = useState('all');
@@ -71,19 +72,22 @@ export default function AgentDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [leadsRes, statsRes, activityRes] = await Promise.all([
+        const [leadsRes, statsRes, activityRes, logsRes] = await Promise.all([
           fetch('/api/v1/leads/'),
           fetch('/api/v1/leads/stats'),
           fetch('/api/v1/leads/activity'),
+          fetch('/api/v1/leads/logs?limit=50'),
         ]);
 
         const leadsData = leadsRes.ok ? await leadsRes.json() : [];
         const statsData = statsRes.ok ? await statsRes.json() : null;
         const activityData = activityRes.ok ? await activityRes.json() : [];
+        const logsData = logsRes.ok ? await logsRes.json() : [];
 
         setLeads(Array.isArray(leadsData) ? leadsData : leadsData?.results || []);
         setStats(statsData);
         setActivity(Array.isArray(activityData) ? activityData : []);
+        setLogs(Array.isArray(logsData) ? logsData : []);
         
         if (leadsData.length > 0 && !selectedDomain) {
           setSelectedDomain(leadsData[0].domain);
@@ -411,13 +415,12 @@ export default function AgentDashboard() {
             </div>
             <div className="flex-1 p-4 font-mono text-[10px] custom-scrollbar overflow-y-auto max-h-[240px]">
                <div className="space-y-1">
-                 <LogEntry level="info" msg="Booppa Intent Agent v10.0 Enterprise initialized" />
-                 <LogEntry level="info" msg="Connection pool established with production database" />
-                 <LogEntry level="info" msg={`Enrichment complete. Total Leads: ${leads.length}`} />
-                 <LogEntry level="info" msg="Materialized views refreshed concurrently" />
-                 <LogEntry level="info" msg="AI classification batch processed via DeepSeek" />
-                 <LogEntry level="warn" msg="PDPA IP anonymization enforced for 7+ day records" />
-                 <LogEntry level="info" msg="Agent heartbeat stable. Standing by for next cycle." />
+                 {logs.length === 0 && (
+                   <LogEntry level="info" msg="No recent activity." />
+                 )}
+                 {logs.map((l, i) => (
+                   <LogEntry key={`${l.ts}-${i}`} level={l.level} msg={l.ts ? `${new Date(l.ts).toLocaleTimeString()} — ${l.msg}` : l.msg} />
+                 ))}
                </div>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 
 export default function StickyClaimCTA() {
   const [hasClaimedProfile, setHasClaimedProfile] = useState(false);
+  const [atBottom, setAtBottom] = useState(false);
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -16,6 +17,22 @@ export default function StickyClaimCTA() {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const distFromBottom = document.documentElement.scrollHeight - (window.innerHeight + window.scrollY);
+      setAtBottom(distFromBottom < 240);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+
+  if (atBottom) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
