@@ -2,9 +2,10 @@
 
 import type { ReactNode } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  Shield, LayoutDashboard, FileText, Briefcase, Users, Activity,
+  LayoutDashboard, FileText, Briefcase, Users, Activity,
   Upload, Inbox, LifeBuoy, LogOut, Brain, Newspaper, BookOpen,
   ScrollText, GraduationCap,
 } from 'lucide-react'
@@ -59,9 +60,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       <aside className="w-60 shrink-0 bg-neutral-900 border-r border-neutral-800 flex flex-col">
         <div className="px-5 py-5 border-b border-neutral-800">
           <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <div className="p-1.5 bg-amber-500/10 rounded-lg">
-              <Shield className="h-5 w-5 text-amber-400" />
-            </div>
+            <Image src="/logo.png" alt="Booppa" width={28} height={28} className="rounded-md" />
             <span className="font-bold tracking-tight">BOOPPA · ADMIN</span>
           </Link>
         </div>

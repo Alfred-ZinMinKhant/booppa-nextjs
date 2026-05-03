@@ -25,9 +25,9 @@ export const endpoints = {
     importCsv:  '/marketplace/import/csv',
   },
   features: {
-    list:           '/features/',
-    get:            (name: string) => `/features/${name}`,
-    set:            (name: string) => `/features/${name}`,
+    list:           '/features/flags',
+    get:            (name: string) => `/features/flags/${name}`,
+    set:            (_name: string) => `/features/flags`,
     metrics:        '/features/metrics',
     autoActivate:   '/features/auto-activate',
   },

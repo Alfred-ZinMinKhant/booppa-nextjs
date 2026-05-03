@@ -60,10 +60,10 @@ export default function AdminDashboard() {
 	const toggleFlag = async (flagName: string, currentValue: boolean) => {
 		try {
 			const res = await fetch(`/api/v1${endpoints.features.set(flagName)}`, {
-				method: "PUT",
+				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				credentials: "include",
-				body: JSON.stringify({ enabled: !currentValue }),
+				body: JSON.stringify({ flag_name: flagName, enabled: !currentValue }),
 			});
 			if (res.ok) {
 				setFlags((prev) =>
