@@ -70,6 +70,14 @@ const nextConfig = {
   async redirects() {
     return [];
   },
+  async rewrites() {
+    const backend = process.env.BACKEND_BASE_URL || 'https://api.booppa.io';
+    return [
+      { source: '/api/v1/:path*', destination: `${backend}/api/v1/:path*` },
+      { source: '/api/admin/intelligence', destination: `${backend}/api/v1/admin/intelligence` },
+      { source: '/api/admin/intelligence/:path*', destination: `${backend}/api/v1/admin/intelligence/:path*` },
+    ];
+  },
   async headers() {
     return [
       {

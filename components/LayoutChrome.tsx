@@ -7,7 +7,7 @@ import Footer from "./Footer";
 import StickyClaimCTA from "./StickyClaimCTA";
 
 // Routes that render as standalone pages — no global nav/footer/ticker
-const STANDALONE = ["/government"];
+const STANDALONE = ["/government", "/admin"];
 
 export default function LayoutChrome() {
 	const pathname = usePathname();
