@@ -1,0 +1,20 @@
+version: 1
+applications:
+  - frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci --legacy-peer-deps
+        build:
+          commands:
+            # Expose Amplify Console env vars to Next.js SSR runtime
+            - env | grep -E '^(CMS_ADMIN_TOKEN|CMS_BASE|BACKEND_BASE_URL|VERIFY_BASE_URL|COOKIE_SIGNING_SECRET|ADMIN_USER|ADMIN_PASSWORD|NEXT_PUBLIC_BASE_URL|NEXT_PUBLIC_API_BACKEND|NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY|NEXT_PUBLIC_STRIPE_PDPA_QUICK_SCAN|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|RESEND_API_KEY|S3_BUCKET|FEATURE_SEO)=' >> .env.production
+            - npm run build
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - .next/cache/**/*

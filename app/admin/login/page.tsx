@@ -2,7 +2,9 @@
 
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Lock, User, Eye, EyeOff, AlertCircle, Loader2, Shield } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Lock, User, Eye, EyeOff, AlertCircle, Loader2, ArrowLeft } from 'lucide-react'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -37,15 +39,20 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-neutral-950 flex items-center justify-center px-4 relative">
+      <Link
+        href="/"
+        className="absolute top-6 left-6 inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to website
+      </Link>
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-500/10 rounded-xl">
-              <Shield className="h-8 w-8 text-amber-400" />
-            </div>
+          <Link href="/" className="flex items-center gap-3">
+            <Image src="/logo.png" alt="Booppa" width={40} height={40} className="rounded-lg" />
             <span className="text-2xl font-bold text-white tracking-tight">BOOPPA · ADMIN</span>
-          </div>
+          </Link>
         </div>
 
         <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8">
