@@ -3,13 +3,14 @@
 import { Suspense, useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Shield, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react'
+import { Shield, Mail, Lock, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react'
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -80,18 +81,35 @@ function LoginForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-300 mb-1.5">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="login-password" className="block text-sm font-medium text-neutral-300">Password</label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-emerald-400 hover:text-emerald-300"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
                 <input
-                  type="password"
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  maxLength={20}
-                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+                  maxLength={64}
+                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-10 pr-10 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(s => !s)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
 

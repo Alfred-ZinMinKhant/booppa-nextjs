@@ -149,6 +149,11 @@ export default function PricingPage() {
 	const [bundleError, setBundleError] = useState<string | null>(null);
 
 	async function handleCheckout(productType: string) {
+		if (!loggedIn) {
+			const from = typeof window !== "undefined" ? `${window.location.pathname}${window.location.hash || ""}` : "/pricing";
+			window.location.href = `/login?from=${encodeURIComponent(from)}`;
+			return;
+		}
 		if (BUNDLE_TYPES.has(productType)) {
 			// Try to prefill from /api/auth/me
 			try {

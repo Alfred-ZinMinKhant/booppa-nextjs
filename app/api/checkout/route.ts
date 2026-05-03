@@ -7,16 +7,18 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    // Inject the logged-in user's email so the Stripe webhook always has it
-    // for fulfillment (plan activation, email sending) even on subscriptions
-    // where customer_details may be absent for returning Stripe customers.
-    let enrichedBody = body
-    if (!body.prefill_email && !body.customerEmail) {
-      const user = await getServerSideUser()
-      if (user?.email) {
-        enrichedBody = { ...body, prefill_email: user.email }
-      }
+    // Require sign-in: notarization upload, PDPA scan, and bundle fulfillment
+    // all need an authenticated user account. Block checkout for guests.
+    const user = await getServerSideUser()
+    if (!user?.email) {
+      return NextResponse.json(
+        { error: 'Please sign in to purchase.' },
+        { status: 401 }
+      )
     }
+    const enrichedBody = body.prefill_email || body.customerEmail
+      ? body
+      : { ...body, prefill_email: user.email }
 
     const res = await fetchWithAuth('/api/v1/stripe/checkout', {
       method: 'POST',
@@ -34,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(data)
-  } catch (error: any) {
+  } catch (error) {
     console.error('[Checkout proxy error]', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
