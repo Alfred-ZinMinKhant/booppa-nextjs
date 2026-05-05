@@ -4,10 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 type Tab =
-	| "oneoff"
-	| "bundles"
-	| "subscriptions"
-	| "procurement"
+	| "vendors"
+	| "buyers"
 	| "enterprise";
 
 function CheckItem({
@@ -34,12 +32,10 @@ const BUNDLE_TYPES = new Set([
 
 async function startCheckout(productType: string, extraBody?: Record<string, string>): Promise<void> {
 	try {
-		const mergedExtra = extraBody;
-
 		const res = await fetch("/api/checkout", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ productType, ...mergedExtra }),
+			body: JSON.stringify({ productType, ...extraBody }),
 		});
 		const data = await res.json();
 		if (data.url) {
@@ -47,17 +43,14 @@ async function startCheckout(productType: string, extraBody?: Record<string, str
 		} else if (res.status === 409) {
 			window.location.href = "/vendor/dashboard";
 		} else if (res.status === 422 && /website/i.test(data.error || "")) {
-			// Fallback prompt (e.g. for PDPA Monitor or any product missing website)
-			const website = prompt(
-				"We need your website URL to run your first scan.\n\nEnter your website (e.g. https://example.com):"
-			);
+			const website = prompt("We need your website URL to run your first scan.\n\nEnter your website (e.g. https://example.com):");
 			if (website?.trim()) {
-				await startCheckout(productType, { ...(mergedExtra || {}), website: website.trim() });
+				await startCheckout(productType, { ...(extraBody || {}), website: website.trim() });
 			}
 		} else if (res.status === 422 && /company/i.test(data.error || "")) {
 			const company = prompt("We need your company name to generate your bundle reports.\n\nEnter your company name:");
 			if (company?.trim()) {
-				await startCheckout(productType, { ...(mergedExtra || {}), company_name: company.trim() });
+				await startCheckout(productType, { ...(extraBody || {}), company_name: company.trim() });
 			}
 		} else {
 			alert(data.error || "Unable to start checkout. Please try again.");
@@ -68,13 +61,12 @@ async function startCheckout(productType: string, extraBody?: Record<string, str
 }
 
 export default function PricingPage() {
-	const [activeTab, setActiveTab] = useState<Tab>("oneoff");
+	const [activeTab, setActiveTab] = useState<Tab>("vendors");
 	const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
 	const [loggedIn, setLoggedIn] = useState(false);
 	const [activeSubs, setActiveSubs] = useState<string[]>([]);
 	const [platformStats, setPlatformStats] = useState({ vendorsIndexed: 0, verifiedEntities: 0, openTenders: 0 });
 
-	// Check auth on mount so we can swap CTAs for logged-in users and detect active subscriptions
 	useEffect(() => {
 		fetch("/api/auth/me")
 			.then((r) => r.ok ? r.json() : null)
@@ -83,66 +75,19 @@ export default function PricingPage() {
 			})
 			.catch(() => {});
 
-		// Fetch platform stats for real numbers
 		fetch('/api/platform-stats')
 			.then(r => r.ok ? r.json() : null)
 			.then(data => { if (data) setPlatformStats(data); })
 			.catch(() => {});
 
-		// Fetch dashboard alerts to get activeSubscriptions from the Subscription table
 		fetch(`/api/vendor/dashboard-alerts?t=${Date.now()}`)
 			.then(r => r.ok ? r.json() : null)
 			.then((alerts: any) => {
 				const subs = alerts?.activeSubscriptions || [];
-				console.log("Pricing Page - Active Subscriptions:", subs);
 				setActiveSubs(subs);
 			})
-			.catch(err => {
-				console.error("Pricing Page - Subscription Check Failed:", err);
-				setActiveSubs([]);
-			});
+			.catch(() => {});
 	}, []);
-
-	// Find My Plan wizard
-	const [wizardOpen, setWizardOpen] = useState(false);
-	const [wizardStep, setWizardStep] = useState(0);
-	const [wAnswers, setWAnswers] = useState<(number | null)[]>([null, null, null]);
-
-	const WIZARD_QS: { q: string; options: string[] }[] = [
-		{
-			q: "Are you currently bidding on a government tender?",
-			options: ["Yes, I have an active tender", "Not yet — I'm building my profile"],
-		},
-		{
-			q: "Do you already have compliance documentation?",
-			options: ["Yes, I have ISO / PDPA docs", "No, I'm starting from scratch"],
-		},
-		{
-			q: "What is your main goal right now?",
-			options: ["Get verified & visible to buyers", "Build trust & credibility", "Win a specific tender", "Scale to enterprise"],
-		},
-	];
-
-	function getRecommendation() {
-		const [a1, a2, a3] = wAnswers;
-		if (a3 === 3) return { plan: "Enterprise Bid Kit", step: "Step 4", price: "SGD 899", cta: "Go Enterprise →", href: "#bundles", desc: "Full submission pack — built for contracts over SGD 100k.", color: "#f59e0b" };
-		if (a1 === 0 && a3 === 2) return { plan: "RFP Accelerator", step: "Step 3", price: "SGD 449", cta: "Win More Tenders →", href: "#bundles", desc: "Trust Pack + RFP Express bundled — 27% off. The fastest path from new vendor to winning bid.", color: "#7c3aed" };
-		if (a1 === 0) return { plan: "RFP Express", step: "Step 3", price: "SGD 249", cta: "Win This Tender →", href: "/rfp-acceleration", desc: "Tender Readiness PDF + Strategy 6 shortlist alert. For your active tender right now.", color: "#7c3aed" };
-		if (a2 === 1) return { plan: "Vendor Trust Pack", step: "Step 2", price: "SGD 249", cta: "Build Trust →", href: "#bundles", desc: "Vendor Proof + PDPA Scan + 2 Notarizations. Your complete credibility foundation.", color: "#10b981" };
-		return { plan: "Vendor Proof", step: "Step 1", price: "SGD 149", cta: "Get Verified →", href: "/vendor-proof", desc: "Get your verified badge and appear in buyer-only searches immediately.", color: "#10b981" };
-	}
-
-	function handleWizardAnswer(qi: number, ai: number) {
-		const next = [...wAnswers];
-		next[qi] = ai;
-		setWAnswers(next);
-		setWizardStep(qi + 1);
-	}
-
-	function resetWizard() {
-		setWAnswers([null, null, null]);
-		setWizardStep(0);
-	}
 
 	const [bundleModal, setBundleModal] = useState<{ productType: string } | null>(null);
 	const [bundleForm, setBundleForm] = useState({ website: "", company: "" });
@@ -155,7 +100,6 @@ export default function PricingPage() {
 			return;
 		}
 		if (BUNDLE_TYPES.has(productType)) {
-			// Try to prefill from /api/auth/me
 			try {
 				const meRes = await fetch("/api/auth/me");
 				if (meRes.ok) {
@@ -181,7 +125,6 @@ export default function PricingPage() {
 		const company = bundleForm.company.trim();
 		if (!website) { setBundleError("Website URL is required."); return; }
 		if (!company) { setBundleError("Company name is required."); return; }
-		// Normalize: prepend https:// if scheme missing, then validate it parses as a URL.
 		if (!/^https?:\/\//i.test(website)) website = `https://${website}`;
 		try {
 			const u = new URL(website);
@@ -190,7 +133,6 @@ export default function PricingPage() {
 			setBundleError("Please enter a valid website (e.g. yourcompany.com).");
 			return;
 		}
-		setBundleError(null);
 		const productType = bundleModal.productType;
 		setLoadingProduct(productType);
 		setBundleModal(null);
@@ -199,11 +141,9 @@ export default function PricingPage() {
 	}
 
 	const tabs: { id: Tab; label: string }[] = [
-		{ id: "oneoff", label: "One-Time" },
-		{ id: "bundles", label: "Bundles" },
-		{ id: "subscriptions", label: "Subscriptions" },
-		{ id: "procurement", label: "Procurement" },
-		{ id: "enterprise", label: "Enterprise" },
+		{ id: "vendors", label: "For Vendors" },
+		{ id: "buyers", label: "For Buyers" },
+		{ id: "enterprise", label: "For Enterprise" },
 	];
 
 	return (
@@ -240,1606 +180,379 @@ export default function PricingPage() {
 						</div>
 					</div>
 
-					{/* ── ONE-TIME ─────────────────────────────────────────────────── */}
-					{activeTab === "oneoff" && (
-						<div className="space-y-8">
-
-							{/* Social proof */}
-							<p className="text-center text-sm font-semibold text-[#0f172a] mb-4">
-							{platformStats.vendorsIndexed > 0
-								? `${platformStats.vendorsIndexed.toLocaleString()}+ vendors indexed across Singapore`
-								: "Used by 1,000+ vendors across Singapore"}
-						</p>
-
-							{/* ── Journey Path ── */}
-							<div className="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] px-6 py-5">
-								<p className="text-[10px] font-black text-[#94a3b8] uppercase tracking-widest mb-4 text-center">Your compliance journey — start small, upgrade as you grow</p>
-								<div className="flex items-center justify-center flex-wrap gap-2">
-									{[
-										{ n: "1", label: "Get Verified", color: "#10b981", bg: "#f0fdf4" },
-										{ n: "2", label: "Build Credibility", color: "#3b82f6", bg: "#eff6ff" },
-										{ n: "3", label: "Win Tenders", color: "#7c3aed", bg: "#f5f3ff" },
-										{ n: "4", label: "Go Enterprise", color: "#d97706", bg: "#fffbeb" },
-									].map((s, i, arr) => (
-										<div key={s.n} className="flex items-center gap-2">
-											<div className="flex items-center gap-2 px-3 py-1.5 rounded-full border" style={{ borderColor: s.color + "40", background: s.bg }}>
-												<div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-black flex-shrink-0" style={{ background: s.color }}>{s.n}</div>
-												<span className="text-xs font-bold" style={{ color: s.color }}>{s.label}</span>
-											</div>
-											{i < arr.length - 1 && <span className="text-[#cbd5e1] font-bold text-sm">→</span>}
-										</div>
-									))}
+					{/* ── FOR VENDORS ─────────────────────────────────────────────────── */}
+					{activeTab === "vendors" && (
+						<div className="space-y-12">
+							{/* Free Profile Ribbon */}
+							<div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+								<div className="flex items-center gap-4">
+									<div className="flex-shrink-0 w-12 h-12 bg-[#10b981]/10 rounded-xl flex items-center justify-center">
+										<span className="text-xl">🛡️</span>
+									</div>
+									<div>
+										<h3 className="text-lg font-bold text-[#0f172a]">Free Company Profile</h3>
+										<p className="text-sm text-[#64748b]">Claim your presence, appear in vendor searches, and track GeBIZ opportunities at no cost.</p>
+									</div>
+								</div>
+								<div className="flex items-center gap-4">
+									<span className="text-xs font-black text-[#10b981] uppercase tracking-widest bg-[#10b981]/10 px-3 py-1 rounded-full">Always Free</span>
+									<Link href={loggedIn ? "/vendor/dashboard" : "/auth/register"} className="px-6 py-3 bg-[#0f172a] text-white font-bold rounded-xl hover:bg-[#1e293b] transition shadow-lg shadow-[#0f172a]/20 text-sm whitespace-nowrap">
+										{loggedIn ? "Go to Dashboard" : "Claim Free Profile"} →
+									</Link>
 								</div>
 							</div>
 
-							{/* ── Find My Plan Wizard ── */}
-							<div className="bg-white rounded-2xl border-2 border-[#e2e8f0] overflow-hidden">
-								<button
-									type="button"
-									onClick={() => setWizardOpen((o) => !o)}
-									className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-[#f8fafc] transition-colors"
-								>
-									<div>
-										<p className="text-xs font-black text-[#10b981] uppercase tracking-widest mb-0.5">Find My Plan</p>
-										<p className="text-base font-bold text-[#0f172a]">Not sure where to start? Answer 3 quick questions →</p>
-									</div>
-									<span className="text-[#94a3b8] text-xl font-light ml-4">{wizardOpen ? "−" : "+"}</span>
-								</button>
-
-								{wizardOpen && (
-									<div className="px-6 pb-6 border-t border-[#e2e8f0]">
-										{wizardStep < 3 && (
-											<div className="pt-5">
-												<div className="flex gap-1 mb-4">
-													{(["q1", "q2", "q3"] as const).map((id, i) => (
-														<div key={id} className={`h-1 flex-1 rounded-full transition-colors ${i <= wizardStep ? "bg-[#10b981]" : "bg-[#e2e8f0]"}`} />
-													))}
-												</div>
-												<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-2">Question {wizardStep + 1} of 3</p>
-												<p className="text-lg font-bold text-[#0f172a] mb-4">{WIZARD_QS[wizardStep].q}</p>
-												<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-													{WIZARD_QS[wizardStep].options.map((opt, ai) => (
-														<button
-															key={opt}
-															type="button"
-															onClick={() => handleWizardAnswer(wizardStep, ai)}
-															className="text-left px-4 py-3 rounded-xl border-2 border-[#e2e8f0] hover:border-[#10b981] hover:bg-[#f0fdf4] text-sm font-semibold text-[#0f172a] transition-all"
-														>
-															{opt}
-														</button>
-													))}
-												</div>
-											</div>
-										)}
-										{wizardStep === 3 && (() => {
-											const rec = getRecommendation();
-											return (
-												<div className="pt-5">
-													<p className="text-xs font-black text-[#94a3b8] uppercase tracking-widest mb-3">Your Recommended Plan</p>
-													<div className="rounded-xl border-2 p-5 flex flex-col sm:flex-row sm:items-center gap-4" style={{ borderColor: rec.color + "50", background: rec.color + "08" }}>
-														<div className="flex-1">
-															<div className="flex items-center gap-2 mb-1">
-																<span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full text-white" style={{ background: rec.color }}>{rec.step}</span>
-																<span className="text-lg font-black text-[#0f172a]">{rec.plan}</span>
-																<span className="text-base font-bold" style={{ color: rec.color }}>{rec.price}</span>
-															</div>
-															<p className="text-sm text-[#64748b]">{rec.desc}</p>
-														</div>
-														<div className="flex flex-col gap-2 flex-shrink-0">
-															<Link href={rec.href} className="px-5 py-2.5 rounded-xl text-white text-sm font-bold text-center transition hover:opacity-90" style={{ background: rec.color }}>
-																{rec.cta}
-															</Link>
-															<button type="button" onClick={resetWizard} className="text-xs text-[#94a3b8] hover:text-[#64748b] text-center">
-																← Start over
-															</button>
-														</div>
-													</div>
-												</div>
-											);
-										})()}
-									</div>
-								)}
-							</div>
-
-							{/* ── Step 1: Get Verified ── */}
+							{/* Section: One-Time */}
 							<div>
-								<div className="bg-[#f0fdf4] border border-[#10b981]/20 rounded-xl px-5 py-4 mb-4 text-center">
-									<p className="text-[#0f172a] font-bold text-sm">Most vendors are invisible to buyers.</p>
-									<p className="text-[#10b981] font-semibold text-sm">Get verified and start appearing in procurement searches.</p>
+								<div className="flex items-center gap-3 mb-8">
+									<div className="w-8 h-8 rounded-full bg-[#10b981] flex items-center justify-center text-white text-xs font-black">1</div>
+									<h2 className="text-2xl font-black text-[#0f172a]">One-Time Packages</h2>
 								</div>
-								<div className="flex items-center gap-3 mb-4">
-									<div className="w-7 h-7 rounded-full bg-[#10b981] flex items-center justify-center text-white text-xs font-black flex-shrink-0">1</div>
-									<div>
-										<p className="text-xs font-black text-[#10b981] uppercase tracking-widest">Step 1</p>
-										<p className="text-base font-black text-[#0f172a]">Get Verified — establish your presence</p>
-									</div>
-								</div>
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-									<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all">
-										<div className="flex items-start justify-between mb-4">
-											<h3 className="text-xl font-bold text-[#0f172a]">Free Profile</h3>
-											<span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#f1f5f9] text-[#64748b]">Always free</span>
-										</div>
-										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 0</div>
-										<p className="text-sm text-[#64748b] mb-1">Claim your presence on Booppa</p>
-										<p className="text-xs text-[#94a3b8] mb-6 pb-6 border-b border-[#e2e8f0]">Best for: Vendors exploring Booppa before committing</p>
-										<ul className="space-y-2 mb-8">
-											{[
-												"Claim your company profile",
-												"Basic public listing",
-												"Appear in vendor search",
-												"GeBIZ opportunity feed",
-												"Tender Win Probability calculator",
-											].map((f) => (
-												<CheckItem key={f} text={f} />
-											))}
-										</ul>
-										{loggedIn ? (
-											<Link href="/vendor/dashboard" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm">
-												Go to Dashboard →
-											</Link>
-										) : (
-											<Link href="/auth/register" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm">
-												Claim Profile
-											</Link>
-										)}
-									</div>
-
-									<div className="bg-[#0f172a] p-8 rounded-[2rem] border-2 border-[#10b981] shadow-2xl relative hover:-translate-y-1 transition-all">
-										<div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-[#10b981] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
-											Start Here
-										</div>
-										<div className="flex items-start justify-between mb-4">
-											<h3 className="text-xl font-bold text-white">Vendor Proof</h3>
-											<span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/20 text-[#10b981]">Lifetime</span>
-										</div>
+								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+									{/* Vendor Proof */}
+									<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+										<h3 className="text-xl font-bold text-[#0f172a] mb-2">Vendor Proof</h3>
 										<div className="text-4xl font-black text-[#10b981] mb-1">SGD 149</div>
-										<p className="text-sm text-white/60 mb-1">One-time payment, no renewal</p>
-										<p className="text-xs text-white/40 mb-6 pb-6 border-b border-white/10">Best for: New vendors establishing their first verified presence on GeBIZ-linked searches</p>
-										<ul className="space-y-2 mb-8">
-											{[
-												"Verified badge on public profile",
-												"Visible in verified-only buyer searches",
-												"complianceScore baseline (30/100)",
-												"Embeddable trust badge",
-												"CAL engine activated at Level 1",
-												"Reachable by Strategy 6 shortlist alerts",
-											].map((f) => (
-												<li key={f} className="flex items-start gap-2 text-sm text-white/80">
-													<span className="text-[#10b981] font-bold flex-shrink-0">✓</span>
-													{f}
-												</li>
-											))}
+										<p className="text-xs text-[#64748b] mb-6">One-time payment · Lifetime verified badge</p>
+										<ul className="space-y-3 mb-8 flex-1">
+											{["Verified badge on profile", "Appear in verified searches", "Trust scores activation", "Embeddable trust badge"].map(f => <CheckItem key={f} text={f} />)}
 										</ul>
-										<Link href="/vendor-proof" className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 px-6 rounded-xl transition shadow-lg shadow-[#10b981]/30">
+										<Link href="/vendor-proof" className="block w-full text-center bg-[#10b981] text-white font-bold py-3.5 rounded-xl hover:bg-[#059669] transition shadow-lg shadow-[#10b981]/20">
 											Get Verified →
 										</Link>
 									</div>
-								</div>
-							</div>
 
-							{/* ── Connector ── */}
-							<div className="flex items-center gap-4">
-								<div className="flex-1 h-px bg-[#e2e8f0]" />
-								<p className="text-xs font-bold text-[#94a3b8] whitespace-nowrap">Already verified? Build your credibility next ↓</p>
-								<div className="flex-1 h-px bg-[#e2e8f0]" />
-							</div>
-
-							{/* ── Step 2: Build Credibility ── */}
-							<div>
-								<div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-3 mb-4 text-center">
-									<p className="text-blue-800 font-semibold text-sm">Without compliance proof, buyers are unlikely to shortlist you.</p>
-								</div>
-								<div className="flex items-center gap-3 mb-4">
-									<div className="w-7 h-7 rounded-full bg-[#3b82f6] flex items-center justify-center text-white text-xs font-black flex-shrink-0">2</div>
-									<div>
-										<p className="text-xs font-black text-[#3b82f6] uppercase tracking-widest">Step 2</p>
-										<p className="text-base font-black text-[#0f172a]">Build Credibility — document your compliance</p>
-									</div>
-								</div>
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-									<div className="bg-white p-7 rounded-[2rem] border-2 border-blue-200 shadow-sm hover:-translate-y-1 hover:border-[#3b82f6] transition-all">
-										<h3 className="text-lg font-bold mb-1 text-[#0f172a]">PDPA Snapshot</h3>
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: Vendors preparing for compliance checks before tenders</p>
-										<div className="text-3xl font-black text-[#0f172a] mb-1">SGD 79</div>
-										<p className="text-xs text-[#64748b] mb-5">One-time scan</p>
-										<ul className="space-y-2 mb-6">
-											{[
-												"8-dimension PDPA evaluation",
-												"Risk severity report",
-												"Legislation references",
-												"Blockchain timestamp",
-												"Downloadable PDF",
-												"+8 to +25 pts to complianceScore",
-											].map((f) => (
-												<CheckItem key={f} text={f} />
-											))}
+									{/* PDPA Snapshot */}
+									<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+										<h3 className="text-xl font-bold text-[#0f172a] mb-2">PDPA Snapshot</h3>
+										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 299</div>
+										<p className="text-xs text-[#64748b] mb-6">One-time scan · Full risk report</p>
+										<ul className="space-y-3 mb-8 flex-1">
+											{["8-dimension PDPA scan", "Risk severity breakdown", "Remediation guide", "Audit-ready PDF report"].map(f => <CheckItem key={f} text={f} color="text-blue-500" />)}
 										</ul>
-										<Link href="/pdpa" className="block w-full text-center bg-[#3b82f6] hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl transition text-sm">
-											Scan My PDPA →
+										<button 
+											disabled={loadingProduct === "pdpa_quick_scan"}
+											onClick={() => handleCheckout("pdpa_quick_scan")} 
+											className="w-full bg-[#0f172a] text-white font-bold py-3.5 rounded-xl hover:bg-[#1e293b] transition disabled:opacity-50"
+										>
+											{loadingProduct === "pdpa_quick_scan" ? "Redirecting..." : "Run Scan →"}
+										</button>
+									</div>
+
+									{/* Notarization */}
+									<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+										<h3 className="text-xl font-bold text-[#0f172a] mb-2">Notarization</h3>
+										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 69</div>
+										<p className="text-xs text-[#64748b] mb-6">Per document · Blockchain anchored</p>
+										<ul className="space-y-3 mb-8 flex-1">
+											{["Immutable proof of content", "MAS-compliant evidence", "Shareable verification link", "QR code verification"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
+										</ul>
+										<Link href="/notarization" className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] font-bold py-3 rounded-xl hover:bg-[#0f172a] hover:text-white transition">
+											Notarize Now
 										</Link>
 									</div>
 
-									<div className="bg-white p-7 rounded-[2rem] border-2 border-blue-200 shadow-sm hover:-translate-y-1 hover:border-[#3b82f6] transition-all">
-										<h3 className="text-lg font-bold mb-1 text-[#0f172a]">Notarization</h3>
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: Proving document integrity to buyers and auditors</p>
-										<div className="text-3xl font-black text-[#0f172a] mb-1">SGD 69</div>
-										<p className="text-xs text-[#64748b] mb-5">Per document</p>
-										<ul className="space-y-2 mb-3">
-											{[
-												"SHA-256 cryptographic hash",
-												"Blockchain timestamp anchor",
-												"QR verification link",
-												"Progression toward DEEP/CERTIFIED",
-												"Polygonscan URL",
-											].map((f) => (
-												<CheckItem key={f} text={f} />
-											))}
+									{/* RFP Complete */}
+									<div className="bg-white p-8 rounded-[2rem] border-2 border-amber-400 shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+										<h3 className="text-xl font-bold text-[#0f172a] mb-2">RFP Complete</h3>
+										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 599</div>
+										<p className="text-xs text-[#64748b] mb-6">Per RFP · Full submission kit</p>
+										<ul className="space-y-3 mb-8 flex-1">
+											{["Full compliance dossier", "Ready-to-submit bid kit", "Strategy 6 shortlist edge", "Expert review included"].map(f => <CheckItem key={f} text={f} color="text-amber-500" />)}
 										</ul>
-										<p className="text-xs text-[#94a3b8] mb-5">Batch: 10 docs SGD 390 · 50 docs SGD 1,750</p>
-										<Link href="/notarization" className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-2.5 rounded-xl transition text-sm">
-											View Packages
-										</Link>
-									</div>
-								</div>
-							</div>
-
-							{/* ── Connector ── */}
-							<div className="flex items-center gap-4">
-								<div className="flex-1 h-px bg-[#e2e8f0]" />
-								<p className="text-xs font-bold text-[#94a3b8] whitespace-nowrap">Bidding on a tender? Activate your winning edge ↓</p>
-								<div className="flex-1 h-px bg-[#e2e8f0]" />
-							</div>
-
-							{/* ── Step 3 + 4: Win Tenders & Enterprise ── */}
-							<div>
-								<div className="bg-violet-50 border border-violet-200 rounded-xl px-5 py-3 mb-4 text-center">
-									<p className="text-violet-800 font-semibold text-sm">Most vendors lose tenders because they are not prepared. This gives you a real advantage.</p>
-								</div>
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
-									<div className="flex items-center gap-3">
-										<div className="w-7 h-7 rounded-full bg-[#7c3aed] flex items-center justify-center text-white text-xs font-black flex-shrink-0">3</div>
-										<div>
-											<p className="text-xs font-black text-[#7c3aed] uppercase tracking-widest">Step 3</p>
-											<p className="text-base font-black text-[#0f172a]">Win Tenders</p>
-										</div>
-									</div>
-									<div className="flex items-center gap-3">
-										<div className="w-7 h-7 rounded-full bg-[#d97706] flex items-center justify-center text-white text-xs font-black flex-shrink-0">4</div>
-										<div>
-											<p className="text-xs font-black text-[#d97706] uppercase tracking-widest">Step 4</p>
-											<p className="text-base font-black text-[#0f172a]">Go Enterprise</p>
-										</div>
-									</div>
-								</div>
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-									<div className="bg-white p-7 rounded-[2rem] border-2 border-violet-300 shadow-xl relative hover:-translate-y-1 transition-all">
-										<div className="absolute top-[-12px] right-5 bg-violet-500 text-white px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">GeBIZ Ready</div>
-										<h3 className="text-lg font-bold mb-1 text-[#0f172a]">RFP Express</h3>
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: Fast tender submissions</p>
-										<div className="text-3xl font-black text-[#0f172a] mb-1">SGD 249</div>
-										<p className="text-xs text-[#64748b] mb-5">Per RFP, delivered in minutes</p>
-										<ul className="space-y-2 mb-6">
-											{[
-												"Tender Readiness Score (0–100)",
-												"Structured evidence checklist PDF",
-												"Strategy 6 fires — sector shortlist alert",
-												"Blockchain-anchored",
-												"AutoActivation counter +1",
-											].map((f) => (
-												<li key={f} className="flex items-start gap-2 text-xs text-[#64748b]">
-													<span className="text-violet-500 font-bold flex-shrink-0">✓</span>
-													{f}
-												</li>
-											))}
-										</ul>
-										<Link href="/rfp-acceleration" className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white font-bold py-2.5 rounded-xl transition text-sm">
-											Win More Tenders →
+										<Link href="/rfp-acceleration" className="block w-full text-center bg-amber-500 text-white font-bold py-3.5 rounded-xl hover:bg-amber-600 transition shadow-lg shadow-amber-500/20">
+											Build Bid Kit →
 										</Link>
 									</div>
 
-									<div className="bg-white p-7 rounded-[2rem] border-2 border-amber-300 shadow-xl relative hover:-translate-y-1 transition-all">
-										<div className="absolute top-[-12px] right-5 bg-amber-500 text-white px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">High-Value Bids</div>
-										<h3 className="text-lg font-bold mb-1 text-[#0f172a]">RFP Complete</h3>
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: Full submissions on high-value contracts</p>
-										<div className="text-3xl font-black text-[#0f172a] mb-1">SGD 599</div>
-										<p className="text-xs text-[#64748b] mb-5">Per RFP, full procurement dossier</p>
-										<ul className="space-y-2 mb-6">
-											{[
-												"Full procurement dossier",
-												"Enterprise-tier visibility",
-												"Multi-sector matching",
-												"COMPLETE evidence package tier",
-												"AutoActivation counter +1",
-											].map((f) => (
-												<CheckItem key={f} text={f} color="text-amber-500" />
-											))}
-										</ul>
-										<Link href="/rfp-acceleration" className="block w-full text-center bg-amber-500 hover:bg-amber-400 text-white font-bold py-2.5 rounded-xl transition text-sm">
-											Go Enterprise →
-										</Link>
-									</div>
-								</div>
-							</div>
-
-							{/* Tender Win Probability */}
-							<div className="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] p-6 flex flex-col sm:flex-row sm:items-center gap-4">
-								<div className="flex-1">
-									<span className="text-xs font-bold uppercase tracking-widest text-[#10b981]">Free Tool</span>
-									<h3 className="text-lg font-bold text-[#0f172a] mt-1">Tender Win Probability Calculator</h3>
-									<p className="text-sm text-[#64748b] mt-1">
-										Enter a GeBIZ tender number. See your current win probability vs what you'd achieve with RFP Express or RFP Complete.
-									</p>
-								</div>
-								<Link href="/tender-check" className="flex-shrink-0 px-5 py-2.5 bg-[#0f172a] text-white text-sm font-semibold rounded-xl hover:bg-[#1e293b] transition">
-									Try Free Calculator →
-								</Link>
-							</div>
-
-							{/* ── How it works ── */}
-							<div className="mt-4 pt-10 border-t border-[#e2e8f0]">
-								<div className="text-center mb-10">
-									<p className="text-xs font-black text-[#10b981] uppercase tracking-widest mb-2">How it works</p>
-									<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a]">Three steps. One complete bid.</h2>
-									<p className="text-[#64748b] mt-2 max-w-xl mx-auto text-sm">
-										1. Run a compliance check &nbsp;→&nbsp; 2. Notarize your documents &nbsp;→&nbsp; 3. Submit stronger bids
-									</p>
-									<p className="text-[#94a3b8] mt-1 text-xs">Or start directly with RFP if you are ready.</p>
-								</div>
-
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-0 relative">
-									{/* connector line (desktop) */}
-									<div className="hidden md:block absolute top-[52px] left-[calc(16.67%+16px)] right-[calc(16.67%+16px)] h-px bg-[#e2e8f0] z-0" />
-
-									{[
-										{
-											step: "1",
-											color: "#3b82f6",
-											bg: "#eff6ff",
-											border: "#bfdbfe",
-											icon: "🔍",
-											title: "Run a compliance check",
-											product: "PDPA Snapshot · SGD 79",
-											when: "Before submitting any tender or responding to a buyer due-diligence request",
-											what: "Know exactly where your PDPA exposure sits. Get a scored PDF report with legislation references you can attach to any bid.",
-											cta: "Run PDPA Scan →",
-											href: "/pdpa",
-										},
-										{
-											step: "2",
-											color: "#7c3aed",
-											bg: "#f5f3ff",
-											border: "#ddd6fe",
-											icon: "⛓",
-											title: "Notarize your evidence",
-											product: "Notarization · from SGD 69",
-											when: "When you need verifiable proof that a document existed and was unaltered at a point in time",
-											what: "Certify ISO certificates, security audits, or policy documents on-chain. Buyers, auditors and authorities can verify authenticity via QR code.",
-											cta: "Notarize a Document →",
-											href: "/notarization",
-										},
-										{
-											step: "3",
-											color: "#7c3aed",
-											bg: "#f5f3ff",
-											border: "#ddd6fe",
-											icon: "📋",
-											title: "Prepare and submit a stronger bid",
-											product: "RFP Express · SGD 249 or RFP Complete · SGD 599",
-											when: "Once you have an active GeBIZ tender and want a structured, evidence-backed submission",
-											what: "Generate a tender readiness score, structured evidence checklist, and a blockchain-anchored bid kit — in minutes, not days.",
-											cta: "Build My Bid →",
-											href: "/rfp-acceleration",
-										},
-									].map((s, i) => (
-										<div key={s.step} className="relative z-10 flex flex-col items-center text-center px-6 pb-6">
-											{/* Step circle */}
-											<div
-												className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-4 border-2 bg-white shadow-sm"
-												style={{ borderColor: s.border }}
-											>
-												{s.icon}
+									{/* Compliance Bundle */}
+									<div className="bg-[#0f172a] p-8 rounded-[2rem] border-2 border-[#10b981] shadow-2xl hover:-translate-y-1 transition-all relative flex flex-col lg:col-span-2">
+										<div className="absolute top-[-14px] left-8 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Best Value</div>
+										<div className="flex flex-col lg:flex-row lg:items-center gap-8">
+											<div className="flex-1">
+												<h3 className="text-2xl font-black text-white mb-2">Compliance Bundle</h3>
+												<p className="text-white/60 mb-6">The ultimate foundation for winning large-scale enterprise and government contracts.</p>
+												<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+													{["PDPA Scan (Full)", "RFP Complete Kit", "Blockchain Cover Sheet", "Full Evidence Archive"].map(f => (
+														<div key={f} className="flex items-center gap-2 text-sm text-white/80">
+															<span className="text-[#10b981] font-bold">✓</span>
+															{f}
+														</div>
+													))}
+												</div>
 											</div>
-
-											{/* Step number */}
-											<p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: s.color }}>
-												Step {s.step}
-											</p>
-
-											{/* Title */}
-											<h3 className="text-base font-black text-[#0f172a] mb-1">{s.title}</h3>
-
-											{/* Product label */}
-											<p className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full mb-3" style={{ background: s.bg, color: s.color }}>
-												{s.product}
-											</p>
-
-											{/* When to use */}
-											<div className="w-full rounded-xl border p-3 mb-3 text-left" style={{ borderColor: s.border, background: s.bg }}>
-												<p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: s.color }}>When to use</p>
-												<p className="text-xs text-[#0f172a] font-medium">{s.when}</p>
+											<div className="lg:w-64 flex flex-col items-center lg:items-end justify-center border-t lg:border-t-0 lg:border-l border-white/10 pt-6 lg:pt-0 lg:pl-8">
+												<div className="text-5xl font-black text-white mb-1">799</div>
+												<div className="text-white/40 text-xs mb-6 text-center lg:text-right">SGD · One-time bundle<br/>Save over SGD 100</div>
+												<button 
+													disabled={loadingProduct === "compliance_evidence_pack"}
+													onClick={() => handleCheckout("compliance_evidence_pack")} 
+													className="w-full bg-[#10b981] text-white font-bold py-4 rounded-2xl hover:bg-[#059669] transition shadow-lg shadow-[#10b981]/20 disabled:opacity-50"
+												>
+													{loadingProduct === "compliance_evidence_pack" ? "Redirecting..." : "Get Bundle →"}
+												</button>
 											</div>
-
-											{/* What you get */}
-											<p className="text-xs text-[#64748b] mb-4 leading-relaxed">{s.what}</p>
-
-											{/* CTA */}
-											<Link
-												href={s.href}
-												className="text-sm font-bold px-5 py-2.5 rounded-xl transition hover:opacity-90 text-white"
-												style={{ background: s.color }}
-											>
-												{s.cta}
-											</Link>
-
-											{/* Mobile arrow */}
-											{i < 2 && (
-												<div className="md:hidden mt-6 text-[#cbd5e1] text-2xl font-bold">↓</div>
-											)}
 										</div>
-									))}
-								</div>
-
-								{/* Bottom CTA */}
-								<div className="mt-8 bg-[#0f172a] rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center gap-4">
-									<div className="flex-1">
-										<p className="text-white font-bold text-sm">Not sure which step you're at?</p>
-										<p className="text-white/60 text-xs mt-0.5">Answer 3 quick questions and get a personalised recommendation.</p>
 									</div>
-									<button
-										type="button"
-										onClick={() => { setWizardOpen(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-										className="flex-shrink-0 px-5 py-2.5 bg-[#10b981] text-white text-sm font-bold rounded-xl hover:bg-[#059669] transition"
+								</div>
+							</div>
+
+							{/* Section: Subscription */}
+							<div className="pt-8 border-t border-[#e2e8f0]">
+								<div className="flex items-center gap-3 mb-8">
+									<div className="w-8 h-8 rounded-full bg-[#3b82f6] flex items-center justify-center text-white text-xs font-black">2</div>
+									<h2 className="text-2xl font-black text-[#0f172a]">Ongoing Subscriptions</h2>
+								</div>
+								<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+									{/* Vendor Active */}
+									<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm flex flex-col">
+										<h3 className="text-xl font-bold text-[#0f172a] mb-1">Vendor Active</h3>
+										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 39<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+										<p className="text-xs text-[#64748b] mb-6">Essential visibility for active vendors</p>
+										<ul className="space-y-3 mb-8 flex-1">
+											{["Priority in searches", "Real-time GeBIZ alerts", "Unlimited probability checks", "Active badge status"].map(f => <CheckItem key={f} text={f} />)}
+										</ul>
+										<button 
+											disabled={loadingProduct === "vendor_active_monthly"}
+											onClick={() => handleCheckout("vendor_active_monthly")} 
+											className="w-full border-2 border-blue-500 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-500 hover:text-white transition disabled:opacity-50"
+										>
+											{loadingProduct === "vendor_active_monthly" ? "Redirecting..." : "Subscribe"}
+										</button>
+									</div>
+
+									{/* PDPA Monitor */}
+									<div className="bg-white p-8 rounded-[2rem] border-2 border-blue-500 shadow-md relative flex flex-col">
+										<div className="absolute top-[-14px] left-8 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Recommended</div>
+										<h3 className="text-xl font-bold text-[#0f172a] mb-1">PDPA Monitor</h3>
+										<div className="text-4xl font-black text-blue-600 mb-1">SGD 299<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+										<p className="text-xs text-[#64748b] mb-6">Automated data protection compliance</p>
+										<ul className="space-y-3 mb-8 flex-1">
+											{["Monthly automated scans", "Continuous risk monitoring", "Drift alerts & notifications", "Updated audit logs"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
+										</ul>
+										<button 
+											disabled={loadingProduct === "pdpa_monitor_monthly"}
+											onClick={() => handleCheckout("pdpa_monitor_monthly")} 
+											className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-600/20 disabled:opacity-50"
+										>
+											{loadingProduct === "pdpa_monitor_monthly" ? "Redirecting..." : "Start Monitoring"}
+										</button>
+									</div>
+
+									{/* Compliance Evidence */}
+									<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm flex flex-col">
+										<h3 className="text-xl font-bold text-[#0f172a] mb-1">Compliance Evidence</h3>
+										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 499<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+										<p className="text-xs text-[#64748b] mb-6">Automated evidence & bid readiness</p>
+										<ul className="space-y-3 mb-8 flex-1">
+											{["All-in-one PDF/Docs evidence", "PDPA + RFP data coverage", "Blockchain-anchored cover sheets", "Priority procurement support"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
+										</ul>
+										<button 
+											disabled={loadingProduct === "compliance_evidence_monthly"}
+											onClick={() => handleCheckout("compliance_evidence_monthly")} 
+											className="w-full bg-[#0f172a] text-white font-bold py-3.5 rounded-xl hover:bg-[#1e293b] transition disabled:opacity-50"
+										>
+											{loadingProduct === "compliance_evidence_monthly" ? "Redirecting..." : "Select Plan"}
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{/* ── FOR BUYERS ──────────────────────────────────────────────────── */}
+					{activeTab === "buyers" && (
+						<div className="space-y-8">
+							<div className="text-center mb-12">
+								<h2 className="text-3xl font-black text-[#0f172a] mb-4">Institutional Vendor Evaluation</h2>
+								<p className="text-[#64748b] max-w-2xl mx-auto text-lg">Stop chasing documents. Get instant, verified compliance evidence on your entire supply chain.</p>
+							</div>
+
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+								{/* Enterprise Buyer (Existing) */}
+								<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+									<h3 className="text-xl font-bold text-[#0f172a] mb-3">Enterprise Buyer</h3>
+									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 499<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+									<p className="text-sm text-[#64748b] mb-6">For buyer teams evaluating vendors</p>
+									<ul className="space-y-3 mb-8 flex-1">
+										{["Full analytics dashboard", "Vendor comparison engine", "Risk signals & compliance posture", "5,000 notarizations/month"].map(f => <CheckItem key={f} text={f} />)}
+									</ul>
+									<button 
+										disabled={loadingProduct === "enterprise_monthly"}
+										onClick={() => handleCheckout("enterprise_monthly")} 
+										className="w-full bg-[#0f172a] text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50"
 									>
-										Find My Plan →
+										{loadingProduct === "enterprise_monthly" ? "Redirecting..." : "Select Plan"}
+									</button>
+								</div>
+
+								{/* Evaluate Your Suppliers */}
+								<div className="bg-white p-8 rounded-[2rem] border-2 border-blue-500 shadow-md hover:-translate-y-1 transition-all relative flex flex-col">
+									<div className="absolute top-[-14px] left-8 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">New</div>
+									<h3 className="text-xl font-bold text-[#0f172a] mb-3">Evaluate Your Suppliers</h3>
+									<div className="text-4xl font-black text-blue-600 mb-1">SGD 499<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+									<p className="text-sm text-[#64748b] mb-6">Deep insights into vendor health</p>
+									<ul className="space-y-3 mb-8 flex-1">
+										{["Enhanced vendor due diligence", "Automated risk scoring", "Compliance drift tracking", "Team collaboration tools"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
+									</ul>
+									<button 
+										disabled={loadingProduct === "evaluate_suppliers_monthly"}
+										onClick={() => handleCheckout("evaluate_suppliers_monthly")} 
+										className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-blue-600/20 disabled:opacity-50"
+									>
+										{loadingProduct === "evaluate_suppliers_monthly" ? "Redirecting..." : "Select Plan"}
+									</button>
+								</div>
+
+								{/* Verify your Supplier Evidence */}
+								<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
+									<h3 className="text-xl font-bold text-[#0f172a] mb-3">Verify Supplier Evidence</h3>
+									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 799<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+									<p className="text-sm text-[#64748b] mb-6">Full audit-ready verification suite</p>
+									<ul className="space-y-3 mb-8 flex-1">
+										{["Full evidence retrieval", "On-chain verification logs", "Custom evaluation frameworks", "Priority compliance support"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
+									</ul>
+									<button 
+										disabled={loadingProduct === "verify_supplier_evidence_monthly"}
+										onClick={() => handleCheckout("verify_supplier_evidence_monthly")} 
+										className="w-full bg-[#0f172a] text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50"
+									>
+										{loadingProduct === "verify_supplier_evidence_monthly" ? "Redirecting..." : "Select Plan"}
 									</button>
 								</div>
 							</div>
 						</div>
 					)}
 
-					{/* ── BUNDLES ──────────────────────────────────────────────────── */}
-					{activeTab === "bundles" && (
-						<div className="space-y-6">
-							<div className="text-center max-w-2xl mx-auto space-y-1">
-								<p className="text-[#64748b]">Bundles collapse multiple purchase decisions into one. Every bundle is a one-time payment — all components activate immediately.</p>
-								<p className="text-sm font-bold text-[#0f172a]">Start small → upgrade as you grow: <span className="text-[#10b981]">Get Verified</span> → <span className="text-violet-600">Win Tenders</span> → <span className="text-amber-600">Scale to Enterprise</span></p>
+					{/* ── FOR ENTERPRISE ──────────────────────────────────────────────── */}
+					{activeTab === "enterprise" && (
+						<div className="space-y-12">
+							<div className="text-center mb-12">
+								<h2 className="text-3xl font-black text-[#0f172a] mb-4">Institutional Trust Infrastructure</h2>
+								<p className="text-[#64748b] max-w-2xl mx-auto text-lg">From a first compliance check to full enterprise infrastructure — one platform, blockchain-anchored evidence at every tier.</p>
 							</div>
 
-							<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 pt-5">
-								{/* Vendor Trust Pack */}
-								<div className="bg-white rounded-[2rem] border-2 border-[#10b981] shadow-xl overflow-hidden hover:-translate-y-1 transition-all">
-									<div className="bg-[#10b981] px-7 py-5">
-										<p className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1">
-											Bundle · 32% off
-										</p>
-										<h3 className="text-2xl font-black text-white">
-											Vendor Trust Pack
-										</h3>
-										<p className="text-white/80 text-sm mt-1">Step 1–2 · Get Verified + Build Credibility</p>
-										<p className="text-white/50 text-xs mt-1">Best for: Vendors starting from scratch who want a verified, documented compliance foundation</p>
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+								{/* PDPA Quick Scan */}
+								<div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
+									<h3 className="text-xl font-bold text-[#0f172a] mb-2">PDPA Quick Scan</h3>
+									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 299</div>
+									<p className="text-xs text-[#64748b] mb-6">one-time payment</p>
+									<ul className="space-y-3 mb-8 flex-1">
+										{["Public-facing compliance check", "Score + findings report (PDF)", "Polygon Amoy Testnet timestamp", "Independent hash verification"].map(f => <CheckItem key={f} text={f} />)}
+									</ul>
+									<div className="pt-6 border-t border-[#f1f5f9] mb-6">
+										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
+										<p className="text-sm text-[#475569]">SMEs, awareness, first-step compliance</p>
 									</div>
-									<div className="p-7">
-										<div className="flex items-end gap-3 mb-1">
-											<span className="text-4xl font-black text-[#0f172a]">
-												SGD 249
-											</span>
-											<span className="text-[#94a3b8] line-through text-lg mb-1">
-												SGD 366
-											</span>
-										</div>
-										<p className="text-sm text-[#10b981] font-semibold mb-6">
-											Save SGD 117
-										</p>
-
-										<div className="space-y-3 mb-6">
-											<div className="rounded-lg bg-[#f0fdf4] border border-[#10b981]/20 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ Vendor Proof{" "}
-													<span className="text-[#94a3b8] font-normal">
-														(SGD 149)
-													</span>
-												</p>
-												<p className="text-xs text-[#64748b]">
-													VerifyRecord ACTIVE, verified badge, procurement
-													filter
-												</p>
-											</div>
-											<div className="rounded-lg bg-[#f0fdf4] border border-[#10b981]/20 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ PDPA Snapshot{" "}
-													<span className="text-[#94a3b8] font-normal">
-														(SGD 79)
-													</span>
-												</p>
-												<p className="text-xs text-[#64748b]">
-													8-dimension scan, PDF report, +8–25 pts compliance
-												</p>
-											</div>
-											<div className="rounded-lg bg-[#f0fdf4] border border-[#10b981]/20 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ 2 Notarizations{" "}
-													<span className="text-[#94a3b8] font-normal">
-														(SGD 138)
-													</span>
-												</p>
-												<p className="text-xs text-[#64748b]">
-													2 documents certified, begins DEEP progression
-												</p>
-											</div>
-										</div>
-
-										<p className="text-xs text-[#94a3b8] mb-5">
-											Same price as standalone RFP Express — get the full
-											verification foundation instead.
-										</p>
-
-										<button
-											onClick={() => handleCheckout("vendor_trust_pack")}
-											disabled={loadingProduct === "vendor_trust_pack"}
-											className="block w-full text-center bg-[#10b981] hover:bg-[#059669] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/20"
-										>
-											{loadingProduct === "vendor_trust_pack"
-												? "Redirecting…"
-												: "Build Trust — SGD 249"}
-										</button>
-									</div>
-								</div>
-
-								{/* RFP Accelerator */}
-								<div className="bg-[#0f172a] rounded-[2rem] border-2 border-violet-400 shadow-2xl hover:-translate-y-1 transition-all relative">
-									<div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-violet-500 text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
-										Most Popular
-									</div>
-									<div className="bg-violet-600 px-7 py-5 rounded-t-[2rem]">
-										<p className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1">
-											Bundle · 27% off
-										</p>
-										<h3 className="text-2xl font-black text-white">
-											RFP Accelerator
-										</h3>
-										<p className="text-white/80 text-sm mt-1">Step 1–3 · Get Verified + Win Tenders</p>
-										<p className="text-white/50 text-xs mt-1">Best for: Vendors with an active GeBIZ tender who want verification + a winning bid package in one</p>
-									</div>
-									<div className="p-7">
-										<div className="flex items-end gap-3 mb-1">
-											<span className="text-4xl font-black text-white">
-												SGD 449
-											</span>
-											<span className="text-white/40 line-through text-lg mb-1">
-												SGD 615
-											</span>
-										</div>
-										<p className="text-sm text-violet-400 font-semibold mb-6">
-											Save SGD 166
-										</p>
-
-										<div className="space-y-3 mb-6">
-											<div className="rounded-lg bg-white/5 border border-white/10 px-4 py-3">
-												<p className="text-sm font-semibold text-white">
-													✓ Vendor Trust Pack{" "}
-													<span className="text-white/40 font-normal">
-														(SGD 366)
-													</span>
-												</p>
-												<p className="text-xs text-white/50">
-													VP + PDPA + 2 Notarizations
-												</p>
-											</div>
-											<div className="rounded-lg bg-white/5 border border-white/10 px-4 py-3">
-												<p className="text-sm font-semibold text-white">
-													✓ RFP Express{" "}
-													<span className="text-white/40 font-normal">
-														(SGD 249)
-													</span>
-												</p>
-												<p className="text-xs text-white/50">
-													Tender Readiness PDF + Strategy 6 fires
-												</p>
-											</div>
-										</div>
-
-										<p className="text-xs text-white/40 mb-5">
-											For vendors who arrive on Booppa with an active tender
-											already in mind — the highest-intent segment.
-										</p>
-
-										<button
-											onClick={() => handleCheckout("rfp_accelerator")}
-											disabled={loadingProduct === "rfp_accelerator"}
-											className="block w-full text-center bg-violet-500 hover:bg-violet-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
-										>
-											{loadingProduct === "rfp_accelerator"
-												? "Redirecting…"
-												: "Get RFP Accelerator — SGD 449"}
-										</button>
-									</div>
-								</div>
-
-								{/* Enterprise Bid Kit */}
-								<div className="bg-white rounded-[2rem] border-2 border-amber-400 shadow-xl overflow-hidden hover:-translate-y-1 transition-all">
-									<div className="bg-amber-500 px-7 py-5">
-										<p className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1">
-											Bundle · 31% off
-										</p>
-										<h3 className="text-2xl font-black text-white">
-											Enterprise Bid Kit
-										</h3>
-										<p className="text-white/90 text-sm mt-1">Step 1–4 · Full journey in one purchase</p>
-										<p className="text-white/60 text-xs mt-1">Best for: Enterprise vendors targeting high-value GeBIZ contracts of SGD 100k+</p>
-									</div>
-									<div className="p-7">
-										<div className="flex items-end gap-3 mb-1">
-											<span className="text-4xl font-black text-[#0f172a]">
-												SGD 899
-											</span>
-											<span className="text-[#94a3b8] line-through text-lg mb-1">
-												SGD 1,310
-											</span>
-										</div>
-										<p className="text-sm text-amber-600 font-semibold mb-6">
-											Save SGD 411
-										</p>
-
-										<div className="space-y-3 mb-6">
-											<div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ Vendor Trust Pack{" "}
-													<span className="text-[#94a3b8] font-normal">
-														(SGD 366)
-													</span>
-												</p>
-												<p className="text-xs text-[#64748b]">
-													VP + PDPA + 2 Notarizations
-												</p>
-											</div>
-											<div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ RFP Complete{" "}
-													<span className="text-[#94a3b8] font-normal">
-														(SGD 599)
-													</span>
-												</p>
-												<p className="text-xs text-[#64748b]">
-													Full procurement dossier, enterprise visibility
-												</p>
-											</div>
-											<div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ 5 Notarizations{" "}
-													<span className="text-[#94a3b8] font-normal">
-														(SGD 345)
-													</span>
-												</p>
-												<p className="text-xs text-[#64748b]">
-													7 total docs — pushes toward DEEP/CERTIFIED
-												</p>
-											</div>
-										</div>
-
-										<p className="text-xs text-[#94a3b8] mb-5">
-											0.18% of a SGD 500k contract. Combined with Tender Win
-											Probability showing 19% → 67% uplift, the decision is
-											immediate.
-										</p>
-
-										<button
-											onClick={() => handleCheckout("enterprise_bid_kit")}
-											disabled={loadingProduct === "enterprise_bid_kit"}
-											className="block w-full text-center bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
-										>
-											{loadingProduct === "enterprise_bid_kit"
-												? "Redirecting…"
-												: "Get Enterprise Bid Kit — SGD 899"}
-										</button>
-									</div>
+									<button 
+										disabled={loadingProduct === "pdpa_quick_scan"}
+										onClick={() => handleCheckout("pdpa_quick_scan")} 
+										className="w-full bg-[#0f172a] text-white font-bold py-4 rounded-2xl hover:bg-[#1e293b] transition disabled:opacity-50"
+									>
+										{loadingProduct === "pdpa_quick_scan" ? "Redirecting..." : "Run My Scan — SGD 299 →"}
+									</button>
 								</div>
 
 								{/* Compliance Bundle */}
-								<div className="bg-white rounded-[2rem] border-2 border-sky-400 shadow-xl overflow-hidden hover:-translate-y-1 transition-all">
-									<div className="bg-sky-500 px-7 py-5">
-										<p className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1">
-											Bundle · Compliance Evidence
-										</p>
-										<h3 className="text-2xl font-black text-white">
-											Compliance Bundle
-										</h3>
-										<p className="text-white/90 text-sm mt-1">PDPA + Vendor Proof + Cover Sheet</p>
-										<p className="text-white/60 text-xs mt-1">Best for: Vendors who need a single court-admissible evidence pack for buyers, regulators, or audits</p>
+								<div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
+									<div className="flex justify-between items-start mb-2">
+										<h3 className="text-xl font-bold text-[#0f172a]">Compliance Bundle</h3>
+										<span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">3-doc pack</span>
 									</div>
-									<div className="p-7">
-										<div className="flex items-end gap-3 mb-1">
-											<span className="text-4xl font-black text-[#0f172a]">
-												SGD 599
-											</span>
-										</div>
-										<p className="text-sm text-sky-600 font-semibold mb-6">
-											Anchored on-chain · Delivered in minutes
-										</p>
-
-										<div className="space-y-3 mb-6">
-											<div className="rounded-lg bg-sky-50 border border-sky-200 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ Vendor Proof Certificate
-												</p>
-												<p className="text-xs text-[#64748b]">
-													ACRA-verified, signed PDF, blockchain-anchored
-												</p>
-											</div>
-											<div className="rounded-lg bg-sky-50 border border-sky-200 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ PDPA Quick Scan Report
-												</p>
-												<p className="text-xs text-[#64748b]">
-													8-dimension scan, AI-assisted gap analysis
-												</p>
-											</div>
-											<div className="rounded-lg bg-sky-50 border border-sky-200 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ 3 Notarizations
-												</p>
-												<p className="text-xs text-[#64748b]">
-													SHA-256 anchors for any compliance document
-												</p>
-											</div>
-											<div className="rounded-lg bg-sky-50 border border-sky-200 px-4 py-3">
-												<p className="text-sm font-semibold text-[#0f172a]">
-													✓ Summary Cover Sheet
-												</p>
-												<p className="text-xs text-[#64748b]">
-													9-section regulator-ready PDF
-												</p>
-											</div>
-										</div>
-
-										<p className="text-xs text-[#94a3b8] mb-5">
-											One-time payment. All components fan out automatically and arrive by email.
-										</p>
-
-										<button
-											onClick={() => handleCheckout("compliance_evidence_pack")}
-											disabled={loadingProduct === "compliance_evidence_pack"}
-											className="block w-full text-center bg-sky-500 hover:bg-sky-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-sky-500/20"
-										>
-											{loadingProduct === "compliance_evidence_pack"
-												? "Redirecting…"
-												: "Get Compliance Bundle — SGD 599"}
-										</button>
+									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 799</div>
+									<p className="text-xs text-[#64748b] mb-6">one-time payment</p>
+									<ul className="space-y-3 mb-8 flex-1">
+										{["PDPA Quick Scan included", "RFP Complete — 15 Q&A", "Compliance Cover Sheet v3", "All 3 documents on Amoy Testnet"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
+									</ul>
+									<div className="pt-6 border-t border-[#f1f5f9] mb-6">
+										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
+										<p className="text-sm text-[#475569]">tender response, vendor onboarding</p>
 									</div>
-								</div>
-						</div>
-
-							{/* Savings table */}
-							<div className="overflow-x-auto rounded-2xl border border-[#e2e8f0]">
-								<table className="w-full text-sm">
-									<thead className="bg-[#f8fafc] border-b border-[#e2e8f0]">
-										<tr>
-											{[
-												"Bundle",
-												"Includes",
-												"Separate Value",
-												"Bundle Price",
-												"Saving",
-											].map((h) => (
-												<th
-													key={h}
-													className="px-5 py-3 text-left font-semibold text-[#0f172a] text-xs uppercase tracking-wide"
-												>
-													{h}
-												</th>
-											))}
-										</tr>
-									</thead>
-									<tbody className="divide-y divide-[#e2e8f0]">
-										{[
-											{
-												name: "Vendor Trust Pack",
-												includes: "VP + PDPA + 2 Notarizations",
-												separate: "SGD 366",
-												bundle: "SGD 249",
-												saving: "SGD 117 (32%)",
-											},
-											{
-												name: "RFP Accelerator",
-												includes: "Trust Pack + RFP Express",
-												separate: "SGD 615",
-												bundle: "SGD 449",
-												saving: "SGD 166 (27%)",
-											},
-											{
-												name: "Enterprise Bid Kit",
-												includes: "Trust Pack + RFP Complete + 5 Notarizations",
-												separate: "SGD 1,310",
-												bundle: "SGD 899",
-												saving: "SGD 411 (31%)",
-											},
-											{
-												name: "Compliance Bundle",
-												includes: "Vendor Proof + PDPA Scan + 3 Notarizations + Cover Sheet",
-												separate: "—",
-												bundle: "SGD 599",
-												saving: "Evidence pack",
-											},
-										].map((row) => (
-											<tr key={row.name} className="hover:bg-[#f8fafc]">
-												<td className="px-5 py-4 font-semibold text-[#0f172a]">
-													{row.name}
-												</td>
-												<td className="px-5 py-4 text-[#64748b]">
-													{row.includes}
-												</td>
-												<td className="px-5 py-4 text-[#94a3b8] line-through">
-													{row.separate}
-												</td>
-												<td className="px-5 py-4 font-bold text-[#0f172a]">
-													{row.bundle}
-												</td>
-												<td className="px-5 py-4 text-[#10b981] font-semibold">
-													{row.saving}
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							</div>
-						</div>
-					)}
-
-					{/* ── SUBSCRIPTIONS ─────────────────────────────────────────────── */}
-					{activeTab === "subscriptions" && (
-						<div className="space-y-6">
-							<p className="text-center text-[#64748b] max-w-2xl mx-auto">
-								Subscriptions provide continuous monthly value — not just access
-								to a static badge. Each delivers something new every month.
-							</p>
-
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								{/* Vendor Active */}
-								<div className="bg-white rounded-[2rem] border-2 border-[#10b981] shadow-xl overflow-hidden hover:-translate-y-1 transition-all">
-									<div className="px-8 py-6 border-b border-[#e2e8f0]">
-										<div className="flex items-start justify-between mb-2">
-											<h3 className="text-xl font-bold text-[#0f172a]">
-												Vendor Active
-											</h3>
-											<span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#10b981]/10 text-[#10b981]">
-												For Vendors
-											</span>
-										</div>
-										<div className="flex items-end gap-4">
-											<div>
-												<span className="text-4xl font-black text-[#0f172a]">
-													SGD 39
-												</span>
-												<span className="text-[#64748b]">/mo</span>
-											</div>
-											<div className="text-sm text-[#64748b]">
-												or SGD 390/yr{" "}
-												<span className="text-[#10b981] font-semibold">
-													(2 months free)
-												</span>
-											</div>
-										</div>
-									</div>
-									<div className="p-8">
-										<p className="text-sm font-semibold text-[#0f172a] mb-4">
-											What you receive every month:
-										</p>
-										<ul className="space-y-3 mb-8">
-											{[
-												"Profile health check — auto re-evaluation of complianceScore",
-												"Competitor alert when a sector peer improves verificationDepth",
-												"Shortlist priority — ordered ahead of equivalent STANDARD vendors in Strategy 1 and Strategy 6",
-												"Monthly metrics — search appearances, sector views, movement vs prior month",
-											].map((f) => (
-												<CheckItem key={f} text={f} />
-											))}
-										</ul>
-										<p className="text-xs text-[#94a3b8] mb-6">
-											Vendor Proof (SGD 149) is the entry credential. Vendor
-											Active is the ongoing monitoring layer. Both can coexist.
-										</p>
-										{activeSubs.some(s => s.startsWith("vendor_active")) ? (
-											<div className="flex flex-col gap-3">
-												<div className="w-full text-center bg-[#10b981]/10 border border-[#10b981]/30 text-[#10b981] font-bold py-3 rounded-xl text-sm">
-													✓ Subscription Active
-												</div>
-												<Link href="/vendor/dashboard" className="block w-full text-center border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/5 font-semibold py-3 rounded-xl transition text-sm">
-													Manage Subscription →
-												</Link>
-											</div>
-										) : (
-											<div className="flex flex-col gap-3">
-												<button
-													onClick={() => handleCheckout("vendor_active_monthly")}
-													disabled={loadingProduct === "vendor_active_monthly"}
-													className="block w-full text-center bg-[#10b981] hover:bg-[#059669] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
-												>
-													{loadingProduct === "vendor_active_monthly"
-														? "Redirecting…"
-														: "Start Monthly — SGD 39/mo"}
-												</button>
-												<button
-													onClick={() => handleCheckout("vendor_active_annual")}
-													disabled={loadingProduct === "vendor_active_annual"}
-													className="block w-full text-center border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/5 disabled:opacity-60 font-semibold py-3 rounded-xl transition text-sm"
-												>
-													{loadingProduct === "vendor_active_annual"
-														? "Redirecting…"
-														: "Annual — SGD 390/yr (save SGD 78)"}
-												</button>
-											</div>
-										)}
-									</div>
+									<button 
+										disabled={loadingProduct === "compliance_evidence_pack"}
+										onClick={() => handleCheckout("compliance_evidence_pack")} 
+										className="w-full bg-violet-600 text-white font-bold py-4 rounded-2xl hover:bg-violet-500 transition shadow-lg shadow-violet-600/20 disabled:opacity-50"
+									>
+										{loadingProduct === "compliance_evidence_pack" ? "Redirecting..." : "Get Bundle — SGD 799 →"}
+									</button>
 								</div>
 
-								{/* PDPA Monitor */}
-								<div className="bg-white rounded-[2rem] border-2 border-blue-400 shadow-xl overflow-hidden hover:-translate-y-1 transition-all">
-									<div className="px-8 py-6 border-b border-[#e2e8f0]">
-										<div className="flex items-start justify-between mb-2">
-											<h3 className="text-xl font-bold text-[#0f172a]">
-												PDPA Monitor
-											</h3>
-											<span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-600">
-												Optional
-											</span>
-										</div>
-										<p className="text-sm text-[#64748b] mb-3">
-											Your PDPA scan will expire — keep it current automatically
-										</p>
-										<div className="flex items-end gap-4">
-											<div>
-												<span className="text-4xl font-black text-[#0f172a]">
-													SGD 49
-												</span>
-												<span className="text-[#64748b]">/mo</span>
-											</div>
-											<div className="text-sm text-[#64748b]">
-												or SGD 490/yr{" "}
-												<span className="text-blue-500 font-semibold">
-													(2 months free)
-												</span>
-											</div>
-										</div>
+								{/* Standard Suite */}
+								<div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
+									<div className="flex justify-between items-start mb-2">
+										<h3 className="text-xl font-bold text-[#0f172a]">Standard Suite</h3>
+										<span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">Suite</span>
 									</div>
-									<div className="p-8">
-										<p className="text-xs text-[#94a3b8] mb-4 leading-relaxed">
-											Buyers check scan dates. A scan older than 6 months raises flags.
-											PDPA Monitor re-scans quarterly so your report is always fresh.
-										</p>
-										<p className="text-sm font-semibold text-[#0f172a] mb-4">
-											What you receive every month:
-										</p>
-										<ul className="space-y-3 mb-8">
-											{[
-												"Quarterly automatic re-scan — full PDPA Snapshot every 3 months (SGD 79 value each)",
-												"Monthly regulatory alert — plain-language summary of new PDPC guidelines relevant to your sector",
-												"Score trending — running chart of complianceScore over time on your dashboard",
-												"Shareable PDF report — always current, ready to send to any buyer on demand",
-											].map((f) => (
-												<CheckItem key={f} text={f} color="text-blue-500" />
-											))}
-										</ul>
-										<p className="text-xs text-[#94a3b8] mb-6">
-											Quarterly re-scans: SGD 237/yr underlying value. Annual
-											plan: SGD 490. For vendors in healthcare, fintech, HR
-											tech, or professional services.
-										</p>
-										{activeSubs.some(s => s.startsWith("pdpa_monitor")) ? (
-											<div className="flex flex-col gap-3">
-												<div className="w-full text-center bg-blue-500/10 border border-blue-400/30 text-blue-600 font-bold py-3 rounded-xl text-sm">
-													✓ Subscription Active
-												</div>
-												<Link href="/vendor/dashboard" className="block w-full text-center border border-blue-400 text-blue-600 hover:bg-blue-50 font-semibold py-3 rounded-xl transition text-sm">
-													Manage Subscription →
-												</Link>
-											</div>
-										) : (
-											<div className="flex flex-col gap-3">
-												<button
-													onClick={() => handleCheckout("pdpa_monitor_monthly")}
-													disabled={loadingProduct === "pdpa_monitor_monthly"}
-													className="block w-full text-center bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
-												>
-													{loadingProduct === "pdpa_monitor_monthly"
-														? "Redirecting…"
-														: "Start Monthly — SGD 49/mo"}
-												</button>
-												<button
-													onClick={() => handleCheckout("pdpa_monitor_annual")}
-													disabled={loadingProduct === "pdpa_monitor_annual"}
-													className="block w-full text-center border border-blue-400 text-blue-600 hover:bg-blue-50 disabled:opacity-60 font-semibold py-3 rounded-xl transition text-sm"
-												>
-													{loadingProduct === "pdpa_monitor_annual"
-														? "Redirecting…"
-														: "Annual — SGD 490/yr (save SGD 98)"}
-												</button>
-											</div>
-										)}
+									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 1,800<span className="text-lg text-[#64748b] font-normal">/month</span></div>
+									<p className="text-xs text-[#64748b] mb-6">Subscription</p>
+									<ul className="space-y-3 mb-8 flex-1">
+										{["MAS TRM — all 13 domains", "AI gap analysis (Claude Haiku)", "5,000 notarizations/month", "RESTful API + webhooks"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
+									</ul>
+									<div className="pt-6 border-t border-[#f1f5f9] mb-6">
+										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
+										<p className="text-sm text-[#475569]">banks, fintechs, healthcare — MAS regulated</p>
 									</div>
+									<button 
+										disabled={loadingProduct === "standard_suite_monthly"}
+										onClick={() => handleCheckout("standard_suite_monthly")} 
+										className="w-full border-2 border-[#0f172a] text-[#0f172a] font-bold py-3.5 rounded-2xl hover:bg-[#0f172a] hover:text-white transition disabled:opacity-50"
+									>
+										{loadingProduct === "standard_suite_monthly" ? "Redirecting..." : "Subscribe — SGD 1,800/mo →"}
+									</button>
 								</div>
-							</div>
 
-							{/* Subscription value table */}
-							<div className="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] p-6">
-								<h3 className="font-semibold text-[#0f172a] mb-4">
-									Annual plan comparison
-								</h3>
-								<div className="overflow-x-auto">
-									<table className="w-full text-sm">
-										<thead>
-											<tr className="border-b border-[#e2e8f0]">
-												{[
-													"",
-													"Monthly",
-													"Annual",
-													"Annual/mo",
-													"Annual saving",
-												].map((h) => (
-													<th
-														key={h}
-														className="py-2 px-3 text-left text-xs font-semibold text-[#64748b]"
-													>
-														{h}
-													</th>
+								{/* Pro Suite */}
+								<div className="bg-[#0f172a] p-8 rounded-[2.5rem] border-2 border-blue-500 shadow-2xl relative flex flex-col lg:col-span-2">
+									<div className="absolute top-[-14px] left-8 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">★ Most Popular</div>
+									<div className="flex flex-col lg:flex-row gap-8 h-full">
+										<div className="flex-1">
+											<h3 className="text-2xl font-black text-white mb-2">Pro Suite</h3>
+											<div className="text-5xl font-black text-blue-400 mb-1">SGD 4,500<span className="text-xl text-white/40 font-normal">/month</span></div>
+											<p className="text-sm text-white/60 mb-8 leading-relaxed">Full enterprise evidence infrastructure. Multi-subsidiary management and unlimited notarizations.</p>
+											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+												{["SSO — SAML 2.0 + OIDC", "White-label reports", "Multi-subsidiary management", "Unlimited notarizations"].map(f => (
+													<div key={f} className="flex items-center gap-2 text-sm text-white/80">
+														<span className="text-blue-400 font-bold">✓</span>
+														{f}
+													</div>
 												))}
-											</tr>
-										</thead>
-										<tbody className="divide-y divide-[#e2e8f0]">
-											{[
-												{
-													name: "Vendor Active",
-													monthly: "SGD 39",
-													annual: "SGD 390",
-													permo: "SGD 32.50",
-													saving: "SGD 78 (17%)",
-												},
-												{
-													name: "PDPA Monitor",
-													monthly: "SGD 49",
-													annual: "SGD 490",
-													permo: "SGD 40.83",
-													saving: "SGD 98 (17%)",
-												},
-											].map((r) => (
-												<tr key={r.name}>
-													<td className="py-3 px-3 font-medium text-[#0f172a]">
-														{r.name}
-													</td>
-													<td className="py-3 px-3 text-[#64748b]">
-														{r.monthly}
-													</td>
-													<td className="py-3 px-3 font-semibold text-[#0f172a]">
-														{r.annual}
-													</td>
-													<td className="py-3 px-3 text-[#64748b]">
-														{r.permo}
-													</td>
-													<td className="py-3 px-3 text-[#10b981] font-semibold">
-														{r.saving}
-													</td>
-												</tr>
-											))}
-										</tbody>
-									</table>
+											</div>
+										</div>
+										<div className="lg:w-72 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-white/10 pt-6 lg:pt-0 lg:pl-8">
+											<p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Includes</p>
+											<p className="text-sm text-white/80 mb-8 italic">Everything in Standard Suite</p>
+											<div className="mb-8">
+												<p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Best for</p>
+												<p className="text-sm text-white/60">groups, GLC subsidiaries, corporate procurement</p>
+											</div>
+											<button 
+												disabled={loadingProduct === "pro_suite_monthly"}
+												onClick={() => handleCheckout("pro_suite_monthly")} 
+												className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-500 transition shadow-lg shadow-blue-600/30 text-center disabled:opacity-50"
+											>
+												{loadingProduct === "pro_suite_monthly" ? "Redirecting..." : "Subscribe — SGD 4,500/mo →"}
+											</button>
+										</div>
+									</div>
+								</div>
+
+								{/* Custom Enterprise */}
+								<div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
+									<h3 className="text-xl font-bold text-[#0f172a] mb-2">Custom Enterprise</h3>
+									<div className="text-4xl font-black text-[#0f172a] mb-8">Contact Us</div>
+									<ul className="space-y-3 mb-8 flex-1">
+										{["Everything in Pro Suite", "On-premise infrastructure", "99.99% uptime SLA (multi-AZ)", "GeBIZ-ready documentation"].map(f => <CheckItem key={f} text={f} color="text-amber-500" />)}
+									</ul>
+									<div className="pt-6 border-t border-[#f1f5f9] mb-6">
+										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
+										<p className="text-sm text-[#475569]">government agencies, statutory boards</p>
+									</div>
+									<Link href="/demo" className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] font-bold py-3.5 rounded-2xl hover:bg-[#0f172a] hover:text-white transition">
+										Contact Sales →
+									</Link>
 								</div>
 							</div>
-						</div>
-					)}
-
-					{/* ── ENTERPRISE ───────────────────────────────────────────────── */}
-					{/* ── PROCUREMENT ─────────────────────────────────────────────── */}
-					{activeTab === "procurement" && (
-						<div className="space-y-16">
-							{/* Procurement Plans */}
-							<div>
-								<div className="text-center mb-10">
-									<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">
-										Buyer Plans
-									</h2>
-									<p className="text-[#64748b]">
-										For Buyer teams evaluating and managing vendors
-									</p>
-								</div>
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-									<div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all">
-										<h3 className="text-xl font-bold mb-4 text-[#0f172a]">
-											Enterprise
-										</h3>
-										<div className="text-4xl font-bold text-[#0f172a] mb-2">
-											SGD 499
-											<span className="text-xl text-[#64748b] font-normal">
-												/mo
-											</span>
-										</div>
-										<p className="text-sm text-[#64748b] mb-8">
-											For buyer teams evaluating vendors
-										</p>
-										<ul className="space-y-3 mb-10">
-											{[
-												"Full procurement analytics dashboard",
-												"Vendor comparison engine — weighted scoring",
-												"Vendor risk signals & compliance posture",
-												"Compliance health scoring (0-100)",
-												"Audit trail export (PDF + CSV)",
-												"Self-service billing portal",
-												"5,000 blockchain notarizations/month",
-												"Priority support (4h SLA)",
-											].map((f) => (
-												<CheckItem key={f} text={f} />
-											))}
-										</ul>
-										<p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">
-											For institutional buyer teams, GLCs, statutory
-											boards
-										</p>
-										<button
-											onClick={() => handleCheckout("enterprise_monthly")}
-											disabled={loadingProduct === "enterprise_monthly"}
-											className="block w-full text-center bg-[#0f172a] text-white hover:bg-[#1e293b] disabled:opacity-50 font-semibold py-3 rounded-xl transition text-sm"
-										>
-											{loadingProduct === "enterprise_monthly"
-												? "Redirecting…"
-												: "Get Enterprise — SGD 499/mo"}
-										</button>
-									</div>
-
-									<div className="bg-[#0f172a] p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl hover:-translate-y-1 transition-all relative">
-										<div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-[#10b981] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
-											Recommended
-										</div>
-										<h3 className="text-xl font-bold mb-4 text-white">
-											Enterprise Pro
-										</h3>
-										<div className="text-4xl font-bold text-[#10b981] mb-2">
-											SGD 1,499
-											<span className="text-xl text-white/60 font-normal">
-												/mo
-											</span>
-										</div>
-										<p className="text-sm text-white/60 mb-8">
-											Dedicated account + SLA + multi-sector
-										</p>
-										<ul className="space-y-3 mb-10">
-											<li className="text-sm font-semibold text-white">
-												Everything in Enterprise, plus:
-											</li>
-											{[
-												"Dedicated account manager + monthly review",
-												"SLA on data freshness & report turnaround",
-												"Multi-sector procurement views",
-												"Exportable datasets & custom filters",
-												"Historical trend analysis",
-												"MAS TRM, Cyber Hygiene & Third-Party Risk workflows",
-												"Unlimited blockchain notarizations",
-												"White-label reports (your branding)",
-												"24/7 priority support (2h SLA)",
-											].map((f) => (
-												<li
-													key={f}
-													className="flex items-start gap-2 text-sm text-white/80"
-												>
-													<span className="text-[#10b981] font-bold flex-shrink-0">
-														✓
-													</span>
-													{f}
-												</li>
-											))}
-										</ul>
-										<p className="pt-6 border-t border-white/10 text-xs text-white/40 mb-8">
-											For MNCs and government-linked companies
-										</p>
-										<Link
-											href="/demo"
-											className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/30"
-										>
-											Book Enterprise Pro Demo
-										</Link>
-									</div>
-
-									<div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col justify-between">
-										<div>
-											<h3 className="text-xl font-bold mb-6 text-[#0f172a]">
-												Custom Enterprise
-											</h3>
-											<div className="text-3xl font-bold text-[#0f172a] mb-8">
-												Contact Us
-											</div>
-											<ul className="space-y-3 mb-8">
-												{[
-													"On-premise deployment option",
-													"Custom compliance frameworks",
-													"Multi-subsidiary management",
-													"Dedicated infrastructure",
-													"Custom SLAs (e.g., 99.99% uptime)",
-													"SSO integration (SAML/OAuth)",
-													"Compliance team training",
-													"Government agency pricing",
-												].map((f) => (
-													<CheckItem key={f} text={f} />
-												))}
-											</ul>
-										</div>
-										<Link
-											href="/demo"
-											className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm mt-auto"
-										>
-											Contact Enterprise Sales
-										</Link>
-									</div>
-								</div>
-							</div>
-						</div>
-					)}
-
-					{/* ── ENTERPRISE ───────────────────────────────────────────────── */}
-					{activeTab === "enterprise" && (
-						<div className="space-y-12">
-							{/* Header */}
-							<div className="text-center max-w-3xl mx-auto space-y-3">
-								<p className="text-xs font-bold tracking-widest uppercase text-[#10b981]">Singapore compliance infrastructure</p>
-								<h2 className="text-3xl lg:text-4xl font-black text-[#0f172a]">Everything Booppa offers</h2>
-								<p className="text-base text-[#64748b]">From a first compliance check to full enterprise infrastructure — one platform, blockchain-anchored evidence at every tier.</p>
-							</div>
-
-							{/* 6-card grid */}
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-								{/* Card 1 — PDPA Quick Scan */}
-								<div className="bg-white rounded-[2rem] border-2 border-[#10b981]/30 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:border-[#10b981] transition-all flex flex-col">
-									<div className="px-7 pt-7 pb-5">
-										<div className="flex items-center justify-between mb-5">
-											<div className="w-11 h-11 rounded-2xl bg-[#f0fdf4] border border-[#10b981]/20 flex items-center justify-center">
-												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#10b981" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="9" r="7.5" stroke="#10b981" strokeWidth="1"/></svg>
-											</div>
-											<span className="text-[10px] font-bold uppercase tracking-wider bg-[#f0fdf4] text-[#10b981] px-2.5 py-1 rounded-full border border-[#10b981]/20">Available now</span>
-										</div>
-										<h3 className="text-xl font-black text-[#0f172a] mb-1">PDPA Quick Scan</h3>
-										<p className="text-sm text-[#64748b] leading-relaxed mb-5">Automated PDPA compliance check for any Singapore website. Score 0–100 with blockchain-anchored proof in minutes.</p>
-										<div className="flex items-baseline gap-2 mb-5">
-											<span className="text-3xl font-black text-[#0f172a]">SGD 199</span>
-											<span className="text-sm text-[#94a3b8]">one-time</span>
-										</div>
-										<ul className="space-y-2.5 mb-6">
-											{["Public-facing compliance check", "Score + findings report (PDF)", "Polygon Amoy Testnet timestamp", "Independent hash verification"].map((f) => (
-												<li key={f} className="flex gap-2 items-start text-sm text-[#475569]"><span className="text-[#10b981] flex-shrink-0 font-bold">✓</span>{f}</li>
-											))}
-										</ul>
-									</div>
-									<div className="mt-auto px-7 pb-7 pt-4 border-t border-[#f1f5f9]">
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: SMEs, awareness, first-step compliance</p>
-										<button
-											onClick={() => handleCheckout("pdpa_quick_scan")}
-											disabled={loadingProduct === "pdpa_quick_scan"}
-											className="block w-full text-center bg-[#10b981] hover:bg-[#059669] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/20 text-sm"
-										>
-											{loadingProduct === "pdpa_quick_scan" ? "Redirecting…" : "Run My Scan — SGD 199 →"}
-										</button>
-									</div>
-								</div>
-
-								{/* Card 2 — Compliance Bundle */}
-								<div className="bg-white rounded-[2rem] border-2 border-blue-200 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:border-blue-400 transition-all flex flex-col">
-									<div className="px-7 pt-7 pb-5">
-										<div className="flex items-center justify-between mb-5">
-											<div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center">
-												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="1.5" stroke="#3b82f6" strokeWidth="1.3"/><path d="M6 7h6M6 10h4" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round"/></svg>
-											</div>
-											<span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full border border-blue-200">3-doc pack</span>
-										</div>
-										<h3 className="text-xl font-black text-[#0f172a] mb-1">Compliance Bundle</h3>
-										<p className="text-sm text-[#64748b] leading-relaxed mb-5">Three-document procurement pack — PDPA scan + RFP Complete + Cover Sheet — blockchain anchored. Ready in 24 hours.</p>
-										<div className="flex items-baseline gap-2 mb-5">
-											<span className="text-3xl font-black text-[#0f172a]">SGD 599</span>
-											<span className="text-sm text-[#94a3b8]">one-time</span>
-										</div>
-										<ul className="space-y-2.5 mb-6">
-											{["PDPA Quick Scan included", "RFP Complete — 15 Q&A", "Compliance Cover Sheet v3", "All 3 documents on Amoy Testnet"].map((f) => (
-												<li key={f} className="flex gap-2 items-start text-sm text-[#475569]"><span className="text-[#10b981] flex-shrink-0 font-bold">✓</span>{f}</li>
-											))}
-										</ul>
-									</div>
-									<div className="mt-auto px-7 pb-7 pt-4 border-t border-[#f1f5f9]">
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: tender response, vendor onboarding</p>
-										<button
-											onClick={() => handleCheckout("compliance_evidence_pack")}
-											disabled={loadingProduct === "compliance_evidence_pack"}
-											className="block w-full text-center bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/20 text-sm"
-										>
-											{loadingProduct === "compliance_evidence_pack" ? "Redirecting…" : "Get Bundle — SGD 599 →"}
-										</button>
-									</div>
-								</div>
-
-								{/* Card 3 — Standard Suite */}
-								<div className="bg-white rounded-[2rem] border-2 border-amber-200 shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:border-amber-400 transition-all flex flex-col">
-									<div className="px-7 pt-7 pb-5">
-										<div className="flex items-center justify-between mb-5">
-											<div className="w-11 h-11 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center">
-												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M9 2l1.5 4.5H15l-3.75 2.7 1.5 4.5L9 11.1l-3.75 2.6 1.5-4.5L3 6.5h4.5L9 2z" stroke="#f59e0b" strokeWidth="1.3" strokeLinejoin="round"/></svg>
-											</div>
-											<span className="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full border border-amber-200">Suite</span>
-										</div>
-										<h3 className="text-xl font-black text-[#0f172a] mb-1">Standard Suite</h3>
-										<p className="text-sm text-[#64748b] leading-relaxed mb-5">MAS TRM 2021 workflows automated across all 13 domains. AI gap analysis. Blockchain evidence archive. API + webhooks.</p>
-										<div className="flex items-baseline gap-2 mb-5">
-											<span className="text-3xl font-black text-[#0f172a]">SGD 1,800</span>
-											<span className="text-sm text-[#94a3b8]">/month</span>
-										</div>
-										<ul className="space-y-2.5 mb-6">
-											{["MAS TRM — all 13 domains", "AI gap analysis (Claude Haiku)", "5,000 notarizations/month", "RESTful API + webhooks"].map((f) => (
-												<li key={f} className="flex gap-2 items-start text-sm text-[#475569]"><span className="text-[#10b981] flex-shrink-0 font-bold">✓</span>{f}</li>
-										))}
-										</ul>
-									</div>
-									<div className="mt-auto px-7 pb-7 pt-4 border-t border-[#f1f5f9]">
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: banks, fintechs, healthcare — MAS regulated</p>
-										<button
-											onClick={() => handleCheckout("compliance_standard")}
-											disabled={loadingProduct === "compliance_standard"}
-											className="block w-full text-center bg-amber-500 hover:bg-amber-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-amber-500/20 text-sm"
-										>
-											{loadingProduct === "compliance_standard" ? "Redirecting…" : "Subscribe — SGD 1,800/mo →"}
-										</button>
-									</div>
-								</div>
-
-								{/* Card 4 — Pro Suite (Most Popular) */}
-								<div className="bg-[#0f172a] rounded-[2rem] border-2 border-blue-500 shadow-2xl overflow-hidden hover:-translate-y-1 transition-all flex flex-col relative">
-									<div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-500 to-violet-500 text-white text-center py-1.5 text-[10px] font-bold uppercase tracking-widest">
-										★ Most Popular
-									</div>
-									<div className="px-7 pt-12 pb-5">
-										<div className="flex items-center justify-between mb-5">
-											<div className="w-11 h-11 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center">
-												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="2" stroke="#60a5fa" strokeWidth="1.3"/><path d="M5 9h8M9 5v8" stroke="#60a5fa" strokeWidth="1.5" strokeLinecap="round"/></svg>
-											</div>
-											<span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 px-2.5 py-1 rounded-full border border-blue-500/30">Enterprise</span>
-										</div>
-										<h3 className="text-xl font-black text-white mb-1">Pro Suite</h3>
-										<p className="text-sm text-white/60 leading-relaxed mb-5">Full enterprise evidence infrastructure. SSO, white-label reports, multi-subsidiary management and unlimited notarizations.</p>
-										<div className="flex items-baseline gap-2 mb-5">
-											<span className="text-3xl font-black text-blue-400">SGD 4,500</span>
-											<span className="text-sm text-white/50">/month</span>
-										</div>
-										<ul className="space-y-2.5 mb-6">
-											<li className="text-xs font-bold text-white/80 uppercase tracking-wider">Everything in Standard, plus:</li>
-											{["SSO — SAML 2.0 + OIDC", "White-label reports", "Multi-subsidiary management", "Unlimited notarizations"].map((f) => (
-												<li key={f} className="flex gap-2 items-start text-sm text-white/80"><span className="text-blue-400 flex-shrink-0 font-bold">✓</span>{f}</li>
-											))}
-										</ul>
-									</div>
-									<div className="mt-auto px-7 pb-7 pt-4 border-t border-white/10">
-										<p className="text-xs text-white/40 mb-3">Best for: groups, GLC subsidiaries, corporate procurement</p>
-										<button
-											onClick={() => handleCheckout("compliance_pro")}
-											disabled={loadingProduct === "compliance_pro"}
-											className="block w-full text-center bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-500/40 text-sm"
-										>
-											{loadingProduct === "compliance_pro" ? "Redirecting…" : "Subscribe — SGD 4,500/mo →"}
-										</button>
-									</div>
-								</div>
-
-								{/* Card 5 — Custom Enterprise */}
-								<div className="bg-white rounded-[2rem] border-2 border-[#e2e8f0] shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:border-[#0f172a] transition-all flex flex-col">
-									<div className="px-7 pt-7 pb-5">
-										<div className="flex items-center justify-between mb-5">
-											<div className="w-11 h-11 rounded-2xl bg-[#f8fafc] border border-[#e2e8f0] flex items-center justify-center">
-												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M3 9a6 6 0 1 0 12 0A6 6 0 0 0 3 9z" stroke="#475569" strokeWidth="1.3"/><path d="M9 6v3l2 2" stroke="#475569" strokeWidth="1.5" strokeLinecap="round"/></svg>
-											</div>
-											<span className="text-[10px] font-bold uppercase tracking-wider bg-[#f8fafc] text-[#64748b] px-2.5 py-1 rounded-full border border-[#e2e8f0]">Custom</span>
-										</div>
-										<h3 className="text-xl font-black text-[#0f172a] mb-1">Custom Enterprise</h3>
-										<p className="text-sm text-[#64748b] leading-relaxed mb-5">On-premise deployment, 99.99% uptime SLA, 100,000+ notarizations/month, government agency pricing.</p>
-										<div className="flex items-baseline gap-2 mb-5">
-											<span className="text-3xl font-black text-[#0f172a]">Contact Us</span>
-										</div>
-										<ul className="space-y-2.5 mb-6">
-											{["Everything in Pro Suite", "On-premise infrastructure", "99.99% uptime SLA (multi-AZ)", "GeBIZ-ready documentation"].map((f) => (
-												<li key={f} className="flex gap-2 items-start text-sm text-[#475569]"><span className="text-[#10b981] flex-shrink-0 font-bold">✓</span>{f}</li>
-											))}
-										</ul>
-									</div>
-									<div className="mt-auto px-7 pb-7 pt-4 border-t border-[#f1f5f9]">
-										<p className="text-xs text-[#94a3b8] mb-3">Best for: government agencies, statutory boards</p>
-										<Link
-											href="/demo"
-											className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-bold py-3 rounded-xl transition text-sm"
-										>
-											Contact Sales →
-										</Link>
-									</div>
-								</div>
-
-								{/* Card 6 — Intent Intelligence Agent */}
-								<div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] rounded-[2rem] border-2 border-violet-500/40 shadow-2xl overflow-hidden hover:-translate-y-1 hover:border-violet-500 transition-all flex flex-col">
-									<div className="px-7 pt-7 pb-5">
-										<div className="flex items-center justify-between mb-5">
-											<div className="w-11 h-11 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center">
-												<svg width="22" height="22" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2" fill="#a78bfa"/><circle cx="3" cy="5" r="1.5" stroke="#a78bfa" strokeWidth="1"/><circle cx="15" cy="5" r="1.5" stroke="#a78bfa" strokeWidth="1"/><circle cx="3" cy="13" r="1.5" stroke="#a78bfa" strokeWidth="1"/><circle cx="15" cy="13" r="1.5" stroke="#a78bfa" strokeWidth="1"/><path d="M4.2 5.8L7.5 7.5M10.5 7.5L13.8 5.8M4.2 12.2L7.5 10.5M10.5 10.5L13.8 12.2" stroke="#a78bfa" strokeWidth="0.8"/></svg>
-											</div>
-											<span className="text-[10px] font-bold uppercase tracking-wider bg-violet-500/20 text-violet-300 px-2.5 py-1 rounded-full border border-violet-500/30">Add-on · AI</span>
-										</div>
-										<h3 className="text-xl font-black text-white mb-1">Intent Intelligence Agent</h3>
-										<p className="text-sm text-white/60 leading-relaxed mb-5">Identifies which companies are visiting your site, scores their buying intent, and delivers a ranked lead list every morning.</p>
-										<div className="flex items-baseline gap-2 mb-5">
-											<span className="text-3xl font-black text-violet-400">Contact Us</span>
-										</div>
-										<ul className="space-y-2.5 mb-6">
-											{["Company-level IP identification", "Intent score + buying stage AI", "Real-time sales dashboard", "PDPA-compliant (IP anonymized)"].map((f) => (
-												<li key={f} className="flex gap-2 items-start text-sm text-white/80"><span className="text-violet-400 flex-shrink-0 font-bold">✓</span>{f}</li>
-											))}
-										</ul>
-									</div>
-									<div className="mt-auto px-7 pb-7 pt-4 border-t border-white/10">
-										<p className="text-xs text-white/40 mb-3">Available as add-on to any suite plan</p>
-										<Link
-											href="/demo"
-											className="block w-full text-center bg-violet-500 hover:bg-violet-400 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-violet-500/40 text-sm"
-										>
-											Request Access →
-										</Link>
-									</div>
-								</div>
-
-							</div>
-
-							{/* Stats bar */}
-							<div className="bg-[#f8fafc] rounded-[2rem] border border-[#e2e8f0] p-8">
-								<div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-									{[
-										{ value: "S$37", label: "Infrastructure floor cost / mo" },
-										{ value: "Minutes", label: "Time to first compliance output" },
-										{ value: "Polygon", label: "Amoy Testnet — blockchain anchoring" },
-										{ value: "MAS TRM", label: "2021 — all 13 domains covered" },
-									].map((stat) => (
-										<div key={stat.label} className="text-center">
-											<p className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-1">{stat.value}</p>
-											<p className="text-xs text-[#64748b] leading-relaxed">{stat.label}</p>
-										</div>
-									))}
-								</div>
-							</div>
-
-							{/* Legacy commented section kept for reference */}
-							{/* <div>
-								<div className="text-center mb-10">
-									<h2 className="text-2xl lg:text-3xl font-black text-[#0f172a] mb-2">
-										Enterprise Buyer
-									</h2>
-									<p className="text-[#64748b]">
-										Institutional-grade vendor evaluation and management for
-										organizations
-									</p>
-								</div>
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-									<div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all">
-										<h3 className="text-xl font-bold mb-4 text-[#0f172a]">
-											Enterprise
-										</h3>
-										<div className="text-4xl font-bold text-[#0f172a] mb-2">
-											SGD 499
-											<span className="text-xl text-[#64748b] font-normal">
-												/mo
-											</span>
-										</div>
-										<p className="text-sm text-[#64748b] mb-8">
-											For buyer teams evaluating vendors
-										</p>
-										<ul className="space-y-3 mb-10">
-											{[
-												"Full procurement analytics dashboard",
-												"Vendor comparison engine — weighted scoring",
-												"Vendor risk signals & compliance posture",
-												"Compliance health scoring (0-100)",
-												"Audit trail export (PDF + CSV)",
-												"Self-service billing portal",
-												"5,000 blockchain notarizations/month",
-												"Priority support (4h SLA)",
-											].map((f) => (
-												<CheckItem key={f} text={f} />
-											))}
-										</ul>
-										<p className="pt-6 border-t border-[#e2e8f0] text-xs text-[#94a3b8] mb-8">
-											For institutional buyer teams, GLCs, statutory
-											boards
-										</p>
-										<button
-											onClick={() => handleCheckout("enterprise_monthly")}
-											disabled={loadingProduct === "enterprise_monthly"}
-											className="block w-full text-center bg-[#0f172a] text-white hover:bg-[#1e293b] disabled:opacity-50 font-semibold py-3 rounded-xl transition text-sm"
-										>
-											{loadingProduct === "enterprise_monthly"
-												? "Redirecting…"
-												: "Get Enterprise — SGD 499/mo"}
-										</button>
-									</div>
-
-									<div className="bg-[#0f172a] p-10 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl hover:-translate-y-1 transition-all relative">
-										<div className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-[#10b981] text-white px-5 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap">
-											Recommended
-										</div>
-										<h3 className="text-xl font-bold mb-4 text-white">
-											Enterprise Pro
-										</h3>
-										<div className="text-4xl font-bold text-[#10b981] mb-2">
-											SGD 1,499
-											<span className="text-xl text-white/60 font-normal">
-												/mo
-											</span>
-										</div>
-										<p className="text-sm text-white/60 mb-8">
-											Dedicated account + SLA + multi-sector
-										</p>
-										<ul className="space-y-3 mb-10">
-											<li className="text-sm font-semibold text-white">
-												Everything in Enterprise, plus:
-											</li>
-											{[
-												"Dedicated account manager + monthly review",
-												"SLA on data freshness & report turnaround",
-												"Multi-sector procurement views",
-												"Exportable datasets & custom filters",
-												"Historical trend analysis",
-												"MAS TRM, Cyber Hygiene & Third-Party Risk workflows",
-												"Unlimited blockchain notarizations",
-												"White-label reports (your branding)",
-												"24/7 priority support (2h SLA)",
-											].map((f) => (
-												<li
-													key={f}
-													className="flex items-start gap-2 text-sm text-white/80"
-												>
-													<span className="text-[#10b981] font-bold flex-shrink-0">
-														✓
-													</span>
-													{f}
-												</li>
-											))}
-										</ul>
-										<p className="pt-6 border-t border-white/10 text-xs text-white/40 mb-8">
-											For MNCs and government-linked companies
-										</p>
-										<Link
-											href="/demo"
-											className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 rounded-xl transition shadow-lg shadow-[#10b981]/30"
-										>
-											Book Enterprise Pro Demo
-										</Link>
-									</div>
-
-									<div className="bg-white p-10 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col justify-between">
-										<div>
-											<h3 className="text-xl font-bold mb-6 text-[#0f172a]">
-												Custom Enterprise
-											</h3>
-											<div className="text-3xl font-bold text-[#0f172a] mb-8">
-												Contact Us
-											</div>
-											<ul className="space-y-3 mb-8">
-												{[
-													"On-premise deployment option",
-													"Custom compliance frameworks",
-													"Multi-subsidiary management",
-													"Dedicated infrastructure",
-													"Custom SLAs (e.g., 99.99% uptime)",
-													"SSO integration (SAML/OAuth)",
-													"Compliance team training",
-													"Government agency pricing",
-												].map((f) => (
-													<CheckItem key={f} text={f} />
-												))}
-											</ul>
-										</div>
-										<Link
-											href="/demo"
-											className="block w-full text-center border border-[#0f172a] text-[#0f172a] hover:bg-[#0f172a] hover:text-white font-semibold py-3 rounded-xl transition text-sm mt-auto"
-										>
-											Contact Enterprise Sales
-										</Link>
-									</div>
-								</div>
-							</div> */}
 						</div>
 					)}
 
@@ -1857,10 +570,6 @@ export default function PricingPage() {
 								{
 									q: "Can I cancel anytime?",
 									a: "Yes. Monthly plans are cancel-anytime with no long-term contracts. Your historical evidence and certificates remain accessible for 90 days after cancellation.",
-								},
-								{
-									q: "Do bundles require Vendor Proof first?",
-									a: "No — all three bundles include Vendor Proof as a component. One purchase activates everything simultaneously.",
 								},
 								{
 									q: "What payment methods do you accept?",

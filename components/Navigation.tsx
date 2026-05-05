@@ -17,120 +17,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 
-const forVendors = [
-	{
-		name: "Vendor Dashboard",
-		href: "/vendor/dashboard",
-		desc: "Track your trust score, activation ladder, and procurement visibility",
-	},
-	{
-		name: "Compliance Locker",
-		href: "/compliance/locker",
-		desc: "Your Singapore compliance evidence — PDPA, ACRA, GeBIZ, MAS in one place",
-	},
-	{
-		name: "Vendor Proof — S$149",
-		href: "/vendor-proof",
-		desc: "Appear in buyer searches — without verification, buyers cannot find you",
-	},
-	{
-		name: "PDPA Scan — S$79",
-		href: "/pdpa",
-		desc: "Prove data protection compliance before buyers flag you as a liability",
-	},
-	{
-		name: "Notarization — S$69",
-		href: "/notarization",
-		desc: "Tamper-proof your documents so buyers can verify authenticity instantly",
-	},
-	{
-		name: "RFP Express — S$249",
-		href: "/rfp-acceleration",
-		desc: "Submit a credibility-backed tender response instead of price-only bids",
-	},
-	{
-		name: "Tender Win Calculator",
-		href: "/tender-check",
-		desc: "See your exact win probability for any GeBIZ tender — free",
-	},
-];
-
-const forProcurements = [
-	{
-		name: "Procurement Dashboard",
-		href: "/procurement/dashboard",
-		desc: "Evaluate, compare, and shortlist vendors with structured trust data",
-	},
-	{
-		name: "Supply Chain Risk",
-		href: "/supply-chain",
-		desc: "Monitor compliance risk across your vendor portfolio in one place",
-	},
-	{
-		name: "Verify Vendor",
-		href: "/verify",
-		desc: "Check if a vendor is verified and audit their compliance posture",
-	},
-	{
-		name: "Browse Vendors",
-		href: "/vendors",
-		desc: "Search verified suppliers filtered by sector, score, and risk level",
-	},
-	{
-		name: "Compare Vendors",
-		href: "/compare",
-		desc: "Side-by-side evaluation of verification depth, risk, and readiness",
-	},
-];
-
-const solutions = [
-	{
-		name: "For Vendors",
-		href: "/solutions/vendors",
-		desc: "Build procurement trust — from verification to tender-ready dossiers",
-	},
-	{
-		name: "For Buyers",
-		href: "/solutions/procurement",
-		desc: "Reduce supplier risk with structured vendor due diligence",
-	},
-	{
-		name: "For Enterprise",
-		href: "/enterprise",
-		desc: "Institutional-grade compliance & evidence infrastructure",
-	},
-	{
-		name: "Vendor Proof",
-		href: "/vendor-proof",
-		desc: "Buyers filter by verified — without it, you are invisible to them",
-	},
-	{
-		name: "PDPA Compliance",
-		href: "/pdpa",
-		desc: "AI scan across 8 PDPA obligations — avoid S$1M penalty exposure",
-	},
-	{
-		name: "Notarization",
-		href: "/notarization",
-		desc: "SHA-256 hash + QR verification — documents anyone can audit",
-	},
-	{
-		name: "RFP Tools",
-		href: "/rfp-acceleration",
-		desc: "Turn tender bids from price-only into credibility-backed proposals",
-	},
-	{
-		name: "Tender Win Probability",
-		href: "/tender-check",
-		desc: "See the gap between your current score and sector winners — free",
-	},
-	{
-		name: "GeBIZ Opportunities",
-		href: "/opportunities",
-		desc: "Live open tenders matched to your sector and verification level",
-	},
-];
-
 const vendorLinks = [
 	{ name: "Dashboard", href: "/vendor/dashboard", icon: LayoutDashboard },
 	{ name: "My Profile", href: "/profile", icon: User },
@@ -156,9 +42,6 @@ const PROTECTED = ["/vendor", "/procurement"];
 
 export default function Navigation() {
 	const [mobileOpen, setMobileOpen] = useState(false);
-	const [vendorsOpen, setVendorsOpen] = useState(false);
-	const [procurementsOpen, setProcurementsOpen] = useState(false);
-	const [solutionsOpen, setSolutionsOpen] = useState(false);
 	const [userOpen, setUserOpen] = useState(false);
 	const [scrolled, setScrolled] = useState(false);
 	const [authed, setAuthed] = useState<boolean | null>(null);
@@ -168,9 +51,6 @@ export default function Navigation() {
 	const [isVerified, setIsVerified] = useState(false);
 	const pathname = usePathname();
 	const router = useRouter();
-	const vendorsDropdownRef = useRef<HTMLDivElement>(null);
-	const procurementsDropdownRef = useRef<HTMLDivElement>(null);
-	const solutionsDropdownRef = useRef<HTMLDivElement>(null);
 	const userDropdownRef = useRef<HTMLDivElement>(null);
 
 	// Scroll shadow
@@ -180,9 +60,7 @@ export default function Navigation() {
 		return () => window.removeEventListener("scroll", onScroll);
 	}, []);
 
-	// Check auth state and fetch user info.
-	// Re-runs on pathname change so the nav reflects login/logout immediately
-	// without requiring a full page reload.
+	// Check auth state and fetch user info
 	useEffect(() => {
 		fetch("/api/auth/me")
 			.then(async (r) => {
@@ -196,7 +74,6 @@ export default function Navigation() {
 				} else {
 					setAuthed(false);
 					setUserEmail(null);
-					// Stale/expired token — boot to login if on a protected page
 					const onProtected = PROTECTED.some(
 						(p) => pathname === p || pathname?.startsWith(p + "/"),
 					);
@@ -209,8 +86,7 @@ export default function Navigation() {
 			});
 	}, [pathname, router]);
 
-	// Poll every 5 minutes to detect session expiry while the user is idle
-	// on the same page (access token TTL is 24h).
+	// Poll session
 	useEffect(() => {
 		const checkSession = () => {
 			fetch("/api/auth/me")
@@ -227,27 +103,9 @@ export default function Navigation() {
 		return () => clearInterval(id);
 	}, []);
 
-	// Close dropdowns on outside click
+	// Close user dropdown on outside click
 	useEffect(() => {
 		const handler = (e: MouseEvent) => {
-			if (
-				vendorsDropdownRef.current &&
-				!vendorsDropdownRef.current.contains(e.target as Node)
-			) {
-				setVendorsOpen(false);
-			}
-			if (
-				procurementsDropdownRef.current &&
-				!procurementsDropdownRef.current.contains(e.target as Node)
-			) {
-				setProcurementsOpen(false);
-			}
-			if (
-				solutionsDropdownRef.current &&
-				!solutionsDropdownRef.current.contains(e.target as Node)
-			) {
-				setSolutionsOpen(false);
-			}
 			if (
 				userDropdownRef.current &&
 				!userDropdownRef.current.contains(e.target as Node)
@@ -264,12 +122,6 @@ export default function Navigation() {
 		setAuthed(false);
 		router.push("/login");
 	};
-
-	const isVendorsActive = forVendors.some((s) => pathname?.startsWith(s.href));
-	const isProcurementsActive = forProcurements.some((s) =>
-		pathname?.startsWith(s.href),
-	);
-	const isSolutionsActive = solutions.some((s) => pathname?.startsWith(s.href));
 
 	const menuLinks = userRole === "PROCUREMENT" ? procurementLinks : vendorLinks;
 
@@ -294,7 +146,6 @@ export default function Navigation() {
 								Home
 							</Link>
 
-							{/* For Vendors — direct link */}
 							<Link
 								href="/solutions/vendors"
 								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/solutions/vendors") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
@@ -302,7 +153,6 @@ export default function Navigation() {
 								For Vendors
 							</Link>
 
-							{/* For Buyers — direct link */}
 							<Link
 								href="/solutions/procurement"
 								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/solutions/procurement") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
@@ -310,44 +160,12 @@ export default function Navigation() {
 								For Buyers
 							</Link>
 
-							{/* Solutions dropdown */}
-							<div className="relative" ref={solutionsDropdownRef}>
-								<button
-									type="button"
-									onClick={() => {
-										setSolutionsOpen((o) => !o);
-										setVendorsOpen(false);
-										setProcurementsOpen(false);
-									}}
-									className={`flex items-center gap-1 text-sm font-medium transition-colors ${isSolutionsActive ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
-								>
-									Solutions{" "}
-									<ChevronDown
-										className={`h-4 w-4 transition-transform ${solutionsOpen ? "rotate-180" : ""}`}
-									/>
-								</button>
-								{solutionsOpen && (
-									<div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
-										{solutions.map((s) => (
-											<Link
-												key={s.href}
-												href={s.href}
-												onClick={() => setSolutionsOpen(false)}
-												className="flex flex-col px-4 py-3 hover:bg-white/5 transition-colors"
-											>
-												<span
-													className={`text-sm font-medium ${pathname?.startsWith(s.href) ? "text-[#10b981]" : "text-white"}`}
-												>
-													{s.name}
-												</span>
-												<span className="text-xs text-white/50 mt-0.5">
-													{s.desc}
-												</span>
-											</Link>
-										))}
-									</div>
-								)}
-							</div>
+							<Link
+								href="/solutions/enterprise"
+								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/solutions/enterprise") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
+							>
+								For Enterprise
+							</Link>
 
 							<Link
 								href="/opportunities"
@@ -368,13 +186,6 @@ export default function Navigation() {
 								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/resources") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
 							>
 								Resources
-							</Link>
-
-							<Link
-								href="/government"
-								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/government") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
-							>
-								Gov Portal
 							</Link>
 						</div>
 
@@ -400,7 +211,6 @@ export default function Navigation() {
 
 									{userOpen && (
 										<div className="absolute top-full right-0 mt-2 w-56 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
-											{/* Email header */}
 											<div className="px-4 py-3 border-b border-white/10">
 												<p className="text-xs text-white/40">Signed in as</p>
 												<p className="text-sm text-white font-medium truncate">
@@ -411,7 +221,6 @@ export default function Navigation() {
 												</p>
 											</div>
 
-											{/* Tool links */}
 											<div className="py-1">
 												{menuLinks.map(({ name, href, icon: Icon }) => (
 													<Link
@@ -430,7 +239,6 @@ export default function Navigation() {
 												))}
 											</div>
 
-											{/* Sign out */}
 											<div className="border-t border-white/10 py-1">
 												<button
 													type="button"
@@ -486,7 +294,7 @@ export default function Navigation() {
 				</nav>
 			</header>
 
-			{/* Mobile drawer — rendered outside <header> to avoid backdrop-filter containing-block bug */}
+			{/* Mobile drawer */}
 			{mobileOpen && (
 				<>
 					<button
@@ -528,21 +336,12 @@ export default function Navigation() {
 								active={pathname?.startsWith("/solutions/procurement")}
 								close={() => setMobileOpen(false)}
 							/>
-
-							<div className="pt-4 pb-1">
-								<p className="px-3 text-xs font-semibold uppercase tracking-wider text-white/30">
-									Solutions
-								</p>
-							</div>
-							{solutions.map((s) => (
-								<MobileLink
-									key={s.href}
-									href={s.href}
-									label={s.name}
-									active={pathname?.startsWith(s.href)}
-									close={() => setMobileOpen(false)}
-								/>
-							))}
+							<MobileLink
+								href="/solutions/enterprise"
+								label="For Enterprise"
+								active={pathname?.startsWith("/solutions/enterprise")}
+								close={() => setMobileOpen(false)}
+							/>
 							<MobileLink
 								href="/opportunities"
 								label="Vendor Opportunities"
@@ -555,18 +354,10 @@ export default function Navigation() {
 								active={pathname === "/pricing"}
 								close={() => setMobileOpen(false)}
 							/>
-
 							<MobileLink
 								href="/resources"
 								label="Resources"
 								active={pathname?.startsWith("/resources")}
-								close={() => setMobileOpen(false)}
-							/>
-
-							<MobileLink
-								href="/government"
-								label="Gov Portal"
-								active={pathname?.startsWith("/government")}
 								close={() => setMobileOpen(false)}
 							/>
 
@@ -578,8 +369,8 @@ export default function Navigation() {
 											<p className="text-sm text-white font-medium truncate">
 												{userEmail ||
 													(userRole === "PROCUREMENT"
-														? "Procurement"
-														: "Vendor")}
+															? "Procurement"
+															: "Vendor")}
 											</p>
 										</div>
 										{menuLinks.map(({ name, href }) => (
