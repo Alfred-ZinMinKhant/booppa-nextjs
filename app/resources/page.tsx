@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { config } from '@/lib/config';
 
 export const metadata = {
   title: 'Resources — Guides, Blog & Compliance Tips | BOOPPA',
@@ -33,7 +32,8 @@ const FALLBACK_POSTS = [
 
 async function getRecentPosts(): Promise<BlogPost[] | null> {
   try {
-    const res = await fetch(`${config.apiUrl}/api/public/blogs/?limit=3`, { next: { revalidate: 3600 } });
+    const cmsBase = (process.env.CMS_BASE || process.env.NEXT_PUBLIC_CMS_BASE || 'https://cms.booppa.io').replace(/\/$/, '');
+    const res = await fetch(`${cmsBase}/api/public/blogs/?limit=3`, { next: { revalidate: 3600 } });
     if (!res.ok) return null;
     const data = await res.json();
     return (data.results || []) as BlogPost[];

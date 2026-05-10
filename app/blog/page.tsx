@@ -13,7 +13,7 @@ export default function BlogPage() {
     let mounted = true;
     async function load() {
       try {
-        const res = await fetch(`/api/public/blogs/`);
+        const res = await fetch(`/api/blog/posts?limit=50`);
         if (!res.ok) return setPosts([]);
         const data = await res.json();
         if (mounted) setPosts(data.results || []);

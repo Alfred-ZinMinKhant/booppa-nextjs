@@ -24,7 +24,7 @@ const BUNDLE_META: Record<BundleKey, { label: string; rfpResultPath?: string; ex
   vendor_trust_pack: { label: 'Vendor Trust Pack', expectedCount: 2 },
   rfp_accelerator: { label: 'RFP Accelerator', rfpResultPath: '/rfp-acceleration/result', expectedCount: 2 },
   enterprise_bid_kit: { label: 'Enterprise Bid Kit', rfpResultPath: '/rfp-acceleration/result', expectedCount: 7 },
-  compliance_evidence_pack: { label: 'Compliance Evidence Pack', expectedCount: 3 },
+  compliance_evidence_pack: { label: 'Compliance Evidence Pack', expectedCount: 1 },
 }
 
 function BundleNotarizeInner() {
@@ -34,24 +34,15 @@ function BundleNotarizeInner() {
 
   const bundleParam = (searchParams.get('bundle') || '') as BundleKey
   const sessionId = searchParams.get('session_id') || ''
-  const meta = BUNDLE_META[bundleParam] || BUNDLE_META.compliance_evidence_pack
+  const meta = BUNDLE_META[bundleParam] || BUNDLE_META.vendor_trust_pack
 
   const [email, setEmail] = useState('')
   const [authChecked, setAuthChecked] = useState(false)
   const [creditBalance, setCreditBalance] = useState<number | null>(null)
-  const [pendingCoverSheet, setPendingCoverSheet] = useState(false)
   const [reports, setReports] = useState<AnchoredReport[]>([])
   const [descriptor, setDescriptor] = useState('')
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
-  const [generatingCoverSheet, setGeneratingCoverSheet] = useState(false)
-  const [coverSheetQueued, setCoverSheetQueued] = useState(false)
-  const [coverSheetStatus, setCoverSheetStatus] = useState<{
-    cover_sheet: { ready: boolean; pending?: boolean; generated_at?: string | null; download_url?: string | null; tx_hash?: string | null }
-    pdpa: { status: string; score: number | null; completed_at: string | null } | null
-    vendor_proof: { status: string; completed_at: string | null } | null
-    notarizations: { anchored: number; total: number }
-  } | null>(null)
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -66,22 +57,17 @@ function BundleNotarizeInner() {
   const refreshState = async (currentEmail: string) => {
     if (!currentEmail) return
     try {
-      const [creditsRes, reportsRes, statusRes] = await Promise.all([
+      const [creditsRes, reportsRes] = await Promise.all([
         fetch(`${apiBase}/api/v1/notarize/credits?email=${encodeURIComponent(currentEmail)}`),
         fetch(`${apiBase}/api/v1/notarize/bundle/notarizations?email=${encodeURIComponent(currentEmail)}`),
-        fetch(`${apiBase}/api/v1/notarize/bundle/cover-sheet/status?email=${encodeURIComponent(currentEmail)}`),
       ])
       if (creditsRes.ok) {
         const d = await creditsRes.json()
         if (typeof d.balance === 'number') setCreditBalance(d.balance)
-        setPendingCoverSheet(!!d.pending_cover_sheet)
       }
       if (reportsRes.ok) {
         const d = await reportsRes.json()
         if (Array.isArray(d.reports)) setReports(d.reports)
-      }
-      if (statusRes.ok) {
-        setCoverSheetStatus(await statusRes.json())
       }
     } catch {}
   }
@@ -145,28 +131,6 @@ function BundleNotarizeInner() {
     }
   }
 
-  const handleGenerateCoverSheet = async () => {
-    setGeneratingCoverSheet(true)
-    setError('')
-    try {
-      const res = await fetch(`${apiBase}/api/v1/notarize/bundle/cover-sheet/trigger`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.detail || 'Cover sheet trigger failed')
-      }
-      setCoverSheetQueued(true)
-      setPendingCoverSheet(false)
-    } catch (err: any) {
-      setError(err.message || 'Cover sheet trigger failed')
-    } finally {
-      setGeneratingCoverSheet(false)
-    }
-  }
-
   const uploadedCount = reports.length
   const remaining = creditBalance ?? 0
 
@@ -174,6 +138,33 @@ function BundleNotarizeInner() {
     return (
       <main className="bg-white min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#10b981]" />
+      </main>
+    )
+  }
+
+  // Compliance Evidence Pack uses its own page + dedicated credit pool — bounce.
+  if (bundleParam === 'compliance_evidence_pack') {
+    return (
+      <main className="bg-white min-h-screen py-16 px-6">
+        <div className="container max-w-3xl mx-auto">
+          <p className="text-sm font-bold text-[#0ea5e9] uppercase tracking-widest mb-2">{meta.label}</p>
+          <h1 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">Compliance Evidence Pack ready to track</h1>
+          <p className="text-[#64748b] text-lg mb-6">
+            We&apos;ve moved the cover-sheet workflow to its own page so your dedicated Compliance Evidence credit can&apos;t be drained by other notarizations.
+          </p>
+          <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-6">
+            <h2 className="font-black text-[#0f172a] mb-2">Continue at your Compliance Cover Sheet page</h2>
+            <p className="text-sm text-[#475569] mb-4">
+              Track PDPA + RFP generation, download the unsigned Cover Sheet, and upload your signed copy — all in one place.
+            </p>
+            <Link
+              href="/compliance/cover-sheet"
+              className="bg-[#10b981] text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-[#059669] inline-flex items-center gap-2"
+            >
+              Go to Compliance Cover Sheet →
+            </Link>
+          </div>
+        </div>
       </main>
     )
   }
@@ -186,9 +177,6 @@ function BundleNotarizeInner() {
           <h1 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">Notarize your included documents</h1>
           <p className="text-[#64748b] text-lg leading-relaxed">
             Each document is hashed with SHA-256 and anchored on {POLYGON_EXPLORER_HOST}.
-            {pendingCoverSheet && (
-              <> Once you've uploaded all your documents (or click &ldquo;Generate now&rdquo;), we'll compile your 9-section regulator-ready Cover Sheet PDF.</>
-            )}
           </p>
         </div>
 
@@ -318,144 +306,11 @@ function BundleNotarizeInner() {
           </div>
         )}
 
-        {/* Cover sheet ready — render the result card with download link */}
-        {coverSheetStatus?.cover_sheet?.ready && coverSheetStatus.cover_sheet.download_url && (
-          <div className="bg-gradient-to-r from-emerald-50 to-sky-50 border-2 border-emerald-300 rounded-2xl p-6 mb-6">
-            <div className="flex items-start gap-4">
-              <CheckCircle className="w-8 h-8 text-emerald-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="font-black text-[#0f172a] text-xl mb-1">Compliance Cover Sheet Ready</h2>
-                <p className="text-sm text-[#475569] mb-4">
-                  9-section regulator-ready PDF with PDPA score, Vendor Proof status, and SHA-256 anchored evidence for every document.
-                  {coverSheetStatus.cover_sheet.generated_at && (
-                    <span className="block text-xs text-[#94a3b8] mt-1">
-                      Generated {new Date(coverSheetStatus.cover_sheet.generated_at).toLocaleString()}
-                    </span>
-                  )}
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <a
-                    href={coverSheetStatus.cover_sheet.download_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-700 inline-flex items-center gap-2"
-                  >
-                    Download PDF <ExternalLink className="w-4 h-4" />
-                  </a>
-                  {coverSheetStatus.cover_sheet.tx_hash && (
-                    <a
-                      href={polygonscanTxUrl(coverSheetStatus.cover_sheet.tx_hash)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="bg-white border border-emerald-300 text-emerald-700 px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-50 inline-flex items-center gap-2"
-                    >
-                      View Anchor <ExternalLink className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Component status grid — visible whenever cover sheet not yet ready or just informational */}
-        {coverSheetStatus && !coverSheetStatus.cover_sheet.ready && bundleParam === 'compliance_evidence_pack' && (
-          <div className="bg-white border-2 border-[#e2e8f0] rounded-2xl p-6 mb-6">
-            <h2 className="font-bold text-[#0f172a] mb-4">Bundle progress</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* PDPA */}
-              <div className="border border-[#e2e8f0] rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  {coverSheetStatus.pdpa?.status === 'completed' ? (
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
-                  ) : (
-                    <Loader2 className="w-5 h-5 text-sky-600 animate-spin" />
-                  )}
-                  <p className="font-bold text-[#0f172a] text-sm">PDPA Quick Scan</p>
-                </div>
-                <p className="text-xs text-[#64748b]">
-                  {coverSheetStatus.pdpa?.status === 'completed'
-                    ? `Score: ${coverSheetStatus.pdpa.score ?? '—'}/100`
-                    : coverSheetStatus.pdpa?.status
-                      ? `Status: ${coverSheetStatus.pdpa.status}`
-                      : 'Queued'}
-                </p>
-              </div>
-              {/* Vendor Proof */}
-              <div className="border border-[#e2e8f0] rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  {coverSheetStatus.vendor_proof?.status === 'completed' ? (
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
-                  ) : (
-                    <Loader2 className="w-5 h-5 text-sky-600 animate-spin" />
-                  )}
-                  <p className="font-bold text-[#0f172a] text-sm">Vendor Proof</p>
-                </div>
-                <p className="text-xs text-[#64748b]">
-                  {coverSheetStatus.vendor_proof?.status === 'completed'
-                    ? 'Verified'
-                    : coverSheetStatus.vendor_proof?.status
-                      ? `Status: ${coverSheetStatus.vendor_proof.status}`
-                      : 'Queued'}
-                </p>
-              </div>
-              {/* Notarizations */}
-              <div className="border border-[#e2e8f0] rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  {coverSheetStatus.notarizations.anchored === coverSheetStatus.notarizations.total && coverSheetStatus.notarizations.total > 0 ? (
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
-                  ) : (
-                    <Loader2 className="w-5 h-5 text-sky-600 animate-spin" />
-                  )}
-                  <p className="font-bold text-[#0f172a] text-sm">Anchoring</p>
-                </div>
-                <p className="text-xs text-[#64748b]">
-                  {coverSheetStatus.notarizations.anchored} of {coverSheetStatus.notarizations.total} on-chain
-                </p>
-              </div>
-            </div>
-            {(coverSheetStatus.pdpa?.status !== 'completed' || coverSheetStatus.vendor_proof?.status !== 'completed') && (
-              <p className="text-xs text-[#94a3b8] mt-4">
-                Cover Sheet generates automatically once PDPA and Vendor Proof complete. Page refreshes every 8 seconds.
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Cover sheet section — only for Compliance Evidence Pack purchasers */}
-        {pendingCoverSheet ? (
-          <div className="bg-[#f8fafc] border-2 border-[#10b981] rounded-2xl p-6">
-            <h2 className="font-bold text-[#0f172a] mb-2">Generate your Compliance Summary Cover Sheet</h2>
-            <p className="text-sm text-[#64748b] mb-4">
-              9-section regulator-ready PDF including Vendor Proof status, PDPA scan results, and SHA-256
-              anchored evidence for every document above.
-              {remaining > 0 && uploadedCount > 0 && (
-                <span className="block mt-2 text-[#0f172a] font-medium">
-                  You can generate now with {uploadedCount} document{uploadedCount === 1 ? '' : 's'}, or upload all {uploadedCount + remaining} first.
-                </span>
-              )}
-            </p>
-            <button
-              type="button"
-              onClick={handleGenerateCoverSheet}
-              disabled={generatingCoverSheet || coverSheetQueued || uploadedCount === 0}
-              className="bg-[#10b981] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#059669] disabled:opacity-50 inline-flex items-center gap-2"
-            >
-              {generatingCoverSheet ? <><Loader2 className="w-4 h-4 animate-spin" /> Queuing…</> : coverSheetQueued ? 'Queued — check your email' : 'Generate Cover Sheet now'}
-            </button>
-            {uploadedCount === 0 && (
-              <p className="text-xs text-[#94a3b8] mt-2">Upload at least one document to enable cover sheet generation.</p>
-            )}
-          </div>
-        ) : coverSheetQueued ? (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-900 font-medium">
-            Cover Sheet queued — it will arrive in your inbox shortly.
-          </div>
-        ) : remaining === 0 && uploadedCount > 0 && bundleParam !== 'compliance_evidence_pack' ? (
+        {remaining === 0 && uploadedCount > 0 && (
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-900 font-medium">
             All bundle notarizations completed. Each document is anchored on-chain — receipts have been emailed.
           </div>
-        ) : null}
+        )}
       </div>
     </main>
   )

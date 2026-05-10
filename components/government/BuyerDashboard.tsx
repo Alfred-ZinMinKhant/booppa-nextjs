@@ -801,6 +801,7 @@ export default function BuyerDashboard() {
   const [verifyOpen, setVerify] = useState(false);
   const [exportOpen, setExport] = useState(false);
   const [userEmail, setUserEmail] = useState("procurement@agency.gov.sg");
+  const [userPlan, setUserPlan] = useState("free");
 
   const [vendors, setVendors]   = useState<APIState<Vendor[]>>({ data: null, loading: true, error: null });
   const [tenders, setTenders]   = useState<APIState<Tender[]>>({ data: null, loading: true, error: null });
@@ -816,7 +817,10 @@ export default function BuyerDashboard() {
   useEffect(() => {
     fetch(`${API}/api/v1/auth/me`, { credentials: "include" })
       .then((r) => r.ok ? r.json() : null)
-      .then((d) => { if (d?.email) setUserEmail(d.email); })
+      .then((d) => { 
+        if (d?.email) setUserEmail(d.email); 
+        if (d?.plan) setUserPlan(d.plan);
+      })
       .catch(() => {});
   }, []);
 
@@ -965,12 +969,18 @@ export default function BuyerDashboard() {
                 <button
                   ref={exportBtnRef}
                   type="button"
-                  onClick={() => setExport(true)}
+                  onClick={() => {
+                    if (userPlan === "evaluate_suppliers") {
+                      alert("PDF Export is available on the Verify Supplier Evidence plan. Please upgrade to export shortlists.");
+                    } else {
+                      setExport(true);
+                    }
+                  }}
                   aria-haspopup="dialog"
                   aria-label={`Export evaluation shortlist with ${selected.length} vendors`}
-                  style={{ padding: "7px 14px", borderRadius: 5, cursor: "pointer", border: "none", background: C.ink, color: C.white, fontSize: 11, fontWeight: 600 }}
+                  style={{ padding: "7px 14px", borderRadius: 5, cursor: "pointer", border: "none", background: C.ink, color: C.white, fontSize: 11, fontWeight: 600, opacity: userPlan === "evaluate_suppliers" ? 0.7 : 1 }}
                 >
-                  ↓ Export Shortlist ({selected.length})
+                  {userPlan === "evaluate_suppliers" ? "🔒 Upgrade to Export" : `↓ Export Shortlist (${selected.length})`}
                 </button>
               )}
             </div>

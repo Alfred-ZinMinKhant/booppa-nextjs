@@ -163,7 +163,7 @@ export default function SolutionsVendorsPage() {
                 <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 599</div>
                 <p className="text-xs text-[#64748b] mb-6">Per RFP · Full submission kit</p>
                 <ul className="space-y-3 mb-8 flex-1">
-                  {["Full compliance dossier", "Ready-to-submit bid kit", "Strategy 6 shortlist edge", "Expert review included"].map(f => <CheckItem key={f} text={f} color="text-[#10b981]" />)}
+                  {["Full compliance dossier", "Ready-to-submit bid kit", "Fast 24-hour turnaround", "Expert review included"].map(f => <CheckItem key={f} text={f} color="text-[#10b981]" />)}
                 </ul>
                 <button 
                   disabled={loadingProduct === "rfp_complete"}

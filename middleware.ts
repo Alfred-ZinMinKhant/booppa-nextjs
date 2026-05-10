@@ -60,10 +60,21 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Government Buyer routes ───────────────────────────────────────────────
-  // /buyer/dashboard requires a GOV_BUYER role cookie
+  // /buyer/dashboard requires a GOV_BUYER role cookie OR an Enterprise/Buyer plan
   if (pathname.startsWith('/buyer')) {
     const govBuyerToken = request.cookies.get('gov_buyer_token')?.value
-    if (!govBuyerToken) {
+    const rawPlan = request.cookies.get('vendor_plan')?.value
+    let plan = 'free'
+    if (rawPlan) {
+      try { plan = await verifyAndParseCookieValue(rawPlan) || 'free' } catch {}
+    }
+    const isEnterpriseBuyer = [
+        'evaluate_suppliers', 'verify_supplier_evidence',
+        'enterprise', 'enterprise_pro', 'pro_compliance',
+        'standard_compliance', 'standard_suite', 'pro_suite'
+    ].includes(plan)
+
+    if (!govBuyerToken && !isEnterpriseBuyer) {
       const redirectUrl = new URL('/government', request.url)
       redirectUrl.searchParams.set('from', pathname)
       return NextResponse.redirect(redirectUrl)

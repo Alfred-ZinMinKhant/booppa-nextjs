@@ -258,7 +258,7 @@ export default function PricingPage() {
 										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 599</div>
 										<p className="text-xs text-[#64748b] mb-6">Per RFP · Full submission kit</p>
 										<ul className="space-y-3 mb-8 flex-1">
-											{["Full compliance dossier", "Ready-to-submit bid kit", "Strategy 6 shortlist edge", "Expert review included"].map(f => <CheckItem key={f} text={f} color="text-amber-500" />)}
+											{["Full compliance dossier", "Ready-to-submit bid kit", "Fast 24-hour turnaround", "Expert review included"].map(f => <CheckItem key={f} text={f} color="text-amber-500" />)}
 										</ul>
 										<Link href="/rfp-acceleration" className="block w-full text-center bg-amber-500 text-white font-bold py-3.5 rounded-xl hover:bg-amber-600 transition shadow-lg shadow-amber-500/20">
 											Build Bid Kit →
@@ -375,7 +375,7 @@ export default function PricingPage() {
 									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 499<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
 									<p className="text-sm text-[#64748b] mb-6">For buyer teams evaluating vendors</p>
 									<ul className="space-y-3 mb-8 flex-1">
-										{["Full analytics dashboard", "Vendor comparison engine", "Risk signals & compliance posture", "5,000 notarizations/month"].map(f => <CheckItem key={f} text={f} />)}
+										{["Full analytics dashboard", "Vendor comparison engine", "Risk signals & compliance posture", "200 notarizations/month"].map(f => <CheckItem key={f} text={f} />)}
 									</ul>
 									<button 
 										disabled={loadingProduct === "enterprise_monthly"}
@@ -487,7 +487,7 @@ export default function PricingPage() {
 									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 1,800<span className="text-lg text-[#64748b] font-normal">/month</span></div>
 									<p className="text-xs text-[#64748b] mb-6">Subscription</p>
 									<ul className="space-y-3 mb-8 flex-1">
-										{["MAS TRM — all 13 domains", "AI gap analysis (Claude Haiku)", "5,000 notarizations/month", "RESTful API + webhooks"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
+										{["MAS TRM — all 13 domains", "AI gap analysis (Claude Haiku)", "50 notarizations/month", "RESTful API + webhooks"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
 									</ul>
 									<div className="pt-6 border-t border-[#f1f5f9] mb-6">
 										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
@@ -509,9 +509,9 @@ export default function PricingPage() {
 										<div className="flex-1">
 											<h3 className="text-2xl font-black text-white mb-2">Pro Suite</h3>
 											<div className="text-5xl font-black text-blue-400 mb-1">SGD 4,500<span className="text-xl text-white/40 font-normal">/month</span></div>
-											<p className="text-sm text-white/60 mb-8 leading-relaxed">Full enterprise evidence infrastructure. Multi-subsidiary management and unlimited notarizations.</p>
+											<p className="text-sm text-white/60 mb-8 leading-relaxed">Full enterprise evidence infrastructure. Multi-subsidiary management and a generous 100 notarizations every month.</p>
 											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-												{["SSO — SAML 2.0 + OIDC", "White-label reports", "Multi-subsidiary management", "Unlimited notarizations"].map(f => (
+												{["SSO — SAML 2.0 + OIDC", "White-label reports", "Multi-subsidiary management", "100 notarizations/month"].map(f => (
 													<div key={f} className="flex items-center gap-2 text-sm text-white/80">
 														<span className="text-blue-400 font-bold">✓</span>
 														{f}

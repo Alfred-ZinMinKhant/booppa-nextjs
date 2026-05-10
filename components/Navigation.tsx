@@ -12,7 +12,9 @@ import {
 	User,
 	Lock,
 	Network,
+	FileCheck,
 } from "lucide-react";
+import { config } from "@/lib/config";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
@@ -49,6 +51,7 @@ export default function Navigation() {
 	const [userRole, setUserRole] = useState<string | null>(null);
 	const [hasClaimedProfile, setHasClaimedProfile] = useState(false);
 	const [isVerified, setIsVerified] = useState(false);
+	const [showComplianceLink, setShowComplianceLink] = useState(false);
 	const pathname = usePathname();
 	const router = useRouter();
 	const userDropdownRef = useRef<HTMLDivElement>(null);
@@ -123,7 +126,32 @@ export default function Navigation() {
 		router.push("/login");
 	};
 
-	const menuLinks = userRole === "PROCUREMENT" ? procurementLinks : vendorLinks;
+	// Show "Compliance Cover Sheet" in dropdown only for users who own a Compliance
+	// Evidence Pack (have an unused CE credit, a pending cover sheet, or already
+	// uploaded a signed copy). Cheap to call — public endpoint keyed by email.
+	useEffect(() => {
+		if (!userEmail) {
+			setShowComplianceLink(false);
+			return;
+		}
+		fetch(`${config.apiUrl}/api/v1/compliance/cover-sheet/status?email=${encodeURIComponent(userEmail)}`)
+			.then((r) => (r.ok ? r.json() : null))
+			.then((data) => {
+				if (!data) return;
+				setShowComplianceLink(
+					!!(data.credits > 0 || data.pending_cover_sheet || data.signed_uploaded || data.cover_sheet?.ready),
+				);
+			})
+			.catch(() => {});
+	}, [userEmail]);
+
+	const baseMenu = userRole === "PROCUREMENT" ? procurementLinks : vendorLinks;
+	const menuLinks = showComplianceLink
+		? [
+				...baseMenu,
+				{ name: "Compliance Cover Sheet", href: "/compliance/cover-sheet", icon: FileCheck },
+		  ]
+		: baseMenu;
 
 	return (
 		<>
