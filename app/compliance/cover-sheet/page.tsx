@@ -10,6 +10,7 @@ interface CoverSheetStatus {
   credits: number
   pending_cover_sheet: boolean
   signed_uploaded: boolean
+  vendor_url_missing: boolean
   pdpa: { status: string; score: number | null; completed_at: string | null } | null
   rfp: { status: string; completed_at: string | null; download_url: string | null } | null
   cover_sheet: { ready: boolean; download_url?: string | null; tx_hash?: string | null; generated_at?: string | null }
@@ -131,6 +132,27 @@ function CoverSheetInner() {
               placeholder="you@company.com"
               className="w-full px-4 py-3 border-2 border-[#e2e8f0] rounded-lg focus:border-[#10b981] outline-none"
             />
+          </div>
+        )}
+
+        {/* Missing website — surface the deferred-cycle reason. The cycle
+            cannot run without a vendor_url, so prompt them to backfill before
+            anything else. */}
+        {email && status && hasAccess && status.vendor_url_missing && (
+          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 mb-8 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-bold text-amber-900">Add your website to start your cycle</p>
+              <p className="text-sm text-amber-800 mt-1">
+                We need your company website on your profile to refresh your PDPA Snapshot and RFP Complete Kit. Once saved, your cover sheet workflow will resume automatically.
+              </p>
+              <Link
+                href="/profile"
+                className="inline-block mt-3 bg-amber-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-amber-700"
+              >
+                Update profile
+              </Link>
+            </div>
           </div>
         )}
 
