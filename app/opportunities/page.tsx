@@ -97,7 +97,7 @@ export default function OpportunitiesPage() {
 							<strong>Vendor Proof active</strong> — your blockchain-verified
 							profile is visible to agencies reviewing these tenders.{" "}
 							<Link
-								href="/rfp-acceleration"
+								href="/pricing"
 								className="underline hover:no-underline"
 							>
 								Prepare your RFP documents →

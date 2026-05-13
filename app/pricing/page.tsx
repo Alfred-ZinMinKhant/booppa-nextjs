@@ -260,9 +260,14 @@ export default function PricingPage() {
 										<ul className="space-y-3 mb-8 flex-1">
 											{["Full compliance dossier", "Ready-to-submit bid kit", "Fast 24-hour turnaround", "Expert review included"].map(f => <CheckItem key={f} text={f} color="text-amber-500" />)}
 										</ul>
-										<Link href="/rfp-acceleration" className="block w-full text-center bg-amber-500 text-white font-bold py-3.5 rounded-xl hover:bg-amber-600 transition shadow-lg shadow-amber-500/20">
-											Build Bid Kit →
-										</Link>
+										<button
+											type="button"
+											disabled={loadingProduct === "rfp_complete"}
+											onClick={() => handleCheckout("rfp_complete")}
+											className="w-full bg-amber-500 text-white font-bold py-3.5 rounded-xl hover:bg-amber-600 transition shadow-lg shadow-amber-500/20 disabled:opacity-50"
+										>
+											{loadingProduct === "rfp_complete" ? "Redirecting..." : "Build Bid Kit →"}
+										</button>
 									</div>
 
 									{/* Compliance Bundle */}

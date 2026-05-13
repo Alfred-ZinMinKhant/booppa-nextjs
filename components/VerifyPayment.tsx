@@ -94,7 +94,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                           ? 'Your Vendor Proof certificate will be sent to your email within a few minutes.'
                           : isBundle
                             ? (productType === 'compliance_evidence_pack'
-                                ? 'Your Compliance Evidence Pack is activated — Vendor Proof and PDPA Quick Scan are running now. Click below to upload your 3 compliance documents; once anchored, your 9-section regulator-ready Cover Sheet PDF will be emailed automatically.'
+                                ? 'Your Compliance Evidence Pack is activated — PDPA Quick Scan and RFP Complete Kit are running now. Once both finish, your 9-section regulator-ready Cover Sheet PDF will be emailed to you. Track progress and upload your signed copy on the Cover Sheet page.'
                                 : productType === 'enterprise_bid_kit'
                                   ? 'Your Enterprise Bid Kit is activated — Vendor Proof, PDPA Quick Scan, and RFP Complete are running now. Click below to notarize your 7 included bundle documents.'
                                   : productType === 'rfp_accelerator'
@@ -121,10 +121,12 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
           </Link>
         ) : isBundle ? (
           <Link
-            href={`/bundle/notarize?bundle=${productType}${sessionId ? `&session_id=${sessionId}` : ''}`}
+            href={isComplianceEvidencePack
+              ? '/compliance/cover-sheet'
+              : `/bundle/notarize?bundle=${productType}${sessionId ? `&session_id=${sessionId}` : ''}`}
             className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition"
           >
-            {isComplianceEvidencePack ? 'Upload Your 3 Compliance Documents →' :
+            {isComplianceEvidencePack ? 'Open Compliance Cover Sheet →' :
               productType === 'enterprise_bid_kit' ? 'Notarize Your 7 Bundle Documents →' :
               'Notarize Your 2 Bundle Documents →'}
           </Link>

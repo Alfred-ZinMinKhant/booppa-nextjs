@@ -148,20 +148,20 @@ function BundleNotarizeInner() {
       <main className="bg-white min-h-screen py-16 px-6">
         <div className="container max-w-3xl mx-auto">
           <p className="text-sm font-bold text-[#0ea5e9] uppercase tracking-widest mb-2">{meta.label}</p>
-          <h1 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">Compliance Evidence Pack ready to track</h1>
+          <h1 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">Your Compliance Evidence Pack is being generated</h1>
           <p className="text-[#64748b] text-lg mb-6">
-            We&apos;ve moved the cover-sheet workflow to its own page so your dedicated Compliance Evidence credit can&apos;t be drained by other notarizations.
+            Your PDPA Quick Scan and RFP Complete Kit are running now. Once both finish, your 9-section regulator-ready Cover Sheet PDF will be emailed to you automatically.
           </p>
           <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-6">
-            <h2 className="font-black text-[#0f172a] mb-2">Continue at your Compliance Cover Sheet page</h2>
+            <h2 className="font-black text-[#0f172a] mb-2">Track everything on your Cover Sheet page</h2>
             <p className="text-sm text-[#475569] mb-4">
-              Track PDPA + RFP generation, download the unsigned Cover Sheet, and upload your signed copy — all in one place.
+              Watch PDPA + RFP progress in real time, download the unsigned Cover Sheet, then upload your signed copy to anchor the final blockchain receipt.
             </p>
             <Link
               href="/compliance/cover-sheet"
               className="bg-[#10b981] text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-[#059669] inline-flex items-center gap-2"
             >
-              Go to Compliance Cover Sheet →
+              Open Compliance Cover Sheet →
             </Link>
           </div>
         </div>

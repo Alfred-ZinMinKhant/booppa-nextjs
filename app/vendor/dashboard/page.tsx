@@ -115,7 +115,7 @@ export default function VendorDashboard() {
 			case "STANDARD":
 				return { href: "/pdpa", label: "Run PDPA Scan" };
 			case "DEEP":
-				return { href: "/rfp-acceleration", label: "Get RFP Complete" };
+				return { href: "/pricing", label: "Get RFP Complete" };
 			default:
 				return { href: "/notarization", label: "Notarize a Document" };
 		}

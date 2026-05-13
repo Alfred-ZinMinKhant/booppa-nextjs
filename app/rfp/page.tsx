@@ -1,19 +1,10 @@
 import Link from 'next/link';
-import { FileText, Zap, CheckCircle, Clock, Shield } from 'lucide-react';
+import { FileText, CheckCircle, Clock, Shield } from 'lucide-react';
 
 export const metadata = {
   title: 'RFP Tools — Prepare Better Submissions | BOOPPA',
   description: 'Generate procurement-ready RFP evidence packages in minutes. Blockchain-anchored certificates accepted by Singapore government agencies and enterprise buyers.',
 };
-
-const EXPRESS_FEATURES = [
-  '5 copy-ready RFP compliance answers',
-  'RFP Kit Evidence Certificate (PDF)',
-  'Blockchain-anchored on Polygon',
-  'QR verification badge',
-  'Delivered in minutes',
-  'Tender Readiness Score (0–100)',
-];
 
 const COMPLETE_FEATURES = [
   '15 advanced RFP compliance answers',
@@ -43,7 +34,7 @@ export default function RfpPage() {
             Generate stronger, more complete submissions with structured compliance data. Blockchain-anchored certificates that procurement officers can verify instantly.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/rfp-acceleration" className="px-8 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition-colors text-lg">
+            <Link href="/pricing" className="px-8 py-4 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition-colors text-lg">
               Start your RFP Package
             </Link>
             <Link href="/tender-check" className="px-8 py-4 border border-white/20 hover:border-white/40 text-white font-semibold rounded-xl transition-colors text-lg">
@@ -109,38 +100,11 @@ export default function RfpPage() {
 
       {/* Products */}
       <section className="py-20 px-6 bg-white border-b border-[#e2e8f0]">
-        <div className="max-w-[900px] mx-auto">
+        <div className="max-w-[480px] mx-auto">
           <h2 className="text-2xl lg:text-3xl font-bold text-[#0f172a] text-center mb-14">
-            Choose your RFP Kit
+            RFP Kit Complete
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* RFP Express */}
-            <div className="rounded-2xl border-2 border-violet-400 bg-white p-8 relative">
-              <div className="absolute top-[-14px] right-6 bg-violet-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
-                Most Popular
-              </div>
-              <div className="flex items-center gap-2 mb-1">
-                <Zap className="h-5 w-5 text-violet-500" />
-                <h3 className="text-xl font-bold text-[#0f172a]">RFP Kit Express</h3>
-              </div>
-              <div className="text-3xl font-bold text-[#0f172a] mt-3 mb-1">SGD 249</div>
-              <p className="text-sm text-[#64748b] mb-6">Per submission · 2-page evidence certificate</p>
-              <ul className="space-y-3 mb-8">
-                {EXPRESS_FEATURES.map((f, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
-                    <span className="text-violet-500 font-bold flex-shrink-0">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/rfp-acceleration"
-                className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white font-bold py-3 px-6 rounded-xl transition"
-              >
-                Get RFP Kit Express
-              </Link>
-            </div>
-
+          <div className="grid grid-cols-1 gap-8">
             {/* RFP Complete */}
             <div className="rounded-2xl border-2 border-[#10b981] bg-white p-8 relative">
               <div className="absolute top-[-14px] right-6 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
@@ -161,7 +125,7 @@ export default function RfpPage() {
                 ))}
               </ul>
               <Link
-                href="/rfp-acceleration"
+                href="/pricing"
                 className="block w-full text-center bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 px-6 rounded-xl transition"
               >
                 Get RFP Kit Complete

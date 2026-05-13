@@ -63,7 +63,7 @@ const FALLBACK_GUIDES: GuideSection[] = [
     category: 'Vendor Guides',
     items: [
       { title: 'How to Claim Your BOOPPA Vendor Profile', desc: 'Step-by-step guide to claiming, completing, and getting verified on the BOOPPA Vendor Network.', href: '/auth/register' },
-      { title: 'Building a Procurement-Ready Evidence Package', desc: 'What documents to include in your RFP evidence package and how to structure them for maximum credibility.', href: '/rfp-acceleration' },
+      { title: 'Building a Procurement-Ready Evidence Package', desc: 'What documents to include in your RFP evidence package and how to structure them for maximum credibility.', href: '/rfp' },
       { title: 'Understanding Your Tender Win Probability Score', desc: 'How the BOOPPA CAL engine scores your tender eligibility and what actions improve your probability.', href: '/tender-check' },
     ],
   },

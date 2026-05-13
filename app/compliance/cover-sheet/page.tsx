@@ -230,7 +230,7 @@ function CoverSheetInner() {
                 </p>
               </div>
             </div>
-            {(!pdpaDone || !rfpDone) && (
+            {!coverReady && (!pdpaDone || !rfpDone) && (
               <p className="text-xs text-[#94a3b8] mt-4">
                 Cover Sheet generates automatically once PDPA Quick Scan and RFP Complete Kit are ready. Page refreshes every 8 seconds.
               </p>

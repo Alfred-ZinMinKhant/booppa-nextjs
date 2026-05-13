@@ -12,7 +12,6 @@ import {
 	Building,
 	Target,
 	ShieldCheck,
-	Zap,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -457,55 +456,7 @@ function TenderCheckContent() {
 								<h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider">
 									Upgrade Impact
 								</h3>
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-									{/* RFP Express */}
-									<div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-5 space-y-4">
-										<div className="flex items-start justify-between">
-											<div>
-												<div className="flex items-center gap-2 mb-1">
-													<Zap className="h-4 w-4 text-violet-400" />
-													<span className="text-sm font-semibold text-white">
-														RFP Express
-													</span>
-												</div>
-												<p className="text-xs text-neutral-400">
-													{result.projections.rfpExpress.simulates}
-												</p>
-											</div>
-											<div className="text-right">
-												<p className="text-2xl font-bold text-violet-300">
-													{result.projections.rfpExpress.probability}%
-												</p>
-												<p className="text-xs text-emerald-400">
-													+{result.projections.rfpExpress.delta}% uplift
-												</p>
-											</div>
-										</div>
-										<div className="h-1.5 w-full rounded-full bg-neutral-800">
-											<div
-												className="h-1.5 rounded-full bg-violet-500 transition-all duration-700"
-												style={{
-													width: `${result.projections.rfpExpress.probability}%`,
-												}}
-											/>
-										</div>
-										<button
-											type="button"
-											onClick={() => startCheckout("rfp_express")}
-											disabled={checkingOut === "rfp_express"}
-											className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition disabled:opacity-60"
-										>
-											{checkingOut === "rfp_express" ? (
-												"Redirecting…"
-											) : (
-												<>
-													Upgrade to RFP Express{" "}
-													<ArrowRight className="h-3.5 w-3.5" />
-												</>
-											)}
-										</button>
-									</div>
-
+								<div className="grid grid-cols-1 gap-4">
 									{/* RFP Complete */}
 									<div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5 space-y-4">
 										<div className="flex items-start justify-between">

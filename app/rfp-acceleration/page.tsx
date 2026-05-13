@@ -483,16 +483,10 @@ export default function RFPAccelerationPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-6">
             <button
-              onClick={() => openModal('rfp_express')}
-              disabled={loading === 'rfp_express'}
-              className="btn btn-primary px-10 py-4 text-lg disabled:opacity-60"
-            >
-              {loading === 'rfp_express' ? 'Redirecting…' : 'RFP Kit Express — SGD 249'}
-            </button>
-            <button
+              type="button"
               onClick={() => openModal('rfp_complete')}
               disabled={loading === 'rfp_complete'}
-              className="btn btn-secondary px-10 py-4 text-lg disabled:opacity-60"
+              className="btn btn-primary px-10 py-4 text-lg disabled:opacity-60"
             >
               {loading === 'rfp_complete' ? 'Redirecting…' : 'RFP Kit Complete — SGD 599'}
             </button>
@@ -500,59 +494,33 @@ export default function RFPAccelerationPage() {
         </div>
       </section>
 
-      {/* Product Comparison */}
+      {/* Product Detail */}
       <section className="py-24 px-6">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Express Tier */}
-            <div id="express" className="bg-white p-12 rounded-[2.5rem] border-2 border-[#e2e8f0] relative overflow-hidden transition-all hover:border-[#10b981]">
-              <div className="mb-8">
-                <h3 className="text-2xl font-black text-[#0f172a] mb-2">RFP KIT EXPRESS</h3>
-                <div className="text-4xl font-black text-[#10b981] mb-6">SGD 249</div>
-                <p className="text-[#64748b]">Perfect for simple RFPs and basic vendor verification.</p>
-              </div>
-              <ul className="space-y-4 mb-12">
-                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> 5 copy-ready RFP compliance answers</li>
-                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> RFP Kit Evidence Certificate (PDF)</li>
-                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> Blockchain-anchored on Polygon</li>
-                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> QR verification badge</li>
-                <li className="flex items-center gap-3 text-[#0f172a]"><span className="text-[#10b981]">✓</span> Tender Readiness Score (0–100)</li>
-                <li className="flex items-center gap-3 text-[#64748b] opacity-50"><span className="text-[#cbd5e1]">✕</span> No Editable DOCX</li>
-                <li className="flex items-center gap-3 text-[#64748b] opacity-50"><span className="text-[#cbd5e1]">✕</span> No AI Narrative</li>
-              </ul>
-              <button
-                onClick={() => openModal('rfp_express')}
-                disabled={loading === 'rfp_express'}
-                className="btn btn-primary w-full text-center py-4 block disabled:opacity-60"
-              >
-                {loading === 'rfp_express' ? 'Redirecting…' : 'Generate Express Evidence'}
-              </button>
+        <div className="max-w-[600px] mx-auto">
+          {/* Complete Tier */}
+          <div id="complete" className="bg-[#0f172a] p-12 rounded-[2.5rem] border-2 border-[#10b981] relative overflow-hidden">
+            <div className="absolute top-6 right-6 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase">Enterprise Ready</div>
+            <div className="mb-8">
+              <h3 className="text-2xl font-black text-white mb-2">RFP KIT COMPLETE</h3>
+              <div className="text-4xl font-black text-[#10b981] mb-6">SGD 599</div>
+              <p className="text-white/70">Full vendor procurement pack for high-value tenders.</p>
             </div>
-
-            {/* Complete Tier */}
-            <div id="complete" className="bg-[#0f172a] p-12 rounded-[2.5rem] border-2 border-[#10b981] relative overflow-hidden">
-              <div className="absolute top-6 right-6 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase">Enterprise Ready</div>
-              <div className="mb-8">
-                <h3 className="text-2xl font-black text-white mb-2">RFP KIT COMPLETE</h3>
-                <div className="text-4xl font-black text-[#10b981] mb-6">SGD 599</div>
-                <p className="text-white/70">Full vendor procurement pack for high-value tenders.</p>
-              </div>
-              <ul className="space-y-4 mb-12">
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> 15 advanced RFP compliance answers</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Editable DOCX + PDF</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> AI compliance narrative</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Comprehensive control mapping</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Attestation letter</li>
-                <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Priority 12h delivery</li>
-              </ul>
-              <button
-                onClick={() => openModal('rfp_complete')}
-                disabled={loading === 'rfp_complete'}
-                className="btn btn-primary w-full text-center py-4 block disabled:opacity-60"
-              >
-                {loading === 'rfp_complete' ? 'Redirecting…' : 'Get Full RFP Kit'}
-              </button>
-            </div>
+            <ul className="space-y-4 mb-12">
+              <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> 15 advanced RFP compliance answers</li>
+              <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Editable DOCX + PDF</li>
+              <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> AI compliance narrative</li>
+              <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Comprehensive control mapping</li>
+              <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Attestation letter</li>
+              <li className="flex items-center gap-3 text-white"><span className="text-[#10b981]">✓</span> Priority 12h delivery</li>
+            </ul>
+            <button
+              type="button"
+              onClick={() => openModal('rfp_complete')}
+              disabled={loading === 'rfp_complete'}
+              className="btn btn-primary w-full text-center py-4 block disabled:opacity-60"
+            >
+              {loading === 'rfp_complete' ? 'Redirecting…' : 'Get Full RFP Kit'}
+            </button>
           </div>
         </div>
       </section>

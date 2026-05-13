@@ -54,7 +54,7 @@ export default function Home() {
 						</p>
 					</div>
 
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 						{/* PDPA Scan */}
 						<div className="bg-white p-8 rounded-3xl border-2 border-[#e2e8f0] transition-all hover:shadow-xl flex flex-col">
 							<h3 className="text-xl font-bold mb-4">PDPA Scan</h3>
@@ -156,55 +156,6 @@ export default function Home() {
 							</Link>
 						</div>
 
-						{/* RFP Express (includes Vendor Proof) */}
-						<div className="bg-white p-8 rounded-3xl border-2 border-[#e2e8f0] transition-all hover:shadow-xl flex flex-col">
-							<h3 className="text-xl font-bold mb-4">RFP Express</h3>
-							<div className="text-3xl font-bold text-[#0f172a] mb-2">
-								SGD 249
-							</div>
-							<p className="text-[#64748b] text-sm mb-6 pb-6 border-b border-[#e2e8f0]">
-								Fast procurement evidence
-							</p>
-							<ul className="mb-8 space-y-3 flex-1">
-								<li className="flex items-center gap-3 text-sm text-[#64748b]">
-									<span className="text-[#10b981] font-bold">✓</span> 5 RFP Q&A
-									answers
-								</li>
-								<li className="flex items-center gap-3 text-sm text-[#64748b]">
-									<span className="text-[#10b981] font-bold">✓</span> Vendor
-									Proof Certificate
-								</li>
-								<li className="flex items-center gap-3 text-sm text-[#64748b]">
-									<span className="text-[#10b981] font-bold">✓</span> 24-hour delivery
-								</li>
-							</ul>
-
-							{/* REAL OUTPUT PREVIEW: RFP Q&A SAMPLE */}
-							<div className="mb-6 p-4 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0]">
-								<p className="text-[10px] font-black text-[#94a3b8] uppercase mb-3 tracking-widest">RFP Q&A Sample</p>
-								<div className="space-y-2">
-									{[
-										{ q: "Data security measures?", a: "ISO 27001-aligned controls…" },
-										{ q: "Uptime SLA?", a: "99.9% guaranteed SLA…" },
-										{ q: "PDPA compliance?", a: "Fully PDPA-compliant…" },
-									].map((item, i) => (
-										<div key={i} className="bg-white rounded-lg p-2.5 border border-[#e2e8f0]">
-											<p className="text-[8px] font-black text-[#64748b] uppercase tracking-wide mb-0.5">Q{i + 1}</p>
-											<p className="text-[9px] font-semibold text-[#0f172a] leading-tight mb-1">{item.q}</p>
-											<p className="text-[8px] text-[#64748b] leading-tight">{item.a}</p>
-										</div>
-									))}
-								</div>
-							</div>
-
-							<Link
-								href="/rfp-acceleration#express"
-								className="btn btn-outline w-full py-3"
-							>
-								Get Express
-							</Link>
-						</div>
-
 						{/* RFP Kit (No Example) */}
 						<div className="bg-[#0f172a] p-8 rounded-3xl border-2 border-[#10b981] shadow-lg relative transition-all hover:shadow-2xl flex flex-col">
 							<div className="absolute top-[-15px] right-6 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
@@ -237,7 +188,7 @@ export default function Home() {
 							</div>
 
 							<Link
-								href="/rfp-acceleration#complete"
+								href="/pricing"
 								className="btn btn-primary w-full py-3 shadow-lg"
 							>
 								Get RFP Kit
