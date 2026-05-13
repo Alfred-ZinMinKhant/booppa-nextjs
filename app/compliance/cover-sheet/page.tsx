@@ -13,7 +13,7 @@ interface CoverSheetStatus {
   vendor_url_missing: boolean
   pdpa: { status: string; score: number | null; completed_at: string | null } | null
   rfp: { status: string; completed_at: string | null; download_url: string | null } | null
-  cover_sheet: { ready: boolean; download_url?: string | null; tx_hash?: string | null; generated_at?: string | null; schema_version?: number | null; outdated?: boolean }
+  cover_sheet: { ready: boolean; download_url?: string | null; tx_hash?: string | null; generated_at?: string | null; schema_version?: number | null; outdated?: boolean; stale?: boolean }
   signed: { uploaded_at: string | null; tx_hash: string | null; file_hash: string | null; file_name: string | null } | null
 }
 
@@ -128,10 +128,9 @@ function CoverSheetInner() {
 
   const pdpaDone = status?.pdpa?.status === 'completed'
   const rfpDone = status?.rfp?.status === 'completed'
-  // Cover sheet is only surfaced as ready once both upstream inputs are done.
-  // (The backend only generates it after both finish, but we gate the UI here
-  // too so a stale/orphaned record can never appear before the prerequisites.)
-  const coverReady = !!status?.cover_sheet?.ready && pdpaDone && rfpDone
+  // Cover sheet is only surfaced as ready once both upstream inputs are done
+  // AND it isn't stale (i.e., a fresh purchase cycle hasn't superseded it).
+  const coverReady = !!status?.cover_sheet?.ready && pdpaDone && rfpDone && !status?.cover_sheet?.stale
   const signed = status?.signed
   const finalReceipt = !!signed?.tx_hash
   const hasAccess = !!status && (status.credits > 0 || status.pending_cover_sheet || status.signed_uploaded || coverReady)
