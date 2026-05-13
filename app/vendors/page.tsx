@@ -65,7 +65,7 @@ export default function VendorsPage() {
 			{/* Hero */}
 			<section className="py-20 px-6 bg-[#0f172a] text-white">
 				<div className="max-w-[1200px] mx-auto text-center">
-					<h1 className="text-4xl lg:text-6xl font-bold mb-4">
+					<h1 className="text-4xl lg:text-6xl font-bold mb-4 text-white">
 						Vendor Directory
 					</h1>
 					<p className="text-xl text-[#94a3b8] max-w-[600px] mx-auto">

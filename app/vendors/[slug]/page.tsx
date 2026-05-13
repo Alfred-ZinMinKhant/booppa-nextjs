@@ -216,7 +216,7 @@ function VendorProfile({ vendor, user }: { vendor: any; user: User | null }) {
 								)}
 							</div>
 
-							<h1 className="text-3xl lg:text-5xl font-black mb-3 leading-tight">
+							<h1 className="text-3xl lg:text-5xl font-black mb-3 leading-tight text-white">
 								{vendor.company_name}
 							</h1>
 

@@ -37,22 +37,6 @@ export default function Footer() {
 									Notarization Express
 								</Link>
 							</li>
-							<li>
-								<Link
-									href="/rfp-acceleration#express"
-									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
-								>
-									RFP Express
-								</Link>
-							</li>
-							<li>
-								<Link
-									href="/rfp-acceleration#complete"
-									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
-								>
-									RFP Kit
-								</Link>
-							</li>
 						</ul>
 					</div>
 
@@ -105,14 +89,6 @@ export default function Footer() {
 									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
 								>
 									Support
-								</Link>
-							</li>
-							<li>
-								<Link
-									href="/enterprise"
-									className="text-[#64748b] hover:text-[#10b981] transition-colors text-sm"
-								>
-									Enterprise Access
 								</Link>
 							</li>
 						</ul>

@@ -301,7 +301,7 @@ export default function ComparePage() {
 			{/* Hero */}
 			<section className="py-16 px-6 bg-[#0f172a] text-white">
 				<div className="max-w-[1200px] mx-auto text-center">
-					<h1 className="text-3xl lg:text-5xl font-bold mb-4">
+					<h1 className="text-3xl lg:text-5xl font-bold mb-4 text-white">
 						Compare Vendors
 					</h1>
 					<p className="text-xl text-[#94a3b8]">
@@ -463,7 +463,9 @@ export default function ComparePage() {
 														) : !v.claimed ? (
 															<ClaimNudge slug={v.slug || v.id} />
 														) : (
-															<span className="text-[#94a3b8] text-xs">No data</span>
+															<span className="text-[#94a3b8] text-xs">
+																No data
+															</span>
 														)}
 													</td>
 												);
@@ -477,7 +479,13 @@ export default function ComparePage() {
 										<td className={labelTd}>Verification Depth</td>
 										{selected.map((v) => (
 											<td key={v.id} className={td}>
-												{analysis[v.id] ? depthBadge(analysis[v.id].status.verification_depth) : !v.claimed ? <ClaimNudge slug={v.slug || v.id} /> : <span className="text-[#94a3b8] text-xs">—</span>}
+												{analysis[v.id] ? (
+													depthBadge(analysis[v.id].status.verification_depth)
+												) : !v.claimed ? (
+													<ClaimNudge slug={v.slug || v.id} />
+												) : (
+													<span className="text-[#94a3b8] text-xs">—</span>
+												)}
 											</td>
 										))}
 									</tr>
@@ -485,7 +493,13 @@ export default function ComparePage() {
 										<td className={labelTd}>Risk Signal</td>
 										{selected.map((v) => (
 											<td key={v.id} className={td}>
-												{analysis[v.id] ? riskBadge(analysis[v.id].status.risk_signal) : !v.claimed ? <ClaimNudge slug={v.slug || v.id} /> : <span className="text-[#94a3b8] text-xs">—</span>}
+												{analysis[v.id] ? (
+													riskBadge(analysis[v.id].status.risk_signal)
+												) : !v.claimed ? (
+													<ClaimNudge slug={v.slug || v.id} />
+												) : (
+													<span className="text-[#94a3b8] text-xs">—</span>
+												)}
 											</td>
 										))}
 									</tr>
@@ -493,7 +507,15 @@ export default function ComparePage() {
 										<td className={labelTd}>Procurement Readiness</td>
 										{selected.map((v) => (
 											<td key={v.id} className={td}>
-												{analysis[v.id] ? readinessBadge(analysis[v.id].status.procurement_readiness) : !v.claimed ? <ClaimNudge slug={v.slug || v.id} /> : <span className="text-[#94a3b8] text-xs">—</span>}
+												{analysis[v.id] ? (
+													readinessBadge(
+														analysis[v.id].status.procurement_readiness,
+													)
+												) : !v.claimed ? (
+													<ClaimNudge slug={v.slug || v.id} />
+												) : (
+													<span className="text-[#94a3b8] text-xs">—</span>
+												)}
 											</td>
 										))}
 									</tr>
@@ -501,9 +523,15 @@ export default function ComparePage() {
 										<td className={labelTd}>Monitoring Activity</td>
 										{selected.map((v) => (
 											<td key={v.id} className={td}>
-												{analysis[v.id]?.status.monitoring_activity
-													? <span className="text-xs text-[#0f172a]">{analysis[v.id].status.monitoring_activity}</span>
-													: !v.claimed ? <ClaimNudge slug={v.slug || v.id} /> : <span className="text-[#94a3b8] text-xs">—</span>}
+												{analysis[v.id]?.status.monitoring_activity ? (
+													<span className="text-xs text-[#0f172a]">
+														{analysis[v.id].status.monitoring_activity}
+													</span>
+												) : !v.claimed ? (
+													<ClaimNudge slug={v.slug || v.id} />
+												) : (
+													<span className="text-[#94a3b8] text-xs">—</span>
+												)}
 											</td>
 										))}
 									</tr>
