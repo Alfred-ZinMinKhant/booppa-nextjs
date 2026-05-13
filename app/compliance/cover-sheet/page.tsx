@@ -13,7 +13,7 @@ interface CoverSheetStatus {
   vendor_url_missing: boolean
   pdpa: { status: string; score: number | null; completed_at: string | null } | null
   rfp: { status: string; completed_at: string | null; download_url: string | null } | null
-  cover_sheet: { ready: boolean; download_url?: string | null; tx_hash?: string | null; generated_at?: string | null }
+  cover_sheet: { ready: boolean; download_url?: string | null; tx_hash?: string | null; generated_at?: string | null; schema_version?: number | null; outdated?: boolean }
   signed: { uploaded_at: string | null; tx_hash: string | null; file_hash: string | null; file_name: string | null } | null
 }
 
@@ -25,6 +25,7 @@ function CoverSheetInner() {
   const [authChecked, setAuthChecked] = useState(false)
   const [status, setStatus] = useState<CoverSheetStatus | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [regenerating, setRegenerating] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -51,6 +52,29 @@ function CoverSheetInner() {
     const id = setInterval(() => refreshStatus(email), 8000)
     return () => clearInterval(id)
   }, [email, apiBase])
+
+  const handleRegenerate = async () => {
+    if (!email) return
+    setRegenerating(true)
+    try {
+      const formData = new FormData()
+      formData.append('email', email)
+      const res = await fetch(`${apiBase}/api/v1/compliance/cover-sheet/regenerate`, {
+        method: 'POST',
+        body: formData,
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.detail || 'Regeneration failed')
+      }
+      // Poll quickly for the new PDF — the task waits ~5s then runs.
+      setTimeout(() => refreshStatus(email), 8000)
+    } catch (e: any) {
+      setError(e.message || 'Regeneration failed')
+    } finally {
+      setRegenerating(false)
+    }
+  }
 
   const handleUpload = async () => {
     const files = fileRef.current?.files
@@ -104,7 +128,10 @@ function CoverSheetInner() {
 
   const pdpaDone = status?.pdpa?.status === 'completed'
   const rfpDone = status?.rfp?.status === 'completed'
-  const coverReady = !!status?.cover_sheet?.ready
+  // Cover sheet is only surfaced as ready once both upstream inputs are done.
+  // (The backend only generates it after both finish, but we gate the UI here
+  // too so a stale/orphaned record can never appear before the prerequisites.)
+  const coverReady = !!status?.cover_sheet?.ready && pdpaDone && rfpDone
   const signed = status?.signed
   const finalReceipt = !!signed?.tx_hash
   const hasAccess = !!status && (status.credits > 0 || status.pending_cover_sheet || status.signed_uploaded || coverReady)
@@ -276,7 +303,22 @@ function CoverSheetInner() {
                       View Anchor <ExternalLink className="w-4 h-4" />
                     </a>
                   )}
+                  {!finalReceipt && status?.cover_sheet?.outdated && (
+                    <button
+                      type="button"
+                      onClick={handleRegenerate}
+                      disabled={regenerating}
+                      className="bg-amber-500 text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-amber-600 inline-flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" /> Regenerating…</> : 'Regenerate to latest format'}
+                    </button>
+                  )}
                 </div>
+                {!finalReceipt && status?.cover_sheet?.outdated && (
+                  <p className="text-xs text-amber-700 mt-3">
+                    This Cover Sheet was issued by an earlier version. Click <strong>Regenerate to latest format</strong> for a refreshed PDF and blockchain anchor at no cost.
+                  </p>
+                )}
               </div>
             </div>
           </div>
