@@ -194,7 +194,7 @@ export default function EnterprisePage() {
                                     <p className="text-sm text-white/80 mb-8 italic">Everything in Standard Suite</p>
                                     <div className="mb-8">
                                         <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Best for</p>
-                                        <p className="text-sm text-white/60">groups, GLC subsidiaries, corporate procurement</p>
+                                        <p className="text-sm text-white/60">groups, GLC subsidiaries, corporate procurement, enterprise vendors managing multiple entities</p>
                                     </div>
                                     <button 
 										disabled={loadingProduct === "pro_suite_monthly"}
