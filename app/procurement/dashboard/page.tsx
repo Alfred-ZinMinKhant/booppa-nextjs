@@ -383,7 +383,7 @@ export default function ProcurementDashboard() {
     ? Math.round(vendors.reduce((s, v) => s + v.currentScore, 0) / vendors.length)
     : 0;
 
-  const ENTERPRISE_PLANS = ["enterprise", "enterprise_pro", "standard_compliance", "pro_compliance"];
+  const ENTERPRISE_PLANS = ["enterprise", "enterprise_pro"];
   const hasEnterprise = user ? ENTERPRISE_PLANS.includes(user.plan) : false;
 
   if (!user) {

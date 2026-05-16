@@ -24,6 +24,10 @@ export const endpoints = {
     vendor:     (slug: string) => `/marketplace/vendor/${slug}`,
     importCsv:  '/marketplace/import/csv',
   },
+  pricing: {
+    products: '/pricing/products',
+    product:  (slug: string) => `/pricing/products/${slug}`,
+  },
   features: {
     list:           '/features/flags',
     get:            (name: string) => `/features/flags/${name}`,

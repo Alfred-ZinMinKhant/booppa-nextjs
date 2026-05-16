@@ -70,8 +70,8 @@ export async function middleware(request: NextRequest) {
     }
     const isEnterpriseBuyer = [
         'evaluate_suppliers', 'verify_supplier_evidence',
-        'enterprise', 'enterprise_pro', 'pro_compliance',
-        'standard_compliance', 'standard_suite', 'pro_suite'
+        'enterprise', 'enterprise_pro',
+        'standard_suite', 'pro_suite'
     ].includes(plan)
 
     if (!govBuyerToken && !isEnterpriseBuyer) {

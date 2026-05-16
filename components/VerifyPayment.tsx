@@ -52,12 +52,14 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
       </>
     );
   } else if (status === 'success') {
-    const isEnterprise = productType === 'enterprise_monthly' || productType === 'enterprise_pro_monthly';
-    const isCompliance = productType === 'compliance_standard' || productType === 'compliance_pro';
+    const isEnterprise = productType === 'enterprise_monthly' || productType === 'enterprise_pro_monthly'
+      || productType === 'standard_suite_monthly' || productType === 'pro_suite_monthly';
+    const isCompliance = productType === 'compliance_evidence_monthly'
+      || productType === 'evaluate_suppliers_monthly' || productType === 'verify_supplier_evidence_monthly';
     const isBundle = productType === 'vendor_trust_pack' || productType === 'rfp_accelerator' || productType === 'enterprise_bid_kit' || productType === 'compliance_evidence_pack';
     const isComplianceEvidencePack = productType === 'compliance_evidence_pack';
     const isVendorProof = productType === 'vendor_proof';
-    const isNotarization = productType?.startsWith('compliance_notarization') || productType?.startsWith('supply_chain');
+    const isNotarization = productType?.startsWith('compliance_notarization');
     // pdpa_quick_scan / pdpa_snapshot → report page; pdpa_monitor_* → subscription, go to dashboard
     const isPdpa = productType === 'pdpa_quick_scan' || productType === 'pdpa_snapshot';
     const isPdpaMonitor = productType === 'pdpa_monitor_monthly' || productType === 'pdpa_monitor_annual';
