@@ -49,9 +49,24 @@ export default function AdminDashboard() {
 			}).then((r) => (r.ok ? r.json() : null)),
 		])
 			.then(([flagData, metricsData, funnelData]) => {
-				setFlags(flagData?.flags || flagData || []);
+				// Backend returns a dict keyed by flag name; normalize to an array.
+				let flagsArray: FeatureFlag[] = [];
+				if (Array.isArray(flagData?.flags)) {
+					flagsArray = flagData.flags;
+				} else if (Array.isArray(flagData)) {
+					flagsArray = flagData;
+				} else if (flagData && typeof flagData === "object") {
+					flagsArray = Object.entries(flagData).map(
+						([flag_name, v]: [string, any]) => ({
+							flag_name,
+							enabled: !!v?.enabled,
+							description: v?.description,
+						}),
+					);
+				}
+				setFlags(flagsArray);
 				setMetrics(metricsData);
-				setFunnel(funnelData?.stages || []);
+				setFunnel(Array.isArray(funnelData?.stages) ? funnelData.stages : []);
 				setLoading(false);
 			})
 			.catch(() => setLoading(false));
