@@ -4,7 +4,7 @@ import { verifyAndParseCookieValue } from '@/lib/cookie-signing'
 
 // Public vendor/user routes — no `token` cookie required
 const publicRoutes = [
-  '/', '/login', '/register', '/forgot-password',
+  '/', '/login', '/register', '/forgot-password', '/reset-password',
   '/trial', '/pricing', '/faq', '/support', '/book-demo',
   '/privacy', '/terms', '/security', '/dpo', '/cookies',
   '/acceptable-use', '/disclaimer',
