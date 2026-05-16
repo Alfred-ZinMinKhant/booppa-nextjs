@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  LayoutDashboard, FileText, Briefcase, Users, Activity,
+  LayoutDashboard, FileText, Briefcase, Users, UserCircle, Activity,
   Upload, Inbox, LifeBuoy, LogOut, Brain, Newspaper, BookOpen,
   ScrollText, GraduationCap,
 } from 'lucide-react'
@@ -32,6 +32,7 @@ const NAV: { group: string; items: { href: string; label: string; icon: any }[] 
   {
     group: 'Operations',
     items: [
+      { href: '/admin/users', label: 'Users', icon: UserCircle },
       { href: '/admin/tenders', label: 'Tenders', icon: Briefcase },
       { href: '/admin/vendors', label: 'Vendors', icon: Users },
       { href: '/admin/import', label: 'Import CSV', icon: Upload },
