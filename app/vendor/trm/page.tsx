@@ -151,8 +151,8 @@ export default function TrmPage() {
             <Sparkles className="h-4 w-4 text-sky-300 flex-shrink-0 mt-0.5" />
             <p>
               Your 13 TRM controls are initialised. Expand each domain, paste a paragraph of context describing your current
-              state (existing policies, tools, evidence), then click <strong>Run AI gap analysis</strong> to let Claude
-              identify gaps and rate risk.
+              state (existing policies, tools, evidence), then click <strong>Run AI gap analysis</strong> to identify gaps
+              and rate risk.
             </p>
           </div>
         )}
@@ -256,7 +256,7 @@ export default function TrmPage() {
                     {!c.gap_analysis && (context[c.id] || '').length === 0 && (
                       <p className="text-xs text-neutral-500 italic">
                         Tip: a few sentences is enough. Include policy names, tools (e.g. CrowdStrike, OneTrust), audit cadence,
-                        and named owners — Claude uses this to identify what's missing.
+                        and named owners — the model uses this to identify what's missing.
                       </p>
                     )}
                   </div>
