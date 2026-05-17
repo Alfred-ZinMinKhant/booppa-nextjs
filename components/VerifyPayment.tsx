@@ -8,6 +8,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Verifying your payment status...');
   const [productType, setProductType] = useState<string | undefined>(productProp);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     async function verify() {
@@ -20,8 +21,12 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
           setStatus('success');
           setMessage('Payment successfully verified! Your service has been activated.');
           if (data.product_type) setProductType(data.product_type);
-          // Refresh vendor_plan cookie so middleware reflects the new plan immediately
-          fetch('/api/auth/me').catch(() => {});
+          // Refresh vendor_plan cookie so middleware reflects the new plan immediately,
+          // and capture the user's role so we route to the right dashboard.
+          try {
+            const me = await fetch('/api/auth/me').then(r => r.ok ? r.json() : null);
+            if (me?.role) setUserRole(String(me.role).toUpperCase());
+          } catch { /* non-fatal */ }
         } else {
           setStatus('error');
           setMessage('Payment verification failed. Please check your email for confirmation or contact support.');
@@ -133,9 +138,16 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
               'Notarize Your 2 Bundle Documents →'}
           </Link>
         ) : isEnterprise || isCompliance ? (
-          <Link href="/procurement/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-            Go to Procurement Dashboard
-          </Link>
+          // Route by role, not by product. Suites are sold to BOTH vendors and procurement.
+          // Buy-side-only SKUs (evaluate/verify) are gated to procurement at checkout, so
+          // anyone landing here on those is procurement by construction.
+          userRole === 'PROCUREMENT' || userRole === 'GOV_BUYER'
+            ? <Link href="/procurement/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+                Go to Procurement Dashboard
+              </Link>
+            : <Link href="/vendor/subscription" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+                Open My Subscription →
+              </Link>
         ) : (
           <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             {isSubscription ? 'View Subscription Dashboard →' : 'Go to Dashboard'}

@@ -166,6 +166,12 @@ export default function VendorDashboard() {
 					</div>
 					<div className="flex gap-3">
 						<Link
+							href="/vendor/subscription"
+							className="px-4 py-2 bg-neutral-900 text-white rounded-md border border-neutral-800 text-sm font-medium hover:bg-neutral-800 transition"
+						>
+							My Subscription
+						</Link>
+						<Link
 							href="/vendor/referrals"
 							className="px-4 py-2 bg-neutral-900 text-white rounded-md border border-neutral-800 text-sm font-medium hover:bg-neutral-800 transition"
 						>
