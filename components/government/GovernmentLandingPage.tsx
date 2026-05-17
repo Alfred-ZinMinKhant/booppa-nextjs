@@ -196,7 +196,7 @@ export default function GovernmentLandingPage() {
       setContact({ status: "success", message: "Message sent. We'll reply to your email within one business day." });
       setContactName(""); setContactEmail(""); setContactAgency(""); setContactMsg("");
     } catch (err) {
-      setContact({ status: "error", message: err instanceof Error ? err.message : "An unexpected error occurred. Please email us directly at support@booppa.io." });
+      setContact({ status: "error", message: err instanceof Error ? err.message : "An unexpected error occurred. Please email us directly at evidence@booppa.io." });
     }
     setTimeout(() => contactStatusRef.current?.focus(), 100);
   }
@@ -521,10 +521,10 @@ export default function GovernmentLandingPage() {
                     <dt style={{ fontSize: 10, fontWeight: 700, color: C.slate, letterSpacing: "0.09em", marginBottom: 4 }}>EMAIL</dt>
                     <dd>
                       <a
-                        href="mailto:support@booppa.io"
+                        href="mailto:evidence@booppa.io"
                         style={{ fontSize: 14, fontWeight: 600, color: C.ink, textDecoration: "none", fontFamily: "'IBM Plex Mono', monospace" }}
                       >
-                        support@booppa.io
+                        evidence@booppa.io
                       </a>
                     </dd>
                   </div>
@@ -685,7 +685,7 @@ export default function GovernmentLandingPage() {
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
             <p style={{ fontSize: 11, color: C.slate }}>
               © 2026 Booppa Smart Care LLC ·{" "}
-              <a href="mailto:support@booppa.io" style={{ color: C.slate }}>support@booppa.io</a>
+              <a href="mailto:evidence@booppa.io" style={{ color: C.slate }}>evidence@booppa.io</a>
             </p>
             <nav aria-label="Footer navigation">
               <ul style={{ display: "flex", gap: 20, listStyle: "none" }}>

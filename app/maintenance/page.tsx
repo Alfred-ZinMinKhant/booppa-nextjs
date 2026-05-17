@@ -44,8 +44,8 @@ export default function Maintenance() {
           <div className="flex flex-wrap justify-center gap-6 pt-8 border-t border-white/10">
             <div className="text-center">
               <span className="block text-xs font-bold uppercase tracking-widest text-[#10b981] mb-2">Support</span>
-              <a href="mailto:support@booppa.io" className="text-white hover:text-[#10b981] transition-colors font-medium">
-                support@booppa.io
+              <a href="mailto:evidence@booppa.io" className="text-white hover:text-[#10b981] transition-colors font-medium">
+                evidence@booppa.io
               </a>
             </div>
           </div>

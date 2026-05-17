@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     const backendRes = await fetch(`${API}/api/v1/contact`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, agency, message, source, to: "support@booppa.io" }),
+      body: JSON.stringify({ name, email, agency, message, source, to: "evidence@booppa.io" }),
       signal: AbortSignal.timeout(10_000),
     });
 
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[contact] Backend error:", err);
     return NextResponse.json(
-      { detail: "Service temporarily unavailable. Please email us directly at support@booppa.io." },
+      { detail: "Service temporarily unavailable. Please email us directly at evidence@booppa.io." },
       { status: 503 }
     );
   }

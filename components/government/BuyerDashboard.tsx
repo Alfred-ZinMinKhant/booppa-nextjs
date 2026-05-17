@@ -1225,7 +1225,7 @@ export default function BuyerDashboard() {
           </p>
           <nav aria-label="Footer navigation">
             <ul style={{ display: "flex", gap: 16, listStyle: "none" }}>
-              {[{ href: "/privacy", label: "Privacy Policy" }, { href: "/terms", label: "Terms" }, { href: "mailto:support@booppa.io", label: "Support" }].map(({ href, label }) => (
+              {[{ href: "/privacy", label: "Privacy Policy" }, { href: "/terms", label: "Terms" }, { href: "mailto:evidence@booppa.io", label: "Support" }].map(({ href, label }) => (
                 <li key={label}>
                   <a href={href} style={{ fontSize: 11, color: C.slate, textDecoration: "none" }}>{label}</a>
                 </li>
