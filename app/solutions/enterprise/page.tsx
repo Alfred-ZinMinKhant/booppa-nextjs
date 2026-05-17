@@ -157,7 +157,7 @@ export default function EnterprisePage() {
                             <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 1,800<span className="text-lg text-[#64748b] font-normal">/month</span></div>
                             <p className="text-xs text-[#64748b] mb-6">Subscription</p>
                             <ul className="space-y-3 mb-8 flex-1">
-                                {["MAS TRM — all 13 domains", "AI gap analysis (Claude Haiku)", "5,000 notarizations/month", "RESTful API + webhooks"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
+                                {["MAS TRM — all 13 domains", "AI gap analysis (DeepSeek)", "5,000 notarizations/month", "RESTful API + webhooks"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
                             </ul>
                             <div className="pt-6 border-t border-[#f1f5f9] mb-6">
                                 <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>

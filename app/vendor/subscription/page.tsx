@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   CheckCircle, XCircle, Loader2, AlertCircle, ExternalLink,
-  Zap, Shield, FileText, Globe, KeyRound, Webhook, Sparkles, Building2,
+  Zap, Shield, FileText, Globe, KeyRound, Webhook, Building2, ShieldCheck,
 } from 'lucide-react'
 
 interface FeatureMap {
@@ -180,7 +180,7 @@ export default function SubscriptionPage() {
                 </p>
               </div>
               <Link
-                href="/notarize"
+                href="/notarization"
                 className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg text-sm"
               >
                 <Shield className="h-4 w-4" /> Notarize a document
@@ -222,7 +222,7 @@ export default function SubscriptionPage() {
           <p className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-3">What's unlocked</p>
           <div className="divide-y divide-neutral-800">
             <FeatureRow
-              label="Full AI analysis (Claude Haiku gap analysis)"
+              label="Full AI analysis (DeepSeek gap analysis)"
               on={!!f.ai_full}
               hint={f.ai_mode === 'full' ? 'Running full model' : 'Light mode only'}
             />
@@ -239,11 +239,11 @@ export default function SubscriptionPage() {
 
         {/* Quick links to the unlocked surfaces */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {f.ai_full && (
-            <Link href="/vendor/dashboard" className="group bg-neutral-900 border border-neutral-800 hover:border-emerald-700 rounded-xl p-4 transition">
-              <Sparkles className="h-5 w-5 text-emerald-400 mb-2" />
-              <p className="font-semibold text-white text-sm">AI gap analysis</p>
-              <p className="text-xs text-neutral-400 mt-0.5">Open your PDPA gap analysis report</p>
+          {f.dashboard && (
+            <Link href="/vendor/trm" className="group bg-neutral-900 border border-neutral-800 hover:border-emerald-700 rounded-xl p-4 transition">
+              <ShieldCheck className="h-5 w-5 text-emerald-400 mb-2" />
+              <p className="font-semibold text-white text-sm">MAS TRM — 13 domains</p>
+              <p className="text-xs text-neutral-400 mt-0.5">Per-domain status + AI gap analysis</p>
             </Link>
           )}
           {f.api_access && (
@@ -274,7 +274,7 @@ export default function SubscriptionPage() {
               <p className="text-xs text-neutral-400 mt-0.5">Configure SAML 2.0 / OIDC</p>
             </Link>
           )}
-          <Link href="/notarize" className="group bg-neutral-900 border border-neutral-800 hover:border-emerald-700 rounded-xl p-4 transition">
+          <Link href="/notarization" className="group bg-neutral-900 border border-neutral-800 hover:border-emerald-700 rounded-xl p-4 transition">
             <FileText className="h-5 w-5 text-emerald-400 mb-2" />
             <p className="font-semibold text-white text-sm">Notarize a document</p>
             <p className="text-xs text-neutral-400 mt-0.5">SHA-256 anchored on Polygon</p>
