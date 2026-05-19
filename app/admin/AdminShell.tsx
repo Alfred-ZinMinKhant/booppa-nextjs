@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, FileText, Briefcase, Users, UserCircle, Activity,
   Upload, Inbox, LifeBuoy, LogOut, Brain, Newspaper, BookOpen,
-  ScrollText, GraduationCap,
+  ScrollText, GraduationCap, FlaskConical,
 } from 'lucide-react'
 
 const NAV: { group: string; items: { href: string; label: string; icon: any }[] }[] = [
@@ -38,6 +38,12 @@ const NAV: { group: string; items: { href: string; label: string; icon: any }[] 
       { href: '/admin/import', label: 'Import CSV', icon: Upload },
       { href: '/admin/bookings', label: 'Demo Bookings', icon: Inbox },
       { href: '/admin/tickets', label: 'Support Tickets', icon: LifeBuoy },
+    ],
+  },
+  {
+    group: 'QA',
+    items: [
+      { href: '/admin/test-checkout', label: 'Test Checkout', icon: FlaskConical },
     ],
   },
 ]
