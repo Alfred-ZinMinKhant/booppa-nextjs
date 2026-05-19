@@ -9,6 +9,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
   const [message, setMessage] = useState('Verifying your payment status...');
   const [productType, setProductType] = useState<string | undefined>(productProp);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [pendingRfpIntakeId, setPendingRfpIntakeId] = useState<string | null>(null);
 
   useEffect(() => {
     async function verify() {
@@ -27,6 +28,27 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
             const me = await fetch('/api/auth/me').then(r => r.ok ? r.json() : null);
             if (me?.role) setUserRole(String(me.role).toUpperCase());
           } catch { /* non-fatal */ }
+          // RFP-bearing purchases without a brief on file defer kit generation
+          // until the buyer submits one. Surface that intake as the primary CTA.
+          //   - Bundles (rfp_accelerator / enterprise_bid_kit / compliance_evidence_pack)
+          //   - Standalone rfp_express / rfp_complete bought one-click from /pricing
+          const pt = data.product_type || productProp;
+          if (
+            pt === 'rfp_accelerator' ||
+            pt === 'enterprise_bid_kit' ||
+            pt === 'compliance_evidence_pack' ||
+            pt === 'rfp_express' ||
+            pt === 'rfp_complete'
+          ) {
+            try {
+              const res = await fetch('/api/rfp-intake/pending', { cache: 'no-store' });
+              if (res.ok) {
+                const list = await res.json();
+                const items: Array<{ id: string; created_at: string | null }> = list?.items || [];
+                if (items.length > 0) setPendingRfpIntakeId(items[0].id);
+              }
+            } catch { /* non-fatal */ }
+          }
         } else {
           setStatus('error');
           setMessage('Payment verification failed. Please check your email for confirmation or contact support.');
@@ -96,16 +118,24 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                     : isVendorActive
                       ? 'Your Vendor Active subscription is active. Monthly health checks, competitor alerts, and shortlist priority are now enabled. A confirmation has been sent to your email.'
                       : isRfp
-                        ? 'Your RFP evidence package will be delivered to your email shortly.'
+                        ? (pendingRfpIntakeId
+                            ? 'Tell us about your RFP and we will generate the kit immediately.'
+                            : 'Your RFP evidence package will be delivered to your email shortly.')
                         : isVendorProof
                           ? 'Your Vendor Proof certificate will be sent to your email within a few minutes.'
                           : isBundle
                             ? (productType === 'compliance_evidence_pack'
-                                ? 'Your Compliance Evidence Pack is activated — PDPA Quick Scan and RFP Complete Kit are running now. Once both finish, your 9-section regulator-ready Cover Sheet PDF will be emailed to you. Track progress and upload your signed copy on the Cover Sheet page.'
+                                ? (pendingRfpIntakeId
+                                    ? 'Your Compliance Evidence Pack is activated — PDPA Quick Scan is running now. Tell us about your RFP and we will generate your Complete Kit, which feeds into your regulator-ready Cover Sheet.'
+                                    : 'Your Compliance Evidence Pack is activated — PDPA Quick Scan and RFP Complete Kit are running now. Once both finish, your 9-section regulator-ready Cover Sheet PDF will be emailed to you.')
                                 : productType === 'enterprise_bid_kit'
-                                  ? 'Your Enterprise Bid Kit is activated — Vendor Proof, PDPA Quick Scan, and RFP Complete are running now. Click below to notarize your 7 included bundle documents.'
+                                  ? (pendingRfpIntakeId
+                                      ? 'Your Enterprise Bid Kit is activated — Vendor Proof and PDPA Quick Scan are running now. Tell us about your RFP to generate the Complete Kit, then notarize your 7 included documents.'
+                                      : 'Your Enterprise Bid Kit is activated — Vendor Proof, PDPA Quick Scan, and RFP Complete are running now. Click below to notarize your 7 included bundle documents.')
                                   : productType === 'rfp_accelerator'
-                                    ? 'Your RFP Accelerator is activated — Vendor Proof, PDPA Quick Scan, and RFP Express are running now. Click below to notarize your 2 included bundle documents.'
+                                    ? (pendingRfpIntakeId
+                                        ? 'Your RFP Accelerator is activated — Vendor Proof and PDPA Quick Scan are running now. Tell us about your RFP to generate the Express Kit, then notarize your 2 included documents.'
+                                        : 'Your RFP Accelerator is activated — Vendor Proof, PDPA Quick Scan, and RFP Express are running now. Click below to notarize your 2 included bundle documents.')
                                     : 'Your Vendor Trust Pack is activated — Vendor Proof and PDPA Quick Scan are running now. Click below to notarize your 2 included bundle documents.')
                             : isEnterprise || isCompliance
                               ? 'Your Enterprise workspace has been activated. Details have been sent to your email.'
@@ -123,20 +153,35 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
             View Certificate
           </Link>
         ) : isRfp ? (
-          <Link href={`/rfp-acceleration/result?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-            View RFP Kit
-          </Link>
+          pendingRfpIntakeId ? (
+            <Link href={`/rfp-intake/${pendingRfpIntakeId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+              Complete Your RFP Brief →
+            </Link>
+          ) : (
+            <Link href={`/rfp-acceleration/result?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+              View RFP Kit
+            </Link>
+          )
         ) : isBundle ? (
-          <Link
-            href={isComplianceEvidencePack
-              ? '/compliance/cover-sheet'
-              : `/bundle/notarize?bundle=${productType}${sessionId ? `&session_id=${sessionId}` : ''}`}
-            className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition"
-          >
-            {isComplianceEvidencePack ? 'Open Compliance Cover Sheet →' :
-              productType === 'enterprise_bid_kit' ? 'Notarize Your 7 Bundle Documents →' :
-              'Notarize Your 2 Bundle Documents →'}
-          </Link>
+          pendingRfpIntakeId ? (
+            <Link
+              href={`/rfp-intake/${pendingRfpIntakeId}`}
+              className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition"
+            >
+              Complete Your RFP Brief →
+            </Link>
+          ) : (
+            <Link
+              href={isComplianceEvidencePack
+                ? '/compliance/cover-sheet'
+                : `/bundle/notarize?bundle=${productType}${sessionId ? `&session_id=${sessionId}` : ''}`}
+              className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition"
+            >
+              {isComplianceEvidencePack ? 'Open Compliance Cover Sheet →' :
+                productType === 'enterprise_bid_kit' ? 'Notarize Your 7 Bundle Documents →' :
+                'Notarize Your 2 Bundle Documents →'}
+            </Link>
+          )
         ) : isEnterprise || isCompliance ? (
           // Route by role, not by product. Suites are sold to BOTH vendors and procurement.
           // Buy-side-only SKUs (evaluate/verify) are gated to procurement at checkout, so
