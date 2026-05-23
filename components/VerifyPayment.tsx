@@ -93,7 +93,8 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
     // vendor_active_* → subscription, go to dashboard
     const isVendorActive = productType === 'vendor_active_monthly' || productType === 'vendor_active_annual';
     const isTenderIntelligence = productType === 'tender_intelligence_monthly' || productType === 'tender_intelligence_annual';
-    const isSubscription = isPdpaMonitor || isVendorActive || isTenderIntelligence;
+    const isVendorPro = productType === 'vendor_pro_monthly' || productType === 'vendor_pro_annual';
+    const isSubscription = isPdpaMonitor || isVendorActive || isTenderIntelligence || isVendorPro;
     const isRfp = productType?.startsWith('rfp_');
 
     content = (
@@ -120,6 +121,8 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                       ? 'Your Vendor Active subscription is active. Monthly health checks, competitor alerts, and shortlist priority are now enabled. A confirmation has been sent to your email.'
                       : isTenderIntelligence
                         ? 'Your Tender Intelligence subscription is active. Sector trends, historical award lookup, bid timing, and supplier benchmarking are now unlocked. Your first monthly digest will arrive on the 1st of next month.'
+                      : isVendorPro
+                        ? 'Your Vendor Pro subscription is active. Quarterly PDPA scans, 1 notarization/month, tender analytics, and competitor awareness signals are now enabled. A confirmation has been sent to your email.'
                       : isRfp
                         ? (pendingRfpIntakeId
                             ? 'Tell us about your RFP and we will generate the kit immediately.'
@@ -188,6 +191,10 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
         ) : isTenderIntelligence ? (
           <Link href="/tender-intelligence" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             Open Tender Intelligence Dashboard →
+          </Link>
+        ) : isVendorPro ? (
+          <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            Open Vendor Pro Dashboard →
           </Link>
         ) : isEnterprise || isCompliance ? (
           // Route by role, not by product. Suites are sold to BOTH vendors and procurement.

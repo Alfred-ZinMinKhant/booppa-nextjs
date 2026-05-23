@@ -27,6 +27,7 @@ import {
 } from "recharts";
 import VendorStatusBadge from "@/components/vendor/VendorStatusBadge";
 import SectorPressureWidget from "@/components/vendor/SectorPressureWidget";
+import VendorProPanel from "@/components/vendor/VendorProPanel";
 import CalDashboard from "@/components/vendor/CalDashboard";
 import TenderWinProbabilityWidget from "@/components/vendor/TenderWinProbabilityWidget";
 import TrustRing from "@/components/vendor/TrustRing";
@@ -966,6 +967,11 @@ export default function VendorDashboard() {
 						<SectorPressureWidget />
 						<CalDashboard />
 						<TenderWinProbabilityWidget />
+					</div>
+
+					{/* Vendor Pro — shown only to subscribers (the panel handles 403 itself) */}
+					<div className="mt-6">
+						<VendorProPanel />
 					</div>
 				</div>
 			</div>
