@@ -92,7 +92,8 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
     const isPdpaMonitor = productType === 'pdpa_monitor_monthly' || productType === 'pdpa_monitor_annual';
     // vendor_active_* → subscription, go to dashboard
     const isVendorActive = productType === 'vendor_active_monthly' || productType === 'vendor_active_annual';
-    const isSubscription = isPdpaMonitor || isVendorActive;
+    const isTenderIntelligence = productType === 'tender_intelligence_monthly' || productType === 'tender_intelligence_annual';
+    const isSubscription = isPdpaMonitor || isVendorActive || isTenderIntelligence;
     const isRfp = productType?.startsWith('rfp_');
 
     content = (
@@ -117,6 +118,8 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                     ? 'Your PDPA Monitor subscription is active. Quarterly re-scans and monthly regulatory alerts are now enabled. A confirmation has been sent to your email.'
                     : isVendorActive
                       ? 'Your Vendor Active subscription is active. Monthly health checks, competitor alerts, and shortlist priority are now enabled. A confirmation has been sent to your email.'
+                      : isTenderIntelligence
+                        ? 'Your Tender Intelligence subscription is active. Sector trends, historical award lookup, bid timing, and supplier benchmarking are now unlocked. Your first monthly digest will arrive on the 1st of next month.'
                       : isRfp
                         ? (pendingRfpIntakeId
                             ? 'Tell us about your RFP and we will generate the kit immediately.'
@@ -182,6 +185,10 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                 'Notarize Your 2 Bundle Documents →'}
             </Link>
           )
+        ) : isTenderIntelligence ? (
+          <Link href="/tender-intelligence" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            Open Tender Intelligence Dashboard →
+          </Link>
         ) : isEnterprise || isCompliance ? (
           // Route by role, not by product. Suites are sold to BOTH vendors and procurement.
           // Buy-side-only SKUs (evaluate/verify) are gated to procurement at checkout, so

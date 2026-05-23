@@ -260,6 +260,35 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
       'Quarterly strategy review',
     ],
   },
+  tender_intelligence_monthly: {
+    id: 'tender_intelligence_monthly',
+    name: 'Tender Intelligence',
+    description: 'Sector trends, award history, AI bid timing, supplier benchmarking',
+    price: 149,
+    priceAnnual: 1499,
+    currency: 'SGD',
+    type: 'subscription',
+    badge: 'New',
+    features: [
+      'Monthly sector trend reports (win-rate by agency × sector × contract size)',
+      'Historical award lookup (winners, prices, dates)',
+      'AI-driven bid / watch / pass timing per live tender',
+      'Per-supplier benchmarking dashboard',
+      'Monthly email digest with PDF report',
+    ],
+  },
+  tender_intelligence_annual: {
+    id: 'tender_intelligence_annual',
+    name: 'Tender Intelligence (Annual)',
+    description: 'Annual Tender Intelligence — 2 months free vs monthly',
+    price: 1499,
+    currency: 'SGD',
+    type: 'subscription',
+    features: [
+      'Everything in monthly',
+      'SGD 124.92/mo effective (save SGD 289)',
+    ],
+  },
 }
 
 // ── Combined export ────────────────────────────────────────────────────────────
