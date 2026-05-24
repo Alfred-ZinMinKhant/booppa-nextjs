@@ -79,7 +79,7 @@ export default function AcceptableUsePage() {
             </Section>
 
             <Section title="7. Reporting Violations">
-              <p>Report suspected violations to <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a>. Booppa will investigate all reports and take appropriate action.</p>
+              <p>Report suspected violations to <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a>. Booppa will investigate all reports and take appropriate action.</p>
             </Section>
 
             <Section title="8. Enforcement">
@@ -87,7 +87,7 @@ export default function AcceptableUsePage() {
             </Section>
 
             <div className="pt-4 border-t border-[#e2e8f0] text-xs text-[#94a3b8] space-y-1">
-              <p>Contact: <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a></p>
+              <p>Contact: <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
               <p>Also see: <Link href="/terms" className="underline text-[#10b981]">Terms of Service</Link> · <Link href="/privacy" className="underline text-[#10b981]">Privacy Policy</Link></p>
             </div>
           </div>

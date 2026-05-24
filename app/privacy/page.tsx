@@ -37,8 +37,7 @@ export default function PrivacyPage() {
 
             <Section title="1. Data Controller and DPO">
               <p>Booppa Smart Care LLC acts as the data controller for personal data processed through the Booppa platform.</p>
-              <p><strong className="text-[#0f172a]">DPO:</strong> <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
-              <p><strong className="text-[#0f172a]">Legal inquiries:</strong> <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a></p>
+              <p><strong className="text-[#0f172a]">Contact:</strong> <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
               <p className="text-xs bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
                 <strong>For EU/UK users:</strong> Booppa Smart Care LLC is the data controller under GDPR Article 4(7). Where required under Article 27 GDPR, Booppa shall designate an EU-based representative prior to commencing systematic processing of EU residents' personal data.
               </p>
@@ -125,7 +124,7 @@ export default function PrivacyPage() {
             </Section>
 
             <Section title="12. Your Rights — California (CCPA)">
-              <p>California residents have the right to know what personal information is collected and how it is used; the right to delete personal information; and the right to opt out of the sale of personal information. Booppa does not sell personal information. Contact <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a> with subject line "CCPA Request."</p>
+              <p>California residents have the right to know what personal information is collected and how it is used; the right to delete personal information; and the right to opt out of the sale of personal information. Booppa does not sell personal information. Contact <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> with subject line "CCPA Request."</p>
             </Section>
 
             <Section title="13. Data Security">
@@ -134,7 +133,7 @@ export default function PrivacyPage() {
             </Section>
 
             <Section title="14. Children's Privacy">
-              <p>The Booppa platform is intended for business users and is not directed at individuals under 18. We do not knowingly collect personal data from minors. Contact <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a> if you believe we have inadvertently collected such data.</p>
+              <p>The Booppa platform is intended for business users and is not directed at individuals under 18. We do not knowingly collect personal data from minors. Contact <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> if you believe we have inadvertently collected such data.</p>
             </Section>
 
             <Section title="15. Changes to This Policy">
@@ -142,7 +141,7 @@ export default function PrivacyPage() {
             </Section>
 
             <div className="pt-4 border-t border-[#e2e8f0] text-xs text-[#94a3b8] space-y-1">
-              <p><a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> · <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a></p>
+              <p><a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
               <p>Booppa Smart Care LLC · 1209 Orange Street, Wilmington, Delaware 19801, USA</p>
               <p>Also see: <Link href="/terms" className="underline text-[#10b981]">Terms of Service</Link> · <Link href="/dpo" className="underline text-[#10b981]">DPO Contact</Link> · <Link href="/cookies" className="underline text-[#10b981]">Cookie Policy</Link></p>
             </div>

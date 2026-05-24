@@ -148,7 +148,7 @@ export default function CookiesPage() {
             </Section>
 
             <div className="pt-4 border-t border-[#e2e8f0] text-xs text-[#94a3b8] space-y-1">
-              <p>Contact: <a href="mailto:privacy@booppa.io" className="underline text-[#10b981]">privacy@booppa.io</a></p>
+              <p>Contact: <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
               <p>Also see: <Link href="/privacy" className="underline text-[#10b981]">Privacy Policy</Link> · <Link href="/terms" className="underline text-[#10b981]">Terms of Service</Link> · <Link href="/dpo" className="underline text-[#10b981]">DPO Contact</Link></p>
             </div>
           </div>

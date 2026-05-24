@@ -125,7 +125,7 @@ export default function DisclaimerPage() {
             </Section>
 
             <div className="pt-4 border-t border-[#e2e8f0] text-xs text-[#94a3b8] space-y-1">
-              <p>For questions about the scope and limitations of Booppa services: <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a></p>
+              <p>For questions about the scope and limitations of Booppa services: <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
               <p>Also see: <Link href="/terms" className="underline text-[#10b981]">Terms of Service</Link> · <Link href="/privacy" className="underline text-[#10b981]">Privacy Policy</Link></p>
             </div>
           </div>

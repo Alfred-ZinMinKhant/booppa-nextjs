@@ -27,7 +27,7 @@ export default function TermsPage() {
         <p className="text-sm text-[#10b981] mb-2 font-medium">v17 Hardened · Effective Date: March 1, 2026</p>
         <p className="text-xs text-[#64748b] mb-10">
           Booppa Smart Care LLC · 1209 Orange Street, Wilmington, Delaware 19801, USA ·{' '}
-          <a href="mailto:legal@booppa.io" className="underline">legal@booppa.io</a>
+          <a href="mailto:evidence@booppa.io" className="underline">evidence@booppa.io</a>
         </p>
 
         <div className="bg-[#1e293b] border border-amber-500/30 rounded-xl p-5 mb-10 text-sm text-amber-200">
@@ -56,7 +56,7 @@ export default function TermsPage() {
         </Section>
 
         <Section title="3. Account Registration">
-          <p>You agree to provide accurate, current, and complete information; maintain and promptly update your account information; keep your password confidential; notify Booppa immediately at <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a> of any unauthorized use; and accept responsibility for all activities under your account.</p>
+          <p>You agree to provide accurate, current, and complete information; maintain and promptly update your account information; keep your password confidential; notify Booppa immediately at <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> of any unauthorized use; and accept responsibility for all activities under your account.</p>
         </Section>
 
         <Section title="4. Vendor Obligations">
@@ -68,7 +68,7 @@ export default function TermsPage() {
           <p>All prices are displayed in Singapore Dollars (SGD) unless otherwise specified. Payment is processed through Stripe, Inc.</p>
           <p><strong className="text-white">One-Time Purchases:</strong> Fees for Vendor Proof, PDPA Snapshot, Notarization, RFP Express, RFP Complete, and all Bundles are charged at time of purchase and are non-refundable once the product has been delivered or fulfillment has commenced.</p>
           <p><strong className="text-white">Subscriptions:</strong> Vendor Active, PDPA Monitor, Enterprise, Enterprise Pro are billed in advance monthly or annually. Subscriptions renew automatically unless cancelled before renewal. Annual subscriptions may be cancelled within 14 days for a pro-rated refund. Monthly subscriptions cancel at end of current billing period.</p>
-          <p><strong className="text-white">Disputed Charges:</strong> Contact <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a> within 30 days. Chargebacks without first contacting Booppa may result in account suspension.</p>
+          <p><strong className="text-white">Disputed Charges:</strong> Contact <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> within 30 days. Chargebacks without first contacting Booppa may result in account suspension.</p>
         </Section>
 
         <Section title="6. Intellectual Property">
@@ -135,7 +135,7 @@ export default function TermsPage() {
             <li className="flex gap-2 text-xs"><span className="text-[#10b981]">☑</span> "I acknowledge that I do not rely, and have not relied, on any Booppa output — including scores, rankings, probability estimates, or reports — for any legal, financial, procurement, or regulatory decision."</li>
             <li className="flex gap-2 text-xs"><span className="text-[#10b981]">☑</span> "I understand that Booppa is an information tool and not a legal, compliance, or procurement advisor."</li>
           </ul>
-          <p className="mt-3">Records of electronic acceptance, including timestamp and IP address, are retained by Booppa and constitute evidence of agreement. Available on request at <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a>.</p>
+          <p className="mt-3">Records of electronic acceptance, including timestamp and IP address, are retained by Booppa and constitute evidence of agreement. Available on request at <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a>.</p>
         </Section>
 
         <Section title="18. Modifications and Termination">
@@ -154,7 +154,7 @@ export default function TermsPage() {
 
         <div className="mt-10 pt-6 border-t border-[#1e293b] text-xs text-[#475569] space-y-1">
           <p>Booppa Smart Care LLC · 1209 Orange Street, Wilmington, Delaware 19801, USA</p>
-          <p><a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a></p>
+          <p><a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
           <p>Also see: <Link href="/privacy" className="underline text-[#10b981]">Privacy Policy</Link> · <Link href="/disclaimer" className="underline text-[#10b981]">Disclaimer</Link> · <Link href="/acceptable-use" className="underline text-[#10b981]">Acceptable Use</Link> · <Link href="/cookies" className="underline text-[#10b981]">Cookie Policy</Link></p>
         </div>
       </div>

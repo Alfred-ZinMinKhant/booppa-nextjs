@@ -40,7 +40,6 @@ export default function DPOPage() {
               <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-5 space-y-2">
                 <p className="font-semibold text-[#0f172a]">Data Protection Officer — Booppa Smart Care LLC</p>
                 <p><strong className="text-[#0f172a]">Email:</strong> <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
-                <p><strong className="text-[#0f172a]">Legal inquiries:</strong> <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a></p>
                 <p><strong className="text-[#0f172a]">Postal address:</strong> Booppa Smart Care LLC, 1209 Orange Street, Wilmington, Delaware 19801, USA</p>
                 <p className="text-xs text-[#94a3b8] pt-1">Please include your name, jurisdiction (Singapore / EU / UK / US), and the nature of your request in all correspondence.</p>
               </div>
@@ -72,7 +71,7 @@ export default function DPOPage() {
                 <Li><strong className="text-[#0f172a]">Restriction of Processing</strong> — subject: &quot;Processing Restriction Request&quot;</Li>
                 <Li><strong className="text-[#0f172a]">Object to Processing</strong> — subject: &quot;Objection to Processing&quot;</Li>
                 <Li><strong className="text-[#0f172a]">Withdraw Marketing Consent</strong> — subject: &quot;Withdraw Marketing Consent&quot;</Li>
-                <Li><strong className="text-[#0f172a]">CCPA Request</strong> — subject: &quot;CCPA Request&quot; (email <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a>)</Li>
+                <Li><strong className="text-[#0f172a]">CCPA Request</strong> — subject: &quot;CCPA Request&quot;</Li>
               </ul>
             </Section>
 
@@ -184,7 +183,7 @@ export default function DPOPage() {
             </Section>
 
             <div className="pt-4 border-t border-[#e2e8f0] text-xs text-[#94a3b8] space-y-1">
-              <p>DPO: <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> · Legal: <a href="mailto:legal@booppa.io" className="underline text-[#10b981]">legal@booppa.io</a></p>
+              <p>Contact: <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
               <p>Also see: <Link href="/privacy" className="underline text-[#10b981]">Privacy Policy</Link> · <Link href="/cookies" className="underline text-[#10b981]">Cookie Policy</Link> · <Link href="/terms" className="underline text-[#10b981]">Terms of Service</Link></p>
             </div>
           </div>

@@ -416,7 +416,7 @@ function AssessmentConductedBy({ report, reportUrl }: { report: StructuredReport
     ["UEN (Singapore)",     "202415732W"],
     ["Framework Version",   "BACF-v1.0"],
     ["Assessed Entity",     "—"],       // populated below if available
-    ["DPO Contact",         "dpo@booppa.io"],
+    ["DPO Contact",         "evidence@booppa.io"],
   ];
 
   return (
