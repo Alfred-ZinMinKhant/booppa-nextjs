@@ -1,0 +1,169 @@
+name: Frontend tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  lint-typecheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+      - name: Lint
+        run: npm run lint
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: lint-typecheck
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: booppa_test
+          POSTGRES_USER: booppa
+          POSTGRES_PASSWORD: password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U booppa" --health-interval=5s
+          --health-timeout=3s --health-retries=20
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=5s
+          --health-timeout=3s --health-retries=20
+
+    env:
+      NEXT_PUBLIC_API_BACKEND: http://localhost:8000
+      NEXT_PUBLIC_BASE_URL: http://localhost:3000
+      DATABASE_URL: postgresql+psycopg2://booppa:password@localhost:5432/booppa_test
+      REDIS_URL: redis://localhost:6379/0
+      SECRET_KEY: test-only-do-not-use-in-prod
+      ENVIRONMENT: test
+      SKIP_EMAIL: "True"
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_TEST_WEBHOOK_SECRET }}
+      STRIPE_PRICE_IDS_JSON: ${{ secrets.STRIPE_TEST_PRICE_IDS_JSON }}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_TEST_PUBLISHABLE_KEY }}
+      PLAYWRIGHT_TEST_JWT: ${{ secrets.PLAYWRIGHT_TEST_JWT }}
+      PLAYWRIGHT_BASE_URL: http://localhost:3000
+
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      - name: Checkout backend (sibling)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/booppa_backend
+          path: backend
+          token: ${{ secrets.GH_PAT_BACKEND_READ }}
+
+      # ── Backend (FastAPI) ──────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend deps
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Wait for Postgres
+        run: |
+          for i in $(seq 1 30); do
+            pg_isready -h localhost -p 5432 -U booppa && exit 0
+            sleep 1
+          done; exit 1
+
+      - name: Run backend migrations
+        working-directory: backend
+        run: alembic upgrade head
+
+      - name: Export Stripe price IDs from JSON secret
+        if: env.STRIPE_PRICE_IDS_JSON != ''
+        run: |
+          python - <<'PY' >> "$GITHUB_ENV"
+          import json, os
+          for k, v in json.loads(os.environ.get("STRIPE_PRICE_IDS_JSON","{}")).items():
+              if not k.startswith("STRIPE_"):
+                  k = f"STRIPE_{k}"
+              print(f"{k}={v}")
+          PY
+
+      - name: Start backend (uvicorn) in background
+        working-directory: backend
+        run: |
+          nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > backend.log 2>&1 &
+          echo "Waiting for backend to come up..."
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:8000/api/v1/health > /dev/null && exit 0
+            sleep 1
+          done
+          echo "Backend never came up"
+          cat backend.log
+          exit 1
+
+      # ── Frontend (Next.js) ─────────────────────────────────────────────
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install frontend deps
+        run: npm ci --legacy-peer-deps
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Start Next.js in background
+        run: |
+          nohup npm start -- --port 3000 > next.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:3000 > /dev/null && exit 0
+            sleep 1
+          done
+          echo "Next never came up"
+          cat next.log
+          exit 1
+
+      - name: Run Playwright
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
+      - name: Upload backend log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-log
+          path: backend/backend.log
+          if-no-files-found: ignore

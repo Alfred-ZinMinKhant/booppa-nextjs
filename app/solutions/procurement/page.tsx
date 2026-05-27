@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { SUBSCRIPTION_PRODUCTS } from "@/lib/pricing";
+
+const BUYER_TIER_KEYS = ["buyer_starter_monthly", "buyer_pro_monthly", "buyer_enterprise_monthly"] as const;
 
 interface UserInfo {
   email: string;
@@ -25,10 +28,10 @@ function CheckItem({
 }
 
 const JOURNEY_STEPS = [
-  { n: "1", label: "Start Free",              color: "#10b981", bg: "#f0fdf4" },
-  { n: "2", label: "Evaluate at Scale",       color: "#2563eb", bg: "#eff6ff" },
-  { n: "3", label: "Verify Evidence",         color: "#7c3aed", bg: "#f5f3ff" },
-  { n: "4", label: "Enterprise Custom",       color: "#d97706", bg: "#fffbeb" },
+  { n: "1", label: "Start Free",         color: "#10b981", bg: "#f0fdf4" },
+  { n: "2", label: "Buyer Starter",      color: "#0ea5e9", bg: "#f0f9ff" },
+  { n: "3", label: "Buyer Pro",          color: "#2563eb", bg: "#eff6ff" },
+  { n: "4", label: "Buyer Enterprise",   color: "#7c3aed", bg: "#f5f3ff" },
 ];
 
 export default function SolutionsProcurementPage() {
@@ -141,58 +144,61 @@ export default function SolutionsProcurementPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Enterprise Buyer */}
-            <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
-              <h3 className="text-xl font-bold text-[#0f172a] mb-3">Enterprise Buyer</h3>
-              <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 499<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
-              <p className="text-sm text-[#64748b] mb-6">For buyer teams evaluating vendors</p>
-              <ul className="space-y-3 mb-8 flex-1">
-                {["Full analytics dashboard", "Vendor comparison engine", "Risk signals & compliance posture", "5,000 notarizations/month"].map(f => <CheckItem key={f} text={f} />)}
-              </ul>
-              <button 
-                disabled={loadingProduct === "enterprise_monthly"}
-                onClick={() => handleCheckout("enterprise_monthly")} 
-                className="w-full bg-[#0f172a] text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50"
-              >
-                {loadingProduct === "enterprise_monthly" ? "Redirecting..." : "Select Plan"}
-              </button>
-            </div>
-
-            {/* Evaluate Your Suppliers */}
-            <div className="bg-white p-8 rounded-[2rem] border-2 border-blue-500 shadow-md hover:-translate-y-1 transition-all relative flex flex-col">
-              <div className="absolute top-[-14px] left-8 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">New</div>
-              <h3 className="text-xl font-bold text-[#0f172a] mb-3">Evaluate Your Suppliers</h3>
-              <div className="text-4xl font-black text-blue-600 mb-1">SGD 499<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
-              <p className="text-sm text-[#64748b] mb-6">Deep insights into vendor health</p>
-              <ul className="space-y-3 mb-8 flex-1">
-                {["Enhanced vendor due diligence", "Automated risk scoring", "Compliance drift tracking", "Team collaboration tools"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
-              </ul>
-              <button 
-                disabled={loadingProduct === "evaluate_suppliers_monthly"}
-                onClick={() => handleCheckout("evaluate_suppliers_monthly")} 
-                className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-blue-600/20 disabled:opacity-50"
-              >
-                {loadingProduct === "evaluate_suppliers_monthly" ? "Redirecting..." : "Select Plan"}
-              </button>
-            </div>
-
-            {/* Verify Supplier Evidence */}
-            <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
-              <h3 className="text-xl font-bold text-[#0f172a] mb-3">Verify Supplier Evidence</h3>
-              <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 799<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
-              <p className="text-sm text-[#64748b] mb-6">Full audit-ready verification suite</p>
-              <ul className="space-y-3 mb-8 flex-1">
-                {["Full evidence retrieval", "On-chain verification logs", "Custom evaluation frameworks", "Priority compliance support"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
-              </ul>
-              <button 
-                disabled={loadingProduct === "verify_supplier_evidence_monthly"}
-                onClick={() => handleCheckout("verify_supplier_evidence_monthly")} 
-                className="w-full bg-[#0f172a] text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50"
-              >
-                {loadingProduct === "verify_supplier_evidence_monthly" ? "Redirecting..." : "Select Plan"}
-              </button>
-            </div>
+            {BUYER_TIER_KEYS.map((key) => {
+              const p = SUBSCRIPTION_PRODUCTS[key];
+              const isFeatured = key === "buyer_pro_monthly";
+              const accent = isFeatured ? "text-blue-600" : "text-[#0f172a]";
+              const cardBorder = isFeatured ? "border-2 border-blue-500 shadow-md" : "border border-[#e2e8f0] shadow-sm";
+              const btnBg = isFeatured ? "bg-blue-600 shadow-lg shadow-blue-600/20" : "bg-[#0f172a]";
+              return (
+                <div key={key} className={`bg-white p-8 rounded-[2rem] ${cardBorder} hover:-translate-y-1 transition-all relative flex flex-col`}>
+                  {p.badge && (
+                    <div className="absolute top-[-14px] left-8 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">{p.badge}</div>
+                  )}
+                  <h3 className="text-xl font-bold text-[#0f172a] mb-3">{p.name}</h3>
+                  <div className={`text-4xl font-black mb-1 ${accent}`}>SGD {p.price}<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                  <p className="text-sm text-[#64748b] mb-6">{p.description}</p>
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {p.features.map(f => <CheckItem key={f} text={f} color={isFeatured ? "text-blue-600" : "text-[#10b981]"} />)}
+                  </ul>
+                  <button
+                    disabled={loadingProduct === key}
+                    onClick={() => handleCheckout(key)}
+                    className={`w-full ${btnBg} text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50`}
+                  >
+                    {loadingProduct === key ? "Redirecting..." : "Select Plan"}
+                  </button>
+                </div>
+              );
+            })}
           </div>
+
+          {/* Notana Document Add-On */}
+          {(() => {
+            const addon = SUBSCRIPTION_PRODUCTS.notana_document_monthly;
+            return (
+              <div className="mt-12 bg-gradient-to-r from-amber-50 to-white p-8 rounded-[2rem] border border-amber-200 flex flex-col md:flex-row md:items-center gap-6">
+                <div className="flex-1">
+                  <div className="inline-block bg-amber-500 text-white px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-2">{addon.badge}</div>
+                  <h3 className="text-2xl font-black text-[#0f172a] mb-2">{addon.name} — for buyers who need certified vendor documents</h3>
+                  <p className="text-sm text-[#64748b] mb-3">Notarisations are a Vendor tool by default. Add Notana Document to any Buyer plan if your procurement workflow requires buyer-initiated notarisation of vendor evidence.</p>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+                    {addon.features.map(f => <CheckItem key={f} text={f} color="text-amber-600" />)}
+                  </ul>
+                </div>
+                <div className="flex-shrink-0 text-center md:text-right">
+                  <div className="text-3xl font-black text-[#0f172a] mb-1">SGD {addon.price}<span className="text-base text-[#64748b] font-normal">/mo</span></div>
+                  <button
+                    disabled={loadingProduct === "notana_document_monthly"}
+                    onClick={() => handleCheckout("notana_document_monthly")}
+                    className="bg-amber-600 text-white font-bold px-6 py-3 rounded-xl transition disabled:opacity-50 hover:bg-amber-700"
+                  >
+                    {loadingProduct === "notana_document_monthly" ? "Redirecting..." : "Add to Plan"}
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 

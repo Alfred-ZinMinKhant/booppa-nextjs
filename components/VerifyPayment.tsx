@@ -82,7 +82,10 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
     const isEnterprise = productType === 'enterprise_monthly' || productType === 'enterprise_pro_monthly'
       || productType === 'standard_suite_monthly' || productType === 'pro_suite_monthly';
     const isCompliance = productType === 'compliance_evidence_monthly'
-      || productType === 'evaluate_suppliers_monthly' || productType === 'verify_supplier_evidence_monthly';
+      || productType === 'buyer_starter_monthly' || productType === 'buyer_starter_annual'
+      || productType === 'buyer_pro_monthly' || productType === 'buyer_pro_annual'
+      || productType === 'buyer_enterprise_monthly' || productType === 'buyer_enterprise_annual'
+      || productType === 'notana_document_monthly';
     const isBundle = productType === 'vendor_trust_pack' || productType === 'rfp_accelerator' || productType === 'enterprise_bid_kit' || productType === 'compliance_evidence_pack';
     const isComplianceEvidencePack = productType === 'compliance_evidence_pack';
     const isVendorProof = productType === 'vendor_proof';
