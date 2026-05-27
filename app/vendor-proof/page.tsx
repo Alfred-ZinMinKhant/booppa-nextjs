@@ -44,6 +44,7 @@ function VendorProofContent() {
 				if (data.is_verified) setAlreadyVerified(true);
 			})
 			.catch(() => setAuthed(false));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	async function handleSubmit(e: React.FormEvent) {
@@ -188,7 +189,7 @@ function VendorProofContent() {
 							</svg>
 						</div>
 						<h1 className="text-xl font-bold text-white mb-2">
-							You're already verified
+							You&apos;re already verified
 						</h1>
 						<p className="text-gray-400 text-sm mb-8 leading-relaxed">
 							Your Vendor Proof is active. Your blockchain-verified profile is

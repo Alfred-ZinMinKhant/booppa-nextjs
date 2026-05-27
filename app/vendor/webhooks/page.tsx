@@ -151,7 +151,7 @@ export default function WebhooksPage() {
           <div className="bg-emerald-900/20 border border-emerald-600/40 rounded-xl p-5">
             <p className="text-sm font-bold text-emerald-300 mb-2">Webhook created — copy the signing secret now</p>
             <p className="text-xs text-emerald-400/80 mb-3">
-              You'll use this secret to verify <code>X-Booppa-Signature</code> on your receiver. It won't be shown in full again.
+              You&apos;ll use this secret to verify <code>X-Booppa-Signature</code> on your receiver. It won&apos;t be shown in full again.
             </p>
             <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5">
               <code className="text-xs text-emerald-300 font-mono break-all flex-1">{revealedSecret.secret}</code>
@@ -164,7 +164,7 @@ export default function WebhooksPage() {
               </button>
             </div>
             <button onClick={() => setRevealedSecret(null)} className="text-xs text-neutral-400 hover:text-white mt-3">
-              I've saved it — dismiss
+              I&apos;ve saved it — dismiss
             </button>
           </div>
         )}
@@ -280,7 +280,7 @@ export default function WebhooksPage() {
                   <div className="border-t border-neutral-800 p-4 bg-neutral-950/40">
                     <p className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3">Recent deliveries</p>
                     {(deliveries[it.id] || []).length === 0 ? (
-                      <p className="text-xs text-neutral-500">No deliveries yet. Hit "Test" to send a ping.</p>
+                      <p className="text-xs text-neutral-500">No deliveries yet. Hit &quot;Test&quot; to send a ping.</p>
                     ) : (
                       <div className="space-y-2">
                         {(deliveries[it.id] || []).map(d => {

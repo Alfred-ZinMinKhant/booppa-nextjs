@@ -125,7 +125,7 @@ export default function ApiKeysPage() {
               onClick={() => setCreatedKey(null)}
               className="text-xs text-neutral-400 hover:text-white mt-3"
             >
-              I've saved it — dismiss
+              I&apos;ve saved it — dismiss
             </button>
           </div>
         )}

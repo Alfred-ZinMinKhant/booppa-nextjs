@@ -256,7 +256,7 @@ export default function TrmPage() {
                     {!c.gap_analysis && (context[c.id] || '').length === 0 && (
                       <p className="text-xs text-neutral-500 italic">
                         Tip: a few sentences is enough. Include policy names, tools (e.g. CrowdStrike, OneTrust), audit cadence,
-                        and named owners — the model uses this to identify what's missing.
+                        and named owners — the model uses this to identify what&apos;s missing.
                       </p>
                     )}
                   </div>

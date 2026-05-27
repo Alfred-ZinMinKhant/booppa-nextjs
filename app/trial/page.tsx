@@ -190,7 +190,7 @@ function TrialContent() {
 										Account Created
 									</h3>
 									<p className="text-sm text-neutral-400">
-										We've emailed your temporary password. You can now access
+										We&apos;ve emailed your temporary password. You can now access
 										your dashboard.
 									</p>
 								</div>

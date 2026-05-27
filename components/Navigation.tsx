@@ -162,6 +162,7 @@ export default function Navigation() {
 					<div className="flex items-center justify-between">
 						{/* Logo */}
 						<Link href="/" className="flex items-center gap-2 flex-shrink-0">
+							{/* eslint-disable-next-line @next/next/no-img-element */}
 							<img src="/logo.png" alt="BOOPPA" className="h-8 w-auto" />
 						</Link>
 
@@ -334,6 +335,7 @@ export default function Navigation() {
 					<div className="fixed inset-0 z-[997] flex flex-col bg-[#0f172a] px-6 py-6 overflow-y-auto">
 						<div className="flex items-center justify-between mb-8">
 							<Link href="/" onClick={() => setMobileOpen(false)}>
+								{/* eslint-disable-next-line @next/next/no-img-element */}
 								<img src="/logo.png" alt="BOOPPA" className="h-8 w-auto" />
 							</Link>
 							<button

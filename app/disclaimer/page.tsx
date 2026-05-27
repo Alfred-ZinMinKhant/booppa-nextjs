@@ -54,7 +54,7 @@ export default function DisclaimerPage() {
                   'Notarization certificates and integrity records',
                 ].map((s, i) => <Li key={i}>{s}</Li>)}
               </ul>
-              <p className="mt-3">This non-reliance acknowledgment is a material term of User's access to the Service and constitutes a condition of Booppa's willingness to provide it.</p>
+              <p className="mt-3">This non-reliance acknowledgment is a material term of User&apos;s access to the Service and constitutes a condition of Booppa&apos;s willingness to provide it.</p>
             </Section>
 
             <Section title="2. No Professional Status">
@@ -62,7 +62,7 @@ export default function DisclaimerPage() {
             </Section>
 
             <Section title="3a. PDPA Snapshot and PDPA Monitor">
-              <p>The PDPA Snapshot and PDPA Monitor services analyze publicly available website content and uploaded policy documents for indicators of alignment with Singapore's PDPA. These services:</p>
+              <p>The PDPA Snapshot and PDPA Monitor services analyze publicly available website content and uploaded policy documents for indicators of alignment with Singapore&apos;s PDPA. These services:</p>
               <ul className="space-y-1 mt-2">
                 <Li>Do not constitute formal regulatory compliance audits</Li>
                 <Li>Do not ensure PDPA compliance and do not protect users from PDPC enforcement action</Li>
@@ -76,15 +76,15 @@ export default function DisclaimerPage() {
               <ul className="space-y-1 mt-2">
                 <Li>Is a non-predictive estimate and shall not be construed as a statistical guarantee, actuarial prediction, or professional forecast of any kind</Li>
                 <Li>Is not created by, endorsed by, or affiliated with any Singapore government agency including GeBIZ, MTI, or PDPC</Li>
-                <Li>May differ materially from actual procurement outcomes due to factors outside Booppa's data model, including unpublished evaluation criteria, personal relationships, pricing, and policy decisions</Li>
+                <Li>May differ materially from actual procurement outcomes due to factors outside Booppa&apos;s data model, including unpublished evaluation criteria, personal relationships, pricing, and policy decisions</Li>
                 <Li>Shall not be used as the sole or primary basis for any commercial, financial, or procurement decision</Li>
-                <Li>Is labelled as "probability" for convenience only; the term does not imply actuarial accuracy, statistical certification, or professional reliability</Li>
+                <Li>Is labelled as &quot;probability&quot; for convenience only; the term does not imply actuarial accuracy, statistical certification, or professional reliability</Li>
               </ul>
               <p className="mt-2 font-medium text-[#0f172a]">Booppa expressly disclaims any liability for losses, missed tenders, failed bids, or commercial harm arising from reliance on this metric.</p>
             </Section>
 
             <Section title="3c. Notarization">
-              <p>Booppa's notarization service records a SHA-256 cryptographic hash of an uploaded document at a specific date and time, creating a verifiable technical integrity timestamp. This service:</p>
+              <p>Booppa&apos;s notarization service records a SHA-256 cryptographic hash of an uploaded document at a specific date and time, creating a verifiable technical integrity timestamp. This service:</p>
               <ul className="space-y-1 mt-2">
                 <Li>Does not constitute legal notarization or authentication by a notary public, commissioner of oaths, or any recognized legal authority</Li>
                 <Li>Does not verify the accuracy, legality, authorship, or authenticity of the underlying document content</Li>
@@ -94,11 +94,11 @@ export default function DisclaimerPage() {
             </Section>
 
             <Section title="3d. Vendor Rankings and Shortlists">
-              <p>Vendor rankings, sector percentiles, shortlists, and procurement ordering on the Booppa platform reflect the platform's proprietary scoring algorithm. They are not endorsements or recommendations by any government or institutional buyer; may change as vendor data and scoring parameters are updated; and are subject to the platform's published ordering policy.</p>
+              <p>Vendor rankings, sector percentiles, shortlists, and procurement ordering on the Booppa platform reflect the platform&apos;s proprietary scoring algorithm. They are not endorsements or recommendations by any government or institutional buyer; may change as vendor data and scoring parameters are updated; and are subject to the platform&apos;s published ordering policy.</p>
             </Section>
 
             <Section title="3e. Vendor Verification">
-              <p>A Booppa verification badge indicates that the vendor has submitted information to Booppa and paid the applicable fee. It does not constitute a guarantee, warranty, or endorsement of the vendor's business practices, compliance posture, financial standing, or suitability for any procurement requirement.</p>
+              <p>A Booppa verification badge indicates that the vendor has submitted information to Booppa and paid the applicable fee. It does not constitute a guarantee, warranty, or endorsement of the vendor&apos;s business practices, compliance posture, financial standing, or suitability for any procurement requirement.</p>
             </Section>
 
             <Section title="4. Limitation of Use">
@@ -120,7 +120,7 @@ export default function DisclaimerPage() {
 
             <Section title="6. No Warranty">
               <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4 text-xs font-mono uppercase tracking-wide text-[#475569]">
-                ALL BOOPPA PRODUCTS AND SERVICES ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. BOOPPA MAKES NO WARRANTY THAT ANY PRODUCT, REPORT, OR ASSESSMENT IS ACCURATE, COMPLETE, RELIABLE, OR SUITABLE FOR ANY PARTICULAR PURPOSE.
+                ALL BOOPPA PRODUCTS AND SERVICES ARE PROVIDED &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. BOOPPA MAKES NO WARRANTY THAT ANY PRODUCT, REPORT, OR ASSESSMENT IS ACCURATE, COMPLETE, RELIABLE, OR SUITABLE FOR ANY PARTICULAR PURPOSE.
               </div>
             </Section>
 

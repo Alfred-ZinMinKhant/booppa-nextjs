@@ -65,6 +65,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
       setStatus('error');
       setMessage('No payment session ID found. Please start a new transaction.');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   const iconClass = "w-16 h-16 mb-4";

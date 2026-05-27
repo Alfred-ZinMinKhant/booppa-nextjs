@@ -134,7 +134,7 @@ export default function DemoPage() {
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-6xl font-black mb-6">Book a Live Demo</h1>
           <p className="text-xl text-[#64748b] max-w-3xl mx-auto leading-relaxed">
-            Pick a date and time that suits you. See BOOPPA's compliance infrastructure in action.
+            Pick a date and time that suits you. See BOOPPA&apos;s compliance infrastructure in action.
           </p>
         </div>
 
@@ -152,7 +152,7 @@ export default function DemoPage() {
             <h2 className="text-3xl lg:text-4xl font-black mb-6 text-[#0f172a]">Booking Confirmed</h2>
             <p className="text-[#64748b] text-lg leading-relaxed mb-10">
               Your demo is booked! Booking ID: <strong className="text-[#0f172a]">{success.id}</strong>. 
-              We'll send a calendar invite to your email shortly.
+              We&apos;ll send a calendar invite to your email shortly.
             </p>
             <button 
               onClick={() => setSuccess(null)}
@@ -350,7 +350,7 @@ export default function DemoPage() {
                     Confirm Demo Booking
                   </button>
                   <p className="text-center text-[#94a3b8] text-sm mt-4 font-medium italic">
-                    We'll send a confirmation email with the meeting link.
+                    We&apos;ll send a confirmation email with the meeting link.
                   </p>
                 </div>
               </form>

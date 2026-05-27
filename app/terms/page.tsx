@@ -35,8 +35,8 @@ export default function TermsPage() {
         </div>
 
         <Section title="1. Parties and Acceptance">
-          <p>These Terms of Service ("Terms") govern your access to and use of the Booppa platform, website, API, and all related products and services (collectively, the "Service") operated by Booppa Smart Care LLC, a limited liability company organized under the laws of the State of Delaware, USA ("Booppa," "we," "us," or "our").</p>
-          <p>By creating an account, accessing the Service, or clicking "I agree," you confirm that you have read, understood, and agree to be bound by these Terms and our Privacy Policy. If accepting on behalf of a company, you warrant you have authority to bind that entity. Users must be at least 18 years of age.</p>
+          <p>These Terms of Service (&quot;Terms&quot;) govern your access to and use of the Booppa platform, website, API, and all related products and services (collectively, the &quot;Service&quot;) operated by Booppa Smart Care LLC, a limited liability company organized under the laws of the State of Delaware, USA (&quot;Booppa,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;).</p>
+          <p>By creating an account, accessing the Service, or clicking &quot;I agree,&quot; you confirm that you have read, understood, and agree to be bound by these Terms and our Privacy Policy. If accepting on behalf of a company, you warrant you have authority to bind that entity. Users must be at least 18 years of age.</p>
         </Section>
 
         <Section title="2. Description of Services">
@@ -95,12 +95,12 @@ export default function TermsPage() {
         </Section>
 
         <Section title="9. Independent Decision-Making">
-          <p>All decisions made in connection with procurement, vendor selection, compliance, or any commercial activity are made independently and on the basis of User's own assessment. Under no circumstances shall Booppa be liable for decisions taken or not taken by User based on use of the Service, including decisions to submit bids, award contracts, or modify compliance posture.</p>
+          <p>All decisions made in connection with procurement, vendor selection, compliance, or any commercial activity are made independently and on the basis of User&apos;s own assessment. Under no circumstances shall Booppa be liable for decisions taken or not taken by User based on use of the Service, including decisions to submit bids, award contracts, or modify compliance posture.</p>
         </Section>
 
         <Section title="10. Disclaimer of Warranties">
           <div className="bg-[#1e293b] border border-[#334155] rounded-lg p-4 text-xs font-mono uppercase tracking-wide text-amber-200">
-            THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT ANY WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, BOOPPA DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, ACCURACY, RELIABILITY, COMPLETENESS, OR UNINTERRUPTED OPERATION.
+            THE SERVICE IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT ANY WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, BOOPPA DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, ACCURACY, RELIABILITY, COMPLETENESS, OR UNINTERRUPTED OPERATION.
           </div>
         </Section>
 
@@ -109,18 +109,18 @@ export default function TermsPage() {
             TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, BOOPPA SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, PUNITIVE, OR EXEMPLARY DAMAGES, INCLUDING LOSS OF PROFITS, LOSS OF BUSINESS OPPORTUNITIES, LOSS OF TENDERS OR CONTRACTS, REGULATORY PENALTIES, OR REPUTATIONAL DAMAGE.
           </div>
           <p><strong className="text-white">Non-Reliance Damages Exclusion:</strong> User expressly waives any claim based on reliance on the Service, including claims of negligent misrepresentation, promissory estoppel, or any similar theory.</p>
-          <p><strong className="text-white">Liability Cap:</strong> Booppa's total cumulative liability shall not exceed the greater of: (i) the total fees paid by User in the 12 months immediately preceding the claim; or (ii) <strong className="text-white">USD $100</strong>.</p>
-          <p>User acknowledges that these limitations constitute an essential element of the basis of the bargain. The Service is provided exclusively to business users (B2B). To the extent any limitation is challenged under Singapore's Unfair Contract Terms Act (Cap. 396) or equivalent legislation, the parties agree it is fair and reasonable.</p>
+          <p><strong className="text-white">Liability Cap:</strong> Booppa&apos;s total cumulative liability shall not exceed the greater of: (i) the total fees paid by User in the 12 months immediately preceding the claim; or (ii) <strong className="text-white">USD $100</strong>.</p>
+          <p>User acknowledges that these limitations constitute an essential element of the basis of the bargain. The Service is provided exclusively to business users (B2B). To the extent any limitation is challenged under Singapore&apos;s Unfair Contract Terms Act (Cap. 396) or equivalent legislation, the parties agree it is fair and reasonable.</p>
         </Section>
 
         <Section title="12. Indemnification">
-          <p>You agree to defend, indemnify, and hold harmless Booppa Smart Care LLC and its members, officers, employees, and agents from any claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or relating to: (a) your use of the Service; (b) your violation of these Terms; (c) your violation of any third-party right; or (d) any content you submit to the platform.</p>
+          <p>You agree to defend, indemnify, and hold harmless Booppa Smart Care LLC and its members, officers, employees, and agents from any claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys&apos; fees) arising out of or relating to: (a) your use of the Service; (b) your violation of these Terms; (c) your violation of any third-party right; or (d) any content you submit to the platform.</p>
         </Section>
 
         <Section title="13. Dispute Resolution">
-          <p><strong className="text-white">Binding Arbitration:</strong> Any dispute that cannot be resolved through good-faith negotiation within 30 days shall be resolved by final, binding arbitration administered by JAMS (or AAA at Booppa's election). The seat of arbitration shall be San Francisco, California, or Wilmington, Delaware, at Booppa's election.</p>
+          <p><strong className="text-white">Binding Arbitration:</strong> Any dispute that cannot be resolved through good-faith negotiation within 30 days shall be resolved by final, binding arbitration administered by JAMS (or AAA at Booppa&apos;s election). The seat of arbitration shall be San Francisco, California, or Wilmington, Delaware, at Booppa&apos;s election.</p>
           <p><strong className="text-white">Class Action Waiver:</strong> YOU AND BOOPPA AGREE THAT EACH MAY BRING CLAIMS ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS PROCEEDING.</p>
-          <p><strong className="text-white">Governing Law:</strong> These Terms are governed by the laws of the State of <strong className="text-white">Delaware, USA</strong>, without regard to conflict of law provisions. Compliance with Singapore's PDPA 2012 (as amended) is maintained independently.</p>
+          <p><strong className="text-white">Governing Law:</strong> These Terms are governed by the laws of the State of <strong className="text-white">Delaware, USA</strong>, without regard to conflict of law provisions. Compliance with Singapore&apos;s PDPA 2012 (as amended) is maintained independently.</p>
           <p>Either party may seek emergency injunctive relief from a court of competent jurisdiction to prevent irreparable harm pending arbitration.</p>
         </Section>
 
@@ -131,9 +131,9 @@ export default function TermsPage() {
         <Section title="17. Electronic Acceptance and Clickwrap Acknowledgment">
           <p>For all paid products and services, Booppa requires explicit electronic acceptance of these Terms at the point of purchase. Users must affirmatively check all three of the following before completing any transaction:</p>
           <ul className="space-y-2 mt-2 bg-[#1e293b] rounded-lg p-4">
-            <li className="flex gap-2 text-xs"><span className="text-[#10b981]">☑</span> "I have read and agree to Booppa's Terms of Service, Privacy Policy, and Disclaimer."</li>
-            <li className="flex gap-2 text-xs"><span className="text-[#10b981]">☑</span> "I acknowledge that I do not rely, and have not relied, on any Booppa output — including scores, rankings, probability estimates, or reports — for any legal, financial, procurement, or regulatory decision."</li>
-            <li className="flex gap-2 text-xs"><span className="text-[#10b981]">☑</span> "I understand that Booppa is an information tool and not a legal, compliance, or procurement advisor."</li>
+            <li className="flex gap-2 text-xs"><span className="text-[#10b981]">☑</span> &quot;I have read and agree to Booppa&apos;s Terms of Service, Privacy Policy, and Disclaimer.&quot;</li>
+            <li className="flex gap-2 text-xs"><span className="text-[#10b981]">☑</span> &quot;I acknowledge that I do not rely, and have not relied, on any Booppa output — including scores, rankings, probability estimates, or reports — for any legal, financial, procurement, or regulatory decision.&quot;</li>
+            <li className="flex gap-2 text-xs"><span className="text-[#10b981]">☑</span> &quot;I understand that Booppa is an information tool and not a legal, compliance, or procurement advisor.&quot;</li>
           </ul>
           <p className="mt-3">Records of electronic acceptance, including timestamp and IP address, are retained by Booppa and constitute evidence of agreement. Available on request at <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a>.</p>
         </Section>
@@ -147,7 +147,7 @@ export default function TermsPage() {
           <ul className="space-y-2">
             <Li><strong className="text-white">Entire Agreement:</strong> These Terms, together with the Privacy Policy, Cookie Policy, Acceptable Use Policy, and Disclaimer, constitute the entire agreement.</Li>
             <Li><strong className="text-white">Severability:</strong> If any provision is found unenforceable, the remaining provisions continue in full force.</Li>
-            <Li><strong className="text-white">Assignment:</strong> You may not assign your rights without Booppa's prior written consent. Booppa may assign these Terms freely.</Li>
+            <Li><strong className="text-white">Assignment:</strong> You may not assign your rights without Booppa&apos;s prior written consent. Booppa may assign these Terms freely.</Li>
             <Li><strong className="text-white">Force Majeure:</strong> Booppa is not liable for delays resulting from acts beyond its reasonable control.</Li>
           </ul>
         </Section>

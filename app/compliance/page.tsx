@@ -20,8 +20,8 @@ export default function CompliancePage() {
               Compliance monitoring plans provide ongoing operational infrastructure.
             </p>
             <p className="text-[#64748b]">
-              <strong>Use case:</strong> "We need to track consent changes, handle DSAR requests, 
-              and maintain audit trails for PDPC inquiries."
+              <strong>Use case:</strong> &quot;We need to track consent changes, handle DSAR requests, 
+              and maintain audit trails for PDPC inquiries.&quot;
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export default function CompliancePage() {
 
           {/* Feature Deep Dive */}
           <div className="bg-white p-8 lg:p-16 rounded-[2.5rem] shadow-2xl border border-[#e2e8f0] mb-20">
-            <h2 className="text-3xl font-black mb-12 text-[#0f172a]">What's Included: Detailed Breakdown</h2>
+            <h2 className="text-3xl font-black mb-12 text-[#0f172a]">What&apos;s Included: Detailed Breakdown</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               {[
@@ -211,7 +211,7 @@ export default function CompliancePage() {
               ].map((item, i) => (
                 <div key={i} className="bg-white p-8 rounded-2xl border-l-8 border-[#10b981] shadow-xl hover:translate-x-2 transition-all">
                   <h4 className="text-xl font-bold mb-4 text-[#0f172a]">{item.t}</h4>
-                  <p className="text-lg italic text-[#475569] mb-4">"{item.q}"</p>
+                  <p className="text-lg italic text-[#475569] mb-4">&quot;{item.q}&quot;</p>
                   <p className="text-sm font-bold text-[#10b981] uppercase tracking-wider">{item.r}</p>
                 </div>
               ))}
@@ -220,7 +220,7 @@ export default function CompliancePage() {
 
           {/* Legal Disclaimer */}
           <div className="bg-[#fef2f2] p-12 rounded-[2rem] border-2 border-[#fecaca] mb-20">
-            <h3 className="text-2xl font-black mb-8 flex items-center gap-3 text-[#991b1b]">⚖️ What This Service Is (and Isn't)</h3>
+            <h3 className="text-2xl font-black mb-8 flex items-center gap-3 text-[#991b1b]">⚖️ What This Service Is (and Isn&apos;t)</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-10">
               <div>
@@ -236,7 +236,7 @@ export default function CompliancePage() {
               </div>
               
               <div>
-                <h4 className="font-bold text-[#991b1b] mb-4 text-xl tracking-tight">❌ What We Don't Provide</h4>
+                <h4 className="font-bold text-[#991b1b] mb-4 text-xl tracking-tight">❌ What We Don&apos;t Provide</h4>
                 <ul className="space-y-3">
                   {['Legal advice or representation', 'PDPC certification or approval', 'Guarantee of regulatory compliance', 'Substitute for Data Protection Officer'].map((li, i) => (
                     <li key={i} className="flex items-center gap-3 text-[#991b1b] font-medium">

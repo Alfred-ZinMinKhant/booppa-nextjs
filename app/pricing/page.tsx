@@ -158,7 +158,7 @@ export default function PricingPage() {
 							Transparent Pricing
 						</h1>
 						<p className="text-xl text-[#64748b] max-w-3xl mx-auto leading-relaxed">
-							No hidden fees. No "contact sales" gatekeeping. Clear costs for
+							No hidden fees. No &quot;contact sales&quot; gatekeeping. Clear costs for
 							Singapore B2B procurement trust infrastructure.
 						</p>
 					</div>

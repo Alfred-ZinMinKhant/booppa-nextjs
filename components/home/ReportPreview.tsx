@@ -102,7 +102,7 @@ export default function ReportPreview() {
 									Executive Summary
 								</label>
 								<p className="text-[#64748b] leading-relaxed italic border-l-4 border-[#10b981] pl-6 py-2">
-									"Acme Cloud Solutions demonstrates a robust baseline for PDPA compliance. While minor administrative updates are recommended for full transparency, the organization meets all core legal requirements for data processing in Singapore. Recommended for procurement onboarding with standard monitoring."
+									&quot;Acme Cloud Solutions demonstrates a robust baseline for PDPA compliance. While minor administrative updates are recommended for full transparency, the organization meets all core legal requirements for data processing in Singapore. Recommended for procurement onboarding with standard monitoring.&quot;
 								</p>
 							</div>
 						</div>

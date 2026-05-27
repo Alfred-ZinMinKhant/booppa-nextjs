@@ -153,7 +153,7 @@ export default function RfpIntakePage() {
           <div className="text-5xl mb-4">✓</div>
           <h1 className="text-3xl font-bold text-[#0f172a] mb-3">Your {kitLabel} is on the way</h1>
           <p className="text-[#64748b] mb-8">
-            We'll email the kit to you as soon as it's ready — usually within a few minutes.
+            We&apos;ll email the kit to you as soon as it&apos;s ready — usually within a few minutes.
             You can close this page.
           </p>
           <a
@@ -178,7 +178,7 @@ export default function RfpIntakePage() {
             Tell us about your {kitLabel}
           </h1>
           <p className="text-[#64748b] mt-2">
-            A few details and we'll generate your RFP kit. Required field is marked with an asterisk.
+            A few details and we&apos;ll generate your RFP kit. Required field is marked with an asterisk.
           </p>
         </div>
 

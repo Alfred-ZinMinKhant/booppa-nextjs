@@ -164,7 +164,7 @@ export default function ReferralsPage() {
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-neutral-400 mb-4">You don't have an active referral code yet.</p>
+                  <p className="text-sm text-neutral-400 mb-4">You don&apos;t have an active referral code yet.</p>
                   {error && <p className="text-sm text-red-400 mb-3">{error}</p>}
                   <button
                     onClick={generateCode}

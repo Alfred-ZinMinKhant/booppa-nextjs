@@ -60,6 +60,7 @@ export default function AdminContentPage() {
 				setError("Failed to load content.");
 				setLoading(false);
 			});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeType]);
 
 	return (

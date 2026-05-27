@@ -71,7 +71,7 @@ export default function SupportPage() {
               </div>
               <h2 className="text-3xl font-black mb-4 text-[#0f172a]">Ticket Submitted</h2>
               <p className="text-[#64748b] text-lg mb-8">
-                Your ticket <strong className="text-[#0f172a]">{success.ticketId}</strong> has been created. We'll respond to your email shortly.
+                Your ticket <strong className="text-[#0f172a]">{success.ticketId}</strong> has been created. We&apos;ll respond to your email shortly.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a 

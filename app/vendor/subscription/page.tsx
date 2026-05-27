@@ -219,7 +219,7 @@ export default function SubscriptionPage() {
 
         {/* Features */}
         <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6">
-          <p className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-3">What's unlocked</p>
+          <p className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-3">What&apos;s unlocked</p>
           <div className="divide-y divide-neutral-800">
             <FeatureRow
               label="Full AI analysis (DeepSeek gap analysis)"

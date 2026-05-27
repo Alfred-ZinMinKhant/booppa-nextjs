@@ -143,6 +143,7 @@ export default function Home() {
 									</div>
 								</div>
 								<div className="bg-white p-2 rounded-xl mb-3 flex items-center justify-center">
+									{/* eslint-disable-next-line @next/next/no-img-element */}
 									<img src="/4-QR_Container.jpg" alt="QR Code" className="w-20 h-20 object-contain rounded-lg" />
 								</div>
 								<p className="text-[8px] text-[#10b981] text-center font-black tracking-widest uppercase">Verified & Immutable</p>

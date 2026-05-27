@@ -39,7 +39,7 @@ export default function PrivacyPage() {
               <p>Booppa Smart Care LLC acts as the data controller for personal data processed through the Booppa platform.</p>
               <p><strong className="text-[#0f172a]">Contact:</strong> <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a></p>
               <p className="text-xs bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
-                <strong>For EU/UK users:</strong> Booppa Smart Care LLC is the data controller under GDPR Article 4(7). Where required under Article 27 GDPR, Booppa shall designate an EU-based representative prior to commencing systematic processing of EU residents' personal data.
+                <strong>For EU/UK users:</strong> Booppa Smart Care LLC is the data controller under GDPR Article 4(7). Where required under Article 27 GDPR, Booppa shall designate an EU-based representative prior to commencing systematic processing of EU residents&apos; personal data.
               </p>
             </Section>
 
@@ -64,12 +64,12 @@ export default function PrivacyPage() {
 
             <Section title="4. Controller vs. Processor — Data Processing Agreement">
               <p>Booppa acts as <strong className="text-[#0f172a]">data controller</strong> for all processing activities in connection with platform operations, user accounts, and service delivery. Booppa acts as <strong className="text-[#0f172a]">data processor</strong> where processing personal data on behalf of Enterprise and Enterprise Pro subscribers in connection with their specific procurement workflows.</p>
-              <p><strong className="text-[#0f172a]">Data Processing Agreement (DPA):</strong> Booppa makes a standard DPA available for Enterprise and Enterprise Pro subscribers who process personal data subject to GDPR, UK GDPR, or Singapore PDPA. Request by emailing <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> with subject line "DPA Request." Booppa will provide the DPA within 5 business days.</p>
+              <p><strong className="text-[#0f172a]">Data Processing Agreement (DPA):</strong> Booppa makes a standard DPA available for Enterprise and Enterprise Pro subscribers who process personal data subject to GDPR, UK GDPR, or Singapore PDPA. Request by emailing <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> with subject line &quot;DPA Request.&quot; Booppa will provide the DPA within 5 business days.</p>
             </Section>
 
             <Section title="5. How We Use Your Data">
               <p>We use personal data to: deliver products and services you have purchased; process payments and send transaction confirmations; generate compliance reports, certificates, and procurement documentation; calculate vendor trust scores and probability estimates; send operational notifications; improve platform security and functionality; and comply with legal obligations.</p>
-              <p>Marketing communications are sent only where you have opted in or where permitted by applicable law. In accordance with Singapore's PDPA, we respect the <strong>Do Not Call (DNC) Registry</strong> and will not send marketing messages to numbers registered therein without explicit consent.</p>
+              <p>Marketing communications are sent only where you have opted in or where permitted by applicable law. In accordance with Singapore&apos;s PDPA, we respect the <strong>Do Not Call (DNC) Registry</strong> and will not send marketing messages to numbers registered therein without explicit consent.</p>
             </Section>
 
             <Section title="6. Data Sharing — Sub-Processors">
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
             </Section>
 
             <Section title="12. Your Rights — California (CCPA)">
-              <p>California residents have the right to know what personal information is collected and how it is used; the right to delete personal information; and the right to opt out of the sale of personal information. Booppa does not sell personal information. Contact <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> with subject line "CCPA Request."</p>
+              <p>California residents have the right to know what personal information is collected and how it is used; the right to delete personal information; and the right to opt out of the sale of personal information. Booppa does not sell personal information. Contact <a href="mailto:evidence@booppa.io" className="underline text-[#10b981]">evidence@booppa.io</a> with subject line &quot;CCPA Request.&quot;</p>
             </Section>
 
             <Section title="13. Data Security">

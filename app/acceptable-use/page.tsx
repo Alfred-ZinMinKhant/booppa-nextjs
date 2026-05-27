@@ -51,7 +51,7 @@ export default function AcceptableUsePage() {
             <Section title="3. Prohibited Conduct — Platform Integrity">
               <ul className="space-y-1">
                 <Li>Accessing, scraping, or harvesting data without authorization</Li>
-                <Li>Interfering with or disrupting the platform's technical infrastructure</Li>
+                <Li>Interfering with or disrupting the platform&apos;s technical infrastructure</Li>
                 <Li>Attempting to reverse-engineer, decompile, or extract source code</Li>
                 <Li>Using automated bots, crawlers, or scripts without explicit written permission</Li>
                 <Li>Attempting to manipulate or artificially inflate verification scores or procurement rankings</Li>
@@ -83,7 +83,7 @@ export default function AcceptableUsePage() {
             </Section>
 
             <Section title="8. Enforcement">
-              <p>Booppa reserves the right to investigate suspected violations and take action including: removal of content; account suspension or termination; referral to law enforcement; and pursuit of legal remedies. Booppa's failure to act on any violation does not constitute a waiver of its right to act on subsequent violations.</p>
+              <p>Booppa reserves the right to investigate suspected violations and take action including: removal of content; account suspension or termination; referral to law enforcement; and pursuit of legal remedies. Booppa&apos;s failure to act on any violation does not constitute a waiver of its right to act on subsequent violations.</p>
             </Section>
 
             <div className="pt-4 border-t border-[#e2e8f0] text-xs text-[#94a3b8] space-y-1">

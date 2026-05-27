@@ -150,6 +150,7 @@ function NotarizationResultContent() {
     } catch {
       // Silently retry on network errors
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportId, apiBase]);
 
   useEffect(() => {
@@ -341,6 +342,7 @@ function NotarizationResultContent() {
                 <section className="flex flex-col sm:flex-row items-center gap-6">
                   {cert.verification.qr_image && (
                     <div className="flex-shrink-0 bg-white p-3 rounded-xl border border-[#e2e8f0] shadow-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={`data:image/png;base64,${cert.verification.qr_image}`}
                         alt="Verification QR Code"

@@ -75,7 +75,7 @@ export default function ConversionPost() {
           </ul>
 
           <p>
-            By leveraging AWS Singapore for data residency and the <strong>Polygon network</strong> for notarization, Booppa allows companies to pay only for what they actually notarize, eliminating "subscription fatigue".
+            By leveraging AWS Singapore for data residency and the <strong>Polygon network</strong> for notarization, Booppa allows companies to pay only for what they actually notarize, eliminating &quot;subscription fatigue&quot;.
           </p>
 
           <h2>Ready to Optimize?</h2>

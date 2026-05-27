@@ -567,6 +567,7 @@ export default function ReportClient() {
     }, 700);
     const iv2 = setInterval(() => setLoadingStep(prev => Math.min(prev + 1, loadingSteps.length - 1)), 5000);
     return () => { clearInterval(iv1); clearInterval(iv2); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, loadingStep, attempts]);
 
   /* ── Loading ───────────────────────────────────────────── */
@@ -719,6 +720,7 @@ export default function ReportClient() {
         {siteScreenshot && (
           <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5 shadow-sm">
             <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wide mb-3">Website Scanned</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={siteScreenshot.startsWith("data:image") ? siteScreenshot : `data:image/png;base64,${siteScreenshot}`}
               alt="Scanned website"
@@ -731,7 +733,7 @@ export default function ReportClient() {
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
           <SectionHeading n="1" title="Scope of Assessment" />
           <p className="text-sm text-[#334155] leading-relaxed mb-4">
-            This compliance pack is based on information provided by the company's authorised representative
+            This compliance pack is based on information provided by the company&apos;s authorised representative
             and automated website assessment conducted by Booppa on the date indicated.
             The table below lists each element assessed and its scope status.
           </p>

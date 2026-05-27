@@ -275,7 +275,7 @@ function AddVendorModal({
       <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
         <h2 className="text-xl font-bold text-[#0f172a] mb-1">Add Vendor to Portfolio</h2>
         <p className="text-sm text-[#64748b] mb-6">
-          We'll check their Booppa compliance profile automatically.
+          We&apos;ll check their Booppa compliance profile automatically.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -448,7 +448,7 @@ export default function SupplyChainPage() {
                 <h1 className="text-3xl lg:text-4xl font-black mb-2">Vendor Risk Portfolio</h1>
                 <p className="text-white/60 max-w-lg text-sm leading-relaxed">
                   Monitor compliance risk across your vendor supply chain.
-                  Each vendor's Booppa compliance profile is reflected here automatically.
+                  Each vendor&apos;s Booppa compliance profile is reflected here automatically.
                 </p>
               </div>
               <button

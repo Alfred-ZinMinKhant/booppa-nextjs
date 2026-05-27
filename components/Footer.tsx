@@ -8,6 +8,7 @@ export default function Footer() {
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
 					<div className="footer-column">
 						<div className="flex items-center gap-2 mb-6">
+							{/* eslint-disable-next-line @next/next/no-img-element */}
 							<img src="/logo.png" alt="BOOPPA Logo" className="h-8 w-auto" />
 						</div>
 						<p className="text-[#64748b] text-sm max-w-xs">

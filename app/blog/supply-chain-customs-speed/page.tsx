@@ -15,7 +15,7 @@ export default function SupplyChainCustomsSpeed() {
         </div>
 
         <article className="prose prose-invert max-w-none text-gray-200">
-          <p>In the high-stakes world of global logistics, a 48-hour customs delay isn't just an inconvenience—it’s a margin killer. In Singapore, the push towards TradeNet 3.0 and digital trade documents has opened a massive opportunity for companies to cut clearance times from days to minutes.</p>
+          <p>In the high-stakes world of global logistics, a 48-hour customs delay isn&apos;t just an inconvenience—it’s a margin killer. In Singapore, the push towards TradeNet 3.0 and digital trade documents has opened a massive opportunity for companies to cut clearance times from days to minutes.</p>
 
           <h3>The Paperwork Bottleneck</h3>
           <p>The majority of customs delays at Singapore’s ports are not caused by physical inspections, but by documentary discrepancies. Traditional paper-based Certificates of Origin and Bills of Lading are:</p>
@@ -26,7 +26,7 @@ export default function SupplyChainCustomsSpeed() {
           </ul>
 
           <h3>The Booppa Solution: Instant Verification</h3>
-          <p>By notarizing shipping documents on the Polygon blockchain via Booppa, logistics providers can offer customs officers an immutable "Single Source of Truth."</p>
+          <p>By notarizing shipping documents on the Polygon blockchain via Booppa, logistics providers can offer customs officers an immutable &quot;Single Source of Truth.&quot;</p>
 
           <p>A simple scan of a QR code linked to a Booppa-verified hash allows customs to instantly confirm the document’s authenticity, provenance, and integrity. One of our partners recently reduced their average clearance delay from 48 hours to just 30 minutes.</p>
 

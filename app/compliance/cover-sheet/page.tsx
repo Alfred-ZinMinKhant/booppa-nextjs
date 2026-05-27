@@ -51,6 +51,7 @@ function CoverSheetInner() {
     refreshStatus(email)
     const id = setInterval(() => refreshStatus(email), 8000)
     return () => clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, apiBase])
 
   const handleRegenerate = async () => {

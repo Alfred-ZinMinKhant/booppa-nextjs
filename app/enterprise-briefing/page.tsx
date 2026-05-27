@@ -110,7 +110,7 @@ export default function EnterpriseBriefing() {
             </div>
             <h3 className="text-2xl font-bold text-neutral-900">Request Sent Securely</h3>
             <p className="text-neutral-500">
-              We've notified the targeted vendors. When their blockchain-anchored compliance proof is ready, a secure review link will be sent to <strong>{email}</strong>.
+              We&apos;ve notified the targeted vendors. When their blockchain-anchored compliance proof is ready, a secure review link will be sent to <strong>{email}</strong>.
             </p>
             <div className="pt-8">
               <button 

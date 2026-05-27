@@ -115,7 +115,7 @@ export default function CookiesPage() {
             </Section>
 
             <Section title="4. EU/UK Users — Consent Banner">
-              <p>For users accessing from the EU or UK, non-essential cookies (categories 2c and 2d) are not set until you have provided consent via our cookie banner, in accordance with the EU ePrivacy Directive and UK PECR. You may withdraw consent at any time by clearing cookies in your browser or clicking "Manage Preferences" in the footer.</p>
+              <p>For users accessing from the EU or UK, non-essential cookies (categories 2c and 2d) are not set until you have provided consent via our cookie banner, in accordance with the EU ePrivacy Directive and UK PECR. You may withdraw consent at any time by clearing cookies in your browser or clicking &quot;Manage Preferences&quot; in the footer.</p>
               <p>Legal basis for strictly necessary cookies: Legitimate interest (Article 6(1)(f) GDPR) — necessary for secure platform operation. Legal basis for analytics cookies where deployed: Consent (Article 6(1)(a) GDPR).</p>
             </Section>
 

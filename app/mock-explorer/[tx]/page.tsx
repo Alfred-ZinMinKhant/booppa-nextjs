@@ -57,7 +57,7 @@ export default function MockExplorerPage({
 							</li>
 							<li>Timestamp provides an immutable proof of existence.</li>
 							<li>
-								Use the PDF report's Evidence Pack to verify local contents
+								Use the PDF report&apos;s Evidence Pack to verify local contents
 								against this hash.
 							</li>
 						</ul>

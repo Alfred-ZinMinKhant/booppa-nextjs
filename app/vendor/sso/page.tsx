@@ -109,7 +109,7 @@ export default function SsoPage() {
             <p className="text-xs text-amber-200/70">
               SSO config can be saved here, but assertion verification (SAML ACS, OIDC callback)
               is stubbed pending <code>python3-saml</code> / <code>authlib</code> integration.
-              Don't enable in production until that's wired.
+              Don&apos;t enable in production until that&apos;s wired.
             </p>
           </div>
         </div>

@@ -178,7 +178,7 @@ export default function PDPAPage() {
 									required
 								/>
 								<p className="mt-2 text-xs text-[#94a3b8]">
-									We'll scan for PDPA compliance indicators across 8 obligations
+									We&apos;ll scan for PDPA compliance indicators across 8 obligations
 								</p>
 							</div>
 
@@ -227,7 +227,7 @@ export default function PDPAPage() {
 
 							<div className="bg-[#f8fafc] p-6 rounded-xl border-l-4 border-[#10b981] mb-8">
 								<h4 className="font-bold text-[#0f172a] mb-3">
-									What You'll Receive (15 minutes)
+									What You&apos;ll Receive (15 minutes)
 								</h4>
 								<ul className="space-y-2">
 									{[

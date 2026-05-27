@@ -77,6 +77,7 @@ function BundleNotarizeInner() {
     refreshState(email)
     const interval = setInterval(() => refreshState(email), 8000)
     return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, apiBase])
 
   const handleUpload = async () => {

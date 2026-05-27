@@ -341,7 +341,7 @@ export default function ComplianceLockerPage() {
                 </span>
               </div>
               <p className="text-white/70 max-w-xl leading-relaxed text-sm">
-                Your end-to-end compliance evidence across Singapore's key regulatory frameworks —
+                Your end-to-end compliance evidence across Singapore&apos;s key regulatory frameworks —
                 PDPA, ACRA, GeBIZ, and MAS. Expand any regulation to see your evidence on file.
               </p>
             </div>

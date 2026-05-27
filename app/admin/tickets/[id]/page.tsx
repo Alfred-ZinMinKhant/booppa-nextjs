@@ -48,6 +48,7 @@ export default function TicketDetailPage() {
     setData(await res.json())
     setLoading(false)
   }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [id])
 
   async function patch(payload: Partial<TicketDetail>) {

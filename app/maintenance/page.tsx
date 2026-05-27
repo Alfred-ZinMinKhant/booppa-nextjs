@@ -38,7 +38,7 @@ export default function Maintenance() {
           </h1>
           
           <p className="text-white/70 text-lg lg:text-xl mb-12 leading-relaxed">
-            We are currently upgrading our systems to provide you with better blockchain compliance evidence tools. We'll be back shortly.
+            We are currently upgrading our systems to provide you with better blockchain compliance evidence tools. We&apos;ll be back shortly.
           </p>
           
           <div className="flex flex-wrap justify-center gap-6 pt-8 border-t border-white/10">
