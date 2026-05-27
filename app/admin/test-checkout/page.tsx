@@ -43,9 +43,13 @@ const BUNDLES: Sku[] = [
 const SUBSCRIPTIONS: Sku[] = [
   { product_type: 'vendor_active_monthly', label: 'Vendor Active — monthly' },
   { product_type: 'vendor_active_annual', label: 'Vendor Active — annual' },
+  { product_type: 'vendor_pro_monthly', label: 'Vendor Pro — monthly' },
+  { product_type: 'vendor_pro_annual', label: 'Vendor Pro — annual' },
   { product_type: 'pdpa_monitor_monthly', label: 'PDPA Monitor — monthly' },
   { product_type: 'pdpa_monitor_annual', label: 'PDPA Monitor — annual' },
   { product_type: 'compliance_evidence_monthly', label: 'Compliance Evidence — monthly' },
+  { product_type: 'tender_intelligence_monthly', label: 'Tender Intelligence — monthly' },
+  { product_type: 'tender_intelligence_annual', label: 'Tender Intelligence — annual' },
   { product_type: 'buyer_starter_monthly', label: 'Buyer Starter — monthly' },
   { product_type: 'buyer_starter_annual', label: 'Buyer Starter — annual' },
   { product_type: 'buyer_pro_monthly', label: 'Buyer Pro — monthly' },
