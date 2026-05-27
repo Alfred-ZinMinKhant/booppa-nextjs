@@ -211,10 +211,10 @@ export default function Navigation() {
 							</Link>
 
 							<Link
-								href="/resources"
-								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/resources") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
+								href="/notarization"
+								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/notarization") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
 							>
-								Resources
+								Notarization
 							</Link>
 						</div>
 
@@ -385,9 +385,9 @@ export default function Navigation() {
 								close={() => setMobileOpen(false)}
 							/>
 							<MobileLink
-								href="/resources"
-								label="Resources"
-								active={pathname?.startsWith("/resources")}
+								href="/notarization"
+								label="Notarization"
+								active={pathname?.startsWith("/notarization")}
 								close={() => setMobileOpen(false)}
 							/>
 
