@@ -172,33 +172,6 @@ export default function SolutionsProcurementPage() {
               );
             })}
           </div>
-
-          {/* Notana Document Add-On */}
-          {(() => {
-            const addon = SUBSCRIPTION_PRODUCTS.notana_document_monthly;
-            return (
-              <div className="mt-12 bg-gradient-to-r from-amber-50 to-white p-8 rounded-[2rem] border border-amber-200 flex flex-col md:flex-row md:items-center gap-6">
-                <div className="flex-1">
-                  <div className="inline-block bg-amber-500 text-white px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-2">{addon.badge}</div>
-                  <h3 className="text-2xl font-black text-[#0f172a] mb-2">{addon.name} — for buyers who need certified vendor documents</h3>
-                  <p className="text-sm text-[#64748b] mb-3">Notarisations are a Vendor tool by default. Add Notana Document to any Buyer plan if your procurement workflow requires buyer-initiated notarisation of vendor evidence.</p>
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-                    {addon.features.map(f => <CheckItem key={f} text={f} color="text-amber-600" />)}
-                  </ul>
-                </div>
-                <div className="flex-shrink-0 text-center md:text-right">
-                  <div className="text-3xl font-black text-[#0f172a] mb-1">SGD {addon.price}<span className="text-base text-[#64748b] font-normal">/mo</span></div>
-                  <button
-                    disabled={loadingProduct === "notana_document_monthly"}
-                    onClick={() => handleCheckout("notana_document_monthly")}
-                    className="bg-amber-600 text-white font-bold px-6 py-3 rounded-xl transition disabled:opacity-50 hover:bg-amber-700"
-                  >
-                    {loadingProduct === "notana_document_monthly" ? "Redirecting..." : "Add to Plan"}
-                  </button>
-                </div>
-              </div>
-            );
-          })()}
         </div>
       </section>
 
