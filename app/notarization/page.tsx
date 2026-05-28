@@ -16,9 +16,9 @@ type UploadResult = {
 };
 
 const PLANS = {
-  single:  { label: 'Single Document',  price: 'SGD 69',    perDoc: '', product: 'compliance_notarization_1' },
-  batch10: { label: '10 Documents',      price: 'SGD 390',   perDoc: 'SGD 39 each', product: 'compliance_notarization_10' },
-  batch50: { label: '50 Documents',      price: 'SGD 1,750', perDoc: 'SGD 35 each', product: 'compliance_notarization_50' },
+  single:  { label: 'Single Document',  price: 'SGD 69',         perDoc: '',                 product: 'compliance_notarization_1',  recurring: false },
+  batch10: { label: 'Small Batch',       price: 'SGD 390/mo',     perDoc: '10 docs/mo · SGD 39 each',  product: 'compliance_notarization_10', recurring: true },
+  batch50: { label: 'Enterprise Batch',  price: 'SGD 1,750/mo',   perDoc: '50 docs/mo · SGD 35 each',  product: 'compliance_notarization_50', recurring: true },
 } as const;
 
 type PlanKey = keyof typeof PLANS;
@@ -46,6 +46,10 @@ export default function NotarizationPage() {
   const [error, setError] = useState('');
   const [consentValid, setConsentValid] = useState(false);
   const [creditBalance, setCreditBalance] = useState(0);
+  const [userPlan, setUserPlan] = useState<string | null>(null);
+  const [monthlyQuota, setMonthlyQuota] = useState<{ used: number; limit: number; remaining: number } | null>(null);
+
+  const isBatchSubscriber = userPlan === 'compliance_notarization_10' || userPlan === 'compliance_notarization_50';
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -54,9 +58,30 @@ export default function NotarizationPage() {
         if (!data) return;
         if (data.email) setEmail(data.email);
         if (data.company) setCompanyName(data.company);
+        if (data.plan) setUserPlan(data.plan);
       })
       .catch(() => {});
   }, []);
+
+  // Fetch the subscriber's monthly notarization allowance (Small/Enterprise Batch plans)
+  useEffect(() => {
+    if (!email || !email.includes('@')) {
+      setMonthlyQuota(null);
+      return;
+    }
+    const ctrl = new AbortController();
+    fetch(`${apiBase}/api/v1/notarize/enterprise/credits?email=${encodeURIComponent(email)}`, { signal: ctrl.signal })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.enterprise && typeof data.remaining === 'number') {
+          setMonthlyQuota({ used: data.used, limit: data.limit, remaining: data.remaining });
+        } else {
+          setMonthlyQuota(null);
+        }
+      })
+      .catch(() => {});
+    return () => ctrl.abort();
+  }, [email, apiBase]);
 
   // Fetch bundle-granted notarization credits whenever the email changes
   useEffect(() => {
@@ -81,6 +106,30 @@ export default function NotarizationPage() {
     setError('');
     // Scroll to upload section
     setTimeout(() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
+  };
+
+  // Batch tiers are subscriptions — start Stripe Checkout directly (no document upload).
+  // After subscribing, the user returns here and notarizes documents against their monthly quota.
+  const handleSubscribe = async (plan: PlanKey) => {
+    setError('');
+    setCheckingOut(true);
+    try {
+      const res = await fetch(`${apiBase}/api/stripe/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productType: PLANS[plan].product, customerEmail: email }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Could not start subscription. Please try again.');
+      setCheckingOut(false);
+    }
   };
 
   const handleUpload = async () => {
@@ -109,13 +158,22 @@ export default function NotarizationPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('plan', selectedPlan);
       formData.append('document_descriptor', documentDescriptor.trim().slice(0, 120));
-      if (regulationTag) formData.append('regulation_tag', regulationTag);
       if (email) formData.append('email', email);
       if (companyName) formData.append('company_name', companyName);
 
-      const res = await fetch(`${apiBase}/api/v1/notarize/upload`, {
+      // Batch subscribers with monthly quota remaining draw down their allowance
+      // (no Stripe checkout). Everyone else uses the pay-per-document path.
+      const useMonthlyQuota = isBatchSubscriber && (monthlyQuota?.remaining ?? 0) !== 0;
+      const endpoint = useMonthlyQuota
+        ? `${apiBase}/api/v1/notarize/enterprise/upload`
+        : `${apiBase}/api/v1/notarize/upload`;
+      if (!useMonthlyQuota) {
+        formData.append('plan', selectedPlan);
+        if (regulationTag) formData.append('regulation_tag', regulationTag);
+      }
+
+      const res = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
@@ -125,8 +183,16 @@ export default function NotarizationPage() {
         throw new Error(data.detail || 'Upload failed');
       }
 
-      const result: UploadResult & { skip_checkout?: boolean; credits_remaining?: number } = await res.json();
+      const result: UploadResult & { skip_checkout?: boolean; credits_remaining?: number; enterprise_credit?: boolean; credits_used?: number; credits_limit?: number } = await res.json();
       setUploadResult(result);
+      // Monthly-quota notarization is fulfilled immediately — go straight to result.
+      if (result.enterprise_credit) {
+        if (typeof result.credits_remaining === 'number' && typeof result.credits_limit === 'number') {
+          setMonthlyQuota({ used: result.credits_used ?? 0, limit: result.credits_limit, remaining: result.credits_remaining });
+        }
+        window.location.href = `/notarization/result?report_id=${encodeURIComponent(result.report_id)}&credit_redeemed=1`;
+        return;
+      }
       // If a bundle credit was redeemed, fulfillment is already queued — go straight to result
       if (result.skip_checkout) {
         if (typeof result.credits_remaining === 'number') setCreditBalance(result.credits_remaining);
@@ -204,6 +270,24 @@ export default function NotarizationPage() {
             </p>
           </div>
 
+          {isBatchSubscriber && monthlyQuota && (
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-2xl border-2 border-emerald-300 mb-12 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="text-3xl">📦</div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-emerald-900 mb-1">
+                    {Math.max(0, monthlyQuota.remaining)} of {monthlyQuota.limit} notarizations left this month
+                  </h3>
+                  <p className="text-emerald-800 text-sm">
+                    Included with your {userPlan === 'compliance_notarization_50' ? 'Enterprise Batch' : 'Small Batch'} subscription.
+                    Upload any compliance document below — it draws from your monthly allowance, no payment required.
+                    Unused notarizations reset at the start of each billing month.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {creditBalance > 0 && (
             <div className="bg-gradient-to-r from-sky-50 to-blue-50 p-6 rounded-2xl border-2 border-sky-300 mb-12 shadow-sm">
               <div className="flex items-start gap-4">
@@ -251,6 +335,12 @@ export default function NotarizationPage() {
             </div>
             
             {step === 'select' && (
+            <>
+            {/* Billing-type column headers */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-4">
+              <div className="border-2 border-amber-400 rounded-xl py-3 text-center font-bold text-amber-500 uppercase tracking-wider text-sm">One Time</div>
+              <div className="md:col-span-2 border-2 border-blue-500 rounded-xl py-3 text-center font-bold text-blue-600 uppercase tracking-wider text-sm">Subscription (same price monthly)</div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-white p-10 rounded-3xl border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] hover:shadow-xl transition-all">
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Single Document</h3>
@@ -271,11 +361,11 @@ export default function NotarizationPage() {
 
               <div className="bg-white p-10 rounded-3xl border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] hover:shadow-xl transition-all">
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Small Batch</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 390</div>
-                <p className="text-sm text-[#64748b] mb-8">10 documents (SGD 39 each)</p>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 390<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">10 documents / month (SGD 39 each)</p>
                 <ul className="space-y-4 mb-8">
                   <li className="font-bold text-[#0f172a] text-sm">Everything in Single, plus:</li>
-                  {['Batch processing (upload 10 files)', 'Consolidated certificate', 'API access for automation', '3-month retention'].map((f, i) => (
+                  {['10 notarizations every month', 'Batch processing (upload 10 files)', 'Consolidated certificate', 'API access for automation', '3-month retention'].map((f, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
                       <span className="text-[#10b981] font-bold">✓</span>
                       {f}
@@ -283,19 +373,25 @@ export default function NotarizationPage() {
                   ))}
                 </ul>
                 <p className="text-sm font-bold text-[#10b981] mb-8">Save 43% vs single notarization</p>
-                <button onClick={() => handleSelectPlan('batch10')} className="btn btn-primary w-full shadow-lg">
-                  Select — SGD 390
-                </button>
+                {isBatchSubscriber ? (
+                  <button onClick={() => handleSelectPlan('batch10')} className="btn btn-primary w-full shadow-lg">
+                    Notarize a Document →
+                  </button>
+                ) : (
+                  <button onClick={() => handleSubscribe('batch10')} disabled={checkingOut} className="btn btn-primary w-full shadow-lg disabled:opacity-50">
+                    {checkingOut ? 'Redirecting…' : 'Subscribe — SGD 390/mo'}
+                  </button>
+                )}
               </div>
 
               <div className="bg-white p-10 rounded-3xl border-2 border-[#10b981] shadow-xl relative scale-105 z-10 hover:translate-y-[-5px] hover:shadow-2xl transition-all">
                 <div className="absolute top-[-15px] right-6 bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Best Value</div>
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Enterprise Batch</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 1,750</div>
-                <p className="text-sm text-[#64748b] mb-8">50 documents (SGD 35 each)</p>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 1,750<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-sm text-[#64748b] mb-8">50 documents / month (SGD 35 each)</p>
                 <ul className="space-y-4 mb-8">
                   <li className="font-bold text-[#0f172a] text-sm">Everything in Small Batch, plus:</li>
-                  {['Priority processing (< 1 hour)', 'Dashboard reporting', 'Webhook notifications', '12-month retention', 'Dedicated support'].map((f, i) => (
+                  {['50 notarizations every month', 'Priority processing (< 1 hour)', 'Dashboard reporting', 'Webhook notifications', '12-month retention', 'Dedicated support'].map((f, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
                       <span className="text-[#10b981] font-bold">✓</span>
                       {f}
@@ -303,11 +399,18 @@ export default function NotarizationPage() {
                   ))}
                 </ul>
                 <p className="text-sm font-bold text-[#10b981] mb-8">Save 49% vs single notarization</p>
-                <button onClick={() => handleSelectPlan('batch50')} className="btn btn-primary w-full shadow-lg">
-                  Select — SGD 1,750
-                </button>
+                {isBatchSubscriber ? (
+                  <button onClick={() => handleSelectPlan('batch50')} className="btn btn-primary w-full shadow-lg">
+                    Notarize a Document →
+                  </button>
+                ) : (
+                  <button onClick={() => handleSubscribe('batch50')} disabled={checkingOut} className="btn btn-primary w-full shadow-lg disabled:opacity-50">
+                    {checkingOut ? 'Redirecting…' : 'Subscribe — SGD 1,750/mo'}
+                  </button>
+                )}
               </div>
             </div>
+            </>
             )}
 
             {/* Step 2: Upload Document */}

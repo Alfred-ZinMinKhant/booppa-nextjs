@@ -29,8 +29,8 @@ function CheckItem({
 
 const JOURNEY_STEPS = [
   { n: "1", label: "Start Free",         color: "#10b981", bg: "#f0fdf4" },
-  { n: "2", label: "Buyer Starter",      color: "#0ea5e9", bg: "#f0f9ff" },
-  { n: "3", label: "Buyer Pro",          color: "#2563eb", bg: "#eff6ff" },
+  { n: "2", label: "Buyer Essentials",   color: "#0ea5e9", bg: "#f0f9ff" },
+  { n: "3", label: "Buyer Professional", color: "#2563eb", bg: "#eff6ff" },
   { n: "4", label: "Buyer Enterprise",   color: "#7c3aed", bg: "#f5f3ff" },
 ];
 

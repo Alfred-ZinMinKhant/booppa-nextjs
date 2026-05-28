@@ -244,7 +244,7 @@ export default function SolutionsVendorsPage() {
               <div className="w-8 h-8 rounded-full bg-[#3b82f6] flex items-center justify-center text-white text-xs font-black">2</div>
               <h2 className="text-2xl font-black text-[#0f172a]">Ongoing Subscriptions</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Vendor Active */}
               <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm flex flex-col">
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">Vendor Active</h3>
@@ -253,12 +253,46 @@ export default function SolutionsVendorsPage() {
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Priority in searches", "Real-time GeBIZ alerts", "Unlimited probability checks", "Active badge status"].map(f => <CheckItem key={f} text={f} />)}
                 </ul>
-                <button 
+                <button
                   disabled={loadingProduct === "vendor_active_monthly"}
-                  onClick={() => handleCheckout("vendor_active_monthly")} 
+                  onClick={() => handleCheckout("vendor_active_monthly")}
                   className="w-full border-2 border-blue-500 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-500 hover:text-white transition disabled:opacity-50"
                 >
                   {loadingProduct === "vendor_active_monthly" ? "Redirecting..." : "Subscribe"}
+                </button>
+              </div>
+
+              {/* Vendor Pro — bridge tier */}
+              <div className="bg-white p-8 rounded-[2rem] border-2 border-violet-500 shadow-md relative flex flex-col">
+                <div className="absolute top-[-14px] left-8 bg-violet-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">New</div>
+                <h3 className="text-xl font-bold text-[#0f172a] mb-1">Vendor Pro</h3>
+                <div className="text-4xl font-black text-violet-600 mb-1">SGD 99<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                <p className="text-xs text-[#64748b] mb-6">Compliance visibility + tender intelligence for growing vendors</p>
+                <ul className="space-y-3 mb-8 flex-1">
+                  {[
+                    "Everything in Vendor Active",
+                    "Quarterly PDPA Snapshot with drift",
+                    "1 notarization/month (SGD 69 value)",
+                    "Tender analytics dashboard (lite)",
+                    "Competitor awareness signals",
+                    "Priority email support",
+                  ].map(f => <CheckItem key={f} text={f} color="text-violet-600" />)}
+                </ul>
+                <button
+                  type="button"
+                  disabled={loadingProduct === "vendor_pro_monthly"}
+                  onClick={() => handleCheckout("vendor_pro_monthly")}
+                  className="w-full bg-violet-600 text-white font-bold py-3.5 rounded-xl hover:bg-violet-500 transition shadow-lg shadow-violet-600/20 disabled:opacity-50"
+                >
+                  {loadingProduct === "vendor_pro_monthly" ? "Redirecting..." : "Subscribe (SGD 99/mo)"}
+                </button>
+                <button
+                  type="button"
+                  disabled={loadingProduct === "vendor_pro_annual"}
+                  onClick={() => handleCheckout("vendor_pro_annual")}
+                  className="w-full mt-2 border border-violet-500 text-violet-600 font-semibold py-2 rounded-xl hover:bg-violet-50 transition disabled:opacity-50 text-sm"
+                >
+                  {loadingProduct === "vendor_pro_annual" ? "Redirecting..." : "Annual SGD 1,099 · save 2 mo"}
                 </button>
               </div>
 
@@ -271,9 +305,10 @@ export default function SolutionsVendorsPage() {
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Monthly automated scans", "Continuous risk monitoring", "Drift alerts & notifications", "Updated audit logs"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
                 </ul>
-                <button 
+                <button
+                  type="button"
                   disabled={loadingProduct === "pdpa_monitor_monthly"}
-                  onClick={() => handleCheckout("pdpa_monitor_monthly")} 
+                  onClick={() => handleCheckout("pdpa_monitor_monthly")}
                   className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-600/20 disabled:opacity-50"
                 >
                   {loadingProduct === "pdpa_monitor_monthly" ? "Redirecting..." : "Start Monitoring"}
@@ -288,9 +323,10 @@ export default function SolutionsVendorsPage() {
                 <ul className="space-y-3 mb-8 flex-1">
                   {["All-in-one PDF/Docs evidence", "PDPA + RFP data coverage", "Blockchain-anchored cover sheets", "Priority procurement support"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
                 </ul>
-                <button 
+                <button
+                  type="button"
                   disabled={loadingProduct === "compliance_evidence_monthly"}
-                  onClick={() => handleCheckout("compliance_evidence_monthly")} 
+                  onClick={() => handleCheckout("compliance_evidence_monthly")}
                   className="w-full bg-[#0f172a] text-white font-bold py-3.5 rounded-xl hover:bg-[#1e293b] transition disabled:opacity-50"
                 >
                   {loadingProduct === "compliance_evidence_monthly" ? "Redirecting..." : "Select Plan"}
