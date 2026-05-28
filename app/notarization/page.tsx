@@ -335,12 +335,6 @@ export default function NotarizationPage() {
             </div>
             
             {step === 'select' && (
-            <>
-            {/* Billing-type column headers */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-4">
-              <div className="border-2 border-amber-400 rounded-xl py-3 text-center font-bold text-amber-500 uppercase tracking-wider text-sm">One Time</div>
-              <div className="md:col-span-2 border-2 border-blue-500 rounded-xl py-3 text-center font-bold text-blue-600 uppercase tracking-wider text-sm">Subscription (same price monthly)</div>
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-white p-10 rounded-3xl border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] hover:shadow-xl transition-all">
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">Single Document</h3>
@@ -410,7 +404,6 @@ export default function NotarizationPage() {
                 )}
               </div>
             </div>
-            </>
             )}
 
             {/* Step 2: Upload Document */}

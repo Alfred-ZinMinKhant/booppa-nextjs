@@ -244,7 +244,7 @@ export default function SolutionsVendorsPage() {
               <div className="w-8 h-8 rounded-full bg-[#3b82f6] flex items-center justify-center text-white text-xs font-black">2</div>
               <h2 className="text-2xl font-black text-[#0f172a]">Ongoing Subscriptions</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {/* Vendor Active */}
               <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm flex flex-col">
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">Vendor Active</h3>
