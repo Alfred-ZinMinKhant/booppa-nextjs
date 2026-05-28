@@ -27,6 +27,7 @@ function CheckItem({
 export default function EnterprisePage() {
 	const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
 	const [user, setUser] = useState<UserInfo | null>(null);
+	const [billingTab, setBillingTab] = useState<"one-time" | "subscription">("one-time");
 
 	useEffect(() => {
 		fetch("/api/auth/me")
@@ -102,6 +103,28 @@ export default function EnterprisePage() {
 						<p className="text-lg text-[#64748b] max-w-2xl mx-auto">Institutional-grade tools for teams that need verified trust.</p>
 					</div>
 
+					{/* Billing-type toggle */}
+					<div className="flex justify-center mb-12">
+						<div className="inline-flex items-center gap-1 p-1.5 rounded-full bg-white border border-[#e2e8f0]">
+							<button
+								type="button"
+								onClick={() => setBillingTab("one-time")}
+								className={`px-7 py-2.5 rounded-full text-sm font-bold transition-all ${billingTab === "one-time" ? "bg-[#10b981] text-white shadow-sm" : "text-[#64748b] hover:text-[#0f172a]"}`}
+							>
+								One-Time
+							</button>
+							<button
+								type="button"
+								onClick={() => setBillingTab("subscription")}
+								className={`px-7 py-2.5 rounded-full text-sm font-bold transition-all ${billingTab === "subscription" ? "bg-[#10b981] text-white shadow-sm" : "text-[#64748b] hover:text-[#0f172a]"}`}
+							>
+								Subscription
+							</button>
+						</div>
+					</div>
+
+					{/* One-Time packages */}
+					{billingTab === "one-time" && (
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {/* PDPA Quick Scan */}
                         <div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
@@ -147,7 +170,12 @@ export default function EnterprisePage() {
                                 {loadingProduct === "compliance_evidence_pack" ? "Redirecting..." : "Get Bundle — SGD 799 →"}
                             </button>
                         </div>
+                    </div>
+                    )}
 
+                    {/* Subscriptions */}
+                    {billingTab === "subscription" && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {/* Standard Suite */}
                         <div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
                             <div className="flex justify-between items-start mb-2">
@@ -223,6 +251,7 @@ export default function EnterprisePage() {
                             </Link>
                         </div>
                     </div>
+                    )}
 				</div>
 			</section>
 

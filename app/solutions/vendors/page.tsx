@@ -48,6 +48,7 @@ export default function SolutionsVendorsPage() {
   const [hasClaimedProfile, setHasClaimedProfile] = useState(false);
   const [stats, setStats] = useState({ vendorsIndexed: 0, verifiedEntities: 0, openTenders: 0 });
   const [loggedIn, setLoggedIn] = useState(false);
+  const [billingTab, setBillingTab] = useState<'one-time' | 'subscription'>('one-time');
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -150,7 +151,28 @@ export default function SolutionsVendorsPage() {
             </div>
           </div>
 
+          {/* Billing-type toggle */}
+          <div className="flex justify-center mb-12">
+            <div className="inline-flex items-center gap-1 p-1.5 rounded-full bg-[#f1f5f9] border border-[#e2e8f0]">
+              <button
+                type="button"
+                onClick={() => setBillingTab('one-time')}
+                className={`px-7 py-2.5 rounded-full text-sm font-bold transition-all ${billingTab === 'one-time' ? 'bg-[#10b981] text-white shadow-sm' : 'text-[#64748b] hover:text-[#0f172a]'}`}
+              >
+                One-Time
+              </button>
+              <button
+                type="button"
+                onClick={() => setBillingTab('subscription')}
+                className={`px-7 py-2.5 rounded-full text-sm font-bold transition-all ${billingTab === 'subscription' ? 'bg-[#10b981] text-white shadow-sm' : 'text-[#64748b] hover:text-[#0f172a]'}`}
+              >
+                Subscription
+              </button>
+            </div>
+          </div>
+
           {/* One-Time Packages */}
+          {billingTab === 'one-time' && (
           <div className="mb-20">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-8 h-8 rounded-full bg-[#10b981] flex items-center justify-center text-white text-xs font-black">1</div>
@@ -222,23 +244,12 @@ export default function SolutionsVendorsPage() {
                   Get Verified →
                 </Link>
               </div>
-
-              {/* Notarization */}
-              <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
-                <h3 className="text-xl font-bold text-[#0f172a] mb-2">Notarization</h3>
-                <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 69</div>
-                <p className="text-xs text-[#64748b] mb-6">Per document · Blockchain anchored</p>
-                <ul className="space-y-3 mb-8 flex-1">
-                  {["Immutable proof of content", "MAS-compliant evidence", "Shareable verification link", "QR code verification"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
-                </ul>
-                <Link href="/notarization" className="block w-full text-center border-2 border-[#0f172a] text-[#0f172a] font-bold py-3 rounded-xl hover:bg-[#0f172a] hover:text-white transition">
-                  Notarize Now
-                </Link>
-              </div>
             </div>
           </div>
+          )}
 
           {/* Subscriptions */}
+          {billingTab === 'subscription' && (
           <div>
             <div className="flex items-center gap-3 mb-8">
               <div className="w-8 h-8 rounded-full bg-[#3b82f6] flex items-center justify-center text-white text-xs font-black">2</div>
@@ -334,6 +345,7 @@ export default function SolutionsVendorsPage() {
               </div>
             </div>
           </div>
+          )}
 
         </div>
       </section>
