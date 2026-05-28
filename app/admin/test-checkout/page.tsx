@@ -29,6 +29,7 @@ const ONE_TIME: Sku[] = [
   { product_type: 'rfp_express', label: 'RFP Express', needsRfp: true },
   { product_type: 'rfp_complete', label: 'RFP Complete', needsRfp: true },
   { product_type: 'compliance_notarization_1', label: 'Notarization × 1' },
+  { product_type: 'notarization_addon_1', label: 'Extra Notarization (add-on) × 1' },
   { product_type: 'compliance_notarization_10', label: 'Notarization × 10' },
   { product_type: 'compliance_notarization_50', label: 'Notarization × 50' },
 ]

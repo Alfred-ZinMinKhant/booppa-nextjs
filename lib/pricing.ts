@@ -65,6 +65,20 @@ export const ONE_TIME_PRODUCTS: Record<string, Product> = {
       'Polygonscan URL',
     ],
   },
+  notarization_addon_1: {
+    id: 'notarization_addon_1',
+    name: 'Extra Notarization',
+    description: 'Top-up — 1 additional notarization when your plan allowance runs out',
+    price: 29,
+    currency: 'SGD',
+    type: 'one-time',
+    features: [
+      '1 additional notarization credit',
+      'Stacks on top of your monthly allowance',
+      'On-chain timestamped evidence (Polygon)',
+      'Never expires',
+    ],
+  },
   compliance_notarization_10: {
     id: 'compliance_notarization_10',
     name: 'Small Batch',

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { SUBSCRIPTION_PRODUCTS } from "@/lib/pricing";
+import { SUBSCRIPTION_PRODUCTS, ONE_TIME_PRODUCTS } from "@/lib/pricing";
 
 const BUYER_TIER_KEYS = ["buyer_starter_monthly", "buyer_pro_monthly", "buyer_enterprise_monthly"] as const;
 
@@ -172,6 +172,32 @@ export default function SolutionsProcurementPage() {
               );
             })}
           </div>
+
+          {/* Notarization top-up add-on */}
+          {(() => {
+            const addon = ONE_TIME_PRODUCTS.notarization_addon_1;
+            return (
+              <div className="mt-8 bg-white p-6 rounded-2xl border border-[#e2e8f0] shadow-sm flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="inline-block bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest">Add-On</span>
+                    <h3 className="text-lg font-bold text-[#0f172a]">{addon.name}</h3>
+                  </div>
+                  <p className="text-sm text-[#64748b]">{addon.description}. Need more this month? Add notarizations one at a time on top of your plan&apos;s included allowance.</p>
+                </div>
+                <div className="flex items-center gap-4 flex-shrink-0">
+                  <div className="text-2xl font-black text-[#0f172a]">SGD {addon.price}<span className="text-sm text-[#64748b] font-normal">/notarization</span></div>
+                  <button
+                    disabled={loadingProduct === "notarization_addon_1"}
+                    onClick={() => handleCheckout("notarization_addon_1")}
+                    className="bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl transition disabled:opacity-50 hover:bg-emerald-700 whitespace-nowrap"
+                  >
+                    {loadingProduct === "notarization_addon_1" ? "Redirecting..." : "Add +1"}
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 
