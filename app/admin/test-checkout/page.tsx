@@ -23,43 +23,44 @@ interface Sku {
   needsRfp?: boolean
 }
 
-const ONE_TIME: Sku[] = [
-  { product_type: 'pdpa_quick_scan', label: 'PDPA Quick Scan' },
+// One-time — For Vendors
+const ONE_TIME_VENDORS: Sku[] = [
   { product_type: 'vendor_proof', label: 'Vendor Proof' },
-  { product_type: 'rfp_express', label: 'RFP Express', needsRfp: true },
+  { product_type: 'pdpa_quick_scan', label: 'PDPA Snapshot' },
   { product_type: 'rfp_complete', label: 'RFP Complete', needsRfp: true },
-  { product_type: 'compliance_notarization_1', label: 'Notarization × 1' },
-  { product_type: 'notarization_addon_1', label: 'Extra Notarization (add-on) × 1' },
-  { product_type: 'compliance_notarization_10', label: 'Notarization × 10' },
-  { product_type: 'compliance_notarization_50', label: 'Notarization × 50' },
+  { product_type: 'compliance_evidence_pack', label: 'Compliance Bundle' },
+  { product_type: 'compliance_notarization_1', label: 'Notarization (1 doc)' },
 ]
 
-const BUNDLES: Sku[] = [
-  { product_type: 'vendor_trust_pack', label: 'Vendor Trust Pack' },
-  { product_type: 'rfp_accelerator', label: 'RFP Accelerator' },
-  { product_type: 'enterprise_bid_kit', label: 'Enterprise Bid Kit' },
-  { product_type: 'compliance_evidence_pack', label: 'Compliance Evidence Pack' },
+// One-time — For Buyers
+const ONE_TIME_BUYERS: Sku[] = [
+  { product_type: 'notarization_addon_1', label: 'Extra Notarization' },
 ]
 
-const SUBSCRIPTIONS: Sku[] = [
+// Subscriptions — For Vendors
+const SUBS_VENDORS: Sku[] = [
   { product_type: 'vendor_active_monthly', label: 'Vendor Active — monthly' },
   { product_type: 'vendor_active_annual', label: 'Vendor Active — annual' },
   { product_type: 'vendor_pro_monthly', label: 'Vendor Pro — monthly' },
   { product_type: 'vendor_pro_annual', label: 'Vendor Pro — annual' },
   { product_type: 'pdpa_monitor_monthly', label: 'PDPA Monitor — monthly' },
-  { product_type: 'pdpa_monitor_annual', label: 'PDPA Monitor — annual' },
   { product_type: 'compliance_evidence_monthly', label: 'Compliance Evidence — monthly' },
   { product_type: 'tender_intelligence_monthly', label: 'Tender Intelligence — monthly' },
   { product_type: 'tender_intelligence_annual', label: 'Tender Intelligence — annual' },
+  { product_type: 'compliance_notarization_10', label: 'Small Batch — 10 notarizations/mo' },
+  { product_type: 'compliance_notarization_50', label: 'Enterprise Batch — 50 notarizations/mo' },
+]
+
+// Subscriptions — For Buyers
+const SUBS_BUYERS: Sku[] = [
   { product_type: 'buyer_starter_monthly', label: 'Buyer Essentials — monthly' },
-  { product_type: 'buyer_starter_annual', label: 'Buyer Essentials — annual' },
   { product_type: 'buyer_pro_monthly', label: 'Buyer Professional — monthly' },
-  { product_type: 'buyer_pro_annual', label: 'Buyer Professional — annual' },
   { product_type: 'buyer_enterprise_monthly', label: 'Buyer Enterprise — monthly' },
-  { product_type: 'buyer_enterprise_annual', label: 'Buyer Enterprise — annual' },
   { product_type: 'notana_document_monthly', label: 'Notana Document (Add-On) — monthly' },
-  { product_type: 'enterprise_monthly', label: 'Enterprise — monthly' },
-  { product_type: 'enterprise_pro_monthly', label: 'Enterprise Pro — monthly' },
+]
+
+// Subscriptions — For Enterprise
+const SUBS_ENTERPRISE: Sku[] = [
   { product_type: 'standard_suite_monthly', label: 'Standard Suite — monthly' },
   { product_type: 'pro_suite_monthly', label: 'Pro Suite — monthly' },
 ]
@@ -216,19 +217,29 @@ export default function AdminTestCheckoutPage() {
         </div>
       )}
 
-      <Section title="One-time products">
-        {ONE_TIME.map(renderRow)}
-      </Section>
+      <SectionGroup title="One-Time Products">
+        <Section title="For Vendors">
+          {ONE_TIME_VENDORS.map(renderRow)}
+        </Section>
+        <Section title="For Buyers">
+          {ONE_TIME_BUYERS.map(renderRow)}
+        </Section>
+      </SectionGroup>
 
-      <Section title="Bundles">
-        {BUNDLES.map(renderRow)}
-      </Section>
+      <SectionGroup title="Subscriptions">
+        <Section title="For Vendors">
+          {SUBS_VENDORS.map(renderRow)}
+        </Section>
+        <Section title="For Buyers">
+          {SUBS_BUYERS.map(renderRow)}
+        </Section>
+        <Section title="For Enterprise">
+          {SUBS_ENTERPRISE.map(renderRow)}
+        </Section>
+      </SectionGroup>
 
-      <Section title="Subscriptions">
-        {SUBSCRIPTIONS.map(renderRow)}
-      </Section>
-
-      <Section title="Recent simulations">
+      <SectionGroup title="Recent Simulations">
+        <Section title="Last 10">
         {history.length === 0 ? (
           <p className="py-4 text-sm text-neutral-500">No simulations yet.</p>
         ) : (
@@ -254,15 +265,25 @@ export default function AdminTestCheckoutPage() {
             ))}
           </div>
         )}
-      </Section>
+        </Section>
+      </SectionGroup>
+    </div>
+  )
+}
+
+function SectionGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-10">
+      <h2 className="text-base font-black uppercase tracking-widest text-neutral-200 mb-4 pb-2 border-b border-neutral-700">{title}</h2>
+      {children}
     </div>
   )
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mb-8">
-      <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-2">{title}</h2>
+    <div className="mb-6">
+      <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">{title}</h3>
       <div className="rounded-lg border border-neutral-800 bg-neutral-900/30 px-4">
         {children}
       </div>
