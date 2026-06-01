@@ -280,13 +280,13 @@ export default function PDPAPage() {
 								Subscription alternative
 							</p>
 							<h3 className="text-xl font-bold text-[#0f172a] mb-1">
-								PDPA Monitor — SGD 49/mo
+								PDPA Monitor — SGD 299/mo
 							</h3>
 							<p className="text-sm text-[#475569] mb-3">
 								Instead of a one-off scan, get{" "}
 								<strong>quarterly automatic re-scans</strong> (SGD 79 value
 								each), monthly PDPC regulatory alerts, and a running compliance
-								score chart — all for less than one standalone scan per month.
+								score chart — continuous evidence for buyers and regulators.
 							</p>
 							<ul className="text-sm text-[#475569] space-y-1">
 								<li>
@@ -296,7 +296,7 @@ export default function PDPAPage() {
 								<li>✓ Monthly plain-language PDPC guideline alerts</li>
 								<li>✓ Always-current PDF ready to share with buyers</li>
 								<li className="text-blue-600 font-medium">
-									Annual plan: SGD 490/yr — saves SGD 98
+									Annual plan: SGD 2,990/yr — saves SGD 598
 								</li>
 							</ul>
 						</div>
@@ -308,14 +308,14 @@ export default function PDPAPage() {
 										onClick={() => startPdpaCheckout("pdpa_monitor_monthly")}
 										className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition text-sm whitespace-nowrap"
 									>
-										Subscribe — SGD 49/mo
+										Subscribe — SGD 299/mo
 									</button>
 									<button
 										type="button"
 										onClick={() => startPdpaCheckout("pdpa_monitor_annual")}
 										className="px-6 py-3 border border-blue-400 text-blue-600 hover:bg-blue-100 font-semibold rounded-xl transition text-sm whitespace-nowrap"
 									>
-										Annual — SGD 490/yr
+										Annual — SGD 2,990/yr
 									</button>
 								</>
 							) : (

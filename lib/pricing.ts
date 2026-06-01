@@ -115,21 +115,6 @@ export const ONE_TIME_PRODUCTS: Record<string, Product> = {
       'Dedicated support',
     ],
   },
-  rfp_express: {
-    id: 'rfp_express',
-    name: 'RFP Express',
-    description: 'AI-generated tender readiness kit — delivered in minutes',
-    price: 249,
-    currency: 'SGD',
-    type: 'one-time',
-    features: [
-      'Tender Readiness Score (0–100)',
-      'Structured evidence checklist PDF',
-      'Strategy 6 fires — sector shortlist alert',
-      'Blockchain-anchored',
-      'AutoActivation counter +1',
-    ],
-  },
   rfp_complete: {
     id: 'rfp_complete',
     name: 'RFP Complete',
@@ -263,8 +248,8 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
     id: 'pdpa_monitor_monthly',
     name: 'PDPA Monitor',
     description: 'Quarterly automatic re-scans + monthly regulatory alerts',
-    price: 49,
-    priceAnnual: 490,
+    price: 299,
+    priceAnnual: 2990,
     currency: 'SGD',
     type: 'subscription',
     features: [
@@ -278,12 +263,12 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
     id: 'pdpa_monitor_annual',
     name: 'PDPA Monitor (Annual)',
     description: 'Annual PDPA Monitor — 2 months free',
-    price: 490,
+    price: 2990,
     currency: 'SGD',
     type: 'subscription',
     features: [
       'Everything in monthly',
-      'SGD 40.83/mo effective (save SGD 98)',
+      'SGD 249.17/mo effective (save SGD 598)',
     ],
   },
   enterprise_monthly: {
@@ -395,21 +380,6 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
     features: [
       'Everything in monthly',
       'SGD 679.17/mo effective (save SGD 1,438)',
-    ],
-  },
-  notana_document_monthly: {
-    id: 'notana_document_monthly',
-    name: 'Notana Document',
-    description: 'Notarisation add-on for buyers who need certified vendor documents',
-    price: 199,
-    currency: 'SGD',
-    type: 'subscription',
-    badge: 'Add-On',
-    features: [
-      '10 buyer-initiated notarisations / month',
-      'On-chain timestamped evidence (Polygon Amoy)',
-      'Attach to any Buyer plan',
-      'Independent hash verification report',
     ],
   },
   enterprise_pro_monthly: {

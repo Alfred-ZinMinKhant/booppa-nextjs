@@ -1,9 +1,21 @@
 'use client'
 
-import { Suspense, useState, FormEvent } from 'react'
+import { Suspense, useEffect, useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Shield, Mail, Lock, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Shield, Mail, Lock, AlertCircle, Loader2, Eye, EyeOff, Globe } from 'lucide-react'
+
+interface SsoOption {
+  org_slug: string
+  org_name: string
+  protocol: 'saml' | 'oidc'
+  login_url: string | null
+}
+
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  'https://api.booppa.io'
 
 function LoginForm() {
   const router = useRouter()
@@ -13,6 +25,23 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [ssoOptions, setSsoOptions] = useState<SsoOption[]>([])
+
+  // Debounced SSO discovery: as the user types their email, ask the backend
+  // whether their org has SSO configured. Only fires once we have a "@" + 3 chars.
+  useEffect(() => {
+    if (!email || !email.includes('@') || email.length < 5) {
+      setSsoOptions([])
+      return
+    }
+    const handle = setTimeout(() => {
+      fetch(`/api/sso-discover?email=${encodeURIComponent(email)}`, { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : { options: [] })
+        .then((d: { options: SsoOption[] }) => setSsoOptions(d.options || []))
+        .catch(() => setSsoOptions([]))
+    }, 350)
+    return () => clearTimeout(handle)
+  }, [email])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -129,6 +158,27 @@ function LoginForm() {
               {loading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
+
+          {ssoOptions.length > 0 && (
+            <div className="mt-5 pt-5 border-t border-neutral-800 space-y-2">
+              {ssoOptions.map(opt => (
+                opt.login_url ? (
+                  <a
+                    key={opt.org_slug}
+                    href={`${API_BASE}${opt.login_url}`}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold py-2.5 rounded-lg transition text-sm"
+                  >
+                    <Globe className="h-4 w-4 text-emerald-400" />
+                    Continue with {opt.org_name} SSO
+                  </a>
+                ) : (
+                  <p key={opt.org_slug} className="text-xs text-neutral-500 text-center">
+                    {opt.org_name} uses {opt.protocol.toUpperCase()} SSO — start from your identity provider portal.
+                  </p>
+                )
+              ))}
+            </div>
+          )}
 
           <p className="text-center text-neutral-400 text-sm mt-6">
             No account?{' '}

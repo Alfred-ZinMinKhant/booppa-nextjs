@@ -56,7 +56,6 @@ const SUBS_BUYERS: Sku[] = [
   { product_type: 'buyer_starter_monthly', label: 'Buyer Essentials — monthly' },
   { product_type: 'buyer_pro_monthly', label: 'Buyer Professional — monthly' },
   { product_type: 'buyer_enterprise_monthly', label: 'Buyer Enterprise — monthly' },
-  { product_type: 'notana_document_monthly', label: 'Notana Document (Add-On) — monthly' },
 ]
 
 // Subscriptions — For Enterprise

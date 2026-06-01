@@ -64,7 +64,7 @@ export default function CompliancePage() {
               <div className="bg-white p-10 rounded-3xl border-2 border-[#10b981] shadow-xl relative scale-105 z-10 hover:translate-y-[-5px] hover:shadow-2xl transition-all">
                 <div className="absolute top-[-15px] right-6 bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Most Popular</div>
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Monitor</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 49<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 299<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
                 <p className="text-sm text-[#64748b] mb-8">Continuous monitoring with quarterly re-scans</p>
 
                 <ul className="space-y-4 mb-8">
@@ -74,7 +74,7 @@ export default function CompliancePage() {
                     'Monthly PDPC regulatory alerts',
                     'Running compliance score chart',
                     'Always-current PDF for buyers',
-                    'Annual plan: SGD 490 (2 months free)',
+                    'Annual plan: SGD 2,990 (2 months free)',
                   ].map((feature, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-[#64748b]">
                       <span className="text-[#10b981] font-bold">✓</span>
@@ -88,7 +88,7 @@ export default function CompliancePage() {
                 </p>
 
                 <Link href="/pricing" className="block text-center px-6 py-3 bg-[#10b981] hover:bg-[#059669] text-white font-bold rounded-xl transition-colors w-full">
-                  Subscribe — SGD 49/mo
+                  Subscribe — SGD 299/mo
                 </Link>
               </div>
 

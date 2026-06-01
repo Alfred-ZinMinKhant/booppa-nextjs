@@ -920,7 +920,7 @@ export default function VendorDashboard() {
 								</ul>
 								{!vendorState?.activeSubscriptions?.some(s => s.startsWith("pdpa_monitor")) && (
 									<Link href="/pdpa" className="w-full text-center py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold transition">
-										Activate — S$49/mo
+										Activate — S$299/mo
 									</Link>
 								)}
 							</div>

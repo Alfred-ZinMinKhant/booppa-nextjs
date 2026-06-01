@@ -336,7 +336,14 @@ export default function PricingPage() {
 											onClick={() => handleCheckout("vendor_active_monthly")} 
 											className="w-full border-2 border-blue-500 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-500 hover:text-white transition disabled:opacity-50"
 										>
-											{loadingProduct === "vendor_active_monthly" ? "Redirecting..." : "Subscribe"}
+											{loadingProduct === "vendor_active_monthly" ? "Redirecting..." : "Subscribe (SGD 39/mo)"}
+										</button>
+										<button
+											disabled={loadingProduct === "vendor_active_annual"}
+											onClick={() => handleCheckout("vendor_active_annual")}
+											className="w-full mt-2 border border-blue-500 text-blue-600 font-semibold py-2 rounded-xl hover:bg-blue-50 transition disabled:opacity-50 text-sm"
+										>
+											{loadingProduct === "vendor_active_annual" ? "Redirecting..." : "Annual SGD 390 · save 2 mo"}
 										</button>
 									</div>
 
@@ -386,7 +393,14 @@ export default function PricingPage() {
 											onClick={() => handleCheckout("pdpa_monitor_monthly")} 
 											className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-600/20 disabled:opacity-50"
 										>
-											{loadingProduct === "pdpa_monitor_monthly" ? "Redirecting..." : "Start Monitoring"}
+											{loadingProduct === "pdpa_monitor_monthly" ? "Redirecting..." : "Start Monitoring (SGD 299/mo)"}
+										</button>
+										<button
+											disabled={loadingProduct === "pdpa_monitor_annual"}
+											onClick={() => handleCheckout("pdpa_monitor_annual")}
+											className="w-full mt-2 border border-blue-500 text-blue-600 font-semibold py-2 rounded-xl hover:bg-blue-50 transition disabled:opacity-50 text-sm"
+										>
+											{loadingProduct === "pdpa_monitor_annual" ? "Redirecting..." : "Annual SGD 2,990 · save 2 mo"}
 										</button>
 									</div>
 
@@ -463,6 +477,10 @@ export default function PricingPage() {
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 								{BUYER_TIER_KEYS.map((key) => {
 									const p = SUBSCRIPTION_PRODUCTS[key];
+									const annualKey = key.replace("_monthly", "_annual") as keyof typeof SUBSCRIPTION_PRODUCTS;
+									const annualPrice = (p as { priceAnnual?: number }).priceAnnual
+										?? (SUBSCRIPTION_PRODUCTS[annualKey] as { price?: number } | undefined)?.price;
+									const annualSavings = annualPrice ? (p.price * 12 - annualPrice) : 0;
 									const isFeatured = key === "buyer_pro_monthly";
 									const accent = isFeatured ? "text-blue-600" : "text-[#0f172a]";
 									const cardBorder = isFeatured ? "border-2 border-blue-500 shadow-md" : "border border-[#e2e8f0] shadow-sm";
@@ -483,39 +501,24 @@ export default function PricingPage() {
 												onClick={() => handleCheckout(key)}
 												className={`w-full ${btnBg} text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50`}
 											>
-												{loadingProduct === key ? "Redirecting..." : "Select Plan"}
+												{loadingProduct === key ? "Redirecting..." : `Subscribe (SGD ${p.price}/mo)`}
 											</button>
+											{annualPrice && (
+												<button
+													disabled={loadingProduct === annualKey}
+													onClick={() => handleCheckout(annualKey)}
+													className={`w-full mt-2 border ${isFeatured ? "border-blue-500 text-blue-600 hover:bg-blue-50" : "border-[#0f172a] text-[#0f172a] hover:bg-[#f1f5f9]"} font-semibold py-2 rounded-xl transition disabled:opacity-50 text-sm`}
+												>
+													{loadingProduct === annualKey
+														? "Redirecting..."
+														: `Annual SGD ${annualPrice.toLocaleString()}${annualSavings > 0 ? ` · save SGD ${annualSavings.toLocaleString()}` : ""}`}
+												</button>
+											)}
 										</div>
 									);
 								})}
 							</div>
 
-							{/* Notana Document Add-On */}
-							{(() => {
-								const addon = SUBSCRIPTION_PRODUCTS.notana_document_monthly;
-								return (
-									<div className="mt-12 bg-gradient-to-r from-amber-50 to-white p-8 rounded-[2rem] border border-amber-200 flex flex-col md:flex-row md:items-center gap-6">
-										<div className="flex-1">
-											<div className="inline-block bg-amber-500 text-white px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-2">{addon.badge}</div>
-											<h3 className="text-2xl font-black text-[#0f172a] mb-2">{addon.name} — for buyers who need certified vendor documents</h3>
-											<p className="text-sm text-[#64748b] mb-3">Notarisations are a Vendor tool by default. Add Notana Document to any Buyer plan if your procurement workflow requires buyer-initiated notarisation of vendor evidence.</p>
-											<ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-												{addon.features.map(f => <CheckItem key={f} text={f} color="text-amber-600" />)}
-											</ul>
-										</div>
-										<div className="flex-shrink-0 text-center md:text-right">
-											<div className="text-3xl font-black text-[#0f172a] mb-1">SGD {addon.price}<span className="text-base text-[#64748b] font-normal">/mo</span></div>
-											<button
-												disabled={loadingProduct === "notana_document_monthly"}
-												onClick={() => handleCheckout("notana_document_monthly")}
-												className="bg-amber-600 text-white font-bold px-6 py-3 rounded-xl transition disabled:opacity-50 hover:bg-amber-700"
-											>
-												{loadingProduct === "notana_document_monthly" ? "Redirecting..." : "Add to Plan"}
-											</button>
-										</div>
-									</div>
-								);
-							})()}
 						</div>
 					)}
 

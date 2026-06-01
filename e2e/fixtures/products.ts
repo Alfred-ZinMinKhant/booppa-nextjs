@@ -24,7 +24,6 @@ export interface SkuCase {
 export const ONE_TIME: SkuCase[] = [
   { productType: 'pdpa_quick_scan', mode: 'payment', family: 'one_time', buyButtonPath: '/pricing' },
   { productType: 'vendor_proof', mode: 'payment', family: 'one_time', buyButtonPath: '/vendor-proof' },
-  { productType: 'rfp_express', mode: 'payment', family: 'one_time', buyButtonPath: '/pricing', rfpDescription: 'Cloud migration for SG retail' },
   { productType: 'rfp_complete', mode: 'payment', family: 'one_time', buyButtonPath: '/pricing', rfpDescription: 'Enterprise CRM revamp' },
   { productType: 'compliance_notarization_1', mode: 'payment', family: 'one_time', buyButtonPath: '/notarization' },
   { productType: 'compliance_notarization_10', mode: 'payment', family: 'one_time', buyButtonPath: '/notarization' },
@@ -51,14 +50,13 @@ export const SUBSCRIPTIONS: SkuCase[] = [
   'evaluate_suppliers_monthly',
   'verify_supplier_evidence_monthly',
   'compliance_evidence_monthly',
-  // New buyer ladder (replaces legacy keys above) + Notana Document add-on.
+  // New buyer ladder (replaces legacy keys above).
   'buyer_starter_monthly',
   'buyer_starter_annual',
   'buyer_pro_monthly',
   'buyer_pro_annual',
   'buyer_enterprise_monthly',
   'buyer_enterprise_annual',
-  'notana_document_monthly',
   'tender_intelligence_monthly',
   'tender_intelligence_annual',
   'vendor_pro_monthly',

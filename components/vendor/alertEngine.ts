@@ -69,12 +69,12 @@ export const PRODUCTS: Record<string, Product> = {
     colorBg: "rgba(139,92,246,0.08)",
     colorBorder: "rgba(139,92,246,0.2)",
   },
-  rfp_express: {
-    id: "rfp_express",
-    name: "RFP Express",
-    price: "S$249",
+  rfp_complete: {
+    id: "rfp_complete",
+    name: "RFP Complete",
+    price: "S$599",
     priceNote: "one-time",
-    href: "/rfp-acceleration",
+    href: "/pricing",
     icon: "\u{1F4CB}",
     color: "#f59e0b",
     colorBg: "rgba(245,158,11,0.08)",
@@ -105,7 +105,7 @@ export const PRODUCTS: Record<string, Product> = {
   pdpa_monitor: {
     id: "pdpa_monitor",
     name: "PDPA Monitor",
-    price: "S$49",
+    price: "S$299",
     priceNote: "/month",
     href: "/pricing",
     icon: "\u{1F4E1}",
@@ -170,11 +170,11 @@ export function generateAlerts(vendor: VendorState): Alert[] {
     alerts.push({
       id: "rfp_missing",
       priority: "high",
-      productId: "rfp_express",
+      productId: "rfp_complete",
       headline: "No RFP evidence package \u2014 you can\u2019t respond competitively",
       detail: "GeBIZ agencies expect a structured compliance response. Without an RFP kit, your submissions are scored lower than vendors who have one.",
-      cta: "Get RFP Express \u2014 S$249",
-      ctaHref: "/rfp-acceleration",
+      cta: "Get RFP Complete \u2014 S$599",
+      ctaHref: "/pricing",
     });
   }
 
@@ -212,7 +212,7 @@ export function generateAlerts(vendor: VendorState): Alert[] {
       productId: "pdpa_monitor",
       headline: "Your PDPA scan will expire \u2014 keep it current automatically",
       detail: "Buyers check scan dates. A scan older than 6 months raises flags. PDPA Monitor re-scans quarterly so your report is always fresh.",
-      cta: "Subscribe \u2014 S$49/month",
+      cta: "Subscribe \u2014 S$299/month",
       ctaHref: "/pricing",
     });
   }

@@ -24,17 +24,17 @@ test.describe('Pricing page', () => {
     await expect(page.locator('text=/Enterprise/i').first()).toBeVisible()
   })
 
-  test('buyer tab shows new three-tier ladder with Notana add-on', async ({ page }) => {
+  test('buyer tab shows new three-tier ladder', async ({ page }) => {
     await mockAuthAsLoggedIn(page)
     await page.goto('/pricing')
     await page.getByRole('button', { name: /For Buyers/i }).click()
     await expect(page.locator('text=/Buyer Starter/i')).toBeVisible()
     await expect(page.locator('text=/Buyer Pro/i')).toBeVisible()
     await expect(page.locator('text=/Buyer Enterprise/i')).toBeVisible()
-    await expect(page.locator('text=/Notana Document/i')).toBeVisible()
     // The deprecated tier names should be gone.
     await expect(page.locator('text=/Evaluate Your Suppliers/i')).toHaveCount(0)
     await expect(page.locator('text=/Verify Supplier Evidence/i')).toHaveCount(0)
+    await expect(page.locator('text=/Notana Document/i')).toHaveCount(0)
   })
 
   test('buyer tab no longer bundles notarisations into base tiers', async ({ page }) => {

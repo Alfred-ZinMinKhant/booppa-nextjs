@@ -2,23 +2,34 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Globe, AlertCircle, Loader2, ArrowLeft, ShieldCheck, AlertTriangle } from 'lucide-react'
+import { Globe, AlertCircle, Loader2, ArrowLeft, ShieldCheck, Copy, Check } from 'lucide-react'
+
+interface Organisation {
+  id: string
+  name: string
+  slug: string
+  tier: string
+}
 
 interface SsoState {
-  configured?: boolean
+  configured: boolean
+  organisation_id: string
   protocol?: 'saml' | 'oidc'
+  is_active?: boolean
   idp_metadata_url?: string | null
-  has_idp_metadata_xml?: boolean
-  sp_entity_id?: string | null
-  oidc_issuer?: string | null
+  idp_entity_id?: string | null
   oidc_client_id?: string | null
+  oidc_discovery_url?: string | null
   has_oidc_client_secret?: boolean
-  allowed_email_domain?: string | null
-  enabled?: boolean
+  acs_url?: string | null
+  metadata_url?: string | null
+  login_url?: string | null
   updated_at?: string | null
 }
 
 export default function SsoPage() {
+  const [orgs, setOrgs] = useState<Organisation[]>([])
+  const [orgId, setOrgId] = useState<string>('')
   const [state, setState] = useState<SsoState | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -28,62 +39,120 @@ export default function SsoPage() {
   // form
   const [protocol, setProtocol] = useState<'saml' | 'oidc'>('saml')
   const [idpMetadataUrl, setIdpMetadataUrl] = useState('')
-  const [idpMetadataXml, setIdpMetadataXml] = useState('')
-  const [spEntityId, setSpEntityId] = useState('')
-  const [oidcIssuer, setOidcIssuer] = useState('')
+  const [idpEntityId, setIdpEntityId] = useState('')
   const [oidcClientId, setOidcClientId] = useState('')
   const [oidcClientSecret, setOidcClientSecret] = useState('')
-  const [allowedDomain, setAllowedDomain] = useState('')
-  const [enabled, setEnabled] = useState(false)
+  const [oidcDiscoveryUrl, setOidcDiscoveryUrl] = useState('')
+  const [isActive, setIsActive] = useState(false)
 
+  // Load orgs the user belongs to.
   useEffect(() => {
-    fetch('/api/vendor/sso', { cache: 'no-store' })
+    fetch('/api/enterprise/organisations', { cache: 'no-store' })
+      .then(async r => {
+        if (!r.ok) {
+          const d = await r.json().catch(() => ({}))
+          throw new Error(d?.error || `Failed to load organisations (${r.status})`)
+        }
+        return r.json()
+      })
+      .then((data: Organisation[]) => {
+        setOrgs(data)
+        if (data.length > 0) setOrgId(data[0].id)
+        else setLoading(false)
+      })
+      .catch((e: Error) => {
+        setError(e.message)
+        setLoading(false)
+      })
+  }, [])
+
+  // Load current SSO config for the selected org.
+  useEffect(() => {
+    if (!orgId) return
+    setLoading(true)
+    setInfo(''); setError('')
+    fetch(`/api/enterprise/sso?org_id=${encodeURIComponent(orgId)}`, { cache: 'no-store' })
       .then(async r => {
         const d = await r.json()
-        if (!r.ok) { setError(d?.detail || `Failed (${r.status})`); return }
+        if (!r.ok) { setError(d?.detail || d?.error || `Failed (${r.status})`); return }
         setState(d)
         if (d.configured) {
           setProtocol(d.protocol)
           setIdpMetadataUrl(d.idp_metadata_url || '')
-          setSpEntityId(d.sp_entity_id || '')
-          setOidcIssuer(d.oidc_issuer || '')
+          setIdpEntityId(d.idp_entity_id || '')
           setOidcClientId(d.oidc_client_id || '')
-          setAllowedDomain(d.allowed_email_domain || '')
-          setEnabled(!!d.enabled)
+          setOidcDiscoveryUrl(d.oidc_discovery_url || '')
+          setIsActive(!!d.is_active)
+        } else {
+          setProtocol('saml')
+          setIdpMetadataUrl('')
+          setIdpEntityId('')
+          setOidcClientId('')
+          setOidcDiscoveryUrl('')
+          setOidcClientSecret('')
+          setIsActive(false)
         }
       })
       .finally(() => setLoading(false))
-  }, [])
+  }, [orgId])
 
   const save = async () => {
     setSaving(true)
     setError(''); setInfo('')
     try {
-      const r = await fetch('/api/vendor/sso', {
+      const payload: Record<string, unknown> = {
+        protocol,
+        is_active: isActive,
+      }
+      if (protocol === 'saml') {
+        payload.idp_metadata_url = idpMetadataUrl.trim() || null
+        payload.idp_entity_id = idpEntityId.trim() || null
+      } else {
+        payload.discovery_url = oidcDiscoveryUrl.trim() || null
+        payload.client_id = oidcClientId.trim() || null
+        if (oidcClientSecret.trim()) payload.client_secret = oidcClientSecret.trim()
+      }
+
+      const r = await fetch(`/api/enterprise/sso?org_id=${encodeURIComponent(orgId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          protocol,
-          idp_metadata_url: protocol === 'saml' ? (idpMetadataUrl.trim() || null) : null,
-          idp_metadata_xml: protocol === 'saml' ? (idpMetadataXml.trim() || null) : null,
-          sp_entity_id: protocol === 'saml' ? (spEntityId.trim() || null) : null,
-          oidc_issuer: protocol === 'oidc' ? (oidcIssuer.trim() || null) : null,
-          oidc_client_id: protocol === 'oidc' ? (oidcClientId.trim() || null) : null,
-          oidc_client_secret: protocol === 'oidc' ? (oidcClientSecret.trim() || null) : null,
-          allowed_email_domain: allowedDomain.trim() || null,
-          enabled,
-        }),
+        body: JSON.stringify(payload),
       })
       const d = await r.json()
-      if (!r.ok) { setError(d?.detail || `Failed (${r.status})`); return }
+      if (!r.ok) { setError(d?.detail || d?.error || `Failed (${r.status})`); return }
+      // Merge the response (which carries acs_url + metadata_url) into state.
+      setState(prev => ({ ...(prev || { configured: true, organisation_id: orgId }), ...d, configured: true }))
       setInfo('SSO configuration saved.')
     } finally {
       setSaving(false)
     }
   }
 
-  if (loading) {
+  if (loading && orgs.length === 0 && !error) {
     return <main className="min-h-screen bg-neutral-950 flex items-center justify-center"><Loader2 className="h-6 w-6 text-emerald-400 animate-spin" /></main>
+  }
+
+  if (orgs.length === 0) {
+    return (
+      <main className="min-h-screen bg-neutral-950 p-6">
+        <div className="max-w-3xl mx-auto">
+          <Link href="/vendor/subscription" className="text-sm text-neutral-400 hover:text-white inline-flex items-center gap-1">
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to subscription
+          </Link>
+          <div className="mt-6 bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+            <h1 className="text-xl font-bold text-white mb-2">No enterprise organisation</h1>
+            <p className="text-sm text-neutral-400">
+              SSO is available on Pro Suite. Activate an organisation first.
+            </p>
+            {error && (
+              <div className="mt-4 flex items-center gap-2 text-red-400 text-sm">
+                <AlertCircle className="h-4 w-4" /> {error}
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -102,17 +171,18 @@ export default function SsoPage() {
           </p>
         </div>
 
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-3 flex items-start gap-2 text-sm">
-          <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
-          <div className="text-amber-200/90">
-            <p className="font-semibold mb-0.5">Beta — config storage only</p>
-            <p className="text-xs text-amber-200/70">
-              SSO config can be saved here, but assertion verification (SAML ACS, OIDC callback)
-              is stubbed pending <code>python3-saml</code> / <code>authlib</code> integration.
-              Don&apos;t enable in production until that&apos;s wired.
-            </p>
+        {orgs.length > 1 && (
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
+            <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Organisation</label>
+            <select
+              value={orgId}
+              onChange={e => setOrgId(e.target.value)}
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white"
+            >
+              {orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+            </select>
           </div>
-        </div>
+        )}
 
         {error && (
           <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2.5">
@@ -149,42 +219,34 @@ export default function SsoPage() {
           {protocol === 'saml' ? (
             <>
               <Field label="IdP metadata URL" value={idpMetadataUrl} onChange={setIdpMetadataUrl} placeholder="https://idp.example.com/saml/metadata" />
-              <FieldArea label="IdP metadata XML (alternative — paste directly)" value={idpMetadataXml} onChange={setIdpMetadataXml} placeholder="<EntityDescriptor …>" />
-              <Field label="Service-provider entity ID (yours)" value={spEntityId} onChange={setSpEntityId} placeholder="https://booppa.io/sso/yourtenant" />
-              <div className="text-xs text-neutral-500 bg-neutral-950 border border-neutral-800 rounded p-3 font-mono">
-                ACS URL to configure on your IdP: <span className="text-emerald-400 break-all">https://api.booppa.io/api/v1/vendor/sso/acs</span>
-              </div>
+              <Field label="IdP entity ID (optional)" value={idpEntityId} onChange={setIdpEntityId} placeholder="https://idp.example.com" />
+              {state?.configured && state.protocol === 'saml' && (
+                <div className="space-y-2">
+                  <UrlRow label="ACS URL (configure on your IdP)" value={state.acs_url} />
+                  <UrlRow label="SP metadata URL (paste into your IdP)" value={state.metadata_url} />
+                  <UrlRow label="SP-initiated login URL" value={state.login_url} />
+                </div>
+              )}
             </>
           ) : (
             <>
-              <Field label="Issuer URL" value={oidcIssuer} onChange={setOidcIssuer} placeholder="https://login.example.com" />
+              <Field label="OIDC discovery URL" value={oidcDiscoveryUrl} onChange={setOidcDiscoveryUrl} placeholder="https://login.example.com/.well-known/openid-configuration" />
               <Field label="Client ID" value={oidcClientId} onChange={setOidcClientId} />
               <Field label="Client secret" value={oidcClientSecret} onChange={setOidcClientSecret} type="password" placeholder={state?.has_oidc_client_secret ? '••••••••' : ''} />
-              <div className="text-xs text-neutral-500 bg-neutral-950 border border-neutral-800 rounded p-3 font-mono">
-                Callback URL to register with your IdP: <span className="text-emerald-400 break-all">https://api.booppa.io/api/v1/vendor/sso/oidc/callback</span>
-              </div>
             </>
           )}
-
-          <Field
-            label="Allowed email domain"
-            value={allowedDomain}
-            onChange={setAllowedDomain}
-            placeholder="example.com"
-            hint="New users from this domain are auto-attached to your tenant on first SSO login."
-          />
 
           <div className="flex items-center justify-between border-t border-neutral-800 pt-4">
             <div>
               <p className="text-sm text-white font-semibold">Enable SSO for this tenant</p>
-              <p className="text-xs text-neutral-500">When enabled, password login is disabled for users in your allowed domain.</p>
+              <p className="text-xs text-neutral-500">When enabled, the SP-initiated login URL above will accept logins.</p>
             </div>
             <button
               type="button"
-              onClick={() => setEnabled(!enabled)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${enabled ? 'bg-emerald-500' : 'bg-neutral-700'}`}
+              onClick={() => setIsActive(!isActive)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${isActive ? 'bg-emerald-500' : 'bg-neutral-700'}`}
             >
-              <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
+              <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${isActive ? 'translate-x-6' : 'translate-x-1'}`} />
             </button>
           </div>
 
@@ -221,19 +283,30 @@ function Field({ label, value, onChange, placeholder, type, hint }: {
   )
 }
 
-function FieldArea({ label, value, onChange, placeholder }: {
-  label: string; value: string; onChange: (v: string) => void; placeholder?: string
-}) {
+function UrlRow({ label, value }: { label: string; value?: string | null }) {
+  const [copied, setCopied] = useState(false)
+  if (!value) return null
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {/* clipboard blocked */}
+  }
   return (
-    <div>
-      <label className="block text-xs font-semibold text-neutral-300 mb-1.5">{label}</label>
-      <textarea
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        rows={4}
-        className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white placeholder-neutral-500 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-      />
+    <div className="text-xs bg-neutral-950 border border-neutral-800 rounded p-3">
+      <p className="text-neutral-500 mb-1">{label}</p>
+      <div className="flex items-center gap-2">
+        <code className="text-emerald-400 break-all flex-1 font-mono">{value}</code>
+        <button
+          type="button"
+          onClick={copy}
+          className="shrink-0 text-neutral-400 hover:text-white p-1 rounded"
+          title="Copy"
+        >
+          {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+        </button>
+      </div>
     </div>
   )
 }

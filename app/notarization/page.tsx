@@ -593,8 +593,8 @@ export default function NotarizationPage() {
             )}
 
             <p className="text-center mt-12 text-[#64748b]">
-              Need 100+ documents per month? See <Link href="/solutions/procurement" className="text-[#10b981] font-bold hover:underline">Enterprise Suite</Link> 
-              (includes 5,000 notarizations/month).
+              Need 50+ documents per month? See <Link href="/solutions/procurement" className="text-[#10b981] font-bold hover:underline">Enterprise Suite</Link>
+              (Standard Suite includes 50/month, Pro Suite 100/month).
             </p>
           </div>
 
