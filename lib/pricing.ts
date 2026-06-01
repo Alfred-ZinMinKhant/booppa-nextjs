@@ -271,21 +271,6 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
       'SGD 249.17/mo effective (save SGD 598)',
     ],
   },
-  enterprise_monthly: {
-    id: 'enterprise_monthly',
-    name: 'Enterprise',
-    description: 'Full enterprise compliance suite',
-    price: 499,
-    currency: 'SGD',
-    type: 'subscription',
-    features: [
-      'All Vendor Active features',
-      'All PDPA Monitor features',
-      'Dedicated account manager',
-      'Custom reporting',
-    ],
-  },
-
   // ── Buyer subscriptions (institutional vendor evaluation) ────────────────────
   buyer_starter_monthly: {
     id: 'buyer_starter_monthly',
@@ -382,20 +367,6 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
       'SGD 679.17/mo effective (save SGD 1,438)',
     ],
   },
-  enterprise_pro_monthly: {
-    id: 'enterprise_pro_monthly',
-    name: 'Enterprise Pro',
-    description: 'Enterprise Pro with priority support',
-    price: 1499,
-    currency: 'SGD',
-    type: 'subscription',
-    features: [
-      'Everything in Enterprise',
-      'SLA-backed support',
-      'Custom integrations',
-      'Quarterly strategy review',
-    ],
-  },
   tender_intelligence_monthly: {
     id: 'tender_intelligence_monthly',
     name: 'Tender Intelligence',
@@ -439,6 +410,6 @@ export function getProduct(id: string): Product | undefined {
   return ALL_PRODUCTS[id]
 }
 
-export function formatPrice(price: number, currency = 'SGD'): string {
+export function formatPrice(price: number, _currency = 'SGD'): string {
   return `S$${price.toLocaleString()}`
 }
