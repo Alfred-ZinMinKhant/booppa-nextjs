@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 import { config } from '@/lib/config'
 
 export const dynamic = 'force-dynamic'
