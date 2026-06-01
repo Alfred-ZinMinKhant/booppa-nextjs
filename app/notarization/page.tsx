@@ -19,6 +19,7 @@ const PLANS = {
   single:  { label: 'Single Document',  price: 'SGD 69',         perDoc: '',                 product: 'compliance_notarization_1',  recurring: false },
   batch10: { label: 'Small Batch',       price: 'SGD 390/mo',     perDoc: '10 docs/mo · SGD 39 each',  product: 'compliance_notarization_10', recurring: true },
   batch50: { label: 'Enterprise Batch',  price: 'SGD 1,750/mo',   perDoc: '50 docs/mo · SGD 35 each',  product: 'compliance_notarization_50', recurring: true },
+  addon:   { label: 'Extra Notarization', price: 'SGD 29',       perDoc: '1 extra credit · top-up',     product: 'notarization_addon_1',       recurring: false },
 } as const;
 
 type PlanKey = keyof typeof PLANS;
@@ -404,6 +405,27 @@ export default function NotarizationPage() {
                 )}
               </div>
             </div>
+            )}
+
+            {/* Top-up — Extra Notarization (S$29). Surfaced only to batch
+                subscribers who may run out of their monthly cap. */}
+            {step === 'select' && isBatchSubscriber && (
+              <div className="max-w-2xl mx-auto mt-8">
+                <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 flex flex-col md:flex-row md:items-center gap-4 justify-between">
+                  <div className="flex-1">
+                    <p className="text-xs font-bold text-amber-700 uppercase tracking-widest mb-1">Top-up</p>
+                    <h4 className="text-lg font-bold text-[#0f172a] mb-1">Out of monthly credits?</h4>
+                    <p className="text-sm text-[#64748b]">Buy a single extra notarization for SGD 29 — same blockchain anchor and certificate as your batch plan.</p>
+                  </div>
+                  <button
+                    onClick={() => handleSubscribe('addon')}
+                    disabled={checkingOut}
+                    className="px-5 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-sm whitespace-nowrap disabled:opacity-50"
+                  >
+                    {checkingOut ? 'Redirecting…' : 'Add 1 credit — SGD 29'}
+                  </button>
+                </div>
+              </div>
             )}
 
             {/* Step 2: Upload Document */}
