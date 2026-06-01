@@ -248,16 +248,17 @@ function VendorCard({
           {/* Actions */}
           <div className="flex gap-2 mt-3">
             <Link
+              href={`/procurement/vendor/${vendor.slug}`}
+              title="Consumes 1 Quick Scan credit per unique vendor per month (re-views free)"
+              className="flex-1 text-center text-[11px] font-bold py-1.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition"
+            >
+              Run Scan
+            </Link>
+            <Link
               href={`/vendors/${vendor.slug}`}
               className="flex-1 text-center text-[11px] font-bold py-1.5 rounded-md bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition"
             >
-              View Profile
-            </Link>
-            <Link
-              href={`/verify?vendor=${vendor.slug}`}
-              className="flex-1 text-center text-[11px] font-bold py-1.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition"
-            >
-              Verify
+              Public Profile
             </Link>
           </div>
         </div>
