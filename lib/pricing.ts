@@ -247,13 +247,13 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
   pdpa_monitor_monthly: {
     id: 'pdpa_monitor_monthly',
     name: 'PDPA Monitor',
-    description: 'Quarterly automatic re-scans + monthly regulatory alerts',
+    description: 'Monthly automatic re-scans + monthly regulatory alerts',
     price: 299,
     priceAnnual: 2990,
     currency: 'SGD',
     type: 'subscription',
     features: [
-      'Quarterly automatic PDPA re-scan (SGD 79 value)',
+      'Monthly automatic PDPA re-scan (SGD 79 value)',
       'Monthly PDPC regulatory alert',
       'Running complianceScore chart',
       'Always-current PDF for buyers',

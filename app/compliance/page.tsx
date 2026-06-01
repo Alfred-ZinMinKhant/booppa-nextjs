@@ -65,12 +65,12 @@ export default function CompliancePage() {
                 <div className="absolute top-[-15px] right-6 bg-gradient-to-r from-[#10b981] to-[#059669] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Most Popular</div>
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Monitor</h3>
                 <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 299<span className="text-xl text-[#64748b] font-normal">/mo</span></div>
-                <p className="text-sm text-[#64748b] mb-8">Continuous monitoring with quarterly re-scans</p>
+                <p className="text-sm text-[#64748b] mb-8">Continuous monitoring with monthly re-scans</p>
 
                 <ul className="space-y-4 mb-8">
                   <li className="font-bold text-[#0f172a] text-sm">Everything in Snapshot, plus:</li>
                   {[
-                    'Quarterly automatic PDPA re-scan (SGD 79 value)',
+                    'Monthly automatic PDPA re-scan (SGD 79 value)',
                     'Monthly PDPC regulatory alerts',
                     'Running compliance score chart',
                     'Always-current PDF for buyers',

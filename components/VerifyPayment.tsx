@@ -210,7 +210,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                 : isPdpa
                   ? 'Your PDPA compliance report will be sent to your email shortly.'
                   : isPdpaMonitor
-                    ? 'Your PDPA Monitor subscription is active. Quarterly re-scans and monthly regulatory alerts are now enabled. A confirmation has been sent to your email.'
+                    ? 'Your PDPA Monitor subscription is active. Monthly re-scans and monthly regulatory alerts are now enabled. A confirmation has been sent to your email.'
                     : isVendorActive
                       ? 'Your Vendor Active subscription is active. Monthly health checks, competitor alerts, and shortlist priority are now enabled. A confirmation has been sent to your email.'
                       : isTenderIntelligence

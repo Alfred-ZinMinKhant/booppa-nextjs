@@ -15,6 +15,7 @@ import {
   ChevronDown,
   X,
 } from "lucide-react";
+import ScanQuotaWidget from "@/components/procurement/ScanQuotaWidget";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -554,6 +555,11 @@ export default function ProcurementDashboard() {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-6 py-6 space-y-6">
+        {/* Scan-quota widget */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <ScanQuotaWidget />
+        </div>
+
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="rounded-xl border border-white/10 bg-[#0f172a] p-5">

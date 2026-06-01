@@ -211,7 +211,7 @@ export function generateAlerts(vendor: VendorState): Alert[] {
       priority: "low",
       productId: "pdpa_monitor",
       headline: "Your PDPA scan will expire \u2014 keep it current automatically",
-      detail: "Buyers check scan dates. A scan older than 6 months raises flags. PDPA Monitor re-scans quarterly so your report is always fresh.",
+      detail: "Buyers check scan dates. A scan older than 6 months raises flags. PDPA Monitor re-scans monthly so your report is always fresh.",
       cta: "Subscribe \u2014 S$299/month",
       ctaHref: "/pricing",
     });

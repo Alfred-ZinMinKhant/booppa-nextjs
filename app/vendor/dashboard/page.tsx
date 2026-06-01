@@ -896,7 +896,7 @@ export default function VendorDashboard() {
 							<div className="p-6 border-b border-neutral-800 flex items-start justify-between">
 								<div>
 									<h3 className="text-lg font-bold text-white">PDPA Monitor</h3>
-									<p className="text-xs text-neutral-500 mt-1">Automated quarterly re-scans</p>
+									<p className="text-xs text-neutral-500 mt-1">Automated monthly re-scans</p>
 								</div>
 								{vendorState?.activeSubscriptions?.some(s => s.startsWith("pdpa_monitor")) ? (
 									<span className="text-[10px] font-bold uppercase tracking-widest text-blue-400 bg-blue-500/10 px-2 py-1 rounded">Active</span>
@@ -907,7 +907,7 @@ export default function VendorDashboard() {
 							<div className="p-6 flex-1 flex flex-col">
 								<ul className="space-y-3 mb-6 flex-1">
 									{[
-										"Quarterly automatic re-scan (S$79 value)",
+										"Monthly automatic re-scan (S$79 value)",
 										"Monthly regulatory alerts (PDPC)",
 										"Score trending chart on dashboard",
 										"Shareable PDF report — always current"

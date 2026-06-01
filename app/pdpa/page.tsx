@@ -284,13 +284,13 @@ export default function PDPAPage() {
 							</h3>
 							<p className="text-sm text-[#475569] mb-3">
 								Instead of a one-off scan, get{" "}
-								<strong>quarterly automatic re-scans</strong> (SGD 79 value
+								<strong>monthly automatic re-scans</strong> (SGD 79 value
 								each), monthly PDPC regulatory alerts, and a running compliance
 								score chart — continuous evidence for buyers and regulators.
 							</p>
 							<ul className="text-sm text-[#475569] space-y-1">
 								<li>
-									✓ Quarterly PDPA re-scan included (4× per year = SGD 316
+									✓ Monthly PDPA re-scan included (12× per year = SGD 948
 									value)
 								</li>
 								<li>✓ Monthly plain-language PDPC guideline alerts</li>
