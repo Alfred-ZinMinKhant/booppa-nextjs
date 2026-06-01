@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
  * The bearer token cookie is forwarded to the backend so RBAC works.
  */
 
-function bearer() {
+function bearer(): Record<string, string> {
   const token = cookies().get('token')?.value
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
