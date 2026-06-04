@@ -55,6 +55,15 @@ type VerificationData = {
 
 // Subset of the worker's assessment_data shape that the report viewer reads.
 // Mirrors the keys whitelisted in /api/reports/by-session.
+type PrecedentCase = {
+  vendor: string;
+  year: number;
+  fine_sgd: number;
+  section: string;
+  url: string;
+  summary: string;
+};
+
 type ScanData = {
   nric?: { status?: string; score?: number; kind?: string; items?: Array<{ source_url?: string }> };
   policy_clauses?: {
@@ -70,6 +79,7 @@ type ScanData = {
   dnc_mention?: { mentions_dnc?: boolean };
   security_headers?: Record<string, boolean>;
   primary_language?: string;
+  precedents?: Record<string, { summary: string | null; cases: PrecedentCase[] }>;
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -494,6 +504,38 @@ function ComplianceStrengths({ execSummary }: { execSummary?: string }) {
 
 // ── Section 3 (violations): Finding card ─────────────────────────────────────
 
+/** Mirrors backend pdf_service._finding_key_from() so frontend and PDF surface
+ *  the same precedents for the same finding. */
+function precedentKeyFor(f: { type?: string; check_id?: string }): string | null {
+  const raw = (f.check_id || f.type || "").toLowerCase().replace(/[^\w]+/g, "_").replace(/^_|_$/g, "");
+  if (!raw) return null;
+  if (raw.includes("nric") || raw.includes("fin_number")) return "nric:collection";
+  if (raw.includes("breach") || raw.includes("notification")) return "breach:pdpc_enforcement";
+  return `free:${raw}`;
+}
+
+function PrecedentRow({ entry }: { entry: { summary: string | null; cases: PrecedentCase[] } | undefined }) {
+  if (!entry || !entry.summary) return null;
+  return (
+    <div className="grid grid-cols-[120px_1fr] px-5 py-3 gap-3 bg-amber-50/40">
+      <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide pt-0.5">Precedent</p>
+      <div className="text-sm leading-relaxed text-[#334155]">
+        <p>{entry.summary}</p>
+        {entry.cases.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
+            {entry.cases.slice(0, 2).map(c => (
+              <a key={c.url} href={c.url} target="_blank" rel="noopener noreferrer"
+                 className="underline text-amber-700 hover:text-amber-900">
+                {c.vendor} {c.year}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function RemediationBadge({ status }: { status: Remediation["confirmation_status"] }) {
   if (status === "confirmed") {
     return <span className="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">✓ Fix Confirmed</span>;
@@ -547,12 +589,14 @@ function FindingSummaryCard({
   index,
   reportId,
   remediation,
+  precedent,
   onMarked,
 }: {
   f: Finding;
   index: number;
   reportId: string | null;
   remediation: Remediation | undefined;
+  precedent: { summary: string | null; cases: PrecedentCase[] } | undefined;
   onMarked: (r: Remediation) => void;
 }) {
   const sev = f.severity?.toUpperCase() ?? "LOW";
@@ -592,6 +636,7 @@ function FindingSummaryCard({
             </p>
           </div>
         ) : null)}
+        <PrecedentRow entry={precedent} />
       </div>
     </div>
   );
@@ -1060,6 +1105,8 @@ export default function ReportClient() {
             <div className="space-y-4">
               {findings.map((f, i) => {
                 const fk = keyFromFinding(f);
+                const pk = precedentKeyFor(f);
+                const precedent = pk ? scanData?.precedents?.[pk] : undefined;
                 return (
                   <FindingSummaryCard
                     key={i}
@@ -1067,6 +1114,7 @@ export default function ReportClient() {
                     index={i + 1}
                     reportId={reportId}
                     remediation={fk ? remediations[fk] : undefined}
+                    precedent={precedent}
                     onMarked={r => setRemediations(prev => ({ ...prev, [r.finding_key]: r }))}
                   />
                 );
