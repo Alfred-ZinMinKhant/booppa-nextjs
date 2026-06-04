@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { config } from "@/lib/config";
 import { polygonscanTxUrl, POLYGON_NETWORK_NAME, POLYGON_EXPLORER_HOST } from "@/lib/blockchain";
 import Link from "next/link";
+import {
+  listRemediationsForReport,
+  markRemediation,
+  keyFromFinding,
+  type Remediation,
+} from "@/lib/remediations";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -47,6 +53,25 @@ type VerificationData = {
   audit_hash?: string;
 };
 
+// Subset of the worker's assessment_data shape that the report viewer reads.
+// Mirrors the keys whitelisted in /api/reports/by-session.
+type ScanData = {
+  nric?: { status?: string; score?: number; kind?: string; items?: Array<{ source_url?: string }> };
+  policy_clauses?: {
+    status?: string; score?: number; present_count?: number; total?: number;
+    missing?: string[]; items?: Array<{ clause?: string; present?: boolean }>;
+  };
+  pdpc_enforcement?: { checked?: boolean; found?: boolean; cases?: Array<{ title?: string }> };
+  hosting?: { checked?: boolean; inferred_provider?: string | null; inferred_region?: string | null };
+  trackers?: { inventory?: string[]; pre_consent?: Array<{ vendor?: string }>; post_consent?: unknown[] };
+  consent_mechanism?: { has_cookie_banner?: boolean; detected_providers?: string[] };
+  privacy_policy?: { found?: boolean; link?: string };
+  dpo_compliance?: { has_dpo?: boolean; dpo_email?: string };
+  dnc_mention?: { mentions_dnc?: boolean };
+  security_headers?: Record<string, boolean>;
+  primary_language?: string;
+};
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function extractViolationText(raw: string): string {
@@ -83,17 +108,21 @@ function SectionHeading({ n, title, sub }: { n: string; title: string; sub?: str
 // ── Section 1: Scope of Assessment ───────────────────────────────────────────
 
 const SCOPE_ROWS: { element: string; description: string; inScope: boolean }[] = [
-  { element: "Cookie Consent Mechanism",     description: "Consent banner implementation and pre-consent cookie behaviour",            inScope: true  },
-  { element: "Privacy Policy (PDPA §11/13)", description: "Privacy policy link detection and content indicators on homepage",          inScope: true  },
-  { element: "Security HTTP Headers",        description: "HTTP response header analysis for PDPA §24 Protection Obligation",          inScope: true  },
-  { element: "Cookie Attributes",            description: "Secure, HttpOnly and SameSite flag inspection on set-cookie responses",     inScope: true  },
-  { element: "DNC Registry Reference",       description: "Detection of marketing opt-out mechanism and DNC references",               inScope: true  },
-  { element: "Data Subject Rights Mechanism",description: "Presence of access, correction and withdrawal request pathways",            inScope: true  },
-  { element: "NRIC / FIN Collection Signals",description: "Keyword detection of regulated identity document collection",               inScope: true  },
-  { element: "Backend Systems & Data Flows", description: "Server-side processing, databases, internal APIs",                          inScope: false },
-  { element: "Employee Data Handling",       description: "HR data, payroll, staff records",                                           inScope: false },
-  { element: "Third-Party Processor Agreements", description: "DPA agreements and sub-processor contracts",                           inScope: false },
-  { element: "Data Breach Notification",     description: "Internal incident response and PDPC notification workflows",                inScope: false },
+  { element: "Cookie Consent Mechanism",           description: "Consent banner implementation and pre-consent cookie behaviour",                          inScope: true  },
+  { element: "Third-Party Tracker Inventory",      description: "Pre-consent third-party request capture via headless-browser rendering",                   inScope: true  },
+  { element: "Privacy Policy (PDPA §11/13)",       description: "Clause-level analysis: purpose, withdrawal, DPO, retention, third-party, DSR",             inScope: true  },
+  { element: "Security HTTP Headers",              description: "HTTP response header analysis for PDPA §24 Protection Obligation",                         inScope: true  },
+  { element: "Cookie Attributes",                  description: "Secure, HttpOnly and SameSite flag inspection on set-cookie responses",                    inScope: true  },
+  { element: "DNC Registry Reference",             description: "Detection of marketing opt-out mechanism and DNC references",                              inScope: true  },
+  { element: "Data Subject Rights Mechanism",      description: "Presence of access, correction and withdrawal request pathways",                           inScope: true  },
+  { element: "NRIC Exposure",                      description: "Detection of NRIC/FIN collection or exposure on publicly accessible pages",                inScope: true  },
+  { element: "Retention Limitation (§25)",         description: "Privacy-policy clause check for stated retention period or destruction policy",            inScope: true  },
+  { element: "Data Breach Notification (§26B-D)",  description: "Cross-reference against PDPC public enforcement decisions",                                inScope: true  },
+  { element: "Cross-Border Transfer (§26)",        description: "Hosting infrastructure inference from HTTP signals; Singapore vs. overseas region",        inScope: true  },
+  { element: "Backend Systems & Data Flows",       description: "Server-side processing, databases, internal APIs",                                         inScope: false },
+  { element: "Employee Data Handling",             description: "HR data, payroll, staff records",                                                          inScope: false },
+  { element: "Third-Party Processor Agreements",   description: "DPA agreements and sub-processor contracts",                                               inScope: false },
+  { element: "Internal Breach Response Procedures",description: "Internal incident response runbooks (not publicly observable)",                            inScope: false },
 ];
 
 function ScopeTable() {
@@ -135,47 +164,227 @@ function ScopeTable() {
 
 type DimScore = { name: string; score: number; status: "Compliant" | "Partial" | "Non-Compliant"; note: string };
 
-function computeScores(findings: Finding[]): DimScore[] {
-  function hasIssue(keywords: string[]): Finding | undefined {
-    return findings.find(f => {
-      const text = [f.type, f.title, (f as any).check_id].filter(Boolean).join(" ").toLowerCase();
-      return keywords.some(k => text.includes(k));
-    });
-  }
-  function scoreFrom(f: Finding | undefined, base: number, compliantNote: string, issueNote: string): DimScore["status"] {
-    if (!f) return "Compliant";
-    const sev = (f.severity ?? "MEDIUM").toUpperCase();
-    return sev === "CRITICAL" || sev === "HIGH" ? "Non-Compliant" : "Partial";
-  }
-  function numScore(status: DimScore["status"], base: number): number {
-    return status === "Compliant" ? base : status === "Partial" ? 60 : 20;
-  }
+// Weight map mirrors backend pdf_service._DIMENSION_WEIGHTS so the web view's
+// overall score matches the PDF's overall score row.
+const DIMENSION_WEIGHTS: Record<string, number> = {
+  "NRIC Exposure": 2,
+  "Data Breach Notification (§26B-D)": 2,
+  "Privacy Policy (PDPA §11/13)": 2,
+  "Third-Party Tracker Inventory": 2,
+  "Cookie Consent Mechanism": 2,
+};
 
-  const dims: Array<{ name: string; keys: string[]; base: number; ok: string; fail: string }> = [
-    { name: "Cookie Consent Mechanism",  keys: ["consent", "cookie_consent", "no_consent_banner", "tracking_cookie"], base: 96,
-      ok:   "Granular consent mechanism detected; pre-consent cookies blocked.",
-      fail: "No consent mechanism detected; tracking cookies set on page load." },
-    { name: "Privacy Policy (PDPA §13)", keys: ["privacy_policy", "no_privacy_policy", "privacy policy"], base: 98,
-      ok:   "Privacy policy linked from homepage — PDPA §11 Openness Obligation satisfied.",
-      fail: "Privacy policy not accessible from homepage — required under PDPA §11." },
-    { name: "DNC Registry Reference",    keys: ["dnc", "marketing", "do_not_call", "spam"], base: 92,
-      ok:   "DNC opt-out mechanism referenced; marketing consent pathway present.",
-      fail: "DNC Registry opt-out mechanism not detected." },
-    { name: "Data Subject Rights Mechanism", keys: ["data_subject", "rights", "access_request", "correction"], base: 90,
-      ok:   "Access and correction request pathway detected on website.",
-      fail: "No data subject rights mechanism found — required under PDPA §21–22." },
-  ];
+const CLAUSE_LABEL: Record<string, string> = {
+  purpose: "Purpose of Collection",
+  withdrawal: "Consent Withdrawal Mechanism",
+  dpo_contact: "DPO Contact Disclosure",
+  retention: "Retention Period",
+  third_party: "Third-Party / Overseas Transfer Disclosure",
+  data_subject_rights: "Data Subject Rights (Access & Correction)",
+};
 
-  return dims.map(d => {
-    const f = hasIssue(d.keys);
-    const status = scoreFrom(f, d.base, d.ok, d.fail);
-    return { name: d.name, score: numScore(status, d.base), status, note: status === "Compliant" ? d.ok : d.fail };
-  });
+function classify(score: number): DimScore["status"] {
+  if (score >= 85) return "Compliant";
+  if (score >= 50) return "Partial";
+  return "Non-Compliant";
 }
 
-function ComplianceScoreTable({ findings }: { findings: Finding[] }) {
-  const dims = computeScores(findings);
-  const overall = Math.round(dims.reduce((s, d) => s + d.score, 0) / dims.length);
+// Mirrors backend app/services/pdf_service.py::_compliance_score_table.
+// Reads structured scan_data when present (post-Tier-1) and falls back to
+// the legacy findings heuristic when the new keys are absent.
+function computeScores(scanData: ScanData | null, findings: Finding[]): DimScore[] {
+  const sd = scanData ?? {};
+  const dims: DimScore[] = [];
+
+  // ── Cookie Consent (behaviour-aware) ────────────────────────────────────
+  const inventory = sd.trackers?.inventory ?? [];
+  if (inventory.length > 0) {
+    dims.push({
+      name: "Cookie Consent Mechanism", score: 8, status: "Non-Compliant",
+      note: `${inventory.length} third-party tracker(s) fired before consent: ${inventory.slice(0,3).join(", ")}${inventory.length>3?"…":""}.`,
+    });
+  } else if (sd.consent_mechanism?.has_cookie_banner) {
+    const providers = (sd.consent_mechanism.detected_providers ?? []).slice(0,3).join(", ") || "compliant mechanism";
+    dims.push({ name: "Cookie Consent Mechanism", score: 96, status: "Compliant",
+      note: `Consent mechanism detected (${providers}); no pre-consent trackers observed.` });
+  } else {
+    dims.push({ name: "Cookie Consent Mechanism", score: 25, status: "Non-Compliant",
+      note: "Cookie consent mechanism absent — consent required before tracking." });
+  }
+
+  // ── Third-Party Tracker Inventory ───────────────────────────────────────
+  if (sd.trackers) {
+    if (inventory.length > 0) {
+      dims.push({ name: "Third-Party Tracker Inventory", score: 30, status: "Non-Compliant",
+        note: `Detected ${inventory.length} third-party tracker(s) without prior consent: ${inventory.slice(0,5).join(", ")}${inventory.length>5?"…":""}.` });
+    } else {
+      dims.push({ name: "Third-Party Tracker Inventory", score: 95, status: "Compliant",
+        note: "No third-party trackers observed during page load." });
+    }
+  } else {
+    dims.push({ name: "Third-Party Tracker Inventory", score: 70, status: "Partial",
+      note: "Tracker inventory check unavailable (rendered scan did not run)." });
+  }
+
+  // ── Privacy Policy (clause-classifier driven) ────────────────────────────
+  if (sd.policy_clauses) {
+    const c = sd.policy_clauses;
+    const score = c.score ?? 0;
+    const missing = (c.missing ?? []).slice(0,3).map(m => CLAUSE_LABEL[m] ?? m).join(", ");
+    const note = (c.missing && c.missing.length > 0)
+      ? `${c.present_count ?? 0}/${c.total ?? 6} §13 clauses present. Missing: ${missing}.`
+      : `All ${c.total ?? 6} required §13 clauses present.`;
+    dims.push({ name: "Privacy Policy (PDPA §11/13)", score, status: classify(score), note });
+  } else if (sd.privacy_policy) {
+    const hasLink = !!sd.privacy_policy.found;
+    const hasDpo = !!sd.dpo_compliance?.has_dpo;
+    const score = hasLink && hasDpo ? 95 : hasLink ? 55 : hasDpo ? 45 : 30;
+    dims.push({ name: "Privacy Policy (PDPA §11/13)", score, status: classify(score),
+      note: hasLink && hasDpo ? "Privacy policy linked; DPO contact disclosed." :
+            hasLink ? "Privacy policy found but DPO contact not publicly disclosed." :
+            hasDpo ? "DPO reference found but no privacy policy link on homepage." :
+            "Neither privacy policy nor DPO contact found." });
+  } else {
+    dims.push({ name: "Privacy Policy (PDPA §11/13)", score: 70, status: "Partial",
+      note: "Privacy policy assessment unavailable." });
+  }
+
+  // ── Security HTTP Headers ───────────────────────────────────────────────
+  const sh = sd.security_headers ?? {};
+  if (sd.security_headers) {
+    const flags = ["hsts","csp","x_content_type_options","x_frame_options","referrer_policy","permissions_policy"];
+    const present = flags.filter(f => sh[f]).length;
+    const score = Math.round((present / flags.length) * 100);
+    dims.push({ name: "Security HTTP Headers", score, status: classify(score),
+      note: `${present}/${flags.length} PDPA §24 protection headers present.` });
+  } else {
+    dims.push({ name: "Security HTTP Headers", score: 70, status: "Partial",
+      note: "Security headers not assessed." });
+  }
+
+  // ── Cookie Attributes (carried by the findings heuristic) ───────────────
+  const hasCookieAttrFinding = findings.some(f => {
+    const t = [f.type, f.title].filter(Boolean).join(" ").toLowerCase();
+    return ["secure", "httponly", "samesite"].some(k => t.includes(k));
+  });
+  dims.push({
+    name: "Cookie Attributes",
+    score: hasCookieAttrFinding ? 30 : 92,
+    status: hasCookieAttrFinding ? "Non-Compliant" : "Compliant",
+    note: hasCookieAttrFinding
+      ? "One or more Set-Cookie responses missing Secure / HttpOnly / SameSite attributes."
+      : "Set-Cookie responses carry Secure, HttpOnly and SameSite attributes.",
+  });
+
+  // ── DNC Registry ────────────────────────────────────────────────────────
+  if (sd.dnc_mention) {
+    const mentions = !!sd.dnc_mention.mentions_dnc;
+    dims.push({
+      name: "DNC Registry Reference",
+      score: mentions ? 92 : 35,
+      status: mentions ? "Compliant" : "Non-Compliant",
+      note: mentions
+        ? "DNC opt-out mechanism referenced; marketing consent pathway present."
+        : "DNC Registry opt-out mechanism not detected.",
+    });
+  } else {
+    dims.push({ name: "DNC Registry Reference", score: 70, status: "Partial",
+      note: "DNC reference not assessed." });
+  }
+
+  // ── Data Subject Rights ─────────────────────────────────────────────────
+  const dsrFinding = findings.find(f => {
+    const t = [f.type, f.title].filter(Boolean).join(" ").toLowerCase();
+    return ["data_subject","rights","access_request","correction","withdrawal"].some(k => t.includes(k));
+  });
+  const dsrClausePresent = sd.policy_clauses?.items?.some(i => i.clause === "data_subject_rights" && i.present);
+  if (dsrClausePresent) {
+    dims.push({ name: "Data Subject Rights Mechanism", score: 91, status: "Compliant",
+      note: "Access, correction and withdrawal pathway present in privacy policy." });
+  } else if (dsrFinding) {
+    dims.push({ name: "Data Subject Rights Mechanism", score: 30, status: "Non-Compliant",
+      note: "Data subject rights mechanism not detected — required under PDPA §21-22." });
+  } else {
+    dims.push({ name: "Data Subject Rights Mechanism", score: 80, status: "Partial",
+      note: "Data subject rights pathway not explicitly assessed." });
+  }
+
+  // ── NRIC Exposure ───────────────────────────────────────────────────────
+  if (sd.nric) {
+    const kind = sd.nric.kind ?? "none";
+    const score = sd.nric.score ?? (kind === "leakage" ? 0 : kind === "collection" ? 5 : 100);
+    const status = (sd.nric.status as DimScore["status"]) ?? classify(score);
+    const note = kind === "leakage"
+      ? `NRIC leakage detected on public content${sd.nric.items?.[0]?.source_url ? ` — ${sd.nric.items[0].source_url}` : "."}`
+      : kind === "collection"
+        ? "Active NRIC collection detected on publicly accessible pages."
+        : kind === "policy_mention"
+          ? "NRIC referenced only in privacy/policy text (no collection or leakage signal)."
+          : "No NRIC exposure detected on publicly accessible pages.";
+    dims.push({ name: "NRIC Exposure", score, status, note });
+  } else {
+    dims.push({ name: "NRIC Exposure", score: 100, status: "Compliant",
+      note: "No NRIC exposure detected." });
+  }
+
+  // ── Retention Limitation (§25) — derived from clause classifier ─────────
+  const retentionPresent = sd.policy_clauses?.items?.some(i => i.clause === "retention" && i.present);
+  if (sd.policy_clauses) {
+    if (retentionPresent) {
+      dims.push({ name: "Retention Limitation (§25)", score: 92, status: "Compliant",
+        note: "Privacy policy states a retention period or destruction policy." });
+    } else {
+      dims.push({ name: "Retention Limitation (§25)", score: 20, status: "Non-Compliant",
+        note: "Retention period not stated in the privacy policy — required under §25." });
+    }
+  } else {
+    dims.push({ name: "Retention Limitation (§25)", score: 70, status: "Partial",
+      note: "Retention obligation not assessed." });
+  }
+
+  // ── Data Breach Notification (§26B-D) ───────────────────────────────────
+  if (sd.pdpc_enforcement?.checked) {
+    if (sd.pdpc_enforcement.found) {
+      const firstCase = sd.pdpc_enforcement.cases?.[0]?.title;
+      dims.push({ name: "Data Breach Notification (§26B-D)", score: 10, status: "Non-Compliant",
+        note: firstCase ? `PDPC enforcement record found: ${firstCase}.` : "PDPC enforcement record found." });
+    } else {
+      dims.push({ name: "Data Breach Notification (§26B-D)", score: 95, status: "Compliant",
+        note: "No PDPC enforcement actions found for this organisation." });
+    }
+  } else {
+    dims.push({ name: "Data Breach Notification (§26B-D)", score: 70, status: "Partial",
+      note: "PDPC enforcement check unavailable — manual verification recommended." });
+  }
+
+  // ── Cross-Border Transfer (§26) ─────────────────────────────────────────
+  if (sd.hosting?.checked) {
+    const provider = sd.hosting.inferred_provider ?? null;
+    const region = sd.hosting.inferred_region ?? null;
+    if (region === "Singapore") {
+      dims.push({ name: "Cross-Border Transfer (§26)", score: 92, status: "Compliant",
+        note: `Hosting (${provider ?? "inferred provider"}) indicates Singapore region — no cross-border transfer signal.` });
+    } else if (provider) {
+      dims.push({ name: "Cross-Border Transfer (§26)", score: 60, status: "Partial",
+        note: `Hosting via ${provider} with no Singapore region marker. Ensure a Transfer Impact Assessment is in place under §26.` });
+    } else {
+      dims.push({ name: "Cross-Border Transfer (§26)", score: 75, status: "Partial",
+        note: "Hosting provider could not be inferred from response headers." });
+    }
+  } else {
+    dims.push({ name: "Cross-Border Transfer (§26)", score: 75, status: "Partial",
+      note: "Hosting signal check unavailable — manual verification recommended." });
+  }
+
+  return dims;
+}
+
+function ComplianceScoreTable({ scanData, findings }: { scanData: ScanData | null; findings: Finding[] }) {
+  const dims = computeScores(scanData, findings);
+  const weights = dims.map(d => DIMENSION_WEIGHTS[d.name] ?? 1);
+  const weightedSum = dims.reduce((s, d, i) => s + d.score * weights[i], 0);
+  const totalWeight = weights.reduce((s, w) => s + w, 0) || 1;
+  const overall = Math.round(weightedSum / totalWeight);
   const overallStatus: DimScore["status"] = dims.every(d => d.status === "Compliant")
     ? "Compliant"
     : dims.some(d => d.status === "Non-Compliant") ? "Non-Compliant" : "Partial";
@@ -285,7 +494,67 @@ function ComplianceStrengths({ execSummary }: { execSummary?: string }) {
 
 // ── Section 3 (violations): Finding card ─────────────────────────────────────
 
-function FindingSummaryCard({ f, index }: { f: Finding; index: number }) {
+function RemediationBadge({ status }: { status: Remediation["confirmation_status"] }) {
+  if (status === "confirmed") {
+    return <span className="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">✓ Fix Confirmed</span>;
+  }
+  if (status === "regressed") {
+    return <span className="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-red-50 text-red-700 border-red-200">✗ Fix Regressed</span>;
+  }
+  return <span className="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-amber-50 text-amber-700 border-amber-200">… Pending Confirmation</span>;
+}
+
+function MarkFixedButton({
+  reportId,
+  findingKey,
+  current,
+  onMarked,
+}: {
+  reportId: string | null;
+  findingKey: string | null;
+  current: Remediation | undefined;
+  onMarked: (r: Remediation) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!reportId || !findingKey) return null;
+  if (current) return <RemediationBadge status={current.confirmation_status} />;
+
+  return (
+    <div className="flex flex-col items-end gap-1">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true); setError(null);
+          const result = await markRemediation(reportId, findingKey, "fixed");
+          setBusy(false);
+          if (result) onMarked(result);
+          else setError("Sign in to mark fixes.");
+        }}
+        className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 transition"
+      >
+        {busy ? "Marking…" : "I fixed this"}
+      </button>
+      {error && <p className="text-[10px] text-red-600">{error}</p>}
+    </div>
+  );
+}
+
+function FindingSummaryCard({
+  f,
+  index,
+  reportId,
+  remediation,
+  onMarked,
+}: {
+  f: Finding;
+  index: number;
+  reportId: string | null;
+  remediation: Remediation | undefined;
+  onMarked: (r: Remediation) => void;
+}) {
   const sev = f.severity?.toUpperCase() ?? "LOW";
   const cfg = SEVERITY_CONFIG[sev] ?? SEVERITY_CONFIG.LOW;
   const title = f.title || (f.type ?? "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
@@ -293,6 +562,7 @@ function FindingSummaryCard({ f, index }: { f: Finding; index: number }) {
   const legislation = f.legislation_text || (f.legislation_references ?? []).join("; ");
   const penalty = f.max_penalty || f.penalty?.amount || "Up to S$1,000,000";
   const evidence = f.evidence || "";
+  const findingKey = keyFromFinding(f);
 
   return (
     <div className={`bg-white rounded-xl border border-[#e2e8f0] border-l-4 ${cfg.border} shadow-sm`}>
@@ -300,7 +570,13 @@ function FindingSummaryCard({ f, index }: { f: Finding; index: number }) {
         <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border flex-shrink-0 ${cfg.badge}`}>
           {cfg.label} Severity
         </span>
-        <span className="text-sm font-bold text-[#0f172a]">FINDING {index} — {title}</span>
+        <span className="text-sm font-bold text-[#0f172a] flex-1">FINDING {index} — {title}</span>
+        <MarkFixedButton
+          reportId={reportId}
+          findingKey={findingKey}
+          current={remediation}
+          onMarked={onMarked}
+        />
       </div>
       <div className="divide-y divide-[#f1f5f9]">
         {[
@@ -476,6 +752,9 @@ export default function ReportClient() {
   const [message, setMessage]               = useState("Checking report availability...");
   const [reportUrl, setReportUrl]           = useState<string | null>(null);
   const [report, setReport]                 = useState<StructuredReport | null>(null);
+  const [scanData, setScanData]             = useState<ScanData | null>(null);
+  const [reportId, setReportId]             = useState<string | null>(null);
+  const [remediations, setRemediations]     = useState<Record<string, Remediation>>({});
   const [siteScreenshot, setSiteScreenshot] = useState<string | null>(null);
   const [screenshotError, setScreenshotError] = useState<string | null>(null);
   const [sessionId, setSessionId]           = useState<string | null>(null);
@@ -514,6 +793,8 @@ export default function ReportClient() {
         if (res.ok) {
           const data = await res.json();
           if (data.report)           setReport(data.report);
+          if (data.scan_data)        setScanData(data.scan_data);
+          if (data.report_id)        setReportId(String(data.report_id));
           if (data.site_screenshot)  setSiteScreenshot(data.site_screenshot);
           if (data.screenshot_error) setScreenshotError(data.screenshot_error);
           if (data.url)              setReportUrl(data.url);
@@ -556,6 +837,21 @@ export default function ReportClient() {
     if (sessionId) load();
     return () => { if (timeoutId) clearTimeout(timeoutId); };
   }, [sessionId, retryTrigger]);
+
+  // Load this user's remediations for the current report once it's known.
+  // Silent on auth failure — the user just won't see badges/buttons.
+  useEffect(() => {
+    if (!reportId) return;
+    let cancelled = false;
+    (async () => {
+      const list = await listRemediationsForReport(reportId);
+      if (cancelled) return;
+      const map: Record<string, Remediation> = {};
+      for (const r of list) map[r.finding_key] = r;
+      setRemediations(map);
+    })();
+    return () => { cancelled = true; };
+  }, [reportId]);
 
   useEffect(() => {
     if (status !== "loading" || attempts > maxAttempts) return;
@@ -762,7 +1058,19 @@ export default function ReportClient() {
             <ComplianceStrengths execSummary={report?.executive_summary} />
           ) : (
             <div className="space-y-4">
-              {findings.map((f, i) => <FindingSummaryCard key={i} f={f} index={i + 1} />)}
+              {findings.map((f, i) => {
+                const fk = keyFromFinding(f);
+                return (
+                  <FindingSummaryCard
+                    key={i}
+                    f={f}
+                    index={i + 1}
+                    reportId={reportId}
+                    remediation={fk ? remediations[fk] : undefined}
+                    onMarked={r => setRemediations(prev => ({ ...prev, [r.finding_key]: r }))}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
@@ -774,7 +1082,7 @@ export default function ReportClient() {
             Each PDPA compliance dimension has been independently scored.
             A numeric score is shown even where the result is fully compliant — a documented score is more evidentially credible than an undeclared pass.
           </p>
-          <ComplianceScoreTable findings={findings} />
+          <ComplianceScoreTable scanData={scanData} findings={findings} />
         </div>
 
         {/* ── Section 5: Developer Tasks ────────────────── */}

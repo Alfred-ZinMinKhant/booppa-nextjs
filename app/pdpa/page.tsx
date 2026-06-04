@@ -358,7 +358,7 @@ export default function PDPAPage() {
 								{
 									n: 3,
 									t: "Section 18: Purpose Limitation",
-									d: "Verifies purpose notification and NRIC collection practices",
+									d: "Verifies purpose notification and NRIC exposure practices",
 								},
 								{
 									n: 4,
@@ -377,8 +377,8 @@ export default function PDPAPage() {
 								},
 								{
 									n: 7,
-									t: "NRIC Advisory Compliance (2018)",
-									d: "Detects unauthorized NRIC collection (most common violation)",
+									t: "NRIC Exposure (PDPC Advisory 2018)",
+									d: "Detects NRIC exposure on public pages (most common violation)",
 								},
 								{
 									n: 8,

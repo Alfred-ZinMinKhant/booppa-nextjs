@@ -28,6 +28,7 @@ import {
 import VendorStatusBadge from "@/components/vendor/VendorStatusBadge";
 import SectorPressureWidget from "@/components/vendor/SectorPressureWidget";
 import VendorProPanel from "@/components/vendor/VendorProPanel";
+import RemediationSummaryCard from "@/components/vendor/RemediationSummaryCard";
 import CalDashboard from "@/components/vendor/CalDashboard";
 import TenderWinProbabilityWidget from "@/components/vendor/TenderWinProbabilityWidget";
 import TrustRing from "@/components/vendor/TrustRing";
@@ -593,6 +594,10 @@ export default function VendorDashboard() {
 						</div>
 					</div>
 				)}
+
+				{/* ── PDPA Remediation Activity ─────────────────────────────── */}
+				{/* Self-hiding: renders null when the user has no remediations */}
+				<RemediationSummaryCard />
 
 				{/* ── Vendor Proof Activation Panel ─────────────────────────── */}
 				{badge?.active && (
