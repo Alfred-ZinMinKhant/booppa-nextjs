@@ -147,7 +147,7 @@ export default function RemediationsPage() {
           </Link>
           <h1 className="text-2xl font-bold text-[#0f172a] mt-3">Remediation history</h1>
           <p className="text-sm text-[#64748b] mt-1">
-            Findings you've marked fixed and their auto-confirmation status from later scans.
+            Findings you&apos;ve marked fixed and their auto-confirmation status from later scans.
           </p>
         </header>
 
@@ -156,7 +156,7 @@ export default function RemediationsPage() {
             <h2 className="text-lg font-semibold text-[#0f172a] mb-2">No remediations yet</h2>
             <p className="text-sm text-[#64748b]">
               Open one of your PDPA reports and use the &quot;I fixed this&quot; button on any finding.
-              The next scan will auto-confirm.
+              The next scan will auto-confirm it.
             </p>
           </div>
         ) : (
