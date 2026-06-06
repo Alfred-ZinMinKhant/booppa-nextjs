@@ -14,7 +14,6 @@ import {
 	Check,
 	LogOut,
 	Share2,
-	Sparkles,
 	FileText,
 	Layers,
 	Key,
@@ -179,9 +178,25 @@ export default function VendorDashboard() {
 	};
 
 	if (!mounted || loading) {
+		// Skeleton mirrors the real layout — buyer doesn't see a jarring layout
+		// shift when the data arrives. Pulsing placeholders for header, identity
+		// row, KPIs, chart, signals. Total skeleton time should be < 1.5s.
 		return (
-			<div className="min-h-screen bg-neutral-950 flex items-center justify-center text-neutral-500 text-sm">
-				Loading dashboard…
+			<div className="min-h-screen bg-neutral-950 p-6">
+				<div className="max-w-7xl mx-auto space-y-6 animate-pulse">
+					<div className="h-16 bg-neutral-900/60 rounded-md border border-neutral-800" />
+					<div className="h-12 bg-neutral-900/40 rounded-lg" />
+					<div className="h-28 bg-neutral-900/60 rounded-xl border border-neutral-800" />
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+						<div className="h-28 bg-neutral-900 rounded-lg border border-neutral-800" />
+						<div className="h-28 bg-neutral-900 rounded-lg border border-neutral-800" />
+						<div className="h-28 bg-neutral-900 rounded-lg border border-neutral-800" />
+					</div>
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+						<div className="h-80 bg-neutral-900 rounded-lg border border-neutral-800 lg:col-span-2" />
+						<div className="h-80 bg-neutral-900 rounded-lg border border-neutral-800" />
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -209,7 +224,11 @@ export default function VendorDashboard() {
 		<div className="min-h-screen bg-neutral-950 p-6">
 			<div className="max-w-7xl mx-auto space-y-6">
 
-				{/* ── Header bar ─────────────────────────────────────────────── */}
+				{/* ── Header bar ───────────────────────────────────────────────
+				    Title + just 3 utilitarian buttons. The Intel Pro upsell
+				    used to compete with primary nav; it now lives in the
+				    subscription strip (Zone 5) where it belongs. Share Proof
+				    only shows when the buyer has something verifiable to share. */}
 				<div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 border-b border-neutral-800 pb-6">
 					<div>
 						<h1 className="text-2xl font-bold text-white tracking-tight">
@@ -220,33 +239,51 @@ export default function VendorDashboard() {
 						</p>
 					</div>
 					<div className="flex flex-wrap gap-2">
-						<button
-							onClick={handleShareProof}
-							disabled={shareDisabled}
-							title={shareDisabled ? "Activate Vendor Proof to share" : "Share your verified profile"}
-							className="px-4 py-2 bg-neutral-900 text-white rounded-md border border-neutral-800 text-sm font-medium hover:bg-neutral-800 transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-						>
-							{shared ? (
-								<><Check className="h-3.5 w-3.5 text-emerald-400" /> Copied</>
-							) : (
-								<><Share2 className="h-3.5 w-3.5" /> Share Proof</>
-							)}
-						</button>
-						<Link
-							href="/pricing#intel-pro"
-							className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center gap-1.5"
-						>
-							<Sparkles className="h-3.5 w-3.5" /> Upgrade to Intel Pro
-						</Link>
+						{badge?.active && (
+							<button
+								onClick={handleShareProof}
+								disabled={shareDisabled}
+								title={shareDisabled ? "Activate Vendor Proof to share" : "Share your verified profile"}
+								className="px-4 py-2 bg-neutral-900 text-white rounded-md border border-neutral-800 text-sm font-medium hover:bg-neutral-800 transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+							>
+								{shared ? (
+									<><Check className="h-3.5 w-3.5 text-emerald-400" /> Copied</>
+								) : (
+									<><Share2 className="h-3.5 w-3.5" /> Share Proof</>
+								)}
+							</button>
+						)}
 						<button
 							onClick={handleLogout}
 							className="px-3 py-2 bg-neutral-900 text-neutral-400 rounded-md border border-neutral-800 text-sm font-medium hover:text-white hover:bg-neutral-800 transition flex items-center gap-1.5"
 							title="Sign out"
 						>
-							<LogOut className="h-4 w-4" />
+							<LogOut className="h-4 w-4" /> Sign out
 						</button>
 					</div>
 				</div>
+
+				{/* ── Quick nav (was Zone 6 — promoted to top per UX feedback) ─
+				    Horizontal scrollable strip with icon + label per page. Sticky
+				    so it stays accessible as the buyer scrolls through long
+				    activity feeds / insight rows. */}
+				<nav
+					aria-label="Vendor pages"
+					className="sticky top-0 z-20 -mx-6 px-6 py-3 bg-neutral-950/95 backdrop-blur border-b border-neutral-800/80"
+				>
+					<div className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-800 scrollbar-track-transparent">
+						{SIBLING_LINKS.map(({ href, label, Icon }) => (
+							<Link
+								key={href}
+								href={href}
+								className="shrink-0 rounded-lg border border-neutral-800 bg-neutral-900/60 hover:bg-neutral-800 hover:border-neutral-700 transition px-3 py-2 flex items-center gap-2 text-xs text-neutral-300 whitespace-nowrap"
+							>
+								<Icon className="h-3.5 w-3.5 text-neutral-500" />
+								<span>{label}</span>
+							</Link>
+						))}
+					</div>
+				</nav>
 
 				{/* ── Zone 1: Identity ──────────────────────────────────────── */}
 				{vendorState && (
@@ -363,8 +400,12 @@ export default function VendorDashboard() {
 						)}
 					</div>
 
-				{/* ── Zone 3: 3 compact KPIs ────────────────────────────────── */}
+				{/* ── Zone 3: 3 compact KPIs ──────────────────────────────────
+				    Each card has: KPI title, big value, contextual subtext + a
+				    one-click action when the value is empty (turns the empty
+				    state into a CTA instead of dead text). */}
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+					{/* Trust Score */}
 					<div className="rounded-lg bg-neutral-900 border border-neutral-800 p-5">
 						<div className="flex justify-between items-start">
 							<div>
@@ -384,11 +425,14 @@ export default function VendorDashboard() {
 									<TrendingUp className="h-3 w-3" />+{stats.trustScoreDelta} from last assessment
 								</span>
 							) : (
-								<span className="text-neutral-500">Add evidence to improve</span>
+								<Link href="/pdpa" className="text-blue-400 hover:text-blue-300 transition inline-flex items-center gap-1">
+									Run a PDPA scan to improve <ArrowRight className="h-3 w-3" />
+								</Link>
 							)}
 						</div>
 					</div>
 
+					{/* Enterprise Views */}
 					<div className="rounded-lg bg-neutral-900 border border-neutral-800 p-5">
 						<div className="flex justify-between items-start">
 							<div>
@@ -404,12 +448,17 @@ export default function VendorDashboard() {
 								<span className="text-emerald-400 flex items-center gap-1">
 									<TrendingUp className="h-3 w-3" /> Unique domains, last 7 days
 								</span>
+							) : !badge?.active ? (
+								<Link href="/vendor-proof" className="text-emerald-400 hover:text-emerald-300 transition inline-flex items-center gap-1">
+									Get verified to appear in buyer searches <ArrowRight className="h-3 w-3" />
+								</Link>
 							) : (
 								<span className="text-neutral-500">No profile views this week</span>
 							)}
 						</div>
 					</div>
 
+					{/* Open Tenders */}
 					<div className="rounded-lg bg-neutral-900 border border-neutral-800 p-5">
 						<div className="flex justify-between items-start">
 							<div>
@@ -426,7 +475,9 @@ export default function VendorDashboard() {
 									In {stats.activeProcurementsSector || "your sector"}
 								</span>
 							) : (
-								<span className="text-neutral-500">None matched to your sector</span>
+								<Link href="/vendor/profile" className="text-amber-400 hover:text-amber-300 transition inline-flex items-center gap-1">
+									Set your sector to match tenders <ArrowRight className="h-3 w-3" />
+								</Link>
 							)}
 						</div>
 					</div>
@@ -608,24 +659,6 @@ export default function VendorDashboard() {
 					)}
 				</div>
 
-				{/* ── Zone 6: Sibling-page nav strip ────────────────────────── */}
-				<div className="pt-2">
-					<h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest mb-3">
-						More
-					</h2>
-					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-						{SIBLING_LINKS.map(({ href, label, Icon }) => (
-							<Link
-								key={href}
-								href={href}
-								className="rounded-lg border border-neutral-800 bg-neutral-900/40 hover:bg-neutral-800 hover:border-neutral-700 transition px-3 py-2.5 flex items-center gap-2 text-xs text-neutral-300"
-							>
-								<Icon className="h-3.5 w-3.5 text-neutral-500" />
-								<span className="truncate">{label}</span>
-							</Link>
-						))}
-					</div>
-				</div>
 			</div>
 		</div>
 	);
