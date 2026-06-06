@@ -183,6 +183,22 @@ export const BUNDLE_PRODUCTS: Record<string, Product> = {
       'Save SGD 411 (31%)',
     ],
   },
+  compliance_evidence_pack: {
+    id: 'compliance_evidence_pack',
+    name: 'Compliance Bundle',
+    description: 'PDPA Quick Scan + RFP Complete + Blockchain-anchored Cover Sheet — for tender response and vendor onboarding',
+    price: 799,
+    currency: 'SGD',
+    type: 'bundle',
+    badge: '3-doc pack',
+    features: [
+      'PDPA Quick Scan included',
+      'RFP Complete — 15 Q&A',
+      'Compliance Cover Sheet v3',
+      'All 3 documents on Amoy Testnet',
+      '1 Compliance Evidence notarization credit',
+    ],
+  },
 }
 
 // ── Subscription products ──────────────────────────────────────────────────────
@@ -395,6 +411,53 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
     features: [
       'Everything in monthly',
       'SGD 124.92/mo effective (save SGD 289)',
+    ],
+  },
+  // ── Compliance Evidence (recurring counterpart to compliance_evidence_pack) ──
+  compliance_evidence_monthly: {
+    id: 'compliance_evidence_monthly',
+    name: 'Compliance Evidence',
+    description: 'All-in-one PDF/Docs evidence — PDPA + RFP coverage, blockchain-anchored cover sheets, priority procurement support',
+    price: 499,
+    currency: 'SGD',
+    type: 'subscription',
+    features: [
+      'All-in-one PDF/Docs evidence',
+      'PDPA + RFP data coverage',
+      'Blockchain-anchored cover sheets',
+      'Priority procurement support',
+    ],
+  },
+  // ── Enterprise Suites (MAS-regulated + multi-subsidiary) ─────────────────────
+  standard_suite_monthly: {
+    id: 'standard_suite_monthly',
+    name: 'Standard Suite',
+    description: 'For banks, fintechs, and healthcare — MAS-regulated compliance infrastructure',
+    price: 1800,
+    currency: 'SGD',
+    type: 'subscription',
+    badge: 'Suite',
+    features: [
+      'MAS TRM — all 13 domains',
+      'AI gap analysis (DeepSeek)',
+      '50 notarizations / month',
+      'RESTful API + webhooks',
+    ],
+  },
+  pro_suite_monthly: {
+    id: 'pro_suite_monthly',
+    name: 'Pro Suite',
+    description: 'Full enterprise evidence infrastructure — multi-subsidiary management with a generous monthly notarization allowance',
+    price: 4500,
+    currency: 'SGD',
+    type: 'subscription',
+    badge: 'Most Popular',
+    features: [
+      'Everything in Standard Suite',
+      'SSO — SAML 2.0 + OIDC',
+      'White-label reports',
+      'Multi-subsidiary management',
+      '100 notarizations / month',
     ],
   },
 }

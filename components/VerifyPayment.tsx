@@ -171,8 +171,9 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
       </>
     );
   } else if (status === 'success') {
-    const isEnterprise = productType === 'enterprise_monthly' || productType === 'enterprise_pro_monthly'
-      || productType === 'standard_suite_monthly' || productType === 'pro_suite_monthly';
+    // Retired enterprise_monthly / enterprise_pro_monthly are no longer sold —
+    // existing subscribers go through Stripe portal, not this success page.
+    const isEnterprise = productType === 'standard_suite_monthly' || productType === 'pro_suite_monthly';
     const isCompliance = productType === 'compliance_evidence_monthly'
       || productType === 'buyer_starter_monthly' || productType === 'buyer_starter_annual'
       || productType === 'buyer_pro_monthly' || productType === 'buyer_pro_annual'
