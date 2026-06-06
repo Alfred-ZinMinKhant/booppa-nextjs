@@ -331,7 +331,7 @@ export default function VendorDashboard() {
 						{badge?.active && alerts.length === 0 && (
 							<div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
 								<div className="flex-1">
-									<div className="text-sm font-semibold text-white">You're verified — keep momentum</div>
+									<div className="text-sm font-semibold text-white">You&apos;re verified — keep momentum</div>
 									<div className="text-xs text-neutral-400 mt-0.5">
 										Score {badge.compliance_score}/100 · {badge.verification_level?.toLowerCase()} level
 									</div>
@@ -350,7 +350,7 @@ export default function VendorDashboard() {
 								<div className="flex-1">
 									<div className="text-sm font-semibold text-white">Not yet verified</div>
 									<p className="text-xs text-neutral-400 mt-0.5">
-										Procurement officers filter by verified vendors. Without it, you're invisible to that filter.
+										Procurement officers filter by verified vendors. Without it, you&apos;re invisible to that filter.
 									</p>
 								</div>
 								<Link
