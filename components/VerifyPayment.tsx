@@ -302,8 +302,14 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                 Open My Subscription →
               </Link>
         ) : (
-          <Link href="/vendor/dashboard" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
-            {isSubscription ? 'View Subscription Dashboard →' : 'Go to Dashboard'}
+          // Subscriptions land on /vendor/subscription where the plan, billing,
+          // and feature matrix live — the dashboard only shows a compact chip.
+          // Everything else still goes to the dashboard's overview.
+          <Link
+            href={isSubscription ? "/vendor/subscription" : "/vendor/dashboard"}
+            className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition"
+          >
+            {isSubscription ? 'Manage My Subscription →' : 'Go to Dashboard'}
           </Link>
         )}
       </>

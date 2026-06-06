@@ -33,7 +33,7 @@ async function startPdpaCheckout(productType: string, extra?: Record<string, str
 			await startPdpaCheckout(productType, { website: website.trim() });
 		}
 	} else if (res.status === 409) {
-		window.location.href = "/vendor/dashboard";
+		window.location.href = "/vendor/subscription";
 	} else if (data.error) {
 		alert(data.error);
 	}
@@ -321,13 +321,13 @@ export default function PDPAPage() {
 							) : (
 								<>
 									<a
-										href="/vendor/dashboard"
+										href="/vendor/subscription"
 										className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-xl text-sm text-center"
 									>
-										Active — Manage in dashboard
+										Active — Manage subscription
 									</a>
 									<a
-										href="/vendor/dashboard"
+										href="/vendor/subscription"
 										className="px-6 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl text-sm text-center"
 									>
 										View subscriptions
