@@ -181,10 +181,10 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
     const isComplianceEvidencePack = productType === 'compliance_evidence_pack';
     const isVendorProof = productType === 'vendor_proof';
     const isNotarization = productType?.startsWith('compliance_notarization');
-    // pdpa_quick_scan / pdpa_snapshot → report page; pdpa_monitor_* → subscription, go to dashboard
+    // pdpa_quick_scan / pdpa_snapshot → report page; pdpa_monitor_* → /vendor/subscription
     const isPdpa = productType === 'pdpa_quick_scan' || productType === 'pdpa_snapshot';
     const isPdpaMonitor = productType === 'pdpa_monitor_monthly' || productType === 'pdpa_monitor_annual';
-    // vendor_active_* → subscription, go to dashboard
+    // vendor_active_* → /vendor/subscription (plan + billing live there, not on /vendor/dashboard)
     const isVendorActive = productType === 'vendor_active_monthly' || productType === 'vendor_active_annual';
     const isTenderIntelligence = productType === 'tender_intelligence_monthly' || productType === 'tender_intelligence_annual';
     const isVendorPro = productType === 'vendor_pro_monthly' || productType === 'vendor_pro_annual';
