@@ -344,6 +344,51 @@ export default function SolutionsVendorsPage() {
                 </button>
               </div>
             </div>
+
+            {/* Tender Intelligence — vendor-side GeBIZ analytics. Wide tile
+                below the standard subscription grid because the feature list
+                is longer and the value-prop is distinct (analytics, not
+                evidence generation). */}
+            <div className="mt-6">
+              <div className="bg-white p-8 rounded-[2rem] border-2 border-violet-500 shadow-md relative flex flex-col lg:flex-row gap-8 items-start">
+                <div className="absolute top-[-14px] left-8 bg-violet-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">New</div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-[#0f172a] mb-1">Tender Intelligence</h3>
+                  <div className="flex items-baseline gap-3 mb-1">
+                    <div className="text-4xl font-black text-violet-600">SGD 149<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                    <div className="text-sm text-[#64748b]">or SGD 1,499/yr · save SGD 289</div>
+                  </div>
+                  <p className="text-xs text-[#64748b] mb-6">Win the right bids — GeBIZ tender analytics in one subscription</p>
+                  <ul className="space-y-3 mb-2">
+                    {[
+                      "Monthly sector trend reports (win-rate by agency × sector × contract size)",
+                      "Historical award lookup — winners, prices, dates",
+                      "AI bid / watch / pass timing per live tender",
+                      "Per-supplier benchmarking dashboard",
+                      "Monthly digest email with PDF report",
+                    ].map(f => <CheckItem key={f} text={f} color="text-violet-600" />)}
+                  </ul>
+                </div>
+                <div className="w-full lg:w-72 flex flex-col gap-3 lg:pt-2">
+                  <button
+                    type="button"
+                    disabled={loadingProduct === "tender_intelligence_monthly"}
+                    onClick={() => handleCheckout("tender_intelligence_monthly")}
+                    className="w-full bg-violet-600 text-white font-bold py-3.5 rounded-xl hover:bg-violet-500 transition shadow-lg shadow-violet-600/20 disabled:opacity-50"
+                  >
+                    {loadingProduct === "tender_intelligence_monthly" ? "Redirecting..." : "Subscribe monthly"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={loadingProduct === "tender_intelligence_annual"}
+                    onClick={() => handleCheckout("tender_intelligence_annual")}
+                    className="w-full border-2 border-violet-500 text-violet-600 hover:bg-violet-50 font-bold py-3.5 rounded-xl transition disabled:opacity-50"
+                  >
+                    {loadingProduct === "tender_intelligence_annual" ? "Redirecting..." : "Annual · save 2 mo"}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           )}
 
