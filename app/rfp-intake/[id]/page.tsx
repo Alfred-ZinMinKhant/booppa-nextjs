@@ -10,6 +10,7 @@ interface Intake {
   vendor_url: string | null;
   company_name: string | null;
   status: 'pending' | 'submitted' | string;
+  session_id: string | null;
   created_at: string | null;
 }
 
@@ -116,6 +117,14 @@ export default function RfpIntakePage() {
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || 'Submission failed. Please try again.');
+        return;
+      }
+      // Hop straight to the polling/result page so the buyer watches the kit
+      // arrive instead of getting dumped on a generic "go to dashboard" card.
+      // session_id comes from the Stripe checkout that created this intake.
+      const sessionId = data.session_id || intake?.session_id;
+      if (sessionId) {
+        router.replace(`/rfp-acceleration/result?session_id=${encodeURIComponent(sessionId)}`);
         return;
       }
       setDone(true);
