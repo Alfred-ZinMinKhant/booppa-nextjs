@@ -119,16 +119,17 @@ export const ONE_TIME_PRODUCTS: Record<string, Product> = {
   rfp_complete: {
     id: 'rfp_complete',
     name: 'RFP Complete',
-    description: 'Full procurement dossier for high-value bids',
+    description: 'Compliance & security section of your RFP submission — 15 Q&A pack with verified data sources. Add your own proposal, pricing, and team sections to complete the bid.',
     price: 599,
     currency: 'SGD',
     type: 'one-time',
     features: [
-      'Full procurement dossier',
-      'Enterprise-tier visibility',
-      'Multi-sector matching',
+      'Full compliance dossier (15 Q&A)',
+      'PDF + editable DOCX deliverable',
+      'Generated in under 2 minutes',
+      'Answers verified against ACRA, PDPC, SSL, GeBIZ',
+      'Blockchain-anchored on Polygon',
       'COMPLETE evidence package tier',
-      'AutoActivation counter +1',
     ],
   },
 }

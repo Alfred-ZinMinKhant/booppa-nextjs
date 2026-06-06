@@ -268,9 +268,9 @@ export default function PricingPage() {
 									<div className="bg-white p-8 rounded-[2rem] border-2 border-amber-400 shadow-sm hover:-translate-y-1 transition-all flex flex-col">
 										<h3 className="text-xl font-bold text-[#0f172a] mb-2">RFP Complete</h3>
 										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 599</div>
-										<p className="text-xs text-[#64748b] mb-6">Per RFP · Full submission kit</p>
+										<p className="text-xs text-[#64748b] mb-6">Per RFP · Compliance &amp; security answers</p>
 										<ul className="space-y-3 mb-8 flex-1">
-											{["Full compliance dossier", "Ready-to-submit bid kit", "Fast 24-hour turnaround", "Expert review included"].map(f => <CheckItem key={f} text={f} color="text-amber-500" />)}
+											{["Full compliance dossier (15 Q&A)", "PDF + editable DOCX deliverable", "Generated in under 2 minutes", "Answers verified against ACRA, PDPC, SSL, GeBIZ"].map(f => <CheckItem key={f} text={f} color="text-amber-500" />)}
 										</ul>
 										<button
 											type="button"
@@ -278,7 +278,7 @@ export default function PricingPage() {
 											onClick={() => handleCheckout("rfp_complete")}
 											className="w-full bg-amber-500 text-white font-bold py-3.5 rounded-xl hover:bg-amber-600 transition shadow-lg shadow-amber-500/20 disabled:opacity-50"
 										>
-											{loadingProduct === "rfp_complete" ? "Redirecting..." : "Build Bid Kit →"}
+											{loadingProduct === "rfp_complete" ? "Redirecting..." : "Generate Compliance Pack →"}
 										</button>
 									</div>
 
