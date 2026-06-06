@@ -22,6 +22,11 @@ interface Intake {
 }
 
 interface IntakeFields {
+  // Required: we scrape vendor_url for ISO/SOC/encryption/cloud mentions to
+  // verify claims against published evidence. company_name appears on the
+  // generated PDF. Both can be pre-filled from PendingRfpIntake / User profile.
+  vendor_url: string;
+  company_name: string;
   rfp_description: string;
   sector: string;
   uen: string;
@@ -40,6 +45,8 @@ interface IntakeFields {
 }
 
 const EMPTY: IntakeFields = {
+  vendor_url: '',
+  company_name: '',
   rfp_description: '',
   sector: '',
   uen: '',
@@ -89,12 +96,20 @@ export default function RfpIntakePage() {
         // before checkout. Only known IntakeFields keys are accepted; anything
         // else in intake_data is ignored. Buyer can edit before submitting.
         const pf = data.prefill;
-        if (pf && data.status !== 'submitted') {
+        if (data.status !== 'submitted') {
           const seed: Partial<IntakeFields> = {};
-          if (typeof pf.rfp_description === 'string' && pf.rfp_description) {
+          // Seed website + company from the intake row itself (these come
+          // from the PendingRfpIntake or earlier checkout metadata).
+          if (typeof data.vendor_url === 'string' && data.vendor_url) {
+            seed.vendor_url = data.vendor_url;
+          }
+          if (typeof data.company_name === 'string' && data.company_name) {
+            seed.company_name = data.company_name;
+          }
+          if (pf?.rfp_description) {
             seed.rfp_description = pf.rfp_description;
           }
-          const id = pf.intake_data;
+          const id = pf?.intake_data;
           if (id && typeof id === 'object') {
             for (const k of Object.keys(EMPTY) as (keyof IntakeFields)[]) {
               const v = (id as Record<string, unknown>)[k];
@@ -131,6 +146,18 @@ export default function RfpIntakePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.vendor_url.trim()) {
+      setError("Please enter your company website — we scan it to verify your compliance claims.");
+      return;
+    }
+    if (!/^https?:\/\//i.test(form.vendor_url.trim())) {
+      setError("Website must start with http:// or https://");
+      return;
+    }
+    if (!form.company_name.trim()) {
+      setError('Please enter your company name.');
+      return;
+    }
     if (!form.rfp_description.trim()) {
       setError('Please describe what you are procuring.');
       return;
@@ -138,7 +165,7 @@ export default function RfpIntakePage() {
     setError(null);
     setSubmitting(true);
     try {
-      const { rfp_description, sector, ...rest } = form;
+      const { vendor_url, company_name, rfp_description, sector, ...rest } = form;
       const intake_data: Record<string, string> = {};
       for (const [k, v] of Object.entries(rest)) {
         if (typeof v === 'string' && v.trim()) intake_data[k] = v.trim();
@@ -147,6 +174,8 @@ export default function RfpIntakePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          vendor_url: vendor_url.trim(),
+          company_name: company_name.trim(),
           rfp_description: rfp_description.trim(),
           sector: sector.trim() || undefined,
           intake_data: Object.keys(intake_data).length ? intake_data : undefined,
@@ -236,6 +265,39 @@ export default function RfpIntakePage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="company_name" className="block text-sm font-semibold text-[#0f172a] mb-1">
+                Company name *
+              </label>
+              <input
+                id="company_name"
+                type="text"
+                required
+                value={form.company_name}
+                onChange={(e) => setForm({ ...form, company_name: e.target.value })}
+                placeholder="e.g. Acme Pte Ltd"
+                className="w-full px-3 py-2 border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-[#0ea5e9]"
+              />
+            </div>
+            <div>
+              <label htmlFor="vendor_url" className="block text-sm font-semibold text-[#0f172a] mb-1">
+                Company website *
+              </label>
+              <input
+                id="vendor_url"
+                type="url"
+                required
+                value={form.vendor_url}
+                onChange={(e) => setForm({ ...form, vendor_url: e.target.value })}
+                placeholder="https://acme.io"
+                className="w-full px-3 py-2 border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-[#0ea5e9]"
+              />
+              <p className="text-xs text-[#64748b] mt-1">
+                We scan your site to verify ISO/SOC&nbsp;mentions, encryption language, hosting region, and DPO contact — so more answers can be labelled <strong>Verified&nbsp;on&nbsp;your&nbsp;website</strong> instead of AI&nbsp;draft.
+              </p>
+            </div>
+          </div>
           <div>
             <label htmlFor="rfp_description" className="block text-sm font-semibold text-[#0f172a] mb-1">
               What are you procuring? *

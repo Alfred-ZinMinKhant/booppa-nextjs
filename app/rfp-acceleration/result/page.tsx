@@ -12,11 +12,46 @@ import { useSearchParams } from 'next/navigation';
 const POLL_INTERVAL_MS = 4000;
 const MAX_POLLS = 30;
 
+type VerificationSource =
+  | 'intake'
+  | 'website'
+  | 'intake+website'
+  | 'intake+external'
+  | 'acra'
+  | 'ssl'
+  | 'gebiz'
+  | 'pdpc'
+  | 'external'
+  | 'ai_drafted';
+
+interface Verification {
+  source: VerificationSource;
+  evidence: string[];
+}
+
 interface QAItem {
   question: string;
   answer: string;
+  // Backward-compat: 'fact' when source ≠ ai_drafted, 'generated' otherwise.
   confidence: 'fact' | 'generated';
+  // New: structured source + evidence list, lets the UI pick the right badge.
+  verification?: Verification;
 }
+
+// Badge config per source — label, colour palette, optional emoji.
+// Centralised so the PDF builder can mirror it exactly.
+const SOURCE_BADGE: Record<VerificationSource, { label: string; cls: string }> = {
+  'intake':           { label: 'From your intake',              cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  'website':          { label: 'Verified on your website',      cls: 'bg-teal-500/10 text-teal-300 border-teal-500/30' },
+  'intake+website':   { label: 'Intake + website verified',     cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
+  'intake+external':  { label: 'Intake + public records',       cls: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' },
+  'acra':             { label: 'ACRA verified',                 cls: 'bg-blue-500/10 text-blue-300 border-blue-500/30' },
+  'ssl':              { label: 'SSL Labs verified',             cls: 'bg-blue-500/10 text-blue-300 border-blue-500/30' },
+  'gebiz':            { label: 'GeBIZ supplier verified',       cls: 'bg-blue-500/10 text-blue-300 border-blue-500/30' },
+  'pdpc':             { label: 'PDPC register checked',         cls: 'bg-blue-500/10 text-blue-300 border-blue-500/30' },
+  'external':         { label: 'External evidence verified',    cls: 'bg-blue-500/10 text-blue-300 border-blue-500/30' },
+  'ai_drafted':       { label: '⚠ AI draft — review',           cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30 font-bold uppercase tracking-wider' },
+};
 
 interface RFPResult {
   download_url: string;
@@ -181,10 +216,17 @@ function RFPResultContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
-  const isExpress   = result?.product_type === 'rfp_express';
+  const isExpress    = result?.product_type === 'rfp_express';
   const productLabel = isExpress ? 'RFP Kit Express' : 'RFP Kit Complete';
-  const factCount    = result?.qa_answers?.filter(q => q.confidence === 'fact').length ?? 0;
   const totalCount   = result?.qa_answers?.length ?? 0;
+  // Verified = answer is backed by intake / website / external evidence
+  // (anything that isn't 'ai_drafted'). Fall back to confidence for backward
+  // compatibility with kits generated before the verification field shipped.
+  const verifiedCount = result?.qa_answers?.filter(q => {
+    const src = q.verification?.source;
+    if (src) return src !== 'ai_drafted';
+    return q.confidence === 'fact';
+  }).length ?? 0;
 
   return (
     <main className="min-h-screen bg-[#0a0f1e] py-12 px-4">
@@ -396,8 +438,8 @@ function RFPResultContent() {
 
               {/* Badges */}
               <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/8">
-                {factCount > 0 && (
-                  <Badge variant="green">{factCount}/{totalCount} answers fact-backed</Badge>
+                {verifiedCount > 0 && (
+                  <Badge variant="green">{verifiedCount}/{totalCount} answers verified</Badge>
                 )}
                 {result.tx_hash && (
                   <Badge variant="blue">
@@ -501,28 +543,38 @@ function RFPResultContent() {
                   <h2 className="text-sm font-semibold text-slate-200">Draft Answers</h2>
                   <span className="text-xs text-amber-400/80">review each answer, edit before pasting into your RFP form</span>
                 </div>
-                {result.qa_answers.map((item, i) => (
-                  <div key={i} className="rounded-xl border border-white/8 bg-white/3 p-4">
-                    <div className="flex items-start justify-between gap-2 mb-2.5">
-                      <p className="text-sm font-semibold text-sky-400 leading-snug">{item.question}</p>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {item.confidence === 'fact' ? (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium whitespace-nowrap">
-                            fact-backed
+                {result.qa_answers.map((item, i) => {
+                  const source: VerificationSource =
+                    item.verification?.source ?? (item.confidence === 'fact' ? 'intake' : 'ai_drafted');
+                  const badge = SOURCE_BADGE[source];
+                  const evidenceList = item.verification?.evidence ?? [];
+                  const tooltip = evidenceList.length > 0
+                    ? evidenceList.join(' · ')
+                    : (source === 'ai_drafted' ? 'No verifying source — review carefully before submission.' : '');
+                  return (
+                    <div key={i} className="rounded-xl border border-white/8 bg-white/3 p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2.5">
+                        <p className="text-sm font-semibold text-sky-400 leading-snug">{item.question}</p>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap ${badge.cls}`}
+                            title={tooltip}
+                          >
+                            {badge.label}
                           </span>
-                        ) : (
-                          // Amber, not grey — buyer should treat this as a draft to review,
-                          // not a finished answer ready to copy-submit.
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold uppercase tracking-wider whitespace-nowrap">
-                            ⚠ Review
-                          </span>
-                        )}
-                        <CopyButton text={item.answer} />
+                          <CopyButton text={item.answer} />
+                        </div>
                       </div>
+                      <p className="text-slate-300 text-sm leading-relaxed">{item.answer}</p>
+                      {evidenceList.length > 0 && (
+                        <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                          <span className="text-slate-400 font-medium">Evidence: </span>
+                          {evidenceList.join(' · ')}
+                        </p>
+                      )}
                     </div>
-                    <p className="text-slate-300 text-sm leading-relaxed">{item.answer}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
