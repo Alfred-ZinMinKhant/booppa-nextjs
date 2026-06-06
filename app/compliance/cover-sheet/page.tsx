@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { config } from '@/lib/config'
 import { POLYGON_EXPLORER_HOST, polygonscanTxUrl } from '@/lib/blockchain'
-import { CheckCircle, Loader2, FileText, ExternalLink, Upload as UploadIcon, AlertCircle } from 'lucide-react'
+import { CheckCircle, Loader2, FileText, ExternalLink, Upload as UploadIcon, AlertCircle, ArrowRight, Mail } from 'lucide-react'
 
 interface CoverSheetStatus {
   credits: number
@@ -13,6 +13,7 @@ interface CoverSheetStatus {
   vendor_url_missing: boolean
   pdpa: { status: string; score: number | null; completed_at: string | null } | null
   rfp: { status: string; completed_at: string | null; download_url: string | null } | null
+  rfp_brief_intake_id: string | null
   cover_sheet: { ready: boolean; download_url?: string | null; tx_hash?: string | null; generated_at?: string | null; schema_version?: number | null; outdated?: boolean; stale?: boolean }
   signed: { uploaded_at: string | null; tx_hash: string | null; file_hash: string | null; file_name: string | null } | null
 }
@@ -128,7 +129,12 @@ function CoverSheetInner() {
   }
 
   const pdpaDone = status?.pdpa?.status === 'completed'
-  const rfpDone = status?.rfp?.status === 'completed'
+  // RFP is only "really done" when the Report row says completed AND there is
+  // no unsubmitted brief outstanding — a pending intake means the buyer hasn't
+  // told us what they're procuring yet, so any earlier "completed" tile would
+  // be misleading.
+  const rfpBriefPending = !!status?.rfp_brief_intake_id
+  const rfpDone = status?.rfp?.status === 'completed' && !rfpBriefPending
   // Cover sheet is only surfaced as ready once both upstream inputs are done
   // AND it isn't stale (i.e., a fresh purchase cycle hasn't superseded it).
   const coverReady = !!status?.cover_sheet?.ready && pdpaDone && rfpDone && !status?.cover_sheet?.stale
@@ -195,6 +201,37 @@ function CoverSheetInner() {
           </div>
         )}
 
+        {/* RFP brief required — bundle includes RFP Complete, but the kit
+            can't be generated until the buyer submits the brief. Surface this
+            above the progress grid so the spinner state below makes sense. */}
+        {email && status && hasAccess && rfpBriefPending && status.rfp_brief_intake_id && (
+          <div className="border-2 border-sky-300 bg-gradient-to-b from-sky-50 to-white rounded-2xl p-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-sky-100 flex items-center justify-center flex-shrink-0">
+                <FileText className="w-5 h-5 text-sky-600" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-black text-[#0f172a] mb-1">Tell us about your RFP</h2>
+                <p className="text-sm text-[#475569] mb-4 leading-relaxed">
+                  Your Compliance Evidence Pack includes an RFP Complete Kit. Share a few details
+                  about the procurement (takes about 2 minutes) and we&apos;ll generate the kit
+                  immediately — it then feeds into your regulator-ready Cover Sheet.
+                </p>
+                <Link
+                  href={`/rfp-intake/${status.rfp_brief_intake_id}`}
+                  className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-3 rounded-lg font-bold text-sm transition"
+                >
+                  Complete your RFP brief <ArrowRight className="w-4 h-4" />
+                </Link>
+                <div className="mt-4 flex items-start gap-2 text-xs text-[#64748b]">
+                  <Mail className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                  <p>We&apos;ve also emailed you this link — you can finish the brief later from your inbox.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Component progress grid */}
         {status && hasAccess && (
           <div className="bg-white border-2 border-[#e2e8f0] rounded-2xl p-6 mb-8">
@@ -223,15 +260,31 @@ function CoverSheetInner() {
                 <div className="flex items-center gap-2 mb-2">
                   {rfpDone ? (
                     <CheckCircle className="w-5 h-5 text-emerald-600" />
+                  ) : rfpBriefPending ? (
+                    <AlertCircle className="w-5 h-5 text-amber-500" />
                   ) : (
                     <Loader2 className="w-5 h-5 text-sky-600 animate-spin" />
                   )}
                   <p className="font-bold text-[#0f172a] text-sm">RFP Complete Kit</p>
                 </div>
                 <p className="text-xs text-[#64748b]">
-                  {rfpDone ? 'Generated & anchored' : status.rfp?.status ? `Status: ${status.rfp.status}` : 'Generating…'}
+                  {rfpDone
+                    ? 'Generated & anchored'
+                    : rfpBriefPending
+                      ? 'Waiting for your RFP brief'
+                      : status.rfp?.status
+                        ? `Status: ${status.rfp.status}`
+                        : 'Generating…'}
                 </p>
-                {status.rfp?.download_url && (
+                {rfpBriefPending && status.rfp_brief_intake_id && (
+                  <Link
+                    href={`/rfp-intake/${status.rfp_brief_intake_id}`}
+                    className="text-xs font-semibold text-sky-600 hover:underline inline-flex items-center gap-1 mt-2"
+                  >
+                    Complete brief <ArrowRight className="w-3 h-3" />
+                  </Link>
+                )}
+                {!rfpBriefPending && status.rfp?.download_url && (
                   <a
                     href={status.rfp.download_url}
                     target="_blank"
@@ -259,7 +312,9 @@ function CoverSheetInner() {
             </div>
             {!coverReady && (!pdpaDone || !rfpDone) && (
               <p className="text-xs text-[#94a3b8] mt-4">
-                Cover Sheet generates automatically once PDPA Quick Scan and RFP Complete Kit are ready. Page refreshes every 8 seconds.
+                {rfpBriefPending
+                  ? 'Submit your RFP brief above to start the RFP Complete Kit. The Cover Sheet generates automatically once both PDPA Quick Scan and RFP Complete Kit are ready.'
+                  : 'Cover Sheet generates automatically once PDPA Quick Scan and RFP Complete Kit are ready. Page refreshes every 8 seconds.'}
               </p>
             )}
           </div>

@@ -38,9 +38,10 @@ export default function CompliancePage() {
 
                 <ul className="space-y-4 mb-8">
                   {[
-                    '8-dimension PDPA evaluation',
+                    '11-dimension PDPA evaluation',
                     'Risk severity report',
                     'Legislation references',
+                    'PDPC enforcement precedents per finding',
                     'Blockchain-timestamped PDF',
                     'QR verification link',
                   ].map((feature, i) => (

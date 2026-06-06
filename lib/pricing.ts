@@ -37,14 +37,15 @@ export const ONE_TIME_PRODUCTS: Record<string, Product> = {
   pdpa_quick_scan: {
     id: 'pdpa_quick_scan',
     name: 'PDPA Snapshot',
-    description: '8-dimension PDPA compliance assessment and blockchain-anchored report',
+    description: '11-dimension PDPA compliance assessment and blockchain-anchored report',
     price: 79,
     currency: 'SGD',
     type: 'one-time',
     features: [
-      '8-dimension PDPA evaluation',
+      '11-dimension PDPA evaluation',
       'Risk severity report',
       'Legislation references',
+      'PDPC enforcement precedents per finding',
       'Blockchain timestamp',
       'Downloadable PDF',
       '+8 to +25 pts to complianceScore',
@@ -312,7 +313,7 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
     type: 'subscription',
     badge: 'Most Popular',
     features: [
-      '50 Quick Scans + Deep Scan on 20 vendors/month (L2: 8-dimension PDPA + certifications + financial risk)',
+      '50 Quick Scans + Deep Scan on 20 vendors/month (L2: 11-dimension PDPA + certifications + financial risk)',
       'Compliance drift tracking with automatic change alerts',
       'Advanced vendor comparison engine (side-by-side across Deep Scan parameters)',
       'Customisable risk-scoring weights per category',

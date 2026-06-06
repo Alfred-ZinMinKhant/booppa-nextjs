@@ -74,7 +74,11 @@ function RFPResultContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
-  const [status, setStatus] = useState<'loading' | 'brief_required' | 'ready' | 'error'>('loading');
+  // `verifying` = waiting for /verify before we know if a brief is owed.
+  // `generating` = brief already in, polling for the kit. Splitting these
+  // two stops the page from showing "Generating Your RFP Kit" before we
+  // actually know a brief isn't outstanding.
+  const [status, setStatus] = useState<'verifying' | 'brief_required' | 'generating' | 'ready' | 'error'>('verifying');
   const [result, setResult] = useState<RFPResult | null>(null);
   const [pendingIntakeId, setPendingIntakeId] = useState<string | null>(null);
   const [productType, setProductType] = useState<string | null>(null);
@@ -85,20 +89,33 @@ function RFPResultContent() {
     let polls = 0;
     const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.booppa.io';
 
-    // Check whether the buyer still owes a brief. The webhook may not have
-    // created the PendingRfpIntake row yet, so poll the verify endpoint a few
-    // times before assuming generation is already in flight.
-    async function checkBrief(): Promise<{ pendingId: string | null; productType: string | null }> {
+    // Check the buyer's brief status. The backend tells us three things:
+    //   • requires_brief — product needs a brief at all
+    //   • brief_satisfied — positive proof the brief is taken care of (kit
+    //     in cache, rfp_description in checkout metadata, or intake submitted)
+    //   • pending_rfp_intake_id — outstanding brief row, ready to be filled
+    // We only show "Generating…" when brief_satisfied is true. Otherwise we
+    // surface the brief CTA — the backend lazily creates a PendingRfpIntake
+    // row if one is missing, so pending_rfp_intake_id should be populated by
+    // the time we render that view.
+    async function checkBrief(): Promise<{
+      pendingId: string | null;
+      productType: string | null;
+      requiresBrief: boolean;
+      briefSatisfied: boolean;
+    }> {
       try {
         const res = await fetch(`${apiBase}/api/stripe/checkout/verify?session_id=${sessionId}`);
-        if (!res.ok) return { pendingId: null, productType: null };
+        if (!res.ok) return { pendingId: null, productType: null, requiresBrief: false, briefSatisfied: false };
         const data = await res.json();
         return {
           pendingId: data.pending_rfp_intake_id || null,
           productType: data.product_type || null,
+          requiresBrief: !!data.requires_brief,
+          briefSatisfied: !!data.brief_satisfied,
         };
       } catch {
-        return { pendingId: null, productType: null };
+        return { pendingId: null, productType: null, requiresBrief: false, briefSatisfied: false };
       }
     }
 
@@ -119,29 +136,44 @@ function RFPResultContent() {
     }
 
     (async () => {
-      const initial = await checkBrief();
+      let last = await checkBrief();
       if (cancelled) return;
-      if (initial.productType) setProductType(initial.productType);
-      if (initial.pendingId) {
-        setPendingIntakeId(initial.pendingId);
+      if (last.productType) setProductType(last.productType);
+
+      // Retry the verify endpoint a few times to absorb the Stripe webhook
+      // race. We need either a pending intake (→ brief CTA) or positive proof
+      // the brief is in motion (→ generating). Anything else, we keep waiting.
+      const retries = [1000, 2000, 3000];
+      let attempt = 0;
+      while (
+        !cancelled
+        && !last.pendingId
+        && last.requiresBrief
+        && !last.briefSatisfied
+        && attempt < retries.length
+      ) {
+        await new Promise(r => setTimeout(r, retries[attempt]));
+        if (cancelled) return;
+        last = await checkBrief();
+        if (cancelled) return;
+        if (last.productType && !productType) setProductType(last.productType);
+        attempt++;
+      }
+
+      if (cancelled) return;
+      if (last.pendingId) {
+        setPendingIntakeId(last.pendingId);
         setStatus('brief_required');
         return;
       }
-      // Webhook race: retry a few times before falling back to polling, so a
-      // buyer who owes a brief doesn't briefly see "Generating…" first.
-      const retries = [1000, 2000, 3000];
-      for (const ms of retries) {
-        await new Promise(r => setTimeout(r, ms));
-        if (cancelled) return;
-        const retry = await checkBrief();
-        if (cancelled) return;
-        if (retry.productType && !productType) setProductType(retry.productType);
-        if (retry.pendingId) {
-          setPendingIntakeId(retry.pendingId);
-          setStatus('brief_required');
-          return;
-        }
+      // No outstanding brief AND no proof generation is in flight — refuse to
+      // claim we're generating. Show the error/help view; the user can contact
+      // support if they think this is wrong.
+      if (last.requiresBrief && !last.briefSatisfied) {
+        setStatus('error');
+        return;
       }
+      setStatus('generating');
       poll();
     })();
 
@@ -158,8 +190,23 @@ function RFPResultContent() {
     <main className="min-h-screen bg-[#0a0f1e] py-12 px-4">
       <div className="max-w-3xl mx-auto">
 
-        {/* ── Loading ──────────────────────────────────────────────────────── */}
-        {status === 'loading' && (
+        {/* ── Verifying purchase (neutral while we check for an outstanding brief) ── */}
+        {status === 'verifying' && (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-5">
+            <div className="w-20 h-20 rounded-2xl bg-sky-500/10 flex items-center justify-center">
+              <Loader2 className="w-10 h-10 text-sky-400 animate-spin" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">Confirming your purchase</h2>
+              <p className="text-slate-400 mt-2 max-w-sm mx-auto text-sm leading-relaxed">
+                One moment while we check your order and your next steps.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── Generating (post-brief polling) ──────────────────────────────── */}
+        {status === 'generating' && (
           <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-5">
             <div className="w-20 h-20 rounded-2xl bg-sky-500/10 flex items-center justify-center">
               <Loader2 className="w-10 h-10 text-sky-400 animate-spin" />

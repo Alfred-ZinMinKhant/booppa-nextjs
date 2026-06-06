@@ -253,7 +253,7 @@ export default function PricingPage() {
 										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 299</div>
 										<p className="text-xs text-[#64748b] mb-6">One-time scan · Full risk report</p>
 										<ul className="space-y-3 mb-8 flex-1">
-											{["8-dimension PDPA scan", "Risk severity breakdown", "Remediation guide", "Audit-ready PDF report"].map(f => <CheckItem key={f} text={f} color="text-blue-500" />)}
+											{["11-dimension PDPA scan", "Risk severity breakdown", "PDPC enforcement precedents per finding", "Remediation guide", "Audit-ready PDF report"].map(f => <CheckItem key={f} text={f} color="text-blue-500" />)}
 										</ul>
 										<button 
 											disabled={loadingProduct === "pdpa_quick_scan"}
