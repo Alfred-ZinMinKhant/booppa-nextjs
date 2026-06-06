@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
 	Shield,
 	Eye,
@@ -94,6 +94,7 @@ function nextStepFromLevel(level: string | undefined): { href: string; label: st
 
 export default function VendorDashboard() {
 	const router = useRouter();
+	const pathname = usePathname();
 	const [mounted, setMounted] = useState(false);
 	const [data, setData] = useState<{
 		stats: any;
@@ -263,25 +264,47 @@ export default function VendorDashboard() {
 					</div>
 				</div>
 
-				{/* ── Quick nav (was Zone 6 — promoted to top per UX feedback) ─
-				    Horizontal scrollable strip with icon + label per page. Sticky
-				    so it stays accessible as the buyer scrolls through long
-				    activity feeds / insight rows. */}
+				{/* ── Quick nav ──────────────────────────────────────────────
+				    Sticky horizontal page-nav. Scrollbar is hidden visually
+				    (still functional via swipe/wheel); soft fade-out gradients
+				    on both edges hint at scrollable content. Active route gets
+				    an emerald left-bar + brighter text. */}
 				<nav
 					aria-label="Vendor pages"
-					className="sticky top-0 z-20 -mx-6 px-6 py-3 bg-neutral-950/95 backdrop-blur border-b border-neutral-800/80"
+					className="sticky top-0 z-20 -mx-6 px-6 py-2.5 bg-neutral-950/95 backdrop-blur-md border-b border-neutral-800/60 relative"
 				>
-					<div className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-800 scrollbar-track-transparent">
-						{SIBLING_LINKS.map(({ href, label, Icon }) => (
-							<Link
-								key={href}
-								href={href}
-								className="shrink-0 rounded-lg border border-neutral-800 bg-neutral-900/60 hover:bg-neutral-800 hover:border-neutral-700 transition px-3 py-2 flex items-center gap-2 text-xs text-neutral-300 whitespace-nowrap"
-							>
-								<Icon className="h-3.5 w-3.5 text-neutral-500" />
-								<span>{label}</span>
-							</Link>
-						))}
+					{/* Gradient masks at strip edges to indicate more content */}
+					<div className="pointer-events-none absolute left-6 top-0 bottom-0 w-6 bg-gradient-to-r from-neutral-950 to-transparent z-10" />
+					<div className="pointer-events-none absolute right-6 top-0 bottom-0 w-6 bg-gradient-to-l from-neutral-950 to-transparent z-10" />
+					<div
+						className="flex gap-1.5 overflow-x-auto whitespace-nowrap"
+						style={{
+							scrollbarWidth: "none",      // Firefox
+							msOverflowStyle: "none",    // IE 10+
+						}}
+					>
+						{/* WebKit (Chrome/Safari) scrollbar hide */}
+						<style jsx>{`
+							div::-webkit-scrollbar { display: none; }
+						`}</style>
+						{SIBLING_LINKS.map(({ href, label, Icon }) => {
+							const active = pathname === href || (href !== "/" && pathname?.startsWith(href + "/"));
+							return (
+								<Link
+									key={href}
+									href={href}
+									aria-current={active ? "page" : undefined}
+									className={`shrink-0 rounded-md transition px-2.5 py-1.5 flex items-center gap-1.5 text-[12px] font-medium ${
+										active
+											? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
+											: "text-neutral-400 hover:text-white hover:bg-neutral-900 border border-transparent"
+									}`}
+								>
+									<Icon className={`h-3.5 w-3.5 ${active ? "text-emerald-400" : "text-neutral-500"}`} />
+									<span>{label}</span>
+								</Link>
+							);
+						})}
 					</div>
 				</nav>
 
