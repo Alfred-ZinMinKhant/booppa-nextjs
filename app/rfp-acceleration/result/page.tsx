@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { POLYGON_NETWORK_NAME, polygonscanTxUrl } from '@/lib/blockchain';
 import {
   CheckCircle, Loader2, AlertTriangle, Download, ExternalLink,
-  Shield, Copy, Check, FileText, ArrowUpRight,
+  Shield, Copy, Check, FileText, ArrowUpRight, Mail, ArrowRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -74,28 +74,79 @@ function RFPResultContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'brief_required' | 'ready' | 'error'>('loading');
   const [result, setResult] = useState<RFPResult | null>(null);
+  const [pendingIntakeId, setPendingIntakeId] = useState<string | null>(null);
+  const [productType, setProductType] = useState<string | null>(null);
 
   useEffect(() => {
     if (!sessionId) { setStatus('error'); return; }
+    let cancelled = false;
     let polls = 0;
     const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.booppa.io';
+
+    // Check whether the buyer still owes a brief. The webhook may not have
+    // created the PendingRfpIntake row yet, so poll the verify endpoint a few
+    // times before assuming generation is already in flight.
+    async function checkBrief(): Promise<{ pendingId: string | null; productType: string | null }> {
+      try {
+        const res = await fetch(`${apiBase}/api/stripe/checkout/verify?session_id=${sessionId}`);
+        if (!res.ok) return { pendingId: null, productType: null };
+        const data = await res.json();
+        return {
+          pendingId: data.pending_rfp_intake_id || null,
+          productType: data.product_type || null,
+        };
+      } catch {
+        return { pendingId: null, productType: null };
+      }
+    }
 
     async function poll() {
       try {
         const res = await fetch(`${apiBase}/api/stripe/rfp/result?session_id=${sessionId}`);
         if (res.status === 200) {
           const data = await res.json();
+          if (cancelled) return;
           if (data.error) { setStatus('error'); return; }
           if (data.download_url) { setResult(data); setStatus('ready'); return; }
         }
       } catch { /* keep polling */ }
+      if (cancelled) return;
       polls++;
       if (polls >= MAX_POLLS) { setStatus('error'); return; }
       setTimeout(poll, POLL_INTERVAL_MS);
     }
-    poll();
+
+    (async () => {
+      const initial = await checkBrief();
+      if (cancelled) return;
+      if (initial.productType) setProductType(initial.productType);
+      if (initial.pendingId) {
+        setPendingIntakeId(initial.pendingId);
+        setStatus('brief_required');
+        return;
+      }
+      // Webhook race: retry a few times before falling back to polling, so a
+      // buyer who owes a brief doesn't briefly see "Generating…" first.
+      const retries = [1000, 2000, 3000];
+      for (const ms of retries) {
+        await new Promise(r => setTimeout(r, ms));
+        if (cancelled) return;
+        const retry = await checkBrief();
+        if (cancelled) return;
+        if (retry.productType && !productType) setProductType(retry.productType);
+        if (retry.pendingId) {
+          setPendingIntakeId(retry.pendingId);
+          setStatus('brief_required');
+          return;
+        }
+      }
+      poll();
+    })();
+
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   const isExpress   = result?.product_type === 'rfp_express';
@@ -124,6 +175,54 @@ function RFPResultContent() {
               {[0,1,2].map(i => (
                 <span key={i} className="w-1.5 h-1.5 rounded-full bg-sky-500/40 animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Brief required ───────────────────────────────────────────────── */}
+        {status === 'brief_required' && pendingIntakeId && (
+          <div className="space-y-5">
+            {/* Payment success header */}
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5 flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 shrink-0 text-emerald-400 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-emerald-300">Payment received — thanks for your purchase</p>
+                <p className="text-xs text-emerald-400/80 mt-1 leading-relaxed">
+                  One more step before we can build your {productType === 'rfp_express' ? 'RFP Express Kit' : 'RFP Complete Kit'}.
+                </p>
+              </div>
+            </div>
+
+            {/* Brief CTA card — mirrors the email so users have clear next steps without leaving the page */}
+            <div className="rounded-xl border border-sky-500/30 bg-gradient-to-b from-sky-500/10 to-sky-500/5 p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-lg bg-sky-500/15 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-sky-400" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Tell us about your RFP</h2>
+                  <p className="text-xs text-slate-400 mt-0.5">Takes about 2 minutes · Kit generated as soon as you submit</p>
+                </div>
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed mb-5">
+                Share a few details about the procurement and we&apos;ll generate your
+                {productType === 'rfp_express' ? ' RFP Express Kit' : ' RFP Complete Kit'} immediately.
+                Your kit can&apos;t be generated without it.
+              </p>
+              <Link
+                href={`/rfp-intake/${pendingIntakeId}`}
+                className="inline-flex items-center gap-2 px-5 py-3 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-lg transition text-sm"
+              >
+                Complete your RFP brief <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Secondary: emailed link for users who want to finish later */}
+            <div className="rounded-xl border border-white/8 bg-white/3 px-4 py-3 flex items-start gap-3">
+              <Mail className="w-4 h-4 shrink-0 text-slate-400 mt-0.5" />
+              <p className="text-xs text-slate-400 leading-relaxed">
+                We&apos;ve also emailed you this link — you can close this page and finish the brief later from your inbox.
+              </p>
             </div>
           </div>
         )}
