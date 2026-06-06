@@ -300,6 +300,38 @@ function RFPResultContent() {
         {status === 'ready' && result && (
           <div className="space-y-5">
 
+            {/* Verify-before-submitting banner — mirrors the PDF scope notice.
+                Buyers who copy from this page never see the PDF disclaimer, so
+                the warning has to live here too. Red/amber, top of view. */}
+            <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-300">
+                    Verify every answer before you submit
+                  </p>
+                  <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">
+                    AI-generated answers may name certifications (ISO 27001, SOC&nbsp;2),
+                    encryption standards (AES-256, TLS&nbsp;1.3), uptime SLAs,
+                    cloud providers, or timeframes that don&apos;t reflect your
+                    actual practice. Submitting unverified specifics to GeBIZ
+                    or any other procurement portal is your responsibility under
+                    Singapore&apos;s Government Procurement Act.
+                  </p>
+                  <p className="text-xs text-amber-200/80 mt-2 leading-relaxed">
+                    This kit covers the <strong>PDPA &amp; security compliance section</strong> of
+                    your bid only. You must still add proposal, pricing, delivery
+                    timeline, team, and tender-specific requirements separately.
+                  </p>
+                  {result.discrepancies && result.discrepancies.length > 0 && (
+                    <p className="text-xs text-amber-100 mt-2 font-semibold">
+                      {result.discrepancies.length} discrepanc{result.discrepancies.length === 1 ? 'y' : 'ies'} flagged below — review and correct before submission.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Upgrade banner */}
             {isExpress && (
               <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -466,8 +498,8 @@ function RFPResultContent() {
             {result.qa_answers && result.qa_answers.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-baseline gap-2">
-                  <h2 className="text-sm font-semibold text-slate-200">AI-Generated Answers</h2>
-                  <span className="text-xs text-slate-500">click copy to paste into your RFP form</span>
+                  <h2 className="text-sm font-semibold text-slate-200">Draft Answers</h2>
+                  <span className="text-xs text-amber-400/80">review each answer, edit before pasting into your RFP form</span>
                 </div>
                 {result.qa_answers.map((item, i) => (
                   <div key={i} className="rounded-xl border border-white/8 bg-white/3 p-4">
@@ -479,8 +511,10 @@ function RFPResultContent() {
                             fact-backed
                           </span>
                         ) : (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10 font-medium whitespace-nowrap">
-                            AI-generated
+                          // Amber, not grey — buyer should treat this as a draft to review,
+                          // not a finished answer ready to copy-submit.
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold uppercase tracking-wider whitespace-nowrap">
+                            ⚠ Review
                           </span>
                         )}
                         <CopyButton text={item.answer} />

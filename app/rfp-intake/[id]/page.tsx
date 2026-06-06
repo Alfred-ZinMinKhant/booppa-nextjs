@@ -11,6 +11,13 @@ interface Intake {
   company_name: string | null;
   status: 'pending' | 'submitted' | string;
   session_id: string | null;
+  // Pre-purchase /rfp-acceleration form contents, surfaced by the backend
+  // so the brief form can seed itself. Empty object when there's nothing
+  // cached (one-click /pricing buy, or cache expired).
+  prefill?: {
+    rfp_description?: string;
+    intake_data?: Record<string, string>;
+  };
   created_at: string | null;
 }
 
@@ -78,6 +85,37 @@ export default function RfpIntakePage() {
           return;
         }
         setIntake(data);
+        // Seed the form from anything the buyer entered on /rfp-acceleration
+        // before checkout. Only known IntakeFields keys are accepted; anything
+        // else in intake_data is ignored. Buyer can edit before submitting.
+        const pf = data.prefill;
+        if (pf && data.status !== 'submitted') {
+          const seed: Partial<IntakeFields> = {};
+          if (typeof pf.rfp_description === 'string' && pf.rfp_description) {
+            seed.rfp_description = pf.rfp_description;
+          }
+          const id = pf.intake_data;
+          if (id && typeof id === 'object') {
+            for (const k of Object.keys(EMPTY) as (keyof IntakeFields)[]) {
+              const v = (id as Record<string, unknown>)[k];
+              if (typeof v === 'string' && v) {
+                (seed as Record<string, string>)[k] = v;
+              }
+            }
+            // Open the advanced section if any compliance facts were
+            // pre-filled — otherwise they'd be hidden behind the toggle.
+            const advancedKeys: (keyof IntakeFields)[] = [
+              'uen', 'description', 'dpo_appointed', 'dpo_name', 'dpo_email',
+              'iso_status', 'iso_cert_number', 'iso_cert_expiry',
+              'data_hosting', 'primary_cloud', 'breach_history',
+              'training_frequency', 'key_processors',
+            ];
+            if (advancedKeys.some(k => seed[k])) setShowAdvanced(true);
+          }
+          if (Object.keys(seed).length > 0) {
+            setForm(f => ({ ...f, ...seed }));
+          }
+        }
         if (data.status === 'submitted') {
           setDone(true);
         }
