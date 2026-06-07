@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { normalizeUrl, validateNormalizedUrl } from '@/lib/url';
 
 interface Intake {
@@ -78,6 +78,13 @@ export default function RfpIntakePage() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
+  // Tender-doc upload state. Optional shortcut: buyer drops a tender PDF and
+  // we extract structured fields to prefill the form. They review + edit.
+  const tenderFileRef = useRef<HTMLInputElement>(null);
+  const [extracting, setExtracting] = useState(false);
+  const [extractError, setExtractError] = useState<string | null>(null);
+  const [extractFilledFrom, setExtractFilledFrom] = useState<string | null>(null);
+
   useEffect(() => {
     if (!intakeId) return;
     (async () => {
@@ -151,6 +158,67 @@ export default function RfpIntakePage() {
     : intake?.rfp_product_type === 'rfp_complete'
       ? 'RFP Complete Kit'
       : 'RFP Express Kit';
+
+  async function handleExtractTender() {
+    const files = tenderFileRef.current?.files;
+    if (!files || files.length === 0) {
+      setExtractError('Choose a PDF to extract from.');
+      return;
+    }
+    const file = files[0];
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      setExtractError('Upload a PDF file.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setExtractError('PDF too large. Maximum 10 MB.');
+      return;
+    }
+    setExtractError(null);
+    setExtractFilledFrom(null);
+    setExtracting(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch(`/api/rfp-intake/${intakeId}/extract`, {
+        method: 'POST',
+        body: fd,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setExtractError(data.detail || 'Extraction failed — please type your brief.');
+        return;
+      }
+      if (!data.extracted) {
+        setExtractError(data.reason || "Couldn't extract — please type your brief.");
+        return;
+      }
+      // Merge suggested fields into the form. Buyer reviews + edits.
+      const sx = data.extracted as Record<string, unknown>;
+      const patch: Partial<IntakeFields> = {};
+      if (typeof sx.rfp_description === 'string' && sx.rfp_description.trim()) {
+        patch.rfp_description = String(sx.rfp_description).trim();
+      }
+      if (typeof sx.sector === 'string' && sx.sector.trim() && sx.sector !== 'unknown') {
+        patch.sector = String(sx.sector).trim();
+      }
+      const iso = String(sx.iso_status || 'unknown');
+      if (['certified', 'pursuing', 'none', 'unknown'].includes(iso) && iso !== 'unknown') {
+        patch.iso_status = iso as IntakeFields['iso_status'];
+      }
+      const hosting = String(sx.data_hosting || 'unknown');
+      if (['sg', 'apac', 'global', 'unknown'].includes(hosting) && hosting !== 'unknown') {
+        patch.data_hosting = hosting as IntakeFields['data_hosting'];
+      }
+      setForm(f => ({ ...f, ...patch }));
+      if (patch.iso_status || patch.data_hosting) setShowAdvanced(true);
+      setExtractFilledFrom(typeof data.source_filename === 'string' ? data.source_filename : file.name);
+    } catch {
+      setExtractError('Network error — please type your brief.');
+    } finally {
+      setExtracting(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -320,6 +388,48 @@ export default function RfpIntakePage() {
               </p>
             </div>
           </div>
+          {/* Skip-the-typing affordance: buyer drops the tender PDF and we
+              extract the brief + a few compliance fields. They review + edit
+              before submitting. Failure path is graceful — they fall back to
+              typing the description by hand. */}
+          <div className="border border-dashed border-[#cbd5e1] rounded-lg p-4 bg-[#f8fafc]">
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-[#0f172a]">
+                  Skip the typing — upload your tender PDF
+                </p>
+                <p className="text-xs text-[#64748b] mt-1">
+                  We&apos;ll extract the brief, sector, and a couple of compliance facts. Review and edit before submitting. (Optional)
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <input
+                    ref={tenderFileRef}
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    className="text-xs"
+                    onChange={() => { setExtractError(null); setExtractFilledFrom(null); }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleExtractTender}
+                    disabled={extracting}
+                    className="bg-[#0ea5e9] text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-[#0284c7] disabled:opacity-50"
+                  >
+                    {extracting ? 'Extracting…' : 'Extract & pre-fill'}
+                  </button>
+                </div>
+                {extractError && (
+                  <p className="text-xs text-red-600 mt-2">{extractError}</p>
+                )}
+                {extractFilledFrom && (
+                  <p className="text-xs text-emerald-700 mt-2">
+                    ✓ Pre-filled from <strong>{extractFilledFrom}</strong> — review and edit below before submitting.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div>
             <label htmlFor="rfp_description" className="block text-sm font-semibold text-[#0f172a] mb-1">
               What are you procuring? *

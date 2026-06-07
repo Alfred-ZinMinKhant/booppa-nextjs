@@ -285,25 +285,66 @@ export default function PricingPage() {
 									{/* Compliance Bundle */}
 									<div className="bg-[#0f172a] p-8 rounded-[2rem] border-2 border-[#10b981] shadow-2xl hover:-translate-y-1 transition-all relative flex flex-col lg:col-span-2">
 										<div className="absolute top-[-14px] left-8 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Best Value</div>
-										<div className="flex flex-col lg:flex-row lg:items-center gap-8">
+										<div className="flex flex-col lg:flex-row lg:items-start gap-8">
 											<div className="flex-1">
 												<h3 className="text-2xl font-black text-white mb-2">Compliance Bundle</h3>
 												<p className="text-white/60 mb-6">The ultimate foundation for winning large-scale enterprise and government contracts.</p>
-												<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-													{["PDPA Scan (Full)", "RFP Complete Kit", "Blockchain Cover Sheet", "Full Evidence Archive"].map(f => (
-														<div key={f} className="flex items-center gap-2 text-sm text-white/80">
-															<span className="text-[#10b981] font-bold">✓</span>
-															{f}
-														</div>
+												<div className="space-y-3">
+													{[
+														{
+															label: "PDPA Scan (Full)",
+															scope: "Scans privacy policy, DPO contact, cookie consent, breach notification surfaces. Identifies findings across PDPA's 7 obligations. Report + Polygon Amoy anchor.",
+														},
+														{
+															label: "RFP Complete Kit",
+															scope: "15-question regulator-ready Q&A: PDPA, ISO 27001, encryption, hosting region, sub-processors, breach history, DR/BCP. Answers verified against your website where possible. PDF + blockchain anchor.",
+														},
+														{
+															label: "Blockchain Cover Sheet",
+															scope: "9-section PDF summarising PDPA + RFP findings. You sign in-browser (or download + wet-sign) → final receipt anchored on-chain.",
+														},
+														{
+															label: "Full Evidence Archive",
+															scope: "All four anchored artifacts retained in your Compliance Locker (re-downloadable anytime, no retention expiry).",
+														},
+													].map(item => (
+														<details key={item.label} className="group bg-white/5 rounded-lg border border-white/10">
+															<summary className="cursor-pointer list-none px-3 py-2 flex items-center gap-2 text-sm text-white/90 font-semibold">
+																<span className="text-[#10b981] font-bold">✓</span>
+																<span className="flex-1">{item.label}</span>
+																<span className="text-xs text-white/40 group-open:rotate-180 transition-transform">▼</span>
+															</summary>
+															<div className="px-3 pb-3 pt-1 text-xs text-white/70 leading-relaxed border-t border-white/10">
+																{item.scope}
+															</div>
+														</details>
 													))}
 												</div>
+												<div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+													<div className="bg-white/5 rounded-lg px-3 py-2">
+														<p className="text-white/40 uppercase tracking-widest font-bold text-[10px]">Delivery</p>
+														<p className="text-white/80 mt-0.5">PDPA + Cover Sheet in ~5 min; RFP kit ~5 min after you submit the brief.</p>
+													</div>
+													<div className="bg-white/5 rounded-lg px-3 py-2">
+														<p className="text-white/40 uppercase tracking-widest font-bold text-[10px]">Best for</p>
+														<p className="text-white/80 mt-0.5">GeBIZ tender response · enterprise vendor onboarding · regulator-ready evidence pack.</p>
+													</div>
+												</div>
+												<a
+													href="/samples/compliance-cover-sheet-sample.pdf"
+													target="_blank"
+													rel="noreferrer"
+													className="inline-block mt-4 text-xs font-semibold text-[#10b981] hover:underline"
+												>
+													See a sample Cover Sheet PDF →
+												</a>
 											</div>
 											<div className="lg:w-64 flex flex-col items-center lg:items-end justify-center border-t lg:border-t-0 lg:border-l border-white/10 pt-6 lg:pt-0 lg:pl-8">
 												<div className="text-5xl font-black text-white mb-1">799</div>
 												<div className="text-white/40 text-xs mb-6 text-center lg:text-right">SGD · One-time bundle<br/>Save over SGD 100</div>
-												<button 
+												<button
 													disabled={loadingProduct === "compliance_evidence_pack"}
-													onClick={() => handleCheckout("compliance_evidence_pack")} 
+													onClick={() => handleCheckout("compliance_evidence_pack")}
 													className="w-full bg-[#10b981] text-white font-bold py-4 rounded-2xl hover:bg-[#059669] transition shadow-lg shadow-[#10b981]/20 disabled:opacity-50"
 												>
 													{loadingProduct === "compliance_evidence_pack" ? "Redirecting..." : "Get Bundle →"}
@@ -560,16 +601,56 @@ export default function PricingPage() {
 									</div>
 									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 799</div>
 									<p className="text-xs text-[#64748b] mb-6">one-time payment</p>
-									<ul className="space-y-3 mb-8 flex-1">
-										{["PDPA Quick Scan included", "RFP Complete — 15 Q&A", "Compliance Cover Sheet v3", "All 3 documents on Amoy Testnet"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
-									</ul>
-									<div className="pt-6 border-t border-[#f1f5f9] mb-6">
-										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
-										<p className="text-sm text-[#475569]">tender response, vendor onboarding</p>
+									<div className="space-y-2 mb-6 flex-1">
+										{[
+											{
+												label: "PDPA Quick Scan included",
+												scope: "Privacy policy + DPO contact + cookie consent + breach notification scan. Findings across PDPA's 7 obligations.",
+											},
+											{
+												label: "RFP Complete — 15 Q&A",
+												scope: "Regulator-ready Q&A across PDPA, ISO 27001, encryption, hosting, sub-processors. Answers verified against your website where possible.",
+											},
+											{
+												label: "Compliance Cover Sheet v4",
+												scope: "9-section PDF you sign in-browser (ETA s. 8) or wet-sign. Signed copy anchored on-chain.",
+											},
+											{
+												label: "All 3 documents on Amoy Testnet",
+												scope: "Retained in your Compliance Locker — re-downloadable anytime, no retention expiry.",
+											},
+										].map(item => (
+											<details key={item.label} className="group rounded-md border border-[#f1f5f9]">
+												<summary className="cursor-pointer list-none px-2.5 py-1.5 flex items-center gap-2 text-sm text-[#0f172a]">
+													<span className="text-violet-500 font-bold">✓</span>
+													<span className="flex-1">{item.label}</span>
+													<span className="text-xs text-[#94a3b8] group-open:rotate-180 transition-transform">▼</span>
+												</summary>
+												<p className="px-2.5 pb-2 pt-0.5 text-xs text-[#64748b] leading-relaxed border-t border-[#f1f5f9]">
+													{item.scope}
+												</p>
+											</details>
+										))}
 									</div>
-									<button 
+									<div className="pt-4 border-t border-[#f1f5f9] mb-4">
+										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Delivery</p>
+										<p className="text-sm text-[#475569]">PDPA + Cover Sheet in ~5 min; RFP kit ~5 min after brief.</p>
+									</div>
+									<div className="pb-4 mb-2">
+										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
+										<p className="text-sm text-[#475569]">GeBIZ tender response, enterprise vendor onboarding</p>
+									</div>
+									<a
+										href="/samples/compliance-cover-sheet-sample.pdf"
+										target="_blank"
+										rel="noreferrer"
+										className="text-xs font-semibold text-violet-600 hover:underline mb-4"
+									>
+										See a sample Cover Sheet PDF →
+									</a>
+									<button
 										disabled={loadingProduct === "compliance_evidence_pack"}
-										onClick={() => handleCheckout("compliance_evidence_pack")} 
+										onClick={() => handleCheckout("compliance_evidence_pack")}
 										className="w-full bg-violet-600 text-white font-bold py-4 rounded-2xl hover:bg-violet-500 transition shadow-lg shadow-violet-600/20 disabled:opacity-50"
 									>
 										{loadingProduct === "compliance_evidence_pack" ? "Redirecting..." : "Get Bundle — SGD 799 →"}

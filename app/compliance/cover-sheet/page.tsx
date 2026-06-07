@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { config } from '@/lib/config'
 import { POLYGON_EXPLORER_HOST, polygonscanTxUrl } from '@/lib/blockchain'
-import { CheckCircle, Loader2, FileText, ExternalLink, Upload as UploadIcon, AlertCircle, ArrowRight, Mail } from 'lucide-react'
+import { CheckCircle, Loader2, FileText, ExternalLink, Upload as UploadIcon, AlertCircle, ArrowRight, Mail, Circle, Download as DownloadIcon, PenLine } from 'lucide-react'
 
 interface CoverSheetStatus {
   credits: number
@@ -28,6 +28,16 @@ function CoverSheetInner() {
   const [uploading, setUploading] = useState(false)
   const [regenerating, setRegenerating] = useState(false)
   const [error, setError] = useState('')
+
+  // Sign-step UI state. Default to electronic — it closes the loop without a
+  // platform exit. Wet-sign still works for buyers who need a physical signature.
+  const [signMethod, setSignMethod] = useState<'electronic' | 'wet'>('electronic')
+  const [signerName, setSignerName] = useState('')
+  const [signerTitle, setSignerTitle] = useState('')
+  const [attestAuthorised, setAttestAuthorised] = useState(false)
+  const [attestAccurate, setAttestAccurate] = useState(false)
+  const [esigning, setEsigning] = useState(false)
+  const [downloadedOnce, setDownloadedOnce] = useState(false)
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -117,6 +127,48 @@ function CoverSheetInner() {
       setError(e.message || 'Upload failed')
     } finally {
       setUploading(false)
+    }
+  }
+
+  // In-browser electronic signature path. Sends typed name + title + the two
+  // attestations to the backend, which appends a Signature Page to the
+  // unsigned Cover Sheet and anchors the combined PDF on-chain — same final
+  // pipeline as the wet-sign upload path.
+  const handleESign = async () => {
+    if (!email) {
+      setError('Sign in or enter your purchase email first.')
+      return
+    }
+    if (!signerName.trim() || !signerTitle.trim()) {
+      setError('Enter your full legal name and title.')
+      return
+    }
+    if (!attestAuthorised || !attestAccurate) {
+      setError('Both attestations must be ticked.')
+      return
+    }
+    setError('')
+    setEsigning(true)
+    try {
+      const res = await fetch(`${apiBase}/api/v1/compliance/cover-sheet/sign-electronically`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          signer_name: signerName.trim(),
+          signer_title: signerTitle.trim(),
+          attestations: { authorised: attestAuthorised, accurate: attestAccurate },
+        }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.detail || 'Electronic signature failed')
+      }
+      await refreshStatus(email)
+    } catch (e: any) {
+      setError(e.message || 'Electronic signature failed')
+    } finally {
+      setEsigning(false)
     }
   }
 
@@ -320,19 +372,17 @@ function CoverSheetInner() {
           </div>
         )}
 
-        {/* Cover sheet ready — show download */}
-        {coverReady && status?.cover_sheet?.download_url && (
+        {/* Final receipt card — only shown after the signed Cover Sheet has
+            been anchored (signed_uploaded=true). Section 5 now carries the
+            signed anchor; this is the regulator-ready end-state.            */}
+        {coverReady && status?.signed_uploaded && status?.cover_sheet?.download_url && (
           <div className="bg-gradient-to-r from-emerald-50 to-sky-50 border-2 border-emerald-300 rounded-2xl p-6 mb-8">
             <div className="flex items-start gap-4">
               <CheckCircle className="w-8 h-8 text-emerald-600 flex-shrink-0 mt-1" />
               <div className="flex-1">
-                <h2 className="font-black text-[#0f172a] text-xl mb-1">
-                  {finalReceipt ? 'Updated Cover Sheet' : 'Compliance Cover Sheet ready'}
-                </h2>
+                <h2 className="font-black text-[#0f172a] text-xl mb-1">Updated Cover Sheet</h2>
                 <p className="text-sm text-[#475569] mb-4">
-                  {finalReceipt
-                    ? 'Section 5 now includes your signed Cover Sheet anchor. Keep this PDF — it\'s the regulator-ready evidence trail.'
-                    : '9-section regulator-ready PDF with PDPA score, RFP Complete summary, and SHA-256 anchored evidence. Sign this PDF, then upload the signed copy below using your included Compliance Evidence credit.'}
+                  Section 5 now includes your signed Cover Sheet anchor. Keep this PDF — it&apos;s the regulator-ready evidence trail.
                   {status.cover_sheet.generated_at && (
                     <span className="block text-xs text-[#94a3b8] mt-1">
                       Generated {new Date(status.cover_sheet.generated_at).toLocaleString()}
@@ -358,59 +408,229 @@ function CoverSheetInner() {
                       View Anchor <ExternalLink className="w-4 h-4" />
                     </a>
                   )}
-                  {!finalReceipt && status?.cover_sheet?.outdated && (
-                    <button
-                      type="button"
-                      onClick={handleRegenerate}
-                      disabled={regenerating}
-                      className="bg-amber-500 text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-amber-600 inline-flex items-center gap-2 disabled:opacity-50"
-                    >
-                      {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" /> Regenerating…</> : 'Regenerate to latest format'}
-                    </button>
-                  )}
                 </div>
-                {!finalReceipt && status?.cover_sheet?.outdated && (
-                  <p className="text-xs text-amber-700 mt-3">
-                    This Cover Sheet was issued by an earlier version. Click <strong>Regenerate to latest format</strong> for a refreshed PDF and blockchain anchor at no cost.
-                  </p>
-                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Signed upload form */}
-        {coverReady && !status?.signed_uploaded && status && status.credits > 0 && (
-          <div className="border-2 border-dashed border-[#cbd5e1] rounded-2xl p-8 mb-8 bg-[#f8fafc]">
-            <h2 className="font-bold text-[#0f172a] mb-2 flex items-center gap-2">
-              <UploadIcon className="w-5 h-5 text-[#10b981]" /> Upload your signed Cover Sheet
-            </h2>
-            <p className="text-sm text-[#64748b] mb-4">
-              Sign the downloaded PDF (digital or wet signature), then upload the signed copy here. We&apos;ll anchor it on-chain and email you the final blockchain receipt with all four anchors.
-            </p>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[#334155] mb-1">Signed PDF (max 50 MB)</label>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept=".pdf,application/pdf"
-                  className="w-full text-sm"
-                />
-              </div>
-              {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
-              <button
-                type="button"
-                onClick={handleUpload}
-                disabled={uploading}
-                className="bg-[#10b981] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#059669] disabled:opacity-50 inline-flex items-center gap-2"
-              >
-                {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Anchoring…</> : <>Upload Signed PDF</>}
-              </button>
-              <p className="text-xs text-[#94a3b8]">
-                This consumes your 1 included Compliance Evidence credit. Other bundle notarizations are unaffected.
+        {/* Finalise checklist — sequenced 3-step card. Shown after the
+            unsigned Cover Sheet is generated but before it's been signed.
+            Replaces the old separate Download + Upload blocks so the buyer
+            has a single, ordered set of instructions instead of two
+            disconnected cards. */}
+        {coverReady && !status?.signed_uploaded && status && status.credits > 0 && status?.cover_sheet?.download_url && (
+          <div className="border-2 border-emerald-200 bg-white rounded-2xl p-6 mb-8">
+            <div className="mb-5">
+              <h2 className="text-xl font-black text-[#0f172a] mb-1">Finalise your Cover Sheet</h2>
+              <p className="text-sm text-[#64748b]">
+                Three steps to lock in your regulator-ready evidence trail. The whole loop stays inside Booppa — no DocuSign or external e-sign account needed.
               </p>
+              {status.cover_sheet.generated_at && (
+                <p className="text-xs text-[#94a3b8] mt-1">
+                  Unsigned Cover Sheet generated {new Date(status.cover_sheet.generated_at).toLocaleString()}
+                </p>
+              )}
             </div>
+
+            {/* Step 1 — Download */}
+            <div className="border border-[#e2e8f0] rounded-xl p-4 mb-3">
+              <div className="flex items-start gap-3">
+                {downloadedOnce ? (
+                  <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <Circle className="w-5 h-5 text-[#cbd5e1] flex-shrink-0 mt-0.5" />
+                )}
+                <div className="flex-1">
+                  <p className="font-bold text-[#0f172a] text-sm">Step 1 — Download the unsigned Cover Sheet</p>
+                  <p className="text-xs text-[#64748b] mt-0.5">
+                    Open the 9-section regulator-ready PDF and review the contents before signing.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <a
+                      href={status.cover_sheet.download_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => setDownloadedOnce(true)}
+                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-emerald-700 inline-flex items-center gap-2"
+                    >
+                      <DownloadIcon className="w-3.5 h-3.5" /> Download PDF
+                    </a>
+                    {status.cover_sheet.tx_hash && (
+                      <a
+                        href={polygonscanTxUrl(status.cover_sheet.tx_hash)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="bg-white border border-emerald-300 text-emerald-700 px-4 py-2 rounded-lg font-bold text-xs hover:bg-emerald-50 inline-flex items-center gap-2"
+                      >
+                        View unsigned anchor <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                    {status?.cover_sheet?.outdated && (
+                      <button
+                        type="button"
+                        onClick={handleRegenerate}
+                        disabled={regenerating}
+                        className="bg-amber-500 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-amber-600 inline-flex items-center gap-2 disabled:opacity-50"
+                      >
+                        {regenerating ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Regenerating…</> : 'Regenerate to latest format'}
+                      </button>
+                    )}
+                  </div>
+                  {status?.cover_sheet?.outdated && (
+                    <p className="text-xs text-amber-700 mt-2">
+                      This Cover Sheet was issued by an earlier version. Click <strong>Regenerate</strong> for a refreshed PDF at no cost.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 — Sign */}
+            <div className="border border-[#e2e8f0] rounded-xl p-4 mb-3">
+              <div className="flex items-start gap-3">
+                <Circle className="w-5 h-5 text-[#cbd5e1] flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-bold text-[#0f172a] text-sm">Step 2 — Sign it</p>
+                  <p className="text-xs text-[#64748b] mt-0.5 mb-3">
+                    Pick how you want to sign. Most buyers stay in-browser.
+                  </p>
+
+                  <div className="space-y-2">
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer ${signMethod === 'electronic' ? 'border-emerald-400 bg-emerald-50/50' : 'border-[#e2e8f0]'}`}>
+                      <input
+                        type="radio"
+                        name="signMethod"
+                        value="electronic"
+                        checked={signMethod === 'electronic'}
+                        onChange={() => setSignMethod('electronic')}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-[#0f172a] flex items-center gap-2">
+                          <PenLine className="w-3.5 h-3.5" /> Sign electronically (recommended)
+                        </p>
+                        <p className="text-xs text-[#64748b] mt-0.5">
+                          Type your name and tick two attestations. We append a Signature Page bound to the PDF&apos;s SHA-256 and anchor it on-chain. Valid under Singapore Electronic Transactions Act s. 8.
+                        </p>
+                      </div>
+                    </label>
+
+                    <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer ${signMethod === 'wet' ? 'border-emerald-400 bg-emerald-50/50' : 'border-[#e2e8f0]'}`}>
+                      <input
+                        type="radio"
+                        name="signMethod"
+                        value="wet"
+                        checked={signMethod === 'wet'}
+                        onChange={() => setSignMethod('wet')}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-[#0f172a]">Print, wet-sign, scan</p>
+                        <p className="text-xs text-[#64748b] mt-0.5">
+                          Print the PDF, sign in ink, scan back to PDF. Upload in Step 3 below.
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Electronic-sign inline form */}
+                  {signMethod === 'electronic' && (
+                    <div className="mt-4 space-y-3 border-t border-[#e2e8f0] pt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-[#334155] mb-1">Full legal name *</label>
+                          <input
+                            type="text"
+                            value={signerName}
+                            onChange={(e) => setSignerName(e.target.value)}
+                            placeholder="e.g. Tan Wei Ling"
+                            className="w-full px-3 py-2 text-sm border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-[#334155] mb-1">Title / role *</label>
+                          <input
+                            type="text"
+                            value={signerTitle}
+                            onChange={(e) => setSignerTitle(e.target.value)}
+                            placeholder="e.g. Chief Compliance Officer"
+                            className="w-full px-3 py-2 text-sm border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                      </div>
+                      <label className="flex items-start gap-2 text-xs text-[#334155]">
+                        <input
+                          type="checkbox"
+                          checked={attestAuthorised}
+                          onChange={(e) => setAttestAuthorised(e.target.checked)}
+                          className="mt-0.5"
+                        />
+                        <span>I am authorised to sign this Cover Sheet on behalf of my organisation.</span>
+                      </label>
+                      <label className="flex items-start gap-2 text-xs text-[#334155]">
+                        <input
+                          type="checkbox"
+                          checked={attestAccurate}
+                          onChange={(e) => setAttestAccurate(e.target.checked)}
+                          className="mt-0.5"
+                        />
+                        <span>I attest that the contents of this Cover Sheet are true and accurate to the best of my knowledge.</span>
+                      </label>
+                      {error && <p className="text-xs text-red-600 font-medium">{error}</p>}
+                      <button
+                        type="button"
+                        onClick={handleESign}
+                        disabled={esigning}
+                        className="bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-700 disabled:opacity-50 inline-flex items-center gap-2"
+                      >
+                        {esigning ? <><Loader2 className="w-4 h-4 animate-spin" /> Signing &amp; anchoring…</> : <>Sign &amp; submit <ArrowRight className="w-4 h-4" /></>}
+                      </button>
+                      <p className="text-xs text-[#94a3b8]">
+                        This consumes your 1 included Compliance Evidence credit. Other bundle notarizations are unaffected.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 — Upload (only when wet-sign chosen) */}
+            {signMethod === 'wet' && (
+              <div className="border border-[#e2e8f0] rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <Circle className="w-5 h-5 text-[#cbd5e1] flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-bold text-[#0f172a] text-sm flex items-center gap-2">
+                      <UploadIcon className="w-3.5 h-3.5" /> Step 3 — Upload your signed copy
+                    </p>
+                    <p className="text-xs text-[#64748b] mt-0.5 mb-3">
+                      We&apos;ll anchor the signed PDF on-chain and email the final receipt with all four anchors.
+                    </p>
+                    <div className="space-y-3">
+                      <input
+                        ref={fileRef}
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        className="w-full text-sm"
+                      />
+                      {error && <p className="text-xs text-red-600 font-medium">{error}</p>}
+                      <button
+                        type="button"
+                        onClick={handleUpload}
+                        disabled={uploading}
+                        className="bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-700 disabled:opacity-50 inline-flex items-center gap-2"
+                      >
+                        {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Anchoring…</> : <>Upload signed PDF</>}
+                      </button>
+                      <p className="text-xs text-[#94a3b8]">
+                        Maximum 50 MB. This consumes your 1 included Compliance Evidence credit.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
