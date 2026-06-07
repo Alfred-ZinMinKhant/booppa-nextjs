@@ -4,6 +4,7 @@ import { COMPANY_NAME_SINGAPORE } from "@/lib/company";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { config } from "@/lib/config";
+import { normalizeUrl } from "@/lib/url";
 
 interface Finding {
 	check_id: string;
@@ -31,13 +32,6 @@ interface ScanResult {
 	unlock_cta: { product_type: string; price: string; description: string };
 }
 
-function normalizeUrl(input: string): string {
-	let url = input.trim();
-	if (!url) return url;
-	url = url.replace(/^\/+/, "");
-	if (!/^https?:\/\//i.test(url)) url = "https://" + url;
-	return url;
-}
 
 const severityColor: Record<string, string> = {
 	CRITICAL: "bg-red-600",

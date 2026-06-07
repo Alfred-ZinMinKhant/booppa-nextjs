@@ -3,16 +3,7 @@
 import { useState } from "react";
 import { config } from '@/lib/config';
 import HardenedClickwrap from '@/components/legal/HardenedClickwrap';
-
-function normalizeUrl(input: string): string {
-  let url = input.trim();
-  if (!url) return url;
-  url = url.replace(/^\/+/, '');
-  if (!/^https?:\/\//i.test(url)) {
-    url = 'https://' + url;
-  }
-  return url;
-}
+import { normalizeUrl } from '@/lib/url';
 
 export default function QuickScanPage() {
   const [website, setWebsite] = useState("");

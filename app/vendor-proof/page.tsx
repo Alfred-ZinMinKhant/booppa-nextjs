@@ -5,15 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { config } from "@/lib/config";
 import HardenedClickwrap from "@/components/legal/HardenedClickwrap";
 import Link from "next/link";
-
-function normalizeUrl(input: string): string {
-	let url = input.trim();
-	if (!url) return url;
-	if (!/^https?:\/\//i.test(url)) {
-		url = "https://" + url;
-	}
-	return url;
-}
+import { normalizeUrl } from "@/lib/url";
 
 function VendorProofContent() {
 	const searchParams = useSearchParams();

@@ -3,18 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { config } from "@/lib/config";
-
-function normalizeUrl(input: string): string {
-	let url = input.trim();
-	if (!url) return url;
-	// Strip leading slashes or whitespace
-	url = url.replace(/^\/+/, "");
-	// If it doesn't start with a protocol, add https://
-	if (!/^https?:\/\//i.test(url)) {
-		url = "https://" + url;
-	}
-	return url;
-}
+import { normalizeUrl } from "@/lib/url";
 
 async function startPdpaCheckout(productType: string, extra?: Record<string, string>): Promise<void> {
 	const res = await fetch("/api/checkout", {

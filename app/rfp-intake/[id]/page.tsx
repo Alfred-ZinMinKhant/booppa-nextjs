@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { normalizeUrl, validateNormalizedUrl } from '@/lib/url';
 
 interface Intake {
   id: string;
@@ -146,12 +147,14 @@ export default function RfpIntakePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.vendor_url.trim()) {
+    const normalizedUrl = normalizeUrl(form.vendor_url);
+    if (!normalizedUrl) {
       setError("Please enter your company website — we scan it to verify your compliance claims.");
       return;
     }
-    if (!/^https?:\/\//i.test(form.vendor_url.trim())) {
-      setError("Website must start with http:// or https://");
+    const urlError = validateNormalizedUrl(normalizedUrl);
+    if (urlError) {
+      setError(urlError);
       return;
     }
     if (!form.company_name.trim()) {
@@ -165,7 +168,9 @@ export default function RfpIntakePage() {
     setError(null);
     setSubmitting(true);
     try {
-      const { vendor_url, company_name, rfp_description, sector, ...rest } = form;
+      const { company_name, rfp_description, sector, ...rest } = form;
+      // Drop vendor_url from rest — we send the normalized URL below.
+      delete (rest as Record<string, unknown>).vendor_url;
       const intake_data: Record<string, string> = {};
       for (const [k, v] of Object.entries(rest)) {
         if (typeof v === 'string' && v.trim()) intake_data[k] = v.trim();
@@ -174,7 +179,7 @@ export default function RfpIntakePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vendor_url: vendor_url.trim(),
+          vendor_url: normalizedUrl,
           company_name: company_name.trim(),
           rfp_description: rfp_description.trim(),
           sector: sector.trim() || undefined,
@@ -286,11 +291,15 @@ export default function RfpIntakePage() {
               </label>
               <input
                 id="vendor_url"
-                type="url"
+                type="text"
+                inputMode="url"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
                 required
                 value={form.vendor_url}
                 onChange={(e) => setForm({ ...form, vendor_url: e.target.value })}
-                placeholder="https://acme.io"
+                placeholder="acme.io"
                 className="w-full px-3 py-2 border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-[#0ea5e9]"
               />
               <p className="text-xs text-[#64748b] mt-1">
