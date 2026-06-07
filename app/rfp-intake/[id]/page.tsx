@@ -143,7 +143,14 @@ export default function RfpIntakePage() {
     })();
   }, [intakeId, router]);
 
-  const kitLabel = intake?.rfp_product_type === 'rfp_complete' ? 'RFP Complete Kit' : 'RFP Express Kit';
+  // Compliance Bundle buyers see "Compliance Bundle" framing — the RFP kit
+  // is an internal deliverable; their headline product is the Cover Sheet.
+  const isComplianceBundle = intake?.bundle_source === 'compliance_evidence_pack';
+  const kitLabel = isComplianceBundle
+    ? 'Compliance Bundle'
+    : intake?.rfp_product_type === 'rfp_complete'
+      ? 'RFP Complete Kit'
+      : 'RFP Express Kit';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -191,9 +198,15 @@ export default function RfpIntakePage() {
         setError(data.error || 'Submission failed. Please try again.');
         return;
       }
-      // Hop straight to the polling/result page so the buyer watches the kit
-      // arrive instead of getting dumped on a generic "go to dashboard" card.
-      // session_id comes from the Stripe checkout that created this intake.
+      // Compliance Bundle buyers care about the Cover Sheet, not the bare RFP
+      // kit — the RFP output is just one input to the cover sheet. Send them
+      // to the cover-sheet status page so they watch the headline deliverable.
+      // Everyone else (rfp_complete / rfp_express / rfp_accelerator /
+      // enterprise_bid_kit) lands on the RFP Accelerator result page.
+      if (isComplianceBundle) {
+        router.replace('/compliance/cover-sheet');
+        return;
+      }
       const sessionId = data.session_id || intake?.session_id;
       if (sessionId) {
         router.replace(`/rfp-acceleration/result?session_id=${encodeURIComponent(sessionId)}`);
