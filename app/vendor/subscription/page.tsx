@@ -22,6 +22,21 @@ interface FeatureMap {
   monthly_notarization_quota?: number
 }
 
+interface ActiveSubscription {
+  id: string
+  product_type: string
+  label: string
+  description: string | null
+  price_sgd: number | null
+  interval: 'month' | 'annual'
+  status: string
+  current_period_end: string | null
+  started_at: string | null
+  stripe_subscription_id: string | null
+  stripe_customer_id: string | null
+  features: FeatureMap
+}
+
 interface SubscriptionPayload {
   plan: string
   plan_label: string
@@ -31,6 +46,7 @@ interface SubscriptionPayload {
   stripe_customer_id: string | null
   stripe_subscription_id: string | null
   features: FeatureMap
+  all_subscriptions?: ActiveSubscription[]
   notarization: { monthly_quota: number; used_this_month: number; remaining: number }
   bundle_credits: { notarization: number; compliance_evidence: number }
 }
@@ -60,6 +76,8 @@ export default function SubscriptionPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [portalLoading, setPortalLoading] = useState(false)
+  // Tab state — only matters when the user has >1 active subscription.
+  const [activeSubId, setActiveSubId] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/vendor/subscription', { cache: 'no-store' })
@@ -121,7 +139,28 @@ export default function SubscriptionPage() {
   }
 
   const isFree = !data.stripe_subscription_id || data.plan === 'free'
-  const f = data.features
+  const allSubs = data.all_subscriptions ?? []
+  const hasMultiple = allSubs.length > 1
+
+  // Default the active tab to the highest-priced sub so the page opens on
+  // the buyer's headline subscription. Each tab scopes the header card +
+  // features panel below to that subscription only.
+  const sortedSubs = [...allSubs].sort((a, b) => (b.price_sgd ?? 0) - (a.price_sgd ?? 0))
+  const selectedSub = hasMultiple
+    ? sortedSubs.find(s => s.id === activeSubId) ?? sortedSubs[0]
+    : null
+
+  // Header + feature panel data driven by:
+  //   - multi-sub: the currently selected tab
+  //   - single-sub: legacy User-row plan fields
+  const displayLabel = selectedSub?.label ?? data.plan_label
+  const displayPriceSgd = selectedSub?.price_sgd ?? data.price_sgd
+  const displayInterval = selectedSub?.interval ?? 'month'
+  const displayStartedAt = selectedSub?.started_at ?? data.subscription_started_at
+  const displayCurrentPeriodEnd = selectedSub?.current_period_end ?? null
+  const displayStripeSubId = selectedSub?.stripe_subscription_id ?? data.stripe_subscription_id
+  const displayStatus = selectedSub?.status ?? (isFree ? 'inactive' : 'active')
+  const f = selectedSub?.features ?? data.features
   const notar = data.notarization
   const usePct = notar.monthly_quota > 0
     ? Math.min(100, Math.round((notar.used_this_month / notar.monthly_quota) * 100))
@@ -130,22 +169,77 @@ export default function SubscriptionPage() {
   return (
     <main className="min-h-screen bg-neutral-950 p-6">
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* Subscription tabs — only when the buyer holds more than one. */}
+        {hasMultiple && (
+          <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-2">
+            <div className="flex items-center gap-1 overflow-x-auto" style={{ scrollbarWidth: 'thin' }}>
+              {sortedSubs.map(s => {
+                const active = (selectedSub?.id ?? sortedSubs[0].id) === s.id
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setActiveSubId(s.id)}
+                    className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-2 ${
+                      active
+                        ? 'bg-emerald-600 text-white'
+                        : 'text-neutral-300 hover:bg-neutral-800'
+                    }`}
+                  >
+                    <span>{s.label}</span>
+                    {s.price_sgd != null && (
+                      <span className={`text-[10px] font-normal ${active ? 'text-emerald-100' : 'text-neutral-500'}`}>
+                        SGD {s.price_sgd.toLocaleString()}/{s.interval === 'annual' ? 'yr' : 'mo'}
+                      </span>
+                    )}
+                    {s.status === 'past_due' && (
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-rose-300">past due</span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-[10px] text-neutral-500 mt-1.5 px-2">
+              You have {sortedSubs.length} active subscriptions. Each tab shows what that subscription unlocked, when it renews, and lets you manage it independently.
+            </p>
+          </div>
+        )}
+
         {/* Header card */}
         <div className="bg-gradient-to-br from-emerald-900/30 to-neutral-900 border border-emerald-800/40 rounded-2xl p-6">
-          <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-1">Current plan</p>
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
+              {hasMultiple ? 'Selected subscription' : 'Current plan'}
+            </p>
+            {displayStatus !== 'active' && displayStatus !== 'trialing' && (
+              <span className="text-[10px] font-bold uppercase tracking-widest text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/30">
+                {displayStatus}
+              </span>
+            )}
+          </div>
           <div className="flex items-end justify-between flex-wrap gap-3">
             <div>
-              <h1 className="text-3xl font-black text-white">{data.plan_label}</h1>
-              {data.price_sgd != null && (
+              <h1 className="text-3xl font-black text-white">{displayLabel}</h1>
+              {displayPriceSgd != null && (
                 <p className="text-neutral-300 mt-1">
-                  SGD {data.price_sgd.toLocaleString()}<span className="text-neutral-500 text-sm">/month</span>
+                  SGD {displayPriceSgd.toLocaleString()}<span className="text-neutral-500 text-sm">/{displayInterval === 'annual' ? 'year' : 'month'}</span>
                 </p>
               )}
-              {data.subscription_started_at && (
-                <p className="text-xs text-neutral-500 mt-1">
-                  Active since {new Date(data.subscription_started_at).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </p>
+              {selectedSub?.description && (
+                <p className="text-xs text-neutral-400 mt-2 max-w-xl">{selectedSub.description}</p>
               )}
+              <div className="text-xs text-neutral-500 mt-2 space-y-0.5">
+                {displayStartedAt && (
+                  <p>
+                    Active since {new Date(displayStartedAt).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                )}
+                {displayCurrentPeriodEnd && (
+                  <p>
+                    Next renewal {new Date(displayCurrentPeriodEnd).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                )}
+              </div>
             </div>
             <div className="flex gap-2">
               {!isFree && (
@@ -286,11 +380,12 @@ export default function SubscriptionPage() {
           </Link>
         </div>
 
-        {/* Plan IDs for debugging / support */}
-        {(data.stripe_customer_id || data.stripe_subscription_id) && (
+        {/* Plan IDs for debugging / support — shows the SELECTED sub's id
+            when tabs are active, so support can correlate the right one. */}
+        {(data.stripe_customer_id || displayStripeSubId) && (
           <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 text-xs text-neutral-500 font-mono">
             {data.stripe_customer_id && <div>Customer: {data.stripe_customer_id}</div>}
-            {data.stripe_subscription_id && <div>Subscription: {data.stripe_subscription_id}</div>}
+            {displayStripeSubId && <div>Subscription: {displayStripeSubId}</div>}
           </div>
         )}
       </div>
