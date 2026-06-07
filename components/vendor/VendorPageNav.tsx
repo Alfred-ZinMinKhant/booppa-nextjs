@@ -17,12 +17,14 @@ import {
 	UserCircle2,
 	Archive,
 	LayoutDashboard,
+	Radar,
 } from "lucide-react";
 
 const LINKS: { href: string; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
 	{ href: "/vendor/dashboard",     label: "Dashboard",          Icon: LayoutDashboard },
 	{ href: "/vendor/profile",       label: "Profile",            Icon: UserCircle2 },
 	{ href: "/vendor/subscription",  label: "Subscription",       Icon: Layers },
+	{ href: "/vendor/tender-intelligence", label: "Tender Intel",  Icon: Radar },
 	{ href: "/vendor/evidence",      label: "Evidence",           Icon: Archive },
 	{ href: "/vendor/compliance-locker", label: "Compliance Locker", Icon: LockKeyhole },
 	{ href: "/vendor/remediations",  label: "Remediations",       Icon: ListChecks },

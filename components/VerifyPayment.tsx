@@ -284,7 +284,7 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
             </Link>
           )
         ) : isTenderIntelligence ? (
-          <Link href="/tender-intelligence" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+          <Link href="/vendor/tender-intelligence" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             Open Tender Intelligence Dashboard →
           </Link>
         ) : isVendorPro ? (
