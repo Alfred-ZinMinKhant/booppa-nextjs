@@ -15,7 +15,17 @@ interface CoverSheetStatus {
   rfp: { status: string; completed_at: string | null; download_url: string | null } | null
   rfp_brief_intake_id: string | null
   cover_sheet: { ready: boolean; download_url?: string | null; tx_hash?: string | null; generated_at?: string | null; schema_version?: number | null; outdated?: boolean; stale?: boolean }
-  signed: { uploaded_at: string | null; tx_hash: string | null; file_hash: string | null; file_name: string | null } | null
+  signed: {
+    uploaded_at: string | null
+    tx_hash: string | null
+    file_hash: string | null
+    file_name: string | null
+    signature_method?: 'electronic' | 'uploaded' | string | null
+    signer_name?: string | null
+    signer_title?: string | null
+    signed_at_utc?: string | null
+    legal_basis?: string | null
+  } | null
 }
 
 function CoverSheetInner() {
@@ -192,6 +202,12 @@ function CoverSheetInner() {
   const coverReady = !!status?.cover_sheet?.ready && pdpaDone && rfpDone && !status?.cover_sheet?.stale
   const signed = status?.signed
   const finalReceipt = !!signed?.tx_hash
+  // "Signed in this cycle" is the only correct gate for pre/post-sign UI.
+  // status.signed_uploaded is a lifetime User flag that does NOT reset across
+  // bundle re-purchases — a buyer who bought again would otherwise get stuck
+  // on the post-sign view. The `signed` payload is already cycle-scoped by
+  // the backend (filtered to created_at >= latest PDPA scan).
+  const signedThisCycle = !!signed
   const hasAccess = !!status && (status.credits > 0 || status.pending_cover_sheet || status.signed_uploaded || coverReady)
 
   return (
@@ -373,22 +389,57 @@ function CoverSheetInner() {
         )}
 
         {/* Final receipt card — only shown after the signed Cover Sheet has
-            been anchored (signed_uploaded=true). Section 5 now carries the
-            signed anchor; this is the regulator-ready end-state.            */}
-        {coverReady && status?.signed_uploaded && status?.cover_sheet?.download_url && (
+            been anchored (signed_uploaded=true). Now surfaces the signature
+            method + signer identity so the buyer sees how/who/when in one
+            place rather than scrolling to the anchored-evidence panel. */}
+        {coverReady && signedThisCycle && status?.cover_sheet?.download_url && (
           <div className="bg-gradient-to-r from-emerald-50 to-sky-50 border-2 border-emerald-300 rounded-2xl p-6 mb-8">
             <div className="flex items-start gap-4">
               <CheckCircle className="w-8 h-8 text-emerald-600 flex-shrink-0 mt-1" />
               <div className="flex-1">
-                <h2 className="font-black text-[#0f172a] text-xl mb-1">Updated Cover Sheet</h2>
-                <p className="text-sm text-[#475569] mb-4">
-                  Section 5 now includes your signed Cover Sheet anchor. Keep this PDF — it&apos;s the regulator-ready evidence trail.
-                  {status.cover_sheet.generated_at && (
-                    <span className="block text-xs text-[#94a3b8] mt-1">
-                      Generated {new Date(status.cover_sheet.generated_at).toLocaleString()}
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h2 className="font-black text-[#0f172a] text-xl">Bundle complete</h2>
+                  {signed?.signature_method === 'electronic' && (
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      Signed electronically
                     </span>
                   )}
+                  {signed?.signature_method === 'uploaded' && (
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full">
+                      Signed &amp; uploaded
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-[#475569] mb-4">
+                  Section 5 of the Cover Sheet now carries your signed anchor. Keep this PDF — it&apos;s the regulator-ready evidence trail.
                 </p>
+
+                {/* Signature receipt — only the buyer/regulator can verify
+                    these inline. Mirrors what we anchor on-chain. */}
+                {signed && (signed.signer_name || signed.signed_at_utc) && (
+                  <div className="bg-white/60 border border-emerald-200 rounded-lg p-3 mb-4 text-xs space-y-1">
+                    <p className="font-bold text-[#0f172a] uppercase tracking-widest text-[10px] mb-1">
+                      Signature receipt
+                    </p>
+                    {signed.signer_name && (
+                      <p className="text-[#334155]">
+                        <span className="font-semibold">Signed by:</span> {signed.signer_name}
+                        {signed.signer_title && <span className="text-[#64748b]"> · {signed.signer_title}</span>}
+                      </p>
+                    )}
+                    {signed.signed_at_utc && (
+                      <p className="text-[#64748b]">
+                        <span className="font-semibold text-[#334155]">When:</span> {new Date(signed.signed_at_utc).toLocaleString()} UTC
+                      </p>
+                    )}
+                    {signed.legal_basis && (
+                      <p className="text-[10px] text-[#64748b]">
+                        <span className="font-semibold text-[#334155]">Legal basis:</span> {signed.legal_basis}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-3">
                   <a
                     href={status.cover_sheet.download_url}
@@ -396,7 +447,7 @@ function CoverSheetInner() {
                     rel="noreferrer"
                     className="bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-700 inline-flex items-center gap-2"
                   >
-                    Download PDF <ExternalLink className="w-4 h-4" />
+                    Download signed PDF <ExternalLink className="w-4 h-4" />
                   </a>
                   {status.cover_sheet.tx_hash && (
                     <a
@@ -405,10 +456,25 @@ function CoverSheetInner() {
                       rel="noreferrer"
                       className="bg-white border border-emerald-300 text-emerald-700 px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-50 inline-flex items-center gap-2"
                     >
-                      View Anchor <ExternalLink className="w-4 h-4" />
+                      View Cover Sheet anchor <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                  {signed?.tx_hash && (
+                    <a
+                      href={polygonscanTxUrl(signed.tx_hash)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="bg-white border border-emerald-300 text-emerald-700 px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-emerald-50 inline-flex items-center gap-2"
+                    >
+                      View signed anchor <ExternalLink className="w-4 h-4" />
                     </a>
                   )}
                 </div>
+                {status.cover_sheet.generated_at && (
+                  <p className="text-xs text-[#94a3b8] mt-3">
+                    Cover Sheet generated {new Date(status.cover_sheet.generated_at).toLocaleString()}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -419,7 +485,7 @@ function CoverSheetInner() {
             Replaces the old separate Download + Upload blocks so the buyer
             has a single, ordered set of instructions instead of two
             disconnected cards. */}
-        {coverReady && !status?.signed_uploaded && status && status.credits > 0 && status?.cover_sheet?.download_url && (
+        {coverReady && !signedThisCycle && status && status.credits > 0 && status?.cover_sheet?.download_url && (
           <div className="border-2 border-emerald-200 bg-white rounded-2xl p-6 mb-8">
             <div className="mb-5">
               <h2 className="text-xl font-black text-[#0f172a] mb-1">Finalise your Cover Sheet</h2>
@@ -634,18 +700,46 @@ function CoverSheetInner() {
           </div>
         )}
 
-        {/* Signed uploaded — show anchored evidence */}
+        {/* Signed Cover Sheet anchored — full hash/tx breakdown for the
+            buyer (and any regulator they share this page with). Compact
+            top section names the signer + method; bottom shows the raw
+            cryptographic receipt (SHA-256, tx hash). */}
         {signed && (
           <div className="bg-white border-2 border-[#e2e8f0] rounded-2xl p-6">
             <h2 className="font-bold text-[#0f172a] mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-emerald-600" /> Signed Cover Sheet anchored
+              <FileText className="w-5 h-5 text-emerald-600" /> Signed Cover Sheet — anchored evidence
             </h2>
+
+            {/* Signer block — only the data we capture at sign time. */}
+            {(signed.signer_name || signed.signature_method === 'electronic') && (
+              <div className="border-l-4 border-emerald-400 pl-3 mb-4">
+                <p className="text-xs font-bold text-[#0f172a] uppercase tracking-widest mb-1">
+                  {signed.signature_method === 'electronic' ? 'Electronic signature' : 'Signature'}
+                </p>
+                {signed.signer_name && (
+                  <p className="text-sm text-[#0f172a]">
+                    <span className="font-semibold">{signed.signer_name}</span>
+                    {signed.signer_title && <span className="text-[#64748b]"> · {signed.signer_title}</span>}
+                  </p>
+                )}
+                {signed.signed_at_utc && (
+                  <p className="text-xs text-[#64748b]">
+                    Signed {new Date(signed.signed_at_utc).toLocaleString()} UTC
+                  </p>
+                )}
+                {signed.legal_basis && (
+                  <p className="text-[10px] text-[#94a3b8] mt-1">{signed.legal_basis}</p>
+                )}
+              </div>
+            )}
+
+            {/* Cryptographic receipt — the raw evidence trail. */}
             <div className="space-y-2 text-sm">
               {signed.file_name && (
                 <p className="text-[#334155]"><span className="font-semibold">File:</span> {signed.file_name}</p>
               )}
               {signed.uploaded_at && (
-                <p className="text-[#64748b]"><span className="font-semibold text-[#334155]">Uploaded:</span> {new Date(signed.uploaded_at).toLocaleString()}</p>
+                <p className="text-[#64748b]"><span className="font-semibold text-[#334155]">Anchored:</span> {new Date(signed.uploaded_at).toLocaleString()}</p>
               )}
               {signed.file_hash && (
                 <p className="text-xs text-[#64748b] font-mono break-all">

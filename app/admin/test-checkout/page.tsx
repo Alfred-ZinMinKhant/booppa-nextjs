@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Loader2, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Loader2, AlertTriangle, ExternalLink, Building2, CheckCircle2 } from 'lucide-react'
 
 type Dispatch = 'subscription' | 'bundle' | 'rfp' | 'rfp-deferred' | 'standalone'
 
@@ -15,6 +15,8 @@ interface SimResponse {
 
 interface SimRow extends SimResponse {
   at: string
+  identity_email: string
+  identity_label: string
 }
 
 interface Sku {
@@ -22,6 +24,34 @@ interface Sku {
   label: string
   needsRfp?: boolean
 }
+
+// Two persisted test identities so the operator can run Standard Suite (A) and
+// Pro Suite (B) side-by-side without retyping email/url/company between clicks.
+// localStorage round-trips them across page reloads. "Manual" lets the operator
+// fall back to ad-hoc edits in the legacy single-field block at the bottom of
+// the SectionGroups (kept for compatibility with the older SKU workflow).
+type IdentityKey = 'A' | 'B'
+
+interface Identity {
+  email: string
+  company: string
+  url: string
+}
+
+const IDENTITY_DEFAULTS: Record<IdentityKey, Identity> = {
+  A: {
+    email: 'test+suite-a@booppa.io',
+    company: 'Suite Test Co A',
+    url: 'https://suite-a.booppa.io',
+  },
+  B: {
+    email: 'test+suite-b@booppa.io',
+    company: 'Suite Test Co B',
+    url: 'https://suite-b.booppa.io',
+  },
+}
+
+const STORAGE_KEY = 'booppa_admin_test_identities'
 
 // One-time — For Vendors
 const ONE_TIME_VENDORS: Sku[] = [
@@ -86,23 +116,51 @@ function detailLinks(details: Record<string, unknown>) {
 }
 
 export default function AdminTestCheckoutPage() {
-  const [email, setEmail] = useState('test+admin@booppa.io')
-  const [vendorUrl, setVendorUrl] = useState('https://booppa.io')
-  const [companyName, setCompanyName] = useState('Booppa QA')
+  const [identities, setIdentities] = useState<Record<IdentityKey, Identity>>(IDENTITY_DEFAULTS)
+  const [activeIdentity, setActiveIdentity] = useState<IdentityKey>('A')
   const [rfpDescriptions, setRfpDescriptions] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [history, setHistory] = useState<SimRow[]>([])
 
-  async function simulate(sku: Sku) {
-    setBusy(sku.product_type)
+  // Hydrate identities from localStorage on first render so the operator's
+  // edits survive reloads (and tab swaps). Failure path falls back to defaults.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (!raw) return
+      const parsed = JSON.parse(raw) as { A?: Identity; B?: Identity }
+      setIdentities({
+        A: { ...IDENTITY_DEFAULTS.A, ...(parsed.A || {}) },
+        B: { ...IDENTITY_DEFAULTS.B, ...(parsed.B || {}) },
+      })
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(identities))
+    } catch {}
+  }, [identities])
+
+  function updateIdentity(key: IdentityKey, field: keyof Identity, value: string) {
+    setIdentities(prev => ({ ...prev, [key]: { ...prev[key], [field]: value } }))
+  }
+
+  async function simulate(sku: Sku, identityKey: IdentityKey) {
+    const id = identities[identityKey]
+    if (!id.email.trim()) {
+      setError(`Identity ${identityKey} has no email — fill it in first.`)
+      return
+    }
+    setBusy(`${sku.product_type}:${identityKey}`)
     setError('')
     try {
       const body: Record<string, string> = {
         product_type: sku.product_type,
-        customer_email: email.trim(),
-        vendor_url: vendorUrl.trim(),
-        company_name: companyName.trim(),
+        customer_email: id.email.trim(),
+        vendor_url: id.url.trim(),
+        company_name: id.company.trim(),
       }
       const desc = (rfpDescriptions[sku.product_type] || '').trim()
       if (desc) body.rfp_description = desc
@@ -118,7 +176,12 @@ export default function AdminTestCheckoutPage() {
         setError(typeof data.detail === 'string' ? data.detail : 'Simulation failed')
         return
       }
-      const row: SimRow = { ...data, at: new Date().toLocaleTimeString() }
+      const row: SimRow = {
+        ...data,
+        at: new Date().toLocaleTimeString(),
+        identity_email: id.email.trim(),
+        identity_label: `Identity ${identityKey}`,
+      }
       setHistory(prev => [row, ...prev].slice(0, 10))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Network error')
@@ -128,7 +191,8 @@ export default function AdminTestCheckoutPage() {
   }
 
   function renderRow(sku: Sku) {
-    const isBusy = busy === sku.product_type
+    const isBusy = busy === `${sku.product_type}:${activeIdentity}`
+    const id = identities[activeIdentity]
     return (
       <div
         key={sku.product_type}
@@ -149,13 +213,59 @@ export default function AdminTestCheckoutPage() {
         )}
         <button
           type="button"
-          disabled={isBusy || !email.trim()}
-          onClick={() => simulate(sku)}
+          disabled={isBusy || !id.email.trim()}
+          onClick={() => simulate(sku, activeIdentity)}
           className="px-3 py-1.5 text-xs font-semibold rounded bg-sky-600 hover:bg-sky-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center gap-1.5"
+          title={`Simulate as Identity ${activeIdentity} (${id.email})`}
         >
           {isBusy && <Loader2 className="w-3 h-3 animate-spin" />}
-          Simulate
+          Simulate as {activeIdentity}
         </button>
+      </div>
+    )
+  }
+
+  // Per-tier verify-link strip. Each link opens in a new tab with ?as=<email>
+  // so the operator can sanity-check unlocked features for the right identity
+  // without clobbering their normal admin session.
+  const VERIFY_LINKS = {
+    standard: [
+      { href: '/vendor/trm', label: 'MAS TRM' },
+      { href: '/notarize', label: 'Notarize' },
+      { href: '/vendor/webhooks', label: 'Webhooks' },
+      { href: '/vendor/api-keys', label: 'API keys' },
+    ],
+    pro: [
+      { href: '/vendor/trm', label: 'MAS TRM' },
+      { href: '/notarize', label: 'Notarize' },
+      { href: '/vendor/webhooks', label: 'Webhooks' },
+      { href: '/vendor/api-keys', label: 'API keys' },
+      { href: '/vendor/sso', label: 'SSO' },
+      { href: '/vendor/subsidiaries', label: 'Subsidiaries' },
+    ],
+  } as const
+
+  function lastActivation(identityKey: IdentityKey, productType: string) {
+    return history.find(
+      r => r.identity_email === identities[identityKey].email.trim() && r.product_type === productType,
+    )
+  }
+
+  function renderVerifyStrip(tier: 'standard' | 'pro', email: string) {
+    const safeEmail = encodeURIComponent(email)
+    return (
+      <div className="flex flex-wrap items-center gap-1.5 mt-2">
+        <span className="text-[10px] uppercase tracking-wider text-neutral-500 mr-1">Verify in:</span>
+        {VERIFY_LINKS[tier].map(l => (
+          <Link
+            key={l.href}
+            href={`${l.href}?as=${safeEmail}`}
+            target="_blank"
+            className="px-2 py-0.5 text-[10px] rounded border border-neutral-700 hover:border-sky-500 hover:text-sky-300 text-neutral-300 inline-flex items-center gap-1"
+          >
+            {l.label} <ExternalLink className="w-2.5 h-2.5" />
+          </Link>
+        ))}
       </div>
     )
   }
@@ -177,37 +287,61 @@ export default function AdminTestCheckoutPage() {
         </div>
       </div>
 
-      <div className="mb-8 rounded-lg border border-neutral-800 bg-neutral-900/50 p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div>
-          <label htmlFor="sim-email" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1">Test email</label>
-          <input
-            id="sim-email"
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-700 rounded text-neutral-100 text-sm"
-          />
-        </div>
-        <div>
-          <label htmlFor="sim-vendor-url" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1">vendor_url</label>
-          <input
-            id="sim-vendor-url"
-            type="text"
-            value={vendorUrl}
-            onChange={e => setVendorUrl(e.target.value)}
-            className="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-700 rounded text-neutral-100 text-sm"
-          />
-        </div>
-        <div>
-          <label htmlFor="sim-company" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1">company_name</label>
-          <input
-            id="sim-company"
-            type="text"
-            value={companyName}
-            onChange={e => setCompanyName(e.target.value)}
-            className="w-full px-3 py-1.5 bg-neutral-900 border border-neutral-700 rounded text-neutral-100 text-sm"
-          />
-        </div>
+      {/* Dual identity panel — persisted to localStorage. Replaces the old
+          single email/url/company header so the operator can run two test
+          companies (A, B) in the same session without retyping between
+          activations. Identity A is also the default-active identity used by
+          the legacy SectionGroup rows below. */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+        {(['A', 'B'] as IdentityKey[]).map(k => (
+          <div
+            key={k}
+            className={`rounded-lg border bg-neutral-900/50 p-4 ${activeIdentity === k ? 'border-sky-500/40' : 'border-neutral-800'}`}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-neutral-400" />
+                <p className="text-sm font-bold text-neutral-200">Test Identity {k}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveIdentity(k)}
+                className={`px-2 py-0.5 text-[10px] uppercase tracking-wider rounded ${activeIdentity === k ? 'bg-sky-600 text-white' : 'border border-neutral-700 text-neutral-400 hover:text-neutral-200'}`}
+              >
+                {activeIdentity === k ? 'Active' : 'Use'}
+              </button>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <label className="block text-[10px] uppercase tracking-wider text-neutral-500 mb-0.5">Email</label>
+                <input
+                  type="email"
+                  value={identities[k].email}
+                  onChange={e => updateIdentity(k, 'email', e.target.value)}
+                  className="w-full px-2 py-1 bg-neutral-900 border border-neutral-700 rounded text-neutral-100 text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-wider text-neutral-500 mb-0.5">Company name</label>
+                <input
+                  type="text"
+                  value={identities[k].company}
+                  onChange={e => updateIdentity(k, 'company', e.target.value)}
+                  className="w-full px-2 py-1 bg-neutral-900 border border-neutral-700 rounded text-neutral-100 text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-wider text-neutral-500 mb-0.5">Website</label>
+                <input
+                  type="text"
+                  value={identities[k].url}
+                  onChange={e => updateIdentity(k, 'url', e.target.value)}
+                  className="w-full px-2 py-1 bg-neutral-900 border border-neutral-700 rounded text-neutral-100 text-xs"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {error && (
@@ -215,6 +349,95 @@ export default function AdminTestCheckoutPage() {
           {error}
         </div>
       )}
+
+      {/* Suite Test Drive — promoted hero for the two enterprise SKUs. Each
+          column targets a different identity, so a single trip through this
+          panel provisions Standard (A) + Pro (B). Verify-link strips jump
+          straight to the unlocked features carrying ?as=<email>. */}
+      <div className="mb-10 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-5">
+        <h2 className="text-base font-black uppercase tracking-widest text-emerald-300 mb-1">Suite Test Drive</h2>
+        <p className="text-xs text-neutral-400 mb-5">
+          Activate Standard Suite for Identity A and Pro Suite for Identity B side by side, then jump
+          to each company&apos;s vendor surface to verify the unlocked features.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {([
+            {
+              tier: 'standard' as const,
+              identityKey: 'A' as IdentityKey,
+              productType: 'standard_suite_monthly',
+              label: 'Standard Suite',
+              price: 'SGD 1,800 / mo',
+              features: [
+                'MAS TRM — all 13 domains',
+                'AI gap analysis (DeepSeek)',
+                '50 notarizations / month',
+                'RESTful API + webhooks',
+              ],
+            },
+            {
+              tier: 'pro' as const,
+              identityKey: 'B' as IdentityKey,
+              productType: 'pro_suite_monthly',
+              label: 'Pro Suite',
+              price: 'SGD 4,500 / mo',
+              features: [
+                'Everything in Standard Suite',
+                'SSO — SAML 2.0 + OIDC',
+                'White-label reports',
+                'Multi-subsidiary management',
+                '100 notarizations / month',
+              ],
+            },
+          ]).map(card => {
+            const id = identities[card.identityKey]
+            const last = lastActivation(card.identityKey, card.productType)
+            const sku: Sku = { product_type: card.productType, label: card.label }
+            const isBusy = busy === `${card.productType}:${card.identityKey}`
+            return (
+              <div key={card.productType} className="rounded-lg border border-neutral-700 bg-neutral-900/60 p-4 flex flex-col">
+                <div className="flex items-baseline justify-between mb-1">
+                  <p className="text-sm font-bold text-neutral-100">{card.label}</p>
+                  <p className="text-[11px] text-neutral-500">{card.price}</p>
+                </div>
+                <p className="text-[11px] text-neutral-400 mb-3">
+                  Identity {card.identityKey} · <span className="font-mono">{id.email || '(empty)'}</span>
+                </p>
+                <ul className="text-[11px] text-neutral-300 space-y-1 mb-4 flex-1">
+                  {card.features.map(f => (
+                    <li key={f} className="flex items-start gap-1.5">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400 mt-0.5 flex-shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  disabled={isBusy || !id.email.trim()}
+                  onClick={() => simulate(sku, card.identityKey)}
+                  className="w-full px-3 py-1.5 text-xs font-semibold rounded bg-emerald-600 hover:bg-emerald-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center justify-center gap-1.5"
+                >
+                  {isBusy && <Loader2 className="w-3 h-3 animate-spin" />}
+                  {last ? `Re-activate ${card.label} for ${card.identityKey}` : `Activate ${card.label} for ${card.identityKey}`}
+                </button>
+                {last && (
+                  <div className="mt-3 pt-3 border-t border-neutral-800">
+                    <p className="text-[10px] text-emerald-400">
+                      ✓ Activated {last.at} · {last.identity_email}
+                    </p>
+                    {renderVerifyStrip(card.tier, last.identity_email)}
+                    {card.tier === 'pro' && (
+                      <p className="text-[10px] text-neutral-500 mt-1.5">
+                        White-label report toggle lives on <span className="font-mono">/vendor/profile</span>.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
 
       <SectionGroup title="One-Time Products">
         <Section title="For Vendors">
@@ -249,6 +472,9 @@ export default function AdminTestCheckoutPage() {
                 <span className="font-mono text-xs text-neutral-300 w-56 truncate">{row.product_type}</span>
                 <span className={`px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wider ${dispatchColor(row.dispatch)}`}>
                   {row.dispatch}
+                </span>
+                <span className="text-[10px] text-neutral-400 font-mono truncate w-48" title={row.identity_email}>
+                  {row.identity_label} · {row.identity_email}
                 </span>
                 <div className="flex-1 flex flex-wrap gap-2">
                   {detailLinks(row.details).map((l, j) => (
