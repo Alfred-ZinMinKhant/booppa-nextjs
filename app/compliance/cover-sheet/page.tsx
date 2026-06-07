@@ -25,6 +25,10 @@ interface CoverSheetStatus {
     signer_title?: string | null
     signed_at_utc?: string | null
     legal_basis?: string | null
+    signed_report_id?: string | null
+    anchor_failed?: boolean | null
+    anchor_failed_at?: string | null
+    anchor_failed_reason?: string | null
   } | null
 }
 
@@ -755,8 +759,35 @@ function CoverSheetInner() {
                 >
                   View signed-CS anchor on {POLYGON_EXPLORER_HOST} <ExternalLink className="w-3 h-3" />
                 </a>
+              ) : signed.anchor_failed ? (
+                <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 p-3">
+                  <p className="text-sm font-bold text-rose-700 mb-1">
+                    On-chain anchoring failed
+                  </p>
+                  <p className="text-xs text-rose-600 mb-3">
+                    The signature is recorded and the SHA-256 is committed in the PDF, but the Polygon
+                    Amoy transaction couldn&apos;t complete after multiple attempts. Your signed Cover
+                    Sheet is still valid — only the on-chain receipt needs a retry.
+                    {signed.anchor_failed_reason && (
+                      <span className="block mt-1 font-mono text-[10px] text-rose-500 break-all">
+                        {signed.anchor_failed_reason}
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-xs text-[#64748b]">
+                    Contact <a href="mailto:support@booppa.io" className="text-[#0ea5e9] hover:underline">support@booppa.io</a>{" "}
+                    with this report ID and we&apos;ll trigger a manual retry:
+                  </p>
+                  {signed.signed_report_id && (
+                    <p className="text-[10px] font-mono text-[#334155] mt-1 break-all bg-white px-2 py-1 rounded">
+                      {signed.signed_report_id}
+                    </p>
+                  )}
+                </div>
               ) : (
-                <p className="text-sm text-[#0ea5e9]">Anchoring on-chain… (refreshes automatically)</p>
+                <p className="text-sm text-[#0ea5e9] mt-2">
+                  Anchoring on-chain… <span className="text-xs text-[#94a3b8]">(refreshes every 8 seconds; first confirmation typically within 30s)</span>
+                </p>
               )}
             </div>
           </div>
