@@ -533,7 +533,7 @@ export default function SupplyChainPage() {
               <p className="text-sm text-[#64748b] mb-4">
                 View your own Singapore compliance evidence — PDPA, ACRA, GeBIZ, and MAS.
               </p>
-              <Link href="/compliance/locker" className="text-sm text-[#10b981] font-bold hover:underline">
+              <Link href="/vendor/compliance-locker" className="text-sm text-[#10b981] font-bold hover:underline">
                 Open Compliance Locker →
               </Link>
             </div>

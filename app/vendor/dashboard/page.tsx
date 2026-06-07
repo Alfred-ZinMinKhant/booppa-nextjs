@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
 	Shield,
 	Eye,
@@ -14,17 +14,6 @@ import {
 	Check,
 	LogOut,
 	Share2,
-	FileText,
-	Layers,
-	Key,
-	Webhook,
-	LockKeyhole,
-	Building2,
-	ListChecks,
-	Award,
-	UserPlus,
-	UserCircle2,
-	Archive,
 } from "lucide-react";
 import {
 	XAxis,
@@ -66,23 +55,6 @@ const SUB_TIERS: { key: string; label: string; href: string; color: string }[] =
 	{ key: "intel_pro", label: "Intel Pro", href: "/pricing#intel-pro", color: "violet" },
 ];
 
-// The sibling pages exist but most are unreachable from the dashboard today.
-// Surfacing them in one strip is cheaper than re-thinking the global nav.
-const SIBLING_LINKS: { href: string; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
-	{ href: "/vendor/profile",       label: "Profile",            Icon: UserCircle2 },
-	{ href: "/vendor/subscription",  label: "Subscription",       Icon: Layers },
-	{ href: "/vendor/evidence",      label: "Evidence",           Icon: Archive },
-	{ href: "/compliance/locker",    label: "Compliance Locker",  Icon: LockKeyhole },
-	{ href: "/vendor/remediations",  label: "Remediations",       Icon: ListChecks },
-	{ href: "/vendor/achievements",  label: "Achievements",       Icon: Award },
-	{ href: "/vendor/api-keys",      label: "API Keys",           Icon: Key },
-	{ href: "/vendor/webhooks",      label: "Webhooks",           Icon: Webhook },
-	{ href: "/vendor/sso",           label: "SSO",                Icon: Shield },
-	{ href: "/vendor/subsidiaries",  label: "Subsidiaries",       Icon: Building2 },
-	{ href: "/vendor/trm",           label: "MAS TRM",            Icon: FileText },
-	{ href: "/vendor/referrals",     label: "Referrals",          Icon: UserPlus },
-];
-
 function nextStepFromLevel(level: string | undefined): { href: string; label: string } {
 	switch ((level || "").toUpperCase()) {
 		case "BASIC":     return { href: "/notarization", label: "Notarize a Document" };
@@ -94,7 +66,6 @@ function nextStepFromLevel(level: string | undefined): { href: string; label: st
 
 export default function VendorDashboard() {
 	const router = useRouter();
-	const pathname = usePathname();
 	const [mounted, setMounted] = useState(false);
 	const [data, setData] = useState<{
 		stats: any;
@@ -263,50 +234,6 @@ export default function VendorDashboard() {
 						</button>
 					</div>
 				</div>
-
-				{/* ── Quick nav ──────────────────────────────────────────────
-				    Sticky horizontal page-nav. Scrollbar is hidden visually
-				    (still functional via swipe/wheel); soft fade-out gradients
-				    on both edges hint at scrollable content. Active route gets
-				    an emerald left-bar + brighter text. */}
-				<nav
-					aria-label="Vendor pages"
-					className="sticky top-0 z-20 -mx-6 px-6 py-2.5 bg-neutral-950/95 backdrop-blur-md border-b border-neutral-800/60 relative"
-				>
-					{/* Gradient masks at strip edges to indicate more content */}
-					<div className="pointer-events-none absolute left-6 top-0 bottom-0 w-6 bg-gradient-to-r from-neutral-950 to-transparent z-10" />
-					<div className="pointer-events-none absolute right-6 top-0 bottom-0 w-6 bg-gradient-to-l from-neutral-950 to-transparent z-10" />
-					<div
-						className="flex gap-1.5 overflow-x-auto whitespace-nowrap"
-						style={{
-							scrollbarWidth: "none",      // Firefox
-							msOverflowStyle: "none",    // IE 10+
-						}}
-					>
-						{/* WebKit (Chrome/Safari) scrollbar hide */}
-						<style jsx>{`
-							div::-webkit-scrollbar { display: none; }
-						`}</style>
-						{SIBLING_LINKS.map(({ href, label, Icon }) => {
-							const active = pathname === href || (href !== "/" && pathname?.startsWith(href + "/"));
-							return (
-								<Link
-									key={href}
-									href={href}
-									aria-current={active ? "page" : undefined}
-									className={`shrink-0 rounded-md transition px-2.5 py-1.5 flex items-center gap-1.5 text-[12px] font-medium ${
-										active
-											? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
-											: "text-neutral-400 hover:text-white hover:bg-neutral-900 border border-transparent"
-									}`}
-								>
-									<Icon className={`h-3.5 w-3.5 ${active ? "text-emerald-400" : "text-neutral-500"}`} />
-									<span>{label}</span>
-								</Link>
-							);
-						})}
-					</div>
-				</nav>
 
 				{/* ── Zone 1: Identity ──────────────────────────────────────── */}
 				{vendorState && (
@@ -577,7 +504,7 @@ export default function VendorDashboard() {
 						</div>
 						<div className="border-t border-neutral-800 px-6 py-3">
 							<Link
-								href="/compliance/locker"
+								href="/vendor/compliance-locker"
 								className="w-full text-sm text-neutral-400 hover:text-white transition flex items-center justify-center"
 							>
 								View full activity in Compliance Locker <ArrowRight className="ml-1 h-3 w-3" />

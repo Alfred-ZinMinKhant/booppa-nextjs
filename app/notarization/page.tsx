@@ -583,7 +583,7 @@ export default function NotarizationPage() {
                       <p className="text-sm text-violet-700">
                         This certificate will be tagged to your <strong>{regulationTag}</strong> regulation.
                         After notarization it will appear in your{' '}
-                        <a href="/compliance/locker" className="underline font-semibold hover:text-violet-900">
+                        <a href="/vendor/compliance-locker" className="underline font-semibold hover:text-violet-900">
                           Compliance Locker
                         </a>.
                       </p>

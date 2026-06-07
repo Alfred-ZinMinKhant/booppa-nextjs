@@ -22,7 +22,7 @@ import { useState, useEffect, useRef } from "react";
 const vendorLinks = [
 	{ name: "Dashboard", href: "/vendor/dashboard", icon: LayoutDashboard },
 	{ name: "My Profile", href: "/profile", icon: User },
-	{ name: "Compliance Locker", href: "/compliance/locker", icon: Lock },
+	{ name: "Compliance Locker", href: "/vendor/compliance-locker", icon: Lock },
 	{ name: "Vendor Proof", href: "/vendor-proof", icon: ShieldCheck },
 	{ name: "Notarization", href: "/notarization", icon: FileText },
 	{ name: "PDPA Scan", href: "/pdpa", icon: ShieldCheck },
@@ -33,7 +33,7 @@ const procurementLinks = [
 	{ name: "Dashboard", href: "/procurement/dashboard", icon: LayoutDashboard },
 	{ name: "My Profile", href: "/profile", icon: User },
 	{ name: "Supply Chain Risk", href: "/supply-chain", icon: Network },
-	{ name: "Compliance Locker", href: "/compliance/locker", icon: Lock },
+	{ name: "Compliance Locker", href: "/vendor/compliance-locker", icon: Lock },
 	{ name: "Verify Vendor", href: "/verify", icon: ShieldCheck },
 	{ name: "Browse Vendors", href: "/vendors", icon: Search },
 	{ name: "Compare Vendors", href: "/compare", icon: FileText },
