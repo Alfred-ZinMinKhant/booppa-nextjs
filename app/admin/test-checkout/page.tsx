@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Loader2, AlertTriangle, ExternalLink, Building2, CheckCircle2 } from 'lucide-react'
+import { Loader2, AlertTriangle, ExternalLink, Building2, CheckCircle2, X } from 'lucide-react'
 
 type Dispatch = 'subscription' | 'bundle' | 'rfp' | 'rfp-deferred' | 'standalone'
 
@@ -19,17 +19,25 @@ interface SimRow extends SimResponse {
   identity_label: string
 }
 
-interface Sku {
+interface Product {
   product_type: string
   label: string
+  section: 'one-time-vendors' | 'one-time-buyers' | 'subs-vendors' | 'subs-buyers' | 'subs-enterprise'
+  needsUrl?: boolean
+  needsCompany?: boolean
   needsRfp?: boolean
+}
+
+interface DialogFields {
+  email: string
+  vendor_url: string
+  company_name: string
+  rfp_description: string
 }
 
 // Two persisted test identities so the operator can run Standard Suite (A) and
 // Pro Suite (B) side-by-side without retyping email/url/company between clicks.
-// localStorage round-trips them across page reloads. "Manual" lets the operator
-// fall back to ad-hoc edits in the legacy single-field block at the bottom of
-// the SectionGroups (kept for compatibility with the older SKU workflow).
+// localStorage round-trips them across page reloads.
 type IdentityKey = 'A' | 'B'
 
 interface Identity {
@@ -53,45 +61,41 @@ const IDENTITY_DEFAULTS: Record<IdentityKey, Identity> = {
 
 const STORAGE_KEY = 'booppa_admin_test_identities'
 
-// One-time — For Vendors
-const ONE_TIME_VENDORS: Sku[] = [
-  { product_type: 'vendor_proof', label: 'Vendor Proof' },
-  { product_type: 'pdpa_quick_scan', label: 'PDPA Snapshot' },
-  { product_type: 'rfp_complete', label: 'RFP Complete', needsRfp: true },
-  { product_type: 'compliance_evidence_pack', label: 'Compliance Bundle' },
-  { product_type: 'compliance_notarization_1', label: 'Notarization (1 doc)' },
-]
-
-// One-time — For Buyers
-const ONE_TIME_BUYERS: Sku[] = [
-  { product_type: 'notarization_addon_1', label: 'Extra Notarization' },
-]
-
-// Subscriptions — For Vendors
-const SUBS_VENDORS: Sku[] = [
-  { product_type: 'vendor_active_monthly', label: 'Vendor Active — monthly' },
-  { product_type: 'vendor_active_annual', label: 'Vendor Active — annual' },
-  { product_type: 'vendor_pro_monthly', label: 'Vendor Pro — monthly' },
-  { product_type: 'vendor_pro_annual', label: 'Vendor Pro — annual' },
-  { product_type: 'pdpa_monitor_monthly', label: 'PDPA Monitor — monthly' },
-  { product_type: 'compliance_evidence_monthly', label: 'Compliance Evidence — monthly' },
-  { product_type: 'tender_intelligence_monthly', label: 'Tender Intelligence — monthly' },
-  { product_type: 'tender_intelligence_annual', label: 'Tender Intelligence — annual' },
-  { product_type: 'compliance_notarization_10', label: 'Small Batch — 10 notarizations/mo' },
-  { product_type: 'compliance_notarization_50', label: 'Enterprise Batch — 50 notarizations/mo' },
-]
-
-// Subscriptions — For Buyers
-const SUBS_BUYERS: Sku[] = [
-  { product_type: 'buyer_starter_monthly', label: 'Buyer Essentials — monthly' },
-  { product_type: 'buyer_pro_monthly', label: 'Buyer Professional — monthly' },
-  { product_type: 'buyer_enterprise_monthly', label: 'Buyer Enterprise — monthly' },
-]
-
-// Subscriptions — For Enterprise
-const SUBS_ENTERPRISE: Sku[] = [
-  { product_type: 'standard_suite_monthly', label: 'Standard Suite — monthly' },
-  { product_type: 'pro_suite_monthly', label: 'Pro Suite — monthly' },
+// Complete product catalog with all SKUs + field requirements
+const PRODUCT_CATALOG: Product[] = [
+  // One-time — Vendors
+  { product_type: 'vendor_proof', label: 'Vendor Proof', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
+  { product_type: 'pdpa_quick_scan', label: 'PDPA Snapshot', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
+  { product_type: 'rfp_complete', label: 'RFP Complete', section: 'one-time-vendors', needsRfp: true },
+  { product_type: 'vendor_trust_pack', label: 'Vendor Trust Pack', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
+  { product_type: 'rfp_accelerator', label: 'RFP Accelerator', section: 'one-time-vendors', needsCompany: true, needsUrl: true, needsRfp: true },
+  { product_type: 'enterprise_bid_kit', label: 'Enterprise Bid Kit', section: 'one-time-vendors', needsCompany: true, needsUrl: true, needsRfp: true },
+  { product_type: 'compliance_evidence_pack', label: 'Compliance Evidence Pack', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
+  { product_type: 'compliance_notarization_1', label: 'Notarization (1 doc)', section: 'one-time-vendors' },
+  // One-time — Buyers
+  { product_type: 'notarization_addon_1', label: 'Extra Notarization', section: 'one-time-buyers' },
+  // Subscriptions — Vendors
+  { product_type: 'vendor_active_monthly', label: 'Vendor Active — monthly', section: 'subs-vendors' },
+  { product_type: 'vendor_active_annual', label: 'Vendor Active — annual', section: 'subs-vendors' },
+  { product_type: 'vendor_pro_monthly', label: 'Vendor Pro — monthly', section: 'subs-vendors' },
+  { product_type: 'vendor_pro_annual', label: 'Vendor Pro — annual', section: 'subs-vendors' },
+  { product_type: 'pdpa_monitor_monthly', label: 'PDPA Monitor — monthly', section: 'subs-vendors', needsUrl: true },
+  { product_type: 'pdpa_monitor_annual', label: 'PDPA Monitor — annual', section: 'subs-vendors', needsUrl: true },
+  { product_type: 'compliance_evidence_monthly', label: 'Compliance Evidence — monthly', section: 'subs-vendors' },
+  { product_type: 'tender_intelligence_monthly', label: 'Tender Intelligence — monthly', section: 'subs-vendors' },
+  { product_type: 'tender_intelligence_annual', label: 'Tender Intelligence — annual', section: 'subs-vendors' },
+  { product_type: 'compliance_notarization_10', label: 'Small Batch — 10 notarizations/mo', section: 'subs-vendors' },
+  { product_type: 'compliance_notarization_50', label: 'Enterprise Batch — 50 notarizations/mo', section: 'subs-vendors' },
+  // Subscriptions — Buyers
+  { product_type: 'buyer_starter_monthly', label: 'Buyer Essentials — monthly', section: 'subs-buyers' },
+  { product_type: 'buyer_starter_annual', label: 'Buyer Essentials — annual', section: 'subs-buyers' },
+  { product_type: 'buyer_pro_monthly', label: 'Buyer Professional — monthly', section: 'subs-buyers' },
+  { product_type: 'buyer_pro_annual', label: 'Buyer Professional — annual', section: 'subs-buyers' },
+  { product_type: 'buyer_enterprise_monthly', label: 'Buyer Enterprise — monthly', section: 'subs-buyers' },
+  { product_type: 'buyer_enterprise_annual', label: 'Buyer Enterprise — annual', section: 'subs-buyers' },
+  // Subscriptions — Enterprise
+  { product_type: 'standard_suite_monthly', label: 'Standard Suite — monthly', section: 'subs-enterprise' },
+  { product_type: 'pro_suite_monthly', label: 'Pro Suite — monthly', section: 'subs-enterprise' },
 ]
 
 function dispatchColor(d: Dispatch) {
@@ -101,6 +105,16 @@ function dispatchColor(d: Dispatch) {
     case 'rfp':          return 'bg-amber-500/15 text-amber-300 border-amber-500/30'
     case 'rfp-deferred': return 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30'
     case 'standalone':   return 'bg-sky-500/15 text-sky-300 border-sky-500/30'
+  }
+}
+
+function getSectionTitle(section: Product['section']) {
+  switch (section) {
+    case 'one-time-vendors': return 'For Vendors'
+    case 'one-time-buyers': return 'For Buyers'
+    case 'subs-vendors': return 'For Vendors'
+    case 'subs-buyers': return 'For Buyers'
+    case 'subs-enterprise': return 'For Enterprise'
   }
 }
 
@@ -118,10 +132,16 @@ function detailLinks(details: Record<string, unknown>) {
 export default function AdminTestCheckoutPage() {
   const [identities, setIdentities] = useState<Record<IdentityKey, Identity>>(IDENTITY_DEFAULTS)
   const [activeIdentity, setActiveIdentity] = useState<IdentityKey>('A')
-  const [rfpDescriptions, setRfpDescriptions] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [history, setHistory] = useState<SimRow[]>([])
+  const [dialogProduct, setDialogProduct] = useState<Product | null>(null)
+  const [dialogFields, setDialogFields] = useState<DialogFields>({
+    email: '',
+    vendor_url: '',
+    company_name: '',
+    rfp_description: '',
+  })
 
   // Hydrate identities from localStorage on first render so the operator's
   // edits survive reloads (and tab swaps). Failure path falls back to defaults.
@@ -147,23 +167,43 @@ export default function AdminTestCheckoutPage() {
     setIdentities(prev => ({ ...prev, [key]: { ...prev[key], [field]: value } }))
   }
 
-  async function simulate(sku: Sku, identityKey: IdentityKey) {
-    const id = identities[identityKey]
-    if (!id.email.trim()) {
-      setError(`Identity ${identityKey} has no email — fill it in first.`)
+  function openDialog(product: Product) {
+    const id = identities[activeIdentity]
+    setDialogFields({
+      email: id.email,
+      vendor_url: id.url,
+      company_name: id.company,
+      rfp_description: '',
+    })
+    setDialogProduct(product)
+    setError('')
+  }
+
+  function closeDialog() {
+    setDialogProduct(null)
+  }
+
+  async function confirmDialog() {
+    if (!dialogProduct) return
+    const email = dialogFields.email.trim()
+    if (!email) {
+      setError('Email is required')
       return
     }
-    setBusy(`${sku.product_type}:${identityKey}`)
+    setBusy(dialogProduct.product_type)
     setError('')
+    closeDialog()
     try {
       const body: Record<string, string> = {
-        product_type: sku.product_type,
-        customer_email: id.email.trim(),
-        vendor_url: id.url.trim(),
-        company_name: id.company.trim(),
+        product_type: dialogProduct.product_type,
+        customer_email: email,
       }
-      const desc = (rfpDescriptions[sku.product_type] || '').trim()
-      if (desc) body.rfp_description = desc
+      if (dialogProduct.needsUrl) body.vendor_url = dialogFields.vendor_url.trim()
+      if (dialogProduct.needsCompany) body.company_name = dialogFields.company_name.trim()
+      if (dialogProduct.needsRfp) {
+        const desc = dialogFields.rfp_description.trim()
+        if (desc) body.rfp_description = desc
+      }
 
       const res = await fetch('/api/admin/api/admin/simulate-purchase', {
         method: 'POST',
@@ -179,8 +219,8 @@ export default function AdminTestCheckoutPage() {
       const row: SimRow = {
         ...data,
         at: new Date().toLocaleTimeString(),
-        identity_email: id.email.trim(),
-        identity_label: `Identity ${identityKey}`,
+        identity_email: email,
+        identity_label: `Identity ${activeIdentity}`,
       }
       setHistory(prev => [row, ...prev].slice(0, 10))
     } catch (e) {
@@ -190,36 +230,25 @@ export default function AdminTestCheckoutPage() {
     }
   }
 
-  function renderRow(sku: Sku) {
-    const isBusy = busy === `${sku.product_type}:${activeIdentity}`
-    const id = identities[activeIdentity]
+  function renderRow(product: Product) {
+    const isBusy = busy === product.product_type
     return (
       <div
-        key={sku.product_type}
+        key={product.product_type}
         className="flex items-center gap-3 py-3 border-b border-neutral-800 last:border-0"
       >
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-neutral-100 truncate">{sku.label}</p>
-          <p className="text-xs text-neutral-500 font-mono truncate">{sku.product_type}</p>
+          <p className="text-sm font-medium text-neutral-100 truncate">{product.label}</p>
+          <p className="text-xs text-neutral-500 font-mono truncate">{product.product_type}</p>
         </div>
-        {sku.needsRfp && (
-          <input
-            type="text"
-            value={rfpDescriptions[sku.product_type] || ''}
-            onChange={e => setRfpDescriptions({ ...rfpDescriptions, [sku.product_type]: e.target.value })}
-            placeholder="rfp_description (blank → defer)"
-            className="px-2 py-1.5 text-xs bg-neutral-900 border border-neutral-700 rounded text-neutral-100 w-72"
-          />
-        )}
         <button
           type="button"
-          disabled={isBusy || !id.email.trim()}
-          onClick={() => simulate(sku, activeIdentity)}
+          disabled={isBusy}
+          onClick={() => openDialog(product)}
           className="px-3 py-1.5 text-xs font-semibold rounded bg-sky-600 hover:bg-sky-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center gap-1.5"
-          title={`Simulate as Identity ${activeIdentity} (${id.email})`}
         >
           {isBusy && <Loader2 className="w-3 h-3 animate-spin" />}
-          Simulate as {activeIdentity}
+          Test
         </button>
       </div>
     )
@@ -392,8 +421,8 @@ export default function AdminTestCheckoutPage() {
           ]).map(card => {
             const id = identities[card.identityKey]
             const last = lastActivation(card.identityKey, card.productType)
-            const sku: Sku = { product_type: card.productType, label: card.label }
-            const isBusy = busy === `${card.productType}:${card.identityKey}`
+            const product = PRODUCT_CATALOG.find(p => p.product_type === card.productType)!
+            const isBusy = busy === card.productType
             return (
               <div key={card.productType} className="rounded-lg border border-neutral-700 bg-neutral-900/60 p-4 flex flex-col">
                 <div className="flex items-baseline justify-between mb-1">
@@ -414,7 +443,10 @@ export default function AdminTestCheckoutPage() {
                 <button
                   type="button"
                   disabled={isBusy || !id.email.trim()}
-                  onClick={() => simulate(sku, card.identityKey)}
+                  onClick={() => {
+                    setActiveIdentity(card.identityKey)
+                    openDialog(product)
+                  }}
                   className="w-full px-3 py-1.5 text-xs font-semibold rounded bg-emerald-600 hover:bg-emerald-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center justify-center gap-1.5"
                 >
                   {isBusy && <Loader2 className="w-3 h-3 animate-spin" />}
@@ -441,22 +473,22 @@ export default function AdminTestCheckoutPage() {
 
       <SectionGroup title="One-Time Products">
         <Section title="For Vendors">
-          {ONE_TIME_VENDORS.map(renderRow)}
+          {PRODUCT_CATALOG.filter(p => p.section === 'one-time-vendors').map(renderRow)}
         </Section>
         <Section title="For Buyers">
-          {ONE_TIME_BUYERS.map(renderRow)}
+          {PRODUCT_CATALOG.filter(p => p.section === 'one-time-buyers').map(renderRow)}
         </Section>
       </SectionGroup>
 
       <SectionGroup title="Subscriptions">
         <Section title="For Vendors">
-          {SUBS_VENDORS.map(renderRow)}
+          {PRODUCT_CATALOG.filter(p => p.section === 'subs-vendors').map(renderRow)}
         </Section>
         <Section title="For Buyers">
-          {SUBS_BUYERS.map(renderRow)}
+          {PRODUCT_CATALOG.filter(p => p.section === 'subs-buyers').map(renderRow)}
         </Section>
         <Section title="For Enterprise">
-          {SUBS_ENTERPRISE.map(renderRow)}
+          {PRODUCT_CATALOG.filter(p => p.section === 'subs-enterprise').map(renderRow)}
         </Section>
       </SectionGroup>
 
@@ -492,6 +524,105 @@ export default function AdminTestCheckoutPage() {
         )}
         </Section>
       </SectionGroup>
+
+      {/* Dialog overlay */}
+      {dialogProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-neutral-900 border border-neutral-700 rounded-lg max-w-md w-full">
+            <div className="flex items-center justify-between p-4 border-b border-neutral-700">
+              <h3 className="text-base font-semibold text-neutral-100">{dialogProduct.label}</h3>
+              <button
+                type="button"
+                onClick={closeDialog}
+                className="text-neutral-400 hover:text-neutral-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 space-y-3">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
+                  Send to email *
+                </label>
+                <input
+                  type="email"
+                  value={dialogFields.email}
+                  onChange={e => setDialogFields({ ...dialogFields, email: e.target.value })}
+                  className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-neutral-100 text-sm"
+                  autoFocus
+                />
+              </div>
+              {dialogProduct.needsUrl && (
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
+                    Website URL
+                  </label>
+                  <input
+                    type="text"
+                    value={dialogFields.vendor_url}
+                    onChange={e => setDialogFields({ ...dialogFields, vendor_url: e.target.value })}
+                    placeholder="https://example.com"
+                    className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-neutral-100 text-sm"
+                  />
+                </div>
+              )}
+              {dialogProduct.needsCompany && (
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    value={dialogFields.company_name}
+                    onChange={e => setDialogFields({ ...dialogFields, company_name: e.target.value })}
+                    placeholder="Your company name"
+                    className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-neutral-100 text-sm"
+                  />
+                </div>
+              )}
+              {dialogProduct.needsRfp && (
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
+                    RFP Description (optional)
+                  </label>
+                  <textarea
+                    value={dialogFields.rfp_description}
+                    onChange={e => setDialogFields({ ...dialogFields, rfp_description: e.target.value })}
+                    placeholder="Leave blank to defer brief collection"
+                    className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-neutral-100 text-sm h-20 resize-none"
+                  />
+                  <p className="text-[10px] text-neutral-500 mt-1">
+                    If blank, admin will collect the brief via intake form
+                  </p>
+                </div>
+              )}
+              {error && (
+                <div className="rounded border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+                  {error}
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 p-4 border-t border-neutral-700">
+              <button
+                type="button"
+                onClick={closeDialog}
+                className="flex-1 px-3 py-2 text-sm font-semibold rounded border border-neutral-700 text-neutral-200 hover:bg-neutral-800"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDialog}
+                disabled={busy !== null}
+                className="flex-1 px-3 py-2 text-sm font-semibold rounded bg-sky-600 hover:bg-sky-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center justify-center gap-1.5"
+              >
+                {busy && <Loader2 className="w-3 h-3 animate-spin" />}
+                Simulate
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
