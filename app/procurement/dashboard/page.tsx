@@ -407,13 +407,29 @@ export default function ProcurementDashboard() {
               <h1 className="text-xl font-bold">Procurement Dashboard</h1>
               <p className="text-white/40 text-xs mt-0.5">Vendor evaluation and compliance intelligence</p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg border border-white/10 bg-white/5 text-white/40 hover:text-white transition"
-              title="Sign out"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/procurement/frameworks"
+                className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white/60 hover:text-white text-xs font-medium transition"
+                title="Scoring frameworks"
+              >
+                Scoring profiles
+              </Link>
+              <Link
+                href="/procurement/scan-log"
+                className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-white/60 hover:text-white text-xs font-medium transition"
+                title="On-chain scan log"
+              >
+                Scan log
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg border border-white/10 bg-white/5 text-white/40 hover:text-white transition"
+                title="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
 

@@ -336,7 +336,7 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
       'Customisable risk-scoring weights per category',
       'Exportable Deep Scan PDF reports for shortlists and tender minutes',
       'Team collaboration — 3 seats with viewer / analyst / admin permissions',
-      'Webhook integrations (email, Slack, Teams)',
+      'Webhook integrations — email or any incoming-webhook URL (Slack, Teams, etc.)',
       '5 notarizations / month',
     ],
   },
