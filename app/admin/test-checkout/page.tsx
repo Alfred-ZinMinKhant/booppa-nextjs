@@ -66,7 +66,7 @@ const PRODUCT_CATALOG: Product[] = [
   // One-time — Vendors
   { product_type: 'vendor_proof', label: 'Vendor Proof', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
   { product_type: 'pdpa_quick_scan', label: 'PDPA Snapshot', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
-  { product_type: 'rfp_complete', label: 'RFP Complete', section: 'one-time-vendors', needsRfp: true },
+  { product_type: 'rfp_complete', label: 'RFP Complete', section: 'one-time-vendors', needsCompany: true, needsUrl: true, needsRfp: true },
   { product_type: 'vendor_trust_pack', label: 'Vendor Trust Pack', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
   { product_type: 'rfp_accelerator', label: 'RFP Accelerator', section: 'one-time-vendors', needsCompany: true, needsUrl: true, needsRfp: true },
   { product_type: 'enterprise_bid_kit', label: 'Enterprise Bid Kit', section: 'one-time-vendors', needsCompany: true, needsUrl: true, needsRfp: true },
@@ -194,12 +194,19 @@ export default function AdminTestCheckoutPage() {
     setError('')
     closeDialog()
     try {
+      // Always send the active identity's company + website for EVERY product,
+      // regardless of the per-product needs flags. The test checkout is fully
+      // identity-driven — fulfillment must reflect the active Test Identity
+      // (e.g. Crayon Singapore / crayon.com), never the logged-in user's profile
+      // or the backend's Booppa fallback defaults.
       const body: Record<string, string> = {
         product_type: dialogProduct.product_type,
         customer_email: email,
       }
-      if (dialogProduct.needsUrl) body.vendor_url = dialogFields.vendor_url.trim()
-      if (dialogProduct.needsCompany) body.company_name = dialogFields.company_name.trim()
+      const url = dialogFields.vendor_url.trim()
+      const company = dialogFields.company_name.trim()
+      if (url) body.vendor_url = url
+      if (company) body.company_name = company
       if (dialogProduct.needsRfp) {
         const desc = dialogFields.rfp_description.trim()
         if (desc) body.rfp_description = desc
