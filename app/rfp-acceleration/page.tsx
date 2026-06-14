@@ -550,7 +550,7 @@ export default function RFPAccelerationPage() {
                 n: 1,
                 t: 'Evidence is collected &amp; hashed',
                 d: 'Your company details, questionnaire answers, ACRA registration, SSL grade, and PDPC status are combined into a canonical JSON payload. A SHA-256 hash is derived — a unique 64-character fingerprint of all your evidence.',
-                code: 'SHA-256("company_name:Booppa | uen:... | ssl:A+ | pdpc:clean | ...") → 0x7f9f…',
+                code: 'SHA-256("company_name:Acme Pte Ltd | uen:201812345A | ssl:A+ | pdpc:clean | ...") → 0x7f9f…',
               },
               {
                 n: 2,

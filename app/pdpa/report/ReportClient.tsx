@@ -732,9 +732,11 @@ function TaskCard({ f, index }: { f: Finding; index: number }) {
 
 function AssessmentConductedBy({ report, reportUrl }: { report: StructuredReport | null; reportUrl: string | null }) {
   const reportId = report?.report_metadata?.report_id ?? "—";
+  // Booppa has no Singapore UEN — never print one (the prior "202415732W" was
+  // fabricated; a fake regulatory id on a compliance report is a
+  // misrepresentation). Mirrors the backend pdf_service assessing-entity table.
   const rows: [string, string][] = [
     ["Assessing Entity",    "Booppa Smart Care LLC"],
-    ["UEN (Singapore)",     "202415732W"],
     ["Framework Version",   "BACF-v1.0"],
     ["Assessed Entity",     "—"],       // populated below if available
     ["DPO Contact",         "evidence@booppa.io"],
@@ -1310,7 +1312,7 @@ export default function ReportClient() {
         <p className="text-center text-xs text-[#94a3b8] italic leading-relaxed pb-4">
           Automated compliance assessment by Booppa Smart Care LLC · BACF-v1.0 · Results reflect publicly accessible website elements at assessment date.
           May be used as supporting evidence in procurement and regulatory contexts. Does not substitute for legal counsel.
-          Booppa Smart Care LLC, Singapore UEN: 202415732W.
+          Booppa Smart Care LLC.
         </p>
 
       </div>
