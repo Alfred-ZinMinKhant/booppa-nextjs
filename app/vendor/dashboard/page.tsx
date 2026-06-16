@@ -30,6 +30,7 @@ import VendorProPanel from "@/components/vendor/VendorProPanel";
 import RemediationSummaryCard from "@/components/vendor/RemediationSummaryCard";
 import CalDashboard from "@/components/vendor/CalDashboard";
 import TenderWinProbabilityWidget from "@/components/vendor/TenderWinProbabilityWidget";
+import ExportableArtifacts from "@/components/vendor/ExportableArtifacts";
 import TrustRing from "@/components/vendor/TrustRing";
 import DepthLadder from "@/components/vendor/DepthLadder";
 import AlertCard from "@/components/vendor/AlertCard";
@@ -527,6 +528,11 @@ export default function VendorDashboard() {
 					<VendorStatusBadge />
 				</div>
 				<VendorProPanel />
+
+				{/* Exportable offline evidence — downloadable PDF versions of
+				    dashboard-only signals (badge, priority placement, bid timing,
+				    competitor activity). */}
+				<ExportableArtifacts />
 
 				{/* ── Zone 5: Subscription strip ────────────────────────────── */}
 				<div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">

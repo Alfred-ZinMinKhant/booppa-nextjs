@@ -68,8 +68,6 @@ const PRODUCT_CATALOG: Product[] = [
   { product_type: 'pdpa_quick_scan', label: 'PDPA Snapshot', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
   { product_type: 'rfp_complete', label: 'RFP Complete', section: 'one-time-vendors', needsCompany: true, needsUrl: true, needsRfp: true },
   { product_type: 'vendor_trust_pack', label: 'Vendor Trust Pack', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
-  { product_type: 'rfp_accelerator', label: 'RFP Accelerator', section: 'one-time-vendors', needsCompany: true, needsUrl: true, needsRfp: true },
-  { product_type: 'enterprise_bid_kit', label: 'Enterprise Bid Kit', section: 'one-time-vendors', needsCompany: true, needsUrl: true, needsRfp: true },
   { product_type: 'compliance_evidence_pack', label: 'Compliance Evidence Pack', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
   { product_type: 'compliance_notarization_1', label: 'Notarization (1 doc)', section: 'one-time-vendors' },
   // One-time — Buyers
@@ -124,6 +122,8 @@ function detailLinks(details: Record<string, unknown>) {
   if (reportId) out.push({ href: `/pdpa/report?session_id=${details.session_id ?? ''}`, label: `report ${reportId.slice(0, 8)}` })
   const intakeId = (details.pending_rfp_intake_id ?? details.intake_id) as string | undefined
   if (intakeId) out.push({ href: `/rfp-intake/${intakeId}`, label: `intake ${intakeId.slice(0, 8)}` })
+  const evidencePackId = details.evidence_pack_id as string | undefined
+  if (evidencePackId) out.push({ href: `/evidence-pack-intake/${evidencePackId}`, label: `evidence pack ${evidencePackId.slice(0, 8)}` })
   const stubs = details.stub_report_ids as string[] | undefined
   if (stubs?.length) for (const id of stubs) out.push({ href: `/vendor/dashboard`, label: `stub ${id.slice(0, 8)}` })
   return out
