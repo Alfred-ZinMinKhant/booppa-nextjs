@@ -100,6 +100,11 @@ export default function RfpIntakePage() {
           return;
         }
         setIntake(data);
+        // A prior submission was blocked at the placeholder gate — surface the
+        // advanced compliance section so the buyer can supply the missing facts.
+        if (data.status === 'needs_more_info') {
+          setShowAdvanced(true);
+        }
         // Seed the form from anything the buyer entered on /rfp-acceleration
         // before checkout. Only known IntakeFields keys are accepted; anything
         // else in intake_data is ignored. Buyer can edit before submitting.
@@ -236,6 +241,10 @@ export default function RfpIntakePage() {
       setError('Please enter your company name.');
       return;
     }
+    if (!form.uen.trim()) {
+      setError('Your UEN (Business Registration No.) appears on the GeBIZ-ready kit and is required.');
+      return;
+    }
     if (!form.rfp_description.trim()) {
       setError('Please describe what you are procuring.');
       return;
@@ -344,6 +353,14 @@ export default function RfpIntakePage() {
           </p>
         </div>
 
+        {intake?.status === 'needs_more_info' && (
+          <div className="mb-4 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+            <strong>A few more verified details needed.</strong> We couldn&apos;t issue your kit because some
+            answers still had unverified placeholders. Complete the compliance details below (we&apos;ve opened
+            that section) and resubmit — GeBIZ-ready kits can&apos;t contain blanks.
+          </div>
+        )}
+
         {error && (
           <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
             {error}
@@ -385,6 +402,23 @@ export default function RfpIntakePage() {
               />
               <p className="text-xs text-[#64748b] mt-1">
                 We scan your site to verify ISO/SOC&nbsp;mentions, encryption language, hosting region, and DPO contact — so more answers can be labelled <strong>Verified&nbsp;on&nbsp;your&nbsp;website</strong> instead of AI&nbsp;draft.
+              </p>
+            </div>
+            <div>
+              <label htmlFor="uen" className="block text-sm font-semibold text-[#0f172a] mb-1">
+                UEN (Business Registration No.) *
+              </label>
+              <input
+                id="uen"
+                type="text"
+                required
+                value={form.uen}
+                onChange={(e) => setForm({ ...form, uen: e.target.value })}
+                placeholder="e.g. 201912345A"
+                className="w-full px-3 py-2 border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-[#0ea5e9]"
+              />
+              <p className="text-xs text-[#64748b] mt-1">
+                This is the field GeBIZ procurement officers check first — it must appear on your kit.
               </p>
             </div>
           </div>
@@ -469,14 +503,6 @@ export default function RfpIntakePage() {
 
           {showAdvanced && (
             <div className="space-y-4 border-l-2 border-[#e2e8f0] pl-4">
-              <Row label="UEN">
-                <input
-                  type="text"
-                  value={form.uen}
-                  onChange={(e) => setForm({ ...form, uen: e.target.value })}
-                  className="form-input"
-                />
-              </Row>
               <Row label="Short company description">
                 <textarea
                   rows={2}

@@ -203,6 +203,20 @@ function RFPResultContent() {
       } catch { /* keep polling */ }
       if (cancelled) return;
       polls++;
+      // Every few polls, re-check the brief. A kit blocked at the placeholder
+      // gate flips its intake row to `needs_more_info`, which checkout/verify
+      // reports as an outstanding brief — surface the CTA instead of spinning
+      // on "Generating…" until the timeout.
+      if (polls % 3 === 0) {
+        const b = await checkBrief();
+        if (cancelled) return;
+        if (b.pendingId && !b.briefSatisfied) {
+          setPendingIntakeId(b.pendingId);
+          if (b.productType) setProductType(b.productType);
+          setStatus('brief_required');
+          return;
+        }
+      }
       if (polls >= MAX_POLLS) { setStatus('error'); return; }
       setTimeout(poll, POLL_INTERVAL_MS);
     }
