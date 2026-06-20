@@ -5,6 +5,7 @@ import Link from 'next/link'
 import {
   ShieldCheck, AlertCircle, AlertTriangle, Loader2, ArrowLeft,
   ChevronDown, ChevronRight, Sparkles, CheckCircle2, XCircle, Clock,
+  Upload, Trash2, FileText,
 } from 'lucide-react'
 
 interface TrmControl {
@@ -15,6 +16,7 @@ interface TrmControl {
   status: 'not_started' | 'in_progress' | 'compliant' | 'gap' | null
   risk_rating: 'low' | 'medium' | 'high' | 'critical' | null
   gap_analysis: string | null
+  evidence_count?: number
   updated_at: string | null
 }
 
@@ -183,6 +185,11 @@ export default function TrmPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    {!!c.evidence_count && (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
+                        📎 {c.evidence_count}
+                      </span>
+                    )}
                     {c.risk_rating && (
                       <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${RISK_META[c.risk_rating]}`}>
                         {c.risk_rating}
@@ -259,6 +266,9 @@ export default function TrmPage() {
                         and named owners — the model uses this to identify what&apos;s missing.
                       </p>
                     )}
+
+                    {/* Evidence */}
+                    <EvidenceManager controlId={c.id} onChange={load} />
                   </div>
                 )}
               </div>
@@ -277,6 +287,124 @@ function SummaryCard({ label, value, hint, tone }: { label: string; value: strin
       <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">{label}</p>
       <p className={`text-2xl font-bold mt-1 ${valueColor}`}>{value}</p>
       {hint && <p className="text-[11px] text-neutral-500 mt-0.5">{hint}</p>}
+    </div>
+  )
+}
+
+interface EvidenceItem {
+  id: string
+  file_name: string | null
+  hash_value: string | null
+  tx_hash: string | null
+  uploaded_at: string | null
+  download_url: string | null
+}
+
+function EvidenceManager({ controlId, onChange }: { controlId: string; onChange: () => void }) {
+  const [items, setItems] = useState<EvidenceItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState('')
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const r = await fetch(`/api/vendor/trm/${controlId}/evidence`, { cache: 'no-store' })
+      if (r.ok) {
+        const d = await r.json()
+        setItems(Array.isArray(d.items) ? d.items : [])
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [controlId])
+
+  const upload = async (file: File) => {
+    setUploading(true); setError('')
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const r = await fetch(`/api/vendor/trm/${controlId}/evidence`, { method: 'POST', body: fd })
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}))
+        setError(typeof d?.detail === 'string' ? d.detail : 'Upload failed.')
+      } else {
+        await load()
+        onChange()
+      }
+    } catch {
+      setError('Network error — please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const remove = async (id: string) => {
+    try {
+      const r = await fetch(`/api/vendor/trm/${controlId}/evidence/${id}`, { method: 'DELETE' })
+      if (r.ok) {
+        await load()
+        onChange()
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return (
+    <div className="bg-neutral-950 border border-neutral-800 rounded-lg p-3">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-2">Evidence</p>
+
+      {loading ? (
+        <p className="text-xs text-neutral-500">Loading…</p>
+      ) : items.length === 0 ? (
+        <p className="text-xs text-neutral-500 mb-2">No evidence attached yet.</p>
+      ) : (
+        <ul className="space-y-1 mb-2">
+          {items.map(it => (
+            <li key={it.id} className="flex items-center gap-2 text-xs text-neutral-200">
+              <FileText className="h-3 w-3 text-neutral-500 flex-shrink-0" />
+              {it.download_url ? (
+                <a href={it.download_url} target="_blank" rel="noreferrer" className="text-sky-300 hover:underline truncate">
+                  {it.file_name}
+                </a>
+              ) : (
+                <span className="truncate">{it.file_name}</span>
+              )}
+              {it.tx_hash && <span className="text-[10px] text-emerald-400">anchored</span>}
+              <button
+                type="button"
+                onClick={() => remove(it.id)}
+                className="ml-auto text-neutral-500 hover:text-red-400"
+                aria-label="Delete evidence"
+              >
+                <Trash2 className="h-3 w-3" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {error && <p className="text-xs text-red-400 mb-2">{error}</p>}
+
+      <label className="inline-flex items-center gap-2 text-xs bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800 px-3 py-1.5 rounded-lg cursor-pointer">
+        {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+        {uploading ? 'Uploading…' : 'Upload evidence'}
+        <input
+          type="file"
+          className="hidden"
+          disabled={uploading}
+          onChange={e => {
+            const f = e.target.files?.[0]
+            if (f) upload(f)
+            e.target.value = ''
+          }}
+        />
+      </label>
     </div>
   )
 }

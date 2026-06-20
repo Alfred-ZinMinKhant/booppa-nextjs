@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { config } from '@/lib/config'
 import { POLYGON_EXPLORER_HOST, polygonscanTxUrl } from '@/lib/blockchain'
 import { CheckCircle, Loader2, FileText, ExternalLink, Upload as UploadIcon, AlertCircle, ArrowRight, Mail, Circle, Download as DownloadIcon, PenLine } from 'lucide-react'
+import RopaIntakeSection from './RopaIntakeSection'
 
 interface CoverSheetStatus {
   credits: number
@@ -389,6 +390,16 @@ function CoverSheetInner() {
                   : 'Cover Sheet generates automatically once PDPA Quick Scan and RFP Complete Kit are ready. Page refreshes every 8 seconds.'}
               </p>
             )}
+          </div>
+        )}
+
+        {/* ROPA Lite intake — 4th anchored document of the Compliance Evidence
+            Pack. Shown alongside the status cards; the backend handles every
+            submission-order combination, so the signing UI below is NOT gated
+            on ROPA being submitted first. */}
+        {email && status && hasAccess && (
+          <div className="mb-8">
+            <RopaIntakeSection />
           </div>
         )}
 

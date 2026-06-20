@@ -10,6 +10,7 @@ import {
   keyFromFinding,
   type Remediation,
 } from "@/lib/remediations";
+import PdpaDeclarationSection from "./PdpaDeclarationSection";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -1295,6 +1296,9 @@ export default function ReportClient() {
             </ul>
           </div>
         )}
+
+        {/* ── PDPC Level 2 self-declaration upgrade ───────── */}
+        <PdpaDeclarationSection />
 
         {/* ── PDF CTA ───────────────────────────────────── */}
         {reportUrl && (
