@@ -6,6 +6,7 @@ import { config } from '@/lib/config'
 import { POLYGON_EXPLORER_HOST, polygonscanTxUrl } from '@/lib/blockchain'
 import { CheckCircle, Loader2, FileText, ExternalLink, Upload as UploadIcon, AlertCircle, ArrowRight, Mail, Circle, Download as DownloadIcon, PenLine } from 'lucide-react'
 import RopaIntakeSection from './RopaIntakeSection'
+import EvidencePackSection from './EvidencePackSection'
 
 interface CoverSheetStatus {
   credits: number
@@ -391,6 +392,13 @@ function CoverSheetInner() {
               </p>
             )}
           </div>
+        )}
+
+        {/* PDPA Evidence Pack — the BCEP 7-document governance set. The SKU now
+            centres on this pack, so the workflow hub surfaces its progress
+            (intake → generating → ready) and inline downloads for all 7 docs. */}
+        {email && status && hasAccess && (
+          <EvidencePackSection />
         )}
 
         {/* ROPA Lite intake — 4th anchored document of the Compliance Evidence
