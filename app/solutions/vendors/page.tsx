@@ -202,9 +202,9 @@ export default function SolutionsVendorsPage() {
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">Compliance Bundle</h3>
                 <div className="text-4xl font-black text-blue-600 mb-1">SGD 799</div>
                 <p className="text-xs text-[#64748b] mb-6">One-time bundle · <span className="text-blue-600 font-bold">Save over SGD 300</span></p>
-                <p className="text-sm text-[#475569] mb-6 leading-relaxed">The ultimate foundation for winning large-scale enterprise and government contracts.</p>
+                <p className="text-sm text-[#475569] mb-6 leading-relaxed">The ultimate foundation for winning large-scale enterprise and government contracts — a full PDPA governance set grounded in a live scan of your site.</p>
                 <ul className="space-y-3 mb-8 flex-1">
-                  {["PDPA Scan (Full)", "RFP Complete Kit", "Blockchain Cover Sheet", "Full Evidence Archive"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
+                  {["7-document PDPA Governance Pack (DPMP, ROPA, Data Inventory, Vendor/DPA Register, Breach Runbook, Training, Security Review Log)", "PDPA Scan (Full)", "RFP Complete Kit", "Blockchain Cover Sheet", "Full Evidence Archive"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
                 </ul>
                 <button 
                   disabled={loadingProduct === "compliance_evidence_pack"}

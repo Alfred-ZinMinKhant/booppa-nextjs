@@ -151,12 +151,12 @@ export default function EnterprisePage() {
                         <div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
                             <div className="flex justify-between items-start mb-2">
                                 <h3 className="text-xl font-bold text-[#0f172a]">Compliance Bundle</h3>
-                                <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">3-doc pack</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">10-doc pack</span>
                             </div>
                             <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 799</div>
                             <p className="text-xs text-[#64748b] mb-6">one-time payment</p>
                             <ul className="space-y-3 mb-8 flex-1">
-                                {["PDPA Quick Scan included", "RFP Complete — 15 Q&A", "Compliance Cover Sheet v3", "All 3 documents on Amoy Testnet"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
+                                {["7-document PDPA governance pack (DPMP, ROPA, Data Inventory, Vendor/DPA Register, Breach Runbook, Training, Security Review Log)", "PDPA Quick Scan included", "RFP Complete — 15 Q&A", "Documents grounded in a live website + PDPA scan", "Compliance Cover Sheet v3 (blockchain-anchored)", "All documents on Amoy Testnet"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
                             </ul>
                             <div className="pt-6 border-t border-[#f1f5f9] mb-6">
                                 <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>

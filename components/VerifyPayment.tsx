@@ -28,7 +28,7 @@ function loadingCopyFor(pt: string | undefined): { headline: string; detail: str
   if (pt === 'compliance_evidence_pack') {
     return {
       headline: 'Securing your Compliance Evidence Pack',
-      detail: 'Once verified, you’ll be asked to submit your RFP brief. PDPA Quick Scan runs in parallel; both feed your regulator-ready Cover Sheet.',
+      detail: 'Once verified, you’ll start your 7-document Evidence Pack intake and submit a short RFP brief. Your PDPA Quick Scan runs in parallel; everything feeds your regulator-ready Cover Sheet.',
     };
   }
   if (pt === 'rfp_accelerator' || pt === 'enterprise_bid_kit') {
@@ -67,20 +67,22 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
   const [productType, setProductType] = useState<string | undefined>(productProp);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [pendingRfpIntakeId, setPendingRfpIntakeId] = useState<string | null>(null);
+  const [evidencePackIntakeId, setEvidencePackIntakeId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function verifyOnce(): Promise<{ verified: boolean; pendingId: string | null; productType?: string }> {
+    async function verifyOnce(): Promise<{ verified: boolean; pendingId: string | null; evidencePackId: string | null; productType?: string }> {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'https://api.booppa.io';
       const response = await fetch(`${apiBase}/api/stripe/checkout/verify?session_id=${sessionId}`);
       const data = await response.json();
       if (!(response.ok && data.success)) {
-        return { verified: false, pendingId: null };
+        return { verified: false, pendingId: null, evidencePackId: null };
       }
       return {
         verified: true,
         pendingId: data.pending_rfp_intake_id || null,
+        evidencePackId: data.pending_evidence_pack_intake_id || null,
         productType: data.product_type || undefined,
       };
     }
@@ -101,21 +103,32 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
         setStatus('success');
         setMessage('Payment successfully verified! Your service has been activated.');
 
-        if (attempt.pendingId) {
-          setPendingRfpIntakeId(attempt.pendingId);
-        } else if (resolvedPt && BRIEF_REQUIRED_PRODUCTS.has(resolvedPt)) {
-          // Webhook may not have created the PendingRfpIntake row yet — poll a
-          // few times so the user lands on the correct "Complete your brief" CTA
-          // instead of a misleading "delivered to your email" message.
+        if (attempt.pendingId) setPendingRfpIntakeId(attempt.pendingId);
+        if (attempt.evidencePackId) setEvidencePackIntakeId(attempt.evidencePackId);
+
+        // Webhook may not have created the deferred intake rows yet — poll a few
+        // times so the user lands on the correct CTA(s) instead of a misleading
+        // "delivered to your email" message. CE defers BOTH the RFP brief and the
+        // Evidence Pack intake, so keep polling until we have what this product needs.
+        const ceNeedsPack = resolvedPt === 'compliance_evidence_pack';
+        if ((resolvedPt && BRIEF_REQUIRED_PRODUCTS.has(resolvedPt) && !attempt.pendingId)
+            || (ceNeedsPack && !attempt.evidencePackId)) {
           const delays = [1000, 2000, 3000, 5000];
+          let gotRfp = !!attempt.pendingId;
+          let gotPack = !!attempt.evidencePackId;
           for (const ms of delays) {
+            if (gotRfp && (!ceNeedsPack || gotPack)) break;
             await new Promise(r => setTimeout(r, ms));
             if (cancelled) return;
             const retry = await verifyOnce();
             if (cancelled) return;
-            if (retry.pendingId) {
+            if (!gotRfp && retry.pendingId) {
               setPendingRfpIntakeId(retry.pendingId);
-              break;
+              gotRfp = true;
+            }
+            if (!gotPack && retry.evidencePackId) {
+              setEvidencePackIntakeId(retry.evidencePackId);
+              gotPack = true;
             }
           }
         }
@@ -161,9 +174,11 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
           <div className="mt-5 w-full bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-3 flex items-start gap-3">
             <FileText className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-amber-400">One more step after payment</p>
+              <p className="text-sm font-semibold text-amber-400">{productType === 'compliance_evidence_pack' ? 'Two quick steps after payment' : 'One more step after payment'}</p>
               <p className="text-xs text-gray-400 mt-0.5">
-                Once verified, we’ll ask you to complete a short RFP brief — your kit can’t be generated without it. You’ll also receive an email with the same link.
+                {productType === 'compliance_evidence_pack'
+                  ? 'Once verified, we’ll ask you to start your 7-document Evidence Pack intake and complete a short RFP brief — both are needed to generate your pack. You’ll also receive an email with the same links.'
+                  : 'Once verified, we’ll ask you to complete a short RFP brief — your kit can’t be generated without it. You’ll also receive an email with the same link.'}
               </p>
             </div>
           </div>
@@ -226,9 +241,15 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                           ? 'Your Vendor Proof certificate will be sent to your email within a few minutes.'
                           : isBundle
                             ? (productType === 'compliance_evidence_pack'
-                                ? (pendingRfpIntakeId
-                                    ? 'Your Compliance Evidence Pack is activated — PDPA Quick Scan is running now. Tell us about your RFP and we will generate your Complete Kit, which feeds into your regulator-ready Cover Sheet.'
-                                    : 'Your Compliance Evidence Pack is activated — PDPA Quick Scan and RFP Complete Kit are running now. Once both finish, your 9-section regulator-ready Cover Sheet PDF will be emailed to you.')
+                                ? ((evidencePackIntakeId || pendingRfpIntakeId)
+                                    ? `Your Compliance Evidence Pack is activated — your PDPA Quick Scan is running now. ${
+                                        evidencePackIntakeId && pendingRfpIntakeId
+                                          ? 'Start your 7-document Evidence Pack intake and complete a short RFP brief below'
+                                          : evidencePackIntakeId
+                                            ? 'Start your 7-document Evidence Pack intake below'
+                                            : 'Complete a short RFP brief below'
+                                      } — everything feeds your regulator-ready Cover Sheet. We have also emailed you these links.`
+                                    : 'Your Compliance Evidence Pack is activated — your 7 governance documents, PDPA Quick Scan, and RFP Complete Kit are being prepared. We will email each deliverable plus your regulator-ready Cover Sheet shortly.')
                                 : productType === 'enterprise_bid_kit'
                                   ? (pendingRfpIntakeId
                                       ? 'Your Enterprise Bid Kit is activated — Vendor Proof and PDPA Quick Scan are running now. Tell us about your RFP to generate the Complete Kit, then notarize your 7 included documents.'
@@ -263,6 +284,37 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
               View RFP Kit
             </Link>
           )
+        ) : isComplianceEvidencePack ? (
+          // CE defers two intakes — lead with the namesake 7-document Evidence
+          // Pack, then the RFP brief. Fall back to the Cover Sheet only when
+          // neither intake is outstanding (e.g. test/cycle auto-queued paths).
+          (evidencePackIntakeId || pendingRfpIntakeId) ? (
+            <div className="mt-6 flex flex-col gap-3 w-full sm:w-auto">
+              {evidencePackIntakeId && (
+                <Link
+                  href={`/evidence-pack-intake/${evidencePackIntakeId}`}
+                  className="inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition text-center"
+                >
+                  Start Your Evidence Pack (7 documents) →
+                </Link>
+              )}
+              {pendingRfpIntakeId && (
+                <Link
+                  href={`/rfp-intake/${pendingRfpIntakeId}`}
+                  className="inline-block px-6 py-3 bg-white/10 border border-booppa-green/40 text-white font-semibold rounded-lg hover:bg-white/20 transition text-center"
+                >
+                  Complete Your RFP Brief →
+                </Link>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/compliance/cover-sheet"
+              className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition"
+            >
+              Open Compliance Cover Sheet →
+            </Link>
+          )
         ) : isBundle ? (
           pendingRfpIntakeId ? (
             <Link
@@ -273,13 +325,10 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
             </Link>
           ) : (
             <Link
-              href={isComplianceEvidencePack
-                ? '/compliance/cover-sheet'
-                : `/bundle/notarize?bundle=${productType}${sessionId ? `&session_id=${sessionId}` : ''}`}
+              href={`/bundle/notarize?bundle=${productType}${sessionId ? `&session_id=${sessionId}` : ''}`}
               className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition"
             >
-              {isComplianceEvidencePack ? 'Open Compliance Cover Sheet →' :
-                productType === 'enterprise_bid_kit' ? 'Notarize Your 7 Bundle Documents →' :
+              {productType === 'enterprise_bid_kit' ? 'Notarize Your 7 Bundle Documents →' :
                 'Notarize Your 2 Bundle Documents →'}
             </Link>
           )

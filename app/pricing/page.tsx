@@ -292,6 +292,10 @@ export default function PricingPage() {
 												<div className="space-y-3">
 													{[
 														{
+															label: "PDPA Governance Pack (7 documents)",
+															scope: "DPMP, ROPA, Data Inventory, Third-Party/DPA Register, Breach Response Runbook, Staff Training Register, and Security Review Log — AI-drafted from your intake and grounded in a live website + PDPA scan, each SHA-256 hashed and anchored. Review & sign before evidentiary use.",
+														},
+														{
 															label: "PDPA Scan (Full)",
 															scope: "Scans privacy policy, DPO contact, cookie consent, breach notification surfaces. Identifies findings across PDPA's 7 obligations. Report + Polygon Amoy anchor.",
 														},
@@ -305,7 +309,7 @@ export default function PricingPage() {
 														},
 														{
 															label: "Full Evidence Archive",
-															scope: "All four anchored artifacts retained in your Compliance Locker (re-downloadable anytime, no retention expiry).",
+															scope: "All anchored artifacts (7 governance docs + PDPA scan + RFP kit + cover sheet) retained in your Compliance Locker (re-downloadable anytime, no retention expiry).",
 														},
 													].map(item => (
 														<details key={item.label} className="group bg-white/5 rounded-lg border border-white/10">
@@ -597,12 +601,16 @@ export default function PricingPage() {
 								<div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
 									<div className="flex justify-between items-start mb-2">
 										<h3 className="text-xl font-bold text-[#0f172a]">Compliance Bundle</h3>
-										<span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">3-doc pack</span>
+										<span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">10-doc pack</span>
 									</div>
 									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 799</div>
 									<p className="text-xs text-[#64748b] mb-6">one-time payment</p>
 									<div className="space-y-2 mb-6 flex-1">
 										{[
+											{
+												label: "PDPA Governance Pack — 7 documents",
+												scope: "DPMP, ROPA, Data Inventory, Vendor/DPA Register, Breach Runbook, Training Register, and Security Review Log — AI-drafted from your intake and grounded in a live website + PDPA scan, each anchored. Review & sign before evidentiary use.",
+											},
 											{
 												label: "PDPA Quick Scan included",
 												scope: "Privacy policy + DPO contact + cookie consent + breach notification scan. Findings across PDPA's 7 obligations.",
@@ -616,7 +624,7 @@ export default function PricingPage() {
 												scope: "9-section PDF you sign in-browser (ETA s. 8) or wet-sign. Signed copy anchored on-chain.",
 											},
 											{
-												label: "All 3 documents on Amoy Testnet",
+												label: "All documents on Amoy Testnet",
 												scope: "Retained in your Compliance Locker — re-downloadable anytime, no retention expiry.",
 											},
 										].map(item => (

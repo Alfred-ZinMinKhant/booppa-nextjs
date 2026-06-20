@@ -286,9 +286,9 @@ function CoverSheetInner() {
               <div className="flex-1">
                 <h2 className="text-xl font-black text-[#0f172a] mb-1">Tell us about your RFP</h2>
                 <p className="text-sm text-[#475569] mb-4 leading-relaxed">
-                  Your Compliance Evidence Pack includes an RFP Complete Kit. Share a few details
-                  about the procurement (takes about 2 minutes) and we&apos;ll generate the kit
-                  immediately — it then feeds into your regulator-ready Cover Sheet.
+                  Your Compliance Evidence Pack includes a 7-document PDPA governance set and an
+                  RFP Complete Kit. Share a few details about the procurement (takes about 2 minutes)
+                  and we&apos;ll generate the kit immediately — it then feeds into your regulator-ready Cover Sheet.
                 </p>
                 <Link
                   href={`/rfp-intake/${status.rfp_brief_intake_id}`}

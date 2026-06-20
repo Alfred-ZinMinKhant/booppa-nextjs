@@ -151,7 +151,7 @@ function BundleNotarizeInner() {
           <p className="text-sm font-bold text-[#0ea5e9] uppercase tracking-widest mb-2">{meta.label}</p>
           <h1 className="text-3xl lg:text-4xl font-black text-[#0f172a] mb-3">Your Compliance Evidence Pack is being generated</h1>
           <p className="text-[#64748b] text-lg mb-6">
-            Your PDPA Quick Scan and RFP Complete Kit are running now. Once both finish, your 9-section regulator-ready Cover Sheet PDF will be emailed to you automatically.
+            Your 7-document PDPA governance pack, PDPA Quick Scan, and RFP Complete Kit are running now. Once they finish, your 9-section regulator-ready Cover Sheet PDF will be emailed to you automatically.
           </p>
           <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-6">
             <h2 className="font-black text-[#0f172a] mb-2">Track everything on your Cover Sheet page</h2>
