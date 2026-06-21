@@ -31,6 +31,7 @@ import RemediationSummaryCard from "@/components/vendor/RemediationSummaryCard";
 import CalDashboard from "@/components/vendor/CalDashboard";
 import TenderWinProbabilityWidget from "@/components/vendor/TenderWinProbabilityWidget";
 import ExportableArtifacts from "@/components/vendor/ExportableArtifacts";
+import VendorInsightsPanel from "@/components/vendor/VendorInsightsPanel";
 import TrustRing from "@/components/vendor/TrustRing";
 import DepthLadder from "@/components/vendor/DepthLadder";
 import AlertCard from "@/components/vendor/AlertCard";
@@ -513,6 +514,10 @@ export default function VendorDashboard() {
 						</div>
 					</div>
 				</div>
+
+				{/* Monthly intelligence — trend, sector benchmark, tender matches
+				    (self-gated: renders null for non-subscribers / no data). */}
+				<VendorInsightsPanel />
 
 				{/* Insights row — sector / cal / tender probability */}
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

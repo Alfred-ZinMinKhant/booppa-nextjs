@@ -310,8 +310,9 @@ function VendorProofContent() {
 						</p>
 						<p className="text-xs text-gray-500 mb-4">
 							Vendor Proof is your entry credential. Vendor Active is the
-							ongoing monitoring layer — monthly score health checks, competitor
-							alerts, and shortlist priority in buyer searches.
+							ongoing intelligence layer — a branded monthly report with your
+							Trust-score trend, sector benchmark, personalized tender matches
+							(BID/WATCH/PASS), plus priority placement in buyer searches.
 						</p>
 						<div className="flex flex-col gap-2">
 							<button

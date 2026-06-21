@@ -372,9 +372,9 @@ export default function PricingPage() {
 									<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm flex flex-col">
 										<h3 className="text-xl font-bold text-[#0f172a] mb-1">Vendor Active</h3>
 										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 39<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
-										<p className="text-xs text-[#64748b] mb-6">Essential visibility for active vendors</p>
+										<p className="text-xs text-[#64748b] mb-6">Your monthly procurement intelligence layer</p>
 										<ul className="space-y-3 mb-8 flex-1">
-											{["Priority in searches", "Real-time GeBIZ alerts", "Unlimited probability checks", "Active badge status"].map(f => <CheckItem key={f} text={f} />)}
+											{["Monthly intelligence report — emailed branded PDF", "Personalized tender matches (BID / WATCH / PASS)", "Sector benchmark + Trust-score trend", "Priority placement & Active badge", "Unlimited win-probability checks"].map(f => <CheckItem key={f} text={f} />)}
 										</ul>
 										<button 
 											disabled={loadingProduct === "vendor_active_monthly"}
