@@ -116,6 +116,18 @@ export default function VendorProPanel() {
 				<h3 className="text-sm font-semibold text-white">Vendor Pro</h3>
 			</header>
 
+			{/* Flagship deliverable — consolidated monthly intelligence report */}
+			<a
+				href="/api/vendor-pro/monthly-report.pdf"
+				className="flex items-center justify-between gap-2 rounded-xl border border-violet-700/40 bg-violet-500/10 px-4 py-3 hover:bg-violet-500/20 transition"
+			>
+				<div>
+					<div className="text-sm font-semibold text-white">Monthly Intelligence Report</div>
+					<div className="text-[11px] text-neutral-400">Scores, win-probability pipeline, competitor & PDPA drift — one PDF</div>
+				</div>
+				<span className="text-xs font-bold text-violet-300 whitespace-nowrap">Download ↓</span>
+			</a>
+
 			{/* Quota + PDPA */}
 			<div className="grid grid-cols-2 gap-3">
 				<div className="bg-neutral-950 rounded-xl p-3">

@@ -23,9 +23,10 @@ type Match = {
 	label: "BID" | "WATCH" | "PASS" | null;
 	reason: string | null;
 	confidence: number | null;
+	winProbability: number | null;
 };
 
-type Insights = { trend: Trend; sectorBenchmark: Benchmark; tenderMatches: Match[] };
+type Insights = { isPro?: boolean; trend: Trend; sectorBenchmark: Benchmark; tenderMatches: Match[] };
 
 const LABEL_STYLE: Record<string, string> = {
 	BID: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
@@ -137,11 +138,16 @@ export default function VendorInsightsPanel() {
 										{m.agency || ""}{m.closingDate ? ` · closes ${new Date(m.closingDate).toLocaleDateString()}` : ""}
 									</div>
 								</div>
-								{m.label && (
-									<span className={`shrink-0 text-[11px] font-bold px-2 py-0.5 rounded border ${LABEL_STYLE[m.label] || LABEL_STYLE.PASS}`}>
-										{m.label}
-									</span>
-								)}
+								<div className="shrink-0 flex items-center gap-2">
+									{m.winProbability !== null && m.winProbability !== undefined && (
+										<span className="text-[11px] font-bold text-white">{m.winProbability}%</span>
+									)}
+									{m.label && (
+										<span className={`text-[11px] font-bold px-2 py-0.5 rounded border ${LABEL_STYLE[m.label] || LABEL_STYLE.PASS}`}>
+											{m.label}
+										</span>
+									)}
+								</div>
 							</a>
 						))}
 					</div>

@@ -278,14 +278,15 @@ export default function SolutionsVendorsPage() {
                 <div className="absolute top-[-14px] left-8 bg-violet-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">New</div>
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">Vendor Pro</h3>
                 <div className="text-4xl font-black text-violet-600 mb-1">SGD 99<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
-                <p className="text-xs text-[#64748b] mb-6">Compliance visibility + tender intelligence for growing vendors</p>
+                <p className="text-xs text-[#64748b] mb-6">Full procurement intelligence for growing vendors</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {[
                     "Everything in Vendor Active",
-                    "Quarterly PDPA Snapshot with drift",
+                    "Consolidated monthly Intelligence Report (PDF)",
+                    "Win-probability tender pipeline",
+                    "Sector competitor intelligence",
+                    "Quarterly PDPA Snapshot with drift tracking",
                     "1 notarization/month (SGD 69 value)",
-                    "Tender analytics dashboard (lite)",
-                    "Competitor awareness signals",
                     "Priority email support",
                   ].map(f => <CheckItem key={f} text={f} color="text-violet-600" />)}
                 </ul>
