@@ -40,9 +40,29 @@ interface IntakeFields {
   iso_cert_expiry: string;
   data_hosting: 'sg' | 'apac' | 'global' | 'unknown';
   primary_cloud: string;
+  cross_border_mechanism: string;
   breach_history: 'none' | 'one' | 'multiple' | 'unknown';
   training_frequency: string;
+  training_newhire_window: string;
   key_processors: string;
+  subcontracting: string;
+  // Security & compliance detail fields — supplying these prevents the kit's
+  // [Verify: …] follow-up loop (each maps 1:1 to a kit placeholder).
+  soc2_status: string;
+  dpo_pdpc_reg: string;
+  bcp_last_tested: string;
+  bcp_rto: string;
+  bcp_rpo: string;
+  access_review_cadence: string;
+  mfa_privileged: string;
+  patch_sla: string;
+  scan_cadence: string;
+  encryption_at_rest: string;
+  encryption_in_transit: string;
+  key_management: string;
+  log_retention: string;
+  log_monitoring: string;
+  incident_notification_window: string;
 }
 
 const EMPTY: IntakeFields = {
@@ -60,9 +80,27 @@ const EMPTY: IntakeFields = {
   iso_cert_expiry: '',
   data_hosting: 'unknown',
   primary_cloud: '',
+  cross_border_mechanism: '',
   breach_history: 'unknown',
   training_frequency: '',
+  training_newhire_window: '',
   key_processors: '',
+  subcontracting: '',
+  soc2_status: '',
+  dpo_pdpc_reg: '',
+  bcp_last_tested: '',
+  bcp_rto: '',
+  bcp_rpo: '',
+  access_review_cadence: '',
+  mfa_privileged: '',
+  patch_sla: '',
+  scan_cadence: '',
+  encryption_at_rest: '',
+  encryption_in_transit: '',
+  key_management: '',
+  log_retention: '',
+  log_monitoring: '',
+  incident_notification_window: '',
 };
 
 export default function RfpIntakePage() {
@@ -134,9 +172,13 @@ export default function RfpIntakePage() {
             // pre-filled — otherwise they'd be hidden behind the toggle.
             const advancedKeys: (keyof IntakeFields)[] = [
               'uen', 'description', 'dpo_appointed', 'dpo_name', 'dpo_email',
-              'iso_status', 'iso_cert_number', 'iso_cert_expiry',
-              'data_hosting', 'primary_cloud', 'breach_history',
-              'training_frequency', 'key_processors',
+              'dpo_pdpc_reg', 'iso_status', 'iso_cert_number', 'iso_cert_expiry',
+              'soc2_status', 'data_hosting', 'primary_cloud', 'cross_border_mechanism',
+              'breach_history', 'training_frequency', 'training_newhire_window',
+              'key_processors', 'subcontracting', 'bcp_last_tested', 'bcp_rto', 'bcp_rpo',
+              'access_review_cadence', 'mfa_privileged', 'patch_sla', 'scan_cadence',
+              'encryption_at_rest', 'encryption_in_transit', 'key_management',
+              'log_retention', 'log_monitoring', 'incident_notification_window',
             ];
             if (advancedKeys.some(k => seed[k])) setShowAdvanced(true);
           }
@@ -146,6 +188,12 @@ export default function RfpIntakePage() {
         }
         if (data.status === 'submitted') {
           setDone(true);
+        }
+        // A prior submission was blocked at the placeholder gate — open the
+        // compliance section so the buyer can complete the missing details
+        // (the banner above promises this).
+        if (data.status === 'needs_more_info') {
+          setShowAdvanced(true);
         }
       } catch {
         setError('Network error — please refresh.');
@@ -624,6 +672,113 @@ export default function RfpIntakePage() {
                   placeholder="Comma-separated list"
                   className="form-input"
                 />
+              </Row>
+              <Row label="Subcontracting / offshoring">
+                <input
+                  type="text"
+                  value={form.subcontracting}
+                  onChange={(e) => setForm({ ...form, subcontracting: e.target.value })}
+                  placeholder="None, or list arrangements"
+                  className="form-input"
+                />
+              </Row>
+              <Row label="Cross-border transfer mechanism">
+                <input
+                  type="text"
+                  value={form.cross_border_mechanism}
+                  onChange={(e) => setForm({ ...form, cross_border_mechanism: e.target.value })}
+                  placeholder="e.g. Standard Contractual Clauses, none"
+                  className="form-input"
+                />
+              </Row>
+
+              {/* Security & compliance specifics — each maps to a kit field. Filling
+                  these avoids a follow-up "details needed" email. */}
+              <p className="text-xs text-[#64748b] mt-4 mb-1 font-semibold uppercase tracking-wide">
+                Security &amp; compliance specifics
+              </p>
+              <p className="text-xs text-[#94a3b8] mb-2">
+                Optional, but anything left blank we&apos;ll ask you to confirm before the kit is finalised.
+              </p>
+              <Row label="SOC 2 status">
+                <input type="text" value={form.soc2_status}
+                  onChange={(e) => setForm({ ...form, soc2_status: e.target.value })}
+                  placeholder="Type II (2026), pursuing, none…" className="form-input" />
+              </Row>
+              <Row label="DPO PDPC registration">
+                <input type="text" value={form.dpo_pdpc_reg}
+                  onChange={(e) => setForm({ ...form, dpo_pdpc_reg: e.target.value })}
+                  placeholder="Registration reference, if any" className="form-input" />
+              </Row>
+              <Row label="BCP last tested">
+                <input type="text" value={form.bcp_last_tested}
+                  onChange={(e) => setForm({ ...form, bcp_last_tested: e.target.value })}
+                  placeholder="e.g. Feb 2026" className="form-input" />
+              </Row>
+              <Row label="BCP recovery targets (RTO / RPO)">
+                <div className="flex gap-2">
+                  <input type="text" value={form.bcp_rto}
+                    onChange={(e) => setForm({ ...form, bcp_rto: e.target.value })}
+                    placeholder="RTO e.g. 4 hours" className="form-input" />
+                  <input type="text" value={form.bcp_rpo}
+                    onChange={(e) => setForm({ ...form, bcp_rpo: e.target.value })}
+                    placeholder="RPO e.g. 1 hour" className="form-input" />
+                </div>
+              </Row>
+              <Row label="New-hire training window">
+                <input type="text" value={form.training_newhire_window}
+                  onChange={(e) => setForm({ ...form, training_newhire_window: e.target.value })}
+                  placeholder="e.g. within 30 days" className="form-input" />
+              </Row>
+              <Row label="Privileged access review cadence">
+                <input type="text" value={form.access_review_cadence}
+                  onChange={(e) => setForm({ ...form, access_review_cadence: e.target.value })}
+                  placeholder="e.g. quarterly" className="form-input" />
+              </Row>
+              <Row label="MFA on privileged accounts">
+                <input type="text" value={form.mfa_privileged}
+                  onChange={(e) => setForm({ ...form, mfa_privileged: e.target.value })}
+                  placeholder="Yes / No" className="form-input" />
+              </Row>
+              <Row label="Critical patch SLA">
+                <input type="text" value={form.patch_sla}
+                  onChange={(e) => setForm({ ...form, patch_sla: e.target.value })}
+                  placeholder="e.g. 14 days" className="form-input" />
+              </Row>
+              <Row label="Vulnerability scan cadence">
+                <input type="text" value={form.scan_cadence}
+                  onChange={(e) => setForm({ ...form, scan_cadence: e.target.value })}
+                  placeholder="e.g. monthly" className="form-input" />
+              </Row>
+              <Row label="Encryption (at rest / in transit)">
+                <div className="flex gap-2">
+                  <input type="text" value={form.encryption_at_rest}
+                    onChange={(e) => setForm({ ...form, encryption_at_rest: e.target.value })}
+                    placeholder="At rest e.g. AES-256" className="form-input" />
+                  <input type="text" value={form.encryption_in_transit}
+                    onChange={(e) => setForm({ ...form, encryption_in_transit: e.target.value })}
+                    placeholder="In transit e.g. TLS 1.3" className="form-input" />
+                </div>
+              </Row>
+              <Row label="Key management">
+                <input type="text" value={form.key_management}
+                  onChange={(e) => setForm({ ...form, key_management: e.target.value })}
+                  placeholder="e.g. AWS KMS, HSM" className="form-input" />
+              </Row>
+              <Row label="Audit log retention">
+                <input type="text" value={form.log_retention}
+                  onChange={(e) => setForm({ ...form, log_retention: e.target.value })}
+                  placeholder="e.g. 12 months" className="form-input" />
+              </Row>
+              <Row label="Log monitoring / anomaly detection">
+                <input type="text" value={form.log_monitoring}
+                  onChange={(e) => setForm({ ...form, log_monitoring: e.target.value })}
+                  placeholder="e.g. CloudWatch + alerting" className="form-input" />
+              </Row>
+              <Row label="Incident internal notification window">
+                <input type="text" value={form.incident_notification_window}
+                  onChange={(e) => setForm({ ...form, incident_notification_window: e.target.value })}
+                  placeholder="e.g. within 1 hour" className="form-input" />
               </Row>
             </div>
           )}
