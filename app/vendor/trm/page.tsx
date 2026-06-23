@@ -148,6 +148,9 @@ export default function TrmPage() {
           <SummaryCard label="High/critical risk" value={String((s.by_risk.high || 0) + (s.by_risk.critical || 0))} hint="from AI analysis" tone={gapsAndHighRisk ? 'warn' : 'good'} />
         </div>
 
+        {/* Board-ready monthly report — download latest or generate on demand */}
+        <BoardReportCard />
+
         {/* Pro Suite: group-wide subsidiary comparison (hidden for Standard / sub-tenants) */}
         <SubsidiaryComparison />
 
@@ -291,6 +294,91 @@ function SummaryCard({ label, value, hint, tone }: { label: string; value: strin
       <p className={`text-2xl font-bold mt-1 ${valueColor}`}>{value}</p>
       {hint && <p className="text-[11px] text-neutral-500 mt-0.5">{hint}</p>}
     </div>
+  )
+}
+
+interface BoardReport {
+  available: boolean
+  download_url?: string | null
+  generated_at?: string | null
+  compliant_pct?: number | null
+  plan_label?: string | null
+}
+
+function BoardReportCard() {
+  const [report, setReport] = useState<BoardReport | null>(null)
+  const [hidden, setHidden] = useState(false)
+  const [generating, setGenerating] = useState(false)
+  const [notice, setNotice] = useState('')
+
+  const load = async () => {
+    try {
+      const r = await fetch('/api/vendor/trm/board-report/latest', { cache: 'no-store' })
+      if (!r.ok) { setHidden(true); return }
+      setReport(await r.json())
+    } catch {
+      setHidden(true)
+    }
+  }
+  useEffect(() => { load() /* eslint-disable-line react-hooks/exhaustive-deps */ }, [])
+
+  const generate = async () => {
+    setGenerating(true)
+    setNotice('')
+    try {
+      const r = await fetch('/api/vendor/trm/board-report/generate', { method: 'POST' })
+      const d = await r.json().catch(() => ({}))
+      setNotice(r.ok ? (d?.message || 'Your board report is being generated and will be emailed shortly.')
+                     : (d?.detail || 'Could not start generation.'))
+    } catch {
+      setNotice('Network error — please try again.')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  if (hidden) return null
+
+  const generatedOn = report?.generated_at ? new Date(report.generated_at).toLocaleDateString() : null
+
+  return (
+    <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <FileText className="h-4 w-4 text-emerald-400" /> Board-ready monthly report
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1">
+            One-page RAG status, month-over-month progress, top risks and next focus — board-presentable.
+            {report?.available && typeof report.compliant_pct === 'number'
+              ? ` Latest: ${report.compliant_pct}% compliant${generatedOn ? ` · ${generatedOn}` : ''}.`
+              : ' No report generated yet.'}
+          </p>
+          {notice && <p className="text-xs text-emerald-300 mt-2">{notice}</p>}
+        </div>
+        <div className="flex items-center gap-2">
+          {report?.available && report.download_url && (
+            <a
+              href={report.download_url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg"
+            >
+              <FileText className="h-3.5 w-3.5" /> Download latest
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={generate}
+            disabled={generating}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg disabled:opacity-50"
+          >
+            {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {report?.available ? 'Regenerate' : 'Generate now'}
+          </button>
+        </div>
+      </div>
+    </section>
   )
 }
 
