@@ -148,6 +148,9 @@ export default function TrmPage() {
           <SummaryCard label="High/critical risk" value={String((s.by_risk.high || 0) + (s.by_risk.critical || 0))} hint="from AI analysis" tone={gapsAndHighRisk ? 'warn' : 'good'} />
         </div>
 
+        {/* Pro Suite: group-wide subsidiary comparison (hidden for Standard / sub-tenants) */}
+        <SubsidiaryComparison />
+
         {(s.by_status.not_started || 0) === data.total && (
           <div className="bg-sky-500/10 border border-sky-500/30 rounded-lg px-4 py-3 flex items-start gap-2 text-sm text-sky-200">
             <Sparkles className="h-4 w-4 text-sky-300 flex-shrink-0 mt-0.5" />
@@ -288,6 +291,127 @@ function SummaryCard({ label, value, hint, tone }: { label: string; value: strin
       <p className={`text-2xl font-bold mt-1 ${valueColor}`}>{value}</p>
       {hint && <p className="text-[11px] text-neutral-500 mt-0.5">{hint}</p>}
     </div>
+  )
+}
+
+interface ComparisonEntity {
+  user_id: string
+  name: string
+  is_parent: boolean
+  sector: string | null
+  domains_complete: number
+  domains_total: number
+  compliant_pct: number
+  critical_open: number
+  domain_status: Record<string, string>
+  last_updated: string | null
+}
+
+interface ComparisonPayload {
+  entity_count: number
+  domains: string[]
+  entities: ComparisonEntity[]
+  alerts: string[]
+}
+
+const RAG_DOT: Record<string, string> = {
+  compliant: 'bg-emerald-500',
+  in_progress: 'bg-amber-500',
+  not_started: 'bg-neutral-600',
+  gap: 'bg-red-500',
+}
+
+function SubsidiaryComparison() {
+  const [data, setData] = useState<ComparisonPayload | null>(null)
+  const [hidden, setHidden] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    fetch('/api/vendor/trm/subsidiary-comparison', { cache: 'no-store' })
+      .then(async r => {
+        // 403 (Standard, no multi_vendor) or 400 (sub-tenant) → silently hide.
+        if (!r.ok) { if (active) setHidden(true); return null }
+        return r.json()
+      })
+      .then(d => { if (active && d) setData(d) })
+      .catch(() => { if (active) setHidden(true) })
+    return () => { active = false }
+  }, [])
+
+  // Only meaningful once there's a parent + at least one subsidiary.
+  if (hidden || !data || data.entity_count < 2) return null
+
+  return (
+    <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-5 space-y-4">
+      <div>
+        <h2 className="text-sm font-bold text-white flex items-center gap-2">
+          <ShieldCheck className="h-4 w-4 text-emerald-400" /> Group MAS TRM comparison
+          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/40">Pro</span>
+        </h2>
+        <p className="text-xs text-neutral-400 mt-1">
+          Consolidated TRM posture across your {data.entity_count} group entities.
+        </p>
+      </div>
+
+      {data.alerts.length > 0 && (
+        <div className="space-y-1.5">
+          {data.alerts.map((a, i) => (
+            <div key={i} className="flex items-start gap-2 text-xs text-amber-200 bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-2">
+              <AlertTriangle className="h-3.5 w-3.5 text-amber-300 flex-shrink-0 mt-0.5" />
+              <span>{a}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-[10px] uppercase tracking-wider text-neutral-500 border-b border-neutral-800">
+              <th className="text-left font-bold py-2 pr-3">Entity</th>
+              <th className="text-right font-bold py-2 px-3">Complete</th>
+              <th className="text-right font-bold py-2 px-3">Critical open</th>
+              <th className="text-left font-bold py-2 pl-3">By domain</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.entities.map(e => (
+              <tr key={e.user_id} className="border-b border-neutral-800/60">
+                <td className="py-2.5 pr-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-white font-medium">{e.name}</span>
+                    {e.is_parent && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">Parent</span>
+                    )}
+                  </div>
+                  {e.sector && <span className="text-[10px] text-neutral-500 capitalize">{e.sector}</span>}
+                </td>
+                <td className="py-2.5 px-3 text-right">
+                  <span className={`font-bold ${e.compliant_pct >= 70 ? 'text-emerald-400' : e.compliant_pct >= 40 ? 'text-amber-400' : 'text-red-400'}`}>
+                    {e.compliant_pct}%
+                  </span>
+                  <span className="text-[10px] text-neutral-500 ml-1">({e.domains_complete}/{e.domains_total})</span>
+                </td>
+                <td className="py-2.5 px-3 text-right">
+                  <span className={e.critical_open ? 'text-red-400 font-semibold' : 'text-neutral-500'}>{e.critical_open}</span>
+                </td>
+                <td className="py-2.5 pl-3">
+                  <div className="flex gap-1">
+                    {data.domains.map(d => (
+                      <span
+                        key={d}
+                        title={`${d}: ${(e.domain_status[d] || 'not_started').replace('_', ' ')}`}
+                        className={`h-2.5 w-2.5 rounded-full ${RAG_DOT[e.domain_status[d] || 'not_started'] || 'bg-neutral-600'}`}
+                      />
+                    ))}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   )
 }
 
