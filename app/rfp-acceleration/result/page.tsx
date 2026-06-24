@@ -503,16 +503,21 @@ function RFPResultContent() {
               </Card>
             )}
 
-            {/* Discrepancies */}
+            {/* Discrepancies + resolution */}
             {result.discrepancies && result.discrepancies.length > 0 && (
-              <Card className="border-orange-500/25 bg-orange-500/[0.06] p-4 flex gap-3">
-                <AlertTriangle className="w-5 h-5 shrink-0 text-orange-400 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-orange-300 mb-1.5">Action required: discrepancies found</p>
-                  <ul className="list-disc pl-4 space-y-1 text-xs text-orange-400/80 leading-relaxed">
-                    {result.discrepancies.map((d, i) => <li key={i}>{d}</li>)}
-                  </ul>
+              <Card className="border-orange-500/25 bg-orange-500/[0.06] p-4">
+                <div className="flex gap-3">
+                  <AlertTriangle className="w-5 h-5 shrink-0 text-orange-400 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-orange-300 mb-1.5">Action required: discrepancies found</p>
+                    <ul className="list-disc pl-4 space-y-1 text-xs text-orange-400/80 leading-relaxed">
+                      {result.discrepancies.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
+                  </div>
                 </div>
+                {pendingIntakeId && (
+                  <DiscrepancyResolver intakeId={pendingIntakeId} />
+                )}
               </Card>
             )}
 
@@ -633,5 +638,111 @@ export default function RFPResultPage() {
     }>
       <RFPResultContent />
     </Suspense>
+  );
+}
+
+// Common correction fields the discrepancy detector references (intake keys map
+// 1:1 to the backend's _apply_intake_substitutions). The buyer fills whichever
+// the flagged discrepancy is about; we send only the non-empty ones.
+const RESOLVE_FIELDS: { key: string; label: string; placeholder: string }[] = [
+  { key: 'iso_cert_number', label: 'ISO 27001 certificate number', placeholder: 'e.g. SG-ISO-12345' },
+  { key: 'iso_cert_expiry', label: 'ISO certificate expiry', placeholder: 'e.g. 2027-03-01' },
+  { key: 'soc2_status', label: 'SOC 2 status', placeholder: 'e.g. Type II, report Jan 2026' },
+  { key: 'dpo_name', label: 'DPO name', placeholder: 'e.g. Jane Tan' },
+  { key: 'dpo_email', label: 'DPO email', placeholder: 'e.g. dpo@company.sg' },
+  { key: 'encryption_at_rest', label: 'Encryption at rest', placeholder: 'e.g. AES-256' },
+  { key: 'encryption_in_transit', label: 'Encryption in transit', placeholder: 'e.g. TLS 1.3' },
+];
+
+function DiscrepancyResolver({ intakeId }: { intakeId: string }) {
+  const [open, setOpen] = useState(false);
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  const submit = async () => {
+    const intake_data = Object.fromEntries(
+      Object.entries(values).map(([k, v]) => [k, v.trim()]).filter(([, v]) => v),
+    );
+    if (Object.keys(intake_data).length === 0) {
+      setMsg('Enter at least one corrected detail.');
+      return;
+    }
+    setBusy(true);
+    setMsg('');
+    try {
+      const res = await fetch(`/api/rfp-intake/${intakeId}/resolve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ intake_data }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        setMsg('Please sign in to resolve and regenerate your kit.');
+      } else if (!res.ok) {
+        setMsg(d?.error || 'Could not regenerate — please try again.');
+      } else {
+        setMsg('Corrections submitted — regenerating your kit. This page will refresh shortly…');
+        setTimeout(() => window.location.reload(), 4000);
+      }
+    } catch {
+      setMsg('Network error — please try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-3 ml-8 text-xs font-semibold text-orange-200 underline underline-offset-2 hover:text-orange-100"
+      >
+        Provide corrected details &amp; regenerate →
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-4 ml-8 rounded-lg border border-orange-500/20 bg-[#0a0f1e]/60 p-4">
+      <p className="text-xs text-orange-200/90 mb-3">
+        Supply the correct value for whichever item was flagged — we&apos;ll merge it with your
+        existing brief and regenerate the kit.
+      </p>
+      <div className="grid sm:grid-cols-2 gap-3">
+        {RESOLVE_FIELDS.map((f) => (
+          <label key={f.key} className="block">
+            <span className="block text-[11px] text-slate-400 mb-1">{f.label}</span>
+            <input
+              type="text"
+              value={values[f.key] || ''}
+              onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
+              placeholder={f.placeholder}
+              className="w-full bg-[#0a0f1e] border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
+            />
+          </label>
+        ))}
+      </div>
+      {msg && <p className="text-xs text-orange-200 mt-3">{msg}</p>}
+      <div className="flex items-center gap-2 mt-3">
+        <button
+          type="button"
+          onClick={submit}
+          disabled={busy}
+          className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white font-semibold px-3 py-1.5 rounded-lg text-xs disabled:opacity-50"
+        >
+          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+          Regenerate kit
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="text-xs text-slate-400 hover:text-white px-2 py-1.5"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
   );
 }
