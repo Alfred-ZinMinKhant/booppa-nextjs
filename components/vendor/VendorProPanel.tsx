@@ -20,9 +20,34 @@ interface CompetitorSignal {
 	ts?: string;
 }
 
+interface TrendPoint {
+	label: string;
+	score: number;
+}
+
+function Sparkline({ points }: { points: TrendPoint[] }) {
+	const W = 240;
+	const H = 48;
+	const pad = 4;
+	const n = points.length;
+	// Scores are on a fixed 0–100 scale so the line reads as absolute compliance.
+	const x = (i: number) => (n <= 1 ? pad : pad + (i * (W - 2 * pad)) / (n - 1));
+	const y = (s: number) => H - pad - (Math.max(0, Math.min(100, s)) / 100) * (H - 2 * pad);
+	const line = points.map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(p.score).toFixed(1)}`).join(" ");
+	const last = points[n - 1];
+	return (
+		<svg viewBox={`0 0 ${W} ${H}`} className="w-full h-12" preserveAspectRatio="none" role="img" aria-label="PDPA compliance trend">
+			<line x1={pad} y1={y(50)} x2={W - pad} y2={y(50)} stroke="#27272a" strokeWidth="1" strokeDasharray="3 3" />
+			<path d={line} fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+			<circle cx={x(n - 1)} cy={y(last.score)} r="3" fill="#a78bfa" />
+		</svg>
+	);
+}
+
 export default function VendorProPanel() {
 	const [me, setMe] = useState<VendorProMe | null>(null);
 	const [paywalled, setPaywalled] = useState<boolean>(false);
+	const [trend, setTrend] = useState<TrendPoint[]>([]);
 	const [signals, setSignals] = useState<CompetitorSignal[]>([]);
 	const [optBusy, setOptBusy] = useState(false);
 	const esRef = useRef<EventSource | null>(null);
@@ -35,6 +60,19 @@ export default function VendorProPanel() {
 				return;
 			}
 			if (res.ok) setMe(await res.json());
+		})();
+
+		// PDPA compliance trend (best-effort; empty until first scan).
+		(async () => {
+			try {
+				const r = await fetch("/api/vendor-pro/pdpa-trend");
+				if (r.ok) {
+					const d = await r.json();
+					if (Array.isArray(d.points)) setTrend(d.points);
+				}
+			} catch {
+				/* ignore */
+			}
 		})();
 
 		// Subscribe to the SSE stream for live competitor signals.
@@ -152,6 +190,33 @@ export default function VendorProPanel() {
 					</div>
 				</div>
 			</div>
+
+			{/* PDPA compliance trend */}
+			{trend.length >= 2 && (
+				<div className="bg-neutral-950 rounded-xl p-3">
+					<div className="flex items-center justify-between mb-2">
+						<div className="text-xs text-neutral-500">PDPA compliance trend</div>
+						<div className="text-xs font-semibold text-white">
+							{trend[trend.length - 1].score}
+							<span className="text-neutral-500">/100</span>
+							{(() => {
+								const delta = trend[trend.length - 1].score - trend[0].score;
+								if (delta === 0) return null;
+								return (
+									<span className={delta > 0 ? "text-emerald-400 ml-1.5" : "text-red-400 ml-1.5"}>
+										{delta > 0 ? `▲ +${delta}` : `▼ ${delta}`}
+									</span>
+								);
+							})()}
+						</div>
+					</div>
+					<Sparkline points={trend} />
+					<div className="flex justify-between mt-1 text-[10px] text-neutral-600">
+						<span>{trend[0].label}</span>
+						<span>{trend[trend.length - 1].label}</span>
+					</div>
+				</div>
+			)}
 
 			{/* Live competitor signals */}
 			<div>
