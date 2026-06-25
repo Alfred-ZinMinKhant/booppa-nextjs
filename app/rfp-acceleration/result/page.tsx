@@ -58,6 +58,7 @@ interface RFPResult {
   download_url: string;
   docx_url?: string;
   declaration_url?: string;
+  appendix_d_url?: string;
   product_type: string;
   company_name: string;
   vendor_url?: string;
@@ -414,6 +415,16 @@ function RFPResultContent() {
                       className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-white/15 text-slate-200 hover:text-white hover:border-white/30 font-semibold rounded-xl transition text-sm"
                     >
                       <FileText className="w-4 h-4" /> Supplier Declaration
+                    </a>
+                  )}
+                  {result.appendix_d_url && (
+                    <a
+                      href={result.appendix_d_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-white/15 text-slate-200 hover:text-white hover:border-white/30 font-semibold rounded-xl transition text-sm"
+                    >
+                      <FileText className="w-4 h-4" /> Data Protection Appendix
                     </a>
                   )}
                 </div>
