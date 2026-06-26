@@ -310,16 +310,16 @@ export default function PDPAPage() {
 							) : (
 								<>
 									<a
-										href="/vendor/subscription"
-										className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-xl text-sm text-center"
+										href="/vendor/pdpa"
+										className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm text-center transition"
 									>
-										Active — Manage subscription
+										Open Monitor dashboard
 									</a>
 									<a
 										href="/vendor/subscription"
 										className="px-6 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl text-sm text-center"
 									>
-										View subscriptions
+										Manage subscription
 									</a>
 								</>
 							)}

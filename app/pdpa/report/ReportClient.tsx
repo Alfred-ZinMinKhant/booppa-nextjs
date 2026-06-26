@@ -1011,6 +1011,9 @@ export default function ReportClient() {
                   ⬇ Download PDF
                 </a>
               )}
+              <Link href="/vendor/pdpa" className="inline-flex items-center px-5 py-2.5 border border-white/20 text-white/80 text-sm font-medium rounded-xl hover:bg-white/5 transition">
+                Track over time →
+              </Link>
               <Link href="/pdpa" className="inline-flex items-center px-5 py-2.5 border border-white/20 text-white/80 text-sm font-medium rounded-xl hover:bg-white/5 transition">
                 New Scan
               </Link>

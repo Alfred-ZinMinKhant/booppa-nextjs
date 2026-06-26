@@ -49,11 +49,21 @@ interface BadgeData {
 	verification_level: string;
 }
 
+// Human-readable labels for the Trust Score dimensions returned in
+// /api/dashboard → scoreBreakdown.components. Keys match the backend payload.
+const SCORE_DIMENSION_LABELS: Record<string, string> = {
+	compliance: "Compliance",
+	visibility: "Visibility",
+	engagement: "Engagement",
+	recency: "Recency",
+	procurementInterest: "Procurement Interest",
+};
+
 // Order matches the strip rendered in Zone 5 — drives the "next step" CTA hint
 // when none of these are active. Backend keys come from /api/vendor/status.
 const SUB_TIERS: { key: string; label: string; href: string; color: string }[] = [
 	{ key: "vendor_active", label: "Vendor Active", href: "/pricing", color: "emerald" },
-	{ key: "pdpa_monitor", label: "PDPA Monitor", href: "/pdpa", color: "blue" },
+	{ key: "pdpa_monitor", label: "PDPA Monitor", href: "/vendor/pdpa", color: "blue" },
 	{ key: "intel_pro", label: "Intel Pro", href: "/pricing#intel-pro", color: "violet" },
 ];
 
@@ -73,7 +83,8 @@ export default function VendorDashboard() {
 		stats: any;
 		chartData: any[];
 		recentActivity: any[];
-	}>({ stats: null, chartData: [], recentActivity: [] });
+		scoreBreakdown?: any;
+	}>({ stats: null, chartData: [], recentActivity: [], scoreBreakdown: null });
 	const [loading, setLoading] = useState(true);
 	const [badge, setBadge] = useState<BadgeData | null>(null);
 	const [copied, setCopied] = useState(false);
@@ -182,8 +193,22 @@ export default function VendorDashboard() {
 		enterpriseViews: 0,
 		activeProcurements: 0,
 		activeProcurementsSector: null,
+		sectorRank: null,
 	};
 	const history = data.recentActivity || [];
+
+	// Trust Score dimension breakdown — backend already ships scoreBreakdown.
+	// Sort ascending by score so the biggest improvement opportunity surfaces
+	// first (mirrors the "+N points" framing in the product roadmap).
+	const scoreComponents: Array<{ key: string; label: string; score: number; hint: string }> =
+		Object.entries(data.scoreBreakdown?.components ?? {})
+			.map(([key, c]: [string, any]) => ({
+				key,
+				label: SCORE_DIMENSION_LABELS[key] ?? key.replace(/([A-Z])/g, " $1").replace(/^./, (m) => m.toUpperCase()),
+				score: Number(c?.score ?? 0),
+				hint: String(c?.hint ?? ""),
+			}))
+			.sort((a, b) => a.score - b.score);
 
 	const alerts = vendorState
 		? generateAlerts(vendorState).filter((a) => !dismissedAlerts.has(a.id))
@@ -382,6 +407,30 @@ export default function VendorDashboard() {
 								</Link>
 							)}
 						</div>
+
+						{/* Dimension breakdown — shows which lever to pull to raise the
+						    score. Lowest-scoring dimension first = biggest opportunity. */}
+						{scoreComponents.length > 0 && (
+							<div className="mt-4 pt-3 border-t border-neutral-800 space-y-2.5">
+								{scoreComponents.map((c) => (
+									<div key={c.key}>
+										<div className="flex justify-between items-baseline text-xs">
+											<span className="text-neutral-300 font-medium">{c.label}</span>
+											<span className="text-neutral-400 tabular-nums">{c.score}<span className="text-neutral-600">/100</span></span>
+										</div>
+										<div className="mt-1 h-1.5 rounded-full bg-neutral-800 overflow-hidden">
+											<div
+												className={`h-full rounded-full ${c.score >= 67 ? "bg-emerald-500" : c.score >= 34 ? "bg-amber-500" : "bg-red-500"}`}
+												style={{ width: `${Math.max(0, Math.min(100, c.score))}%` }}
+											/>
+										</div>
+										{c.score < 100 && c.hint && (
+											<p className="mt-1 text-[11px] leading-snug text-neutral-500">{c.hint}</p>
+										)}
+									</div>
+								))}
+							</div>
+						)}
 					</div>
 
 					{/* Enterprise Views */}
@@ -408,6 +457,15 @@ export default function VendorDashboard() {
 								<span className="text-neutral-500">No profile views this week</span>
 							)}
 						</div>
+
+						{/* Search-rank visibility — turns the "priority in searches"
+						    promise into a concrete position the vendor can track. */}
+						{stats.sectorRank && stats.sectorRank.total > 0 && (
+							<div className="mt-3 pt-3 border-t border-neutral-800 text-xs text-neutral-400">
+								Ranked <span className="text-white font-semibold">#{stats.sectorRank.rank}</span> of{" "}
+								{stats.sectorRank.total} in {stats.sectorRank.sector} searches
+							</div>
+						)}
 					</div>
 
 					{/* Open Tenders */}
