@@ -387,6 +387,9 @@ function RFPResultContent() {
                   {result.vendor_url && (
                     <p className="text-slate-400 text-sm mt-1 truncate">{result.vendor_url}</p>
                   )}
+                  <a href="/vendor/rfp-kits" className="inline-block text-xs text-violet-300 hover:text-violet-200 mt-2">
+                    View all my RFP kits →
+                  </a>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0">
                   <a

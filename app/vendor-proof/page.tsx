@@ -211,7 +211,14 @@ function VendorProofContent() {
 		<main className="min-h-[70vh] flex items-center justify-center p-6">
 			<div className="w-full max-w-xl">
 				<div className="mb-8">
-					<h1 className="text-3xl font-bold text-white mb-2">Vendor Proof</h1>
+					<h1 className="text-3xl font-bold text-white mb-2">
+						{searchParams.get("renew") ? "Renew your Vendor Proof" : "Vendor Proof"}
+					</h1>
+					{searchParams.get("renew") && (
+						<div className="mb-3 rounded-lg border border-amber-500/30 bg-amber-950/20 px-4 py-2.5 text-sm text-amber-200">
+							Renewing re-runs your PDPA scan and issues a fresh 12-month certificate so your public verify page stays active.
+						</div>
+					)}
 					<p className="text-gray-400">
 						Automated trust verification with blockchain-notarized certificate.
 						Get a shareable PDF proof of your security posture for enterprise

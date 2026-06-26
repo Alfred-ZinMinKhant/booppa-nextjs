@@ -47,6 +47,9 @@ interface BadgeData {
 	slug: string | null;
 	compliance_score: number;
 	verification_level: string;
+	expires_at?: string | null;
+	days_remaining?: number | null;
+	last_refreshed_at?: string | null;
 }
 
 // Human-readable labels for the Trust Score dimensions returned in
@@ -348,6 +351,7 @@ export default function VendorDashboard() {
 									<div className="text-sm font-semibold text-white">You&apos;re verified — keep momentum</div>
 									<div className="text-xs text-neutral-400 mt-0.5">
 										Score {badge.compliance_score}/100 · {badge.verification_level?.toLowerCase()} level
+										{badge.expires_at ? ` · valid until ${new Date(badge.expires_at).toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric" })}` : ""}
 									</div>
 								</div>
 								<Link
@@ -355,6 +359,28 @@ export default function VendorDashboard() {
 									className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors"
 								>
 									{nextStepFromLevel(badge.verification_level).label} <ArrowRight className="h-3.5 w-3.5" />
+								</Link>
+							</div>
+						)}
+						{/* Certificate renewal — surfaces the expiry the public /verify page
+						    will show, so the vendor renews before a buyer sees "Expired". */}
+						{badge?.active && badge.days_remaining != null && badge.days_remaining <= 30 && (
+							<div className={`rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center gap-3 ${badge.days_remaining <= 0 ? "border-red-500/30 bg-red-950/20" : "border-amber-500/30 bg-amber-950/20"}`}>
+								<div className="flex-1">
+									<div className="text-sm font-semibold text-white">
+										{badge.days_remaining <= 0 ? "Your Vendor Proof certificate has expired" : `Certificate expires in ${badge.days_remaining} day${badge.days_remaining === 1 ? "" : "s"}`}
+									</div>
+									<p className="text-xs text-neutral-400 mt-0.5">
+										{badge.days_remaining <= 0
+											? "Your public verify page now shows “Expired” to procurement officers. Renew to restore it."
+											: "Renewing re-runs your PDPA scan and issues a fresh 12-month certificate."}
+									</p>
+								</div>
+								<Link
+									href="/vendor-proof?renew=1"
+									className={`flex-shrink-0 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-colors ${badge.days_remaining <= 0 ? "bg-red-600 hover:bg-red-500" : "bg-amber-600 hover:bg-amber-500"}`}
+								>
+									Renew — S$149
 								</Link>
 							</div>
 						)}

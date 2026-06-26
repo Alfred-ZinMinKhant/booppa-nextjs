@@ -122,6 +122,8 @@ export default function RfpIntakePage() {
   const [extracting, setExtracting] = useState(false);
   const [extractError, setExtractError] = useState<string | null>(null);
   const [extractFilledFrom, setExtractFilledFrom] = useState<string | null>(null);
+  const [prevAvailable, setPrevAvailable] = useState(false);
+  const [reusedFrom, setReusedFrom] = useState<string | null>(null);
 
   useEffect(() => {
     if (!intakeId) return;
@@ -211,6 +213,37 @@ export default function RfpIntakePage() {
     : intake?.rfp_product_type === 'rfp_complete'
       ? 'RFP Complete Kit'
       : 'RFP Express Kit';
+
+  // Probe whether the user has a prior brief to reuse (so we only show the CTA
+  // when it would actually do something).
+  useEffect(() => {
+    fetch('/api/rfp-intake/previous')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d?.available) setPrevAvailable(true); })
+      .catch(() => {});
+  }, []);
+
+  async function reusePrevious() {
+    try {
+      const r = await fetch('/api/rfp-intake/previous');
+      if (!r.ok) return;
+      const d = await r.json();
+      if (!d?.available) return;
+      const intakeData = (d.intakeData && typeof d.intakeData === 'object') ? d.intakeData : {};
+      setForm((f) => ({
+        ...f,
+        ...intakeData,
+        // Keep this RFP's own brief empty so each tender gets a fresh description.
+        rfp_description: f.rfp_description || (d.rfpDescription || ''),
+        vendor_url: f.vendor_url || (d.vendorUrl || ''),
+        company_name: f.company_name || (d.companyName || ''),
+      }));
+      setShowAdvanced(true);
+      setReusedFrom(d.companyName || 'your last RFP');
+    } catch {
+      /* non-blocking */
+    }
+  }
 
   async function handleExtractTender() {
     const files = tenderFileRef.current?.files;
@@ -412,6 +445,21 @@ export default function RfpIntakePage() {
         {error && (
           <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
             {error}
+          </div>
+        )}
+
+        {/* Reuse previous brief — saves re-entering 30+ compliance fields */}
+        {prevAvailable && !reusedFrom && (
+          <div className="mb-4 px-4 py-3 rounded-lg bg-violet-50 border border-violet-200 text-sm flex flex-wrap items-center justify-between gap-3">
+            <span className="text-violet-800">Bidding again? Reuse the compliance details from your last RFP kit.</span>
+            <button type="button" onClick={reusePrevious} className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold transition">
+              Use previous brief
+            </button>
+          </div>
+        )}
+        {reusedFrom && (
+          <div className="mb-4 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm">
+            ✓ Pre-filled compliance details from <strong>{reusedFrom}</strong>. Update the RFP brief for this tender and review before submitting.
           </div>
         )}
 

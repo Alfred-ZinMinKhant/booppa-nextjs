@@ -8,6 +8,7 @@ interface PackDocument {
   doc_type: string
   title: string
   download_url: string | null
+  anchored?: boolean
 }
 
 interface EvidencePack {
@@ -17,8 +18,15 @@ interface EvidencePack {
   organisation: string | null
   session_id: string | null
   created_at: string | null
+  updated_at?: string | null
+  anchored_count?: number
+  master_anchored?: boolean
+  next_refresh?: string | null
   documents: PackDocument[]
 }
+
+const fmtDate = (iso: string | null | undefined) =>
+  iso ? new Date(iso).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' }) : null
 
 const GENERATING_STATES = ['queued', 'generating', 'anchoring', 'building_pdfs']
 
@@ -128,6 +136,22 @@ export default function EvidencePackSection() {
         </p>
       )}
 
+      {/* Recurring-value signals for the monthly tier: when the pack last
+          regenerated, how many docs are blockchain-anchored, and the next refresh. */}
+      {isReady && pack && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4 text-xs text-[#64748b]">
+          {fmtDate(pack.updated_at || pack.created_at) && (
+            <span>Last regenerated <strong className="text-[#0f172a]">{fmtDate(pack.updated_at || pack.created_at)}</strong></span>
+          )}
+          {typeof pack.anchored_count === 'number' && (
+            <span>{pack.anchored_count}/{docs.length} documents anchored on-chain</span>
+          )}
+          {pack.next_refresh && (
+            <span>Next monthly refresh <strong className="text-[#0f172a]">{fmtDate(pack.next_refresh)}</strong></span>
+          )}
+        </div>
+      )}
+
       {/* Document list — download links when ready, otherwise greyed checklist. */}
       <ul className="space-y-2">
         {docs.map((doc, i) => {
@@ -144,6 +168,9 @@ export default function EvidencePackSection() {
                   <span className="flex items-center gap-2 text-[#0f172a] text-sm font-medium">
                     <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                     {doc.title}
+                    {doc.anchored && (
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-violet-700 bg-violet-100 px-1.5 py-0.5 rounded">Anchored</span>
+                    )}
                   </span>
                   <span className="text-emerald-600 text-sm font-semibold inline-flex items-center gap-1">
                     Download <ExternalLink className="w-3.5 h-3.5" />

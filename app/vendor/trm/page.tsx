@@ -151,8 +151,15 @@ export default function TrmPage() {
         {/* Board-ready monthly report — download latest or generate on demand */}
         <BoardReportCard />
 
+        {/* Compliance trend over time — surfaces month-over-month progress that
+            previously lived only in the emailed board report PDF */}
+        <TrmProgressCard />
+
         {/* Pro Suite: group-wide subsidiary comparison (hidden for Standard / sub-tenants) */}
         <SubsidiaryComparison />
+
+        {/* Pro Suite capabilities — discoverable in one place */}
+        <ProFeaturesCard />
 
         {(s.by_status.not_started || 0) === data.total && (
           <div className="bg-sky-500/10 border border-sky-500/30 rounded-lg px-4 py-3 flex items-start gap-2 text-sm text-sky-200">
@@ -293,6 +300,85 @@ function SummaryCard({ label, value, hint, tone }: { label: string; value: strin
       <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">{label}</p>
       <p className={`text-2xl font-bold mt-1 ${valueColor}`}>{value}</p>
       {hint && <p className="text-[11px] text-neutral-500 mt-0.5">{hint}</p>}
+    </div>
+  )
+}
+
+// ── Compliance trend over time ────────────────────────────────────────────────
+type TrmProgressPoint = { label: string; compliant_pct: number; generated_at: string }
+
+function TrmProgressCard() {
+  const [points, setPoints] = useState<TrmProgressPoint[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let active = true
+    fetch('/api/vendor/trm/progress-history', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : { points: [] }))
+      .then((d) => { if (active) setPoints(Array.isArray(d.points) ? d.points : []) })
+      .catch(() => {})
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [])
+
+  if (loading || points.length < 2) return null  // needs ≥2 snapshots to trend
+
+  const w = 560, h = 120, pad = 26
+  const xs = points.map((_, i) => pad + (i * (w - 2 * pad)) / (points.length - 1))
+  const ys = points.map((p) => h - pad - (p.compliant_pct / 100) * (h - 2 * pad))
+  const path = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ')
+  const first = points[0].compliant_pct
+  const last = points[points.length - 1].compliant_pct
+  const delta = last - first
+
+  return (
+    <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
+      <div className="flex items-center justify-between">
+        <h2 className="text-white font-semibold text-sm">MAS TRM compliance trend</h2>
+        {delta !== 0 && (
+          <span className={`text-xs font-medium ${delta > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            {delta > 0 ? '+' : ''}{delta}% since {points[0].label}
+          </span>
+        )}
+      </div>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-32 mt-2">
+        <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke="#262626" strokeWidth="1" />
+        <path d={path} fill="none" stroke="#34d399" strokeWidth="2" />
+        {xs.map((x, i) => (
+          <g key={points[i].generated_at}>
+            <circle cx={x} cy={ys[i]} r="3" fill="#34d399" />
+            <text x={x} y={ys[i] - 8} textAnchor="middle" className="fill-neutral-300" fontSize="9">{points[i].compliant_pct}%</text>
+            <text x={x} y={h - pad + 14} textAnchor="middle" className="fill-neutral-500" fontSize="9">{points[i].label}</text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
+}
+
+// ── Pro Suite capabilities — discoverable in one place ────────────────────────
+function ProFeaturesCard() {
+  const features = [
+    { title: 'Multi-entity comparison', desc: 'Group-wide MAS TRM rollup across subsidiaries.', href: '/vendor/subsidiaries' },
+    { title: 'Single sign-on (SSO)', desc: 'SAML 2.0 / OIDC for your team.', href: '/vendor/sso' },
+    { title: 'White-label board report', desc: 'Your logo and colours on the monthly board PDF.', href: '/vendor/profile' },
+  ]
+  return (
+    <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
+      <div className="flex items-center gap-2 mb-1">
+        <h2 className="text-white font-semibold text-sm">Pro Suite capabilities</h2>
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-violet-500/15 text-violet-300 border border-violet-500/40">PRO</span>
+      </div>
+      <p className="text-xs text-neutral-500 mb-3">Available on Pro Suite. Standard subscribers can upgrade to unlock these.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {features.map((f) => (
+          <Link key={f.title} href={f.href} className="rounded-lg border border-neutral-800 bg-neutral-950/40 p-3 hover:border-violet-500/40 transition-colors">
+            <p className="text-sm font-semibold text-white">{f.title}</p>
+            <p className="text-[11px] text-neutral-500 mt-0.5">{f.desc}</p>
+            <span className="mt-2 inline-flex items-center gap-1 text-[11px] text-violet-300">Open <ChevronRight className="h-3 w-3" /></span>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }
