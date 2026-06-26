@@ -10,6 +10,10 @@ import {
 	Building,
 	AlertCircle,
 	ArrowRight,
+	Zap,
+	Clock,
+	ExternalLink,
+	Bookmark,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -165,6 +169,44 @@ function recColors(rec: "bid" | "watch" | "pass") {
 	return "bg-rose-50 text-rose-700 border-rose-200";
 }
 
+function badgeColors(label: string | null) {
+	const l = (label || "").toLowerCase();
+	if (l === "bid") return recColors("bid");
+	if (l === "watch") return recColors("watch");
+	return recColors("pass");
+}
+
+// ── Live feed types ───────────────────────────────────────────────────────────
+type IntentValue = "bid" | "watch" | "pass" | "not_bidding";
+
+interface FeedItem {
+	tenderNo: string;
+	title: string | null;
+	agency: string | null;
+	sector: string | null;
+	estimatedValue: number | null;
+	closingDate: string | null;
+	daysToClose: number | null;
+	url: string | null;
+	bidLabel: string | null;
+	bidReason: string | null;
+	bidConfidence: number | null;
+	urgent: boolean;
+	intent: IntentValue | null;
+	notes?: string | null;
+	closed?: boolean;
+}
+
+const INTENT_BUTTONS: { value: IntentValue; label: string }[] = [
+	{ value: "bid", label: "Bidding" },
+	{ value: "watch", label: "Watching" },
+	{ value: "pass", label: "Pass" },
+	{ value: "not_bidding", label: "Not bidding" },
+];
+
+const fmtSgd = (v: number | null) =>
+	v == null ? "—" : v >= 1_000_000 ? `S$${(v / 1_000_000).toFixed(1)}M` : `S$${Math.round(v).toLocaleString()}`;
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function TenderIntelligencePage() {
@@ -200,6 +242,13 @@ export default function TenderIntelligencePage() {
 	const [forecast, setForecast] = useState<ForecastResponse | null>(null);
 	const [forecastLoading, setForecastLoading] = useState(false);
 
+	// Live feed + intent tracking state
+	const [feed, setFeed] = useState<FeedItem[]>([]);
+	const [feedLoading, setFeedLoading] = useState(true);
+	const [tracked, setTracked] = useState<FeedItem[]>([]);
+	const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+	const [savingIntent, setSavingIntent] = useState<Record<string, boolean>>({});
+
 	// ── Initial load: sector trends doubles as the paywall probe ────────────
 	async function loadTrends(sector: string, months: number) {
 		setTrendsLoading(true);
@@ -228,8 +277,63 @@ export default function TenderIntelligencePage() {
 	useEffect(() => {
 		loadTrends("", 12);
 		loadForecast("");
+		loadFeed();
+		loadIntents();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	async function loadFeed() {
+		setFeedLoading(true);
+		try {
+			const res = await fetch("/api/tender-intelligence/feed");
+			if (res.status === 403) {
+				setPaywalled(true);
+				return;
+			}
+			if (res.ok) {
+				const data = await res.json();
+				setFeed(Array.isArray(data.items) ? data.items : []);
+			}
+		} finally {
+			setFeedLoading(false);
+		}
+	}
+
+	async function loadIntents() {
+		try {
+			const res = await fetch("/api/tender-intelligence/intents");
+			if (res.ok) {
+				const data = await res.json();
+				setTracked(Array.isArray(data.items) ? data.items : []);
+			}
+		} catch {
+			/* non-blocking */
+		}
+	}
+
+	async function setIntent(item: FeedItem, intent: IntentValue) {
+		// Toggle off if the same intent is clicked again → untrack.
+		const clearing = item.intent === intent;
+		setSavingIntent((p) => ({ ...p, [item.tenderNo]: true }));
+		// Optimistic update in the feed.
+		setFeed((prev) =>
+			prev.map((f) => (f.tenderNo === item.tenderNo ? { ...f, intent: clearing ? null : intent } : f)),
+		);
+		try {
+			if (clearing) {
+				await fetch(`/api/tender-intelligence/intents/${encodeURIComponent(item.tenderNo)}`, { method: "DELETE" });
+			} else {
+				await fetch("/api/tender-intelligence/intents", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ tender_no: item.tenderNo, intent }),
+				});
+			}
+			await loadIntents();
+		} finally {
+			setSavingIntent((p) => ({ ...p, [item.tenderNo]: false }));
+		}
+	}
 
 	async function loadAwards() {
 		setAwardsLoading(true);
@@ -328,6 +432,114 @@ export default function TenderIntelligencePage() {
 						tenders.
 					</p>
 				</header>
+
+				{/* ── Live opportunities (BID/WATCH/PASS feed + intent) ──────────── */}
+				<div className="mb-6">
+					<Panel
+						icon={Zap}
+						title="Live opportunities"
+						description="Open GeBIZ tenders scored for your profile — same engine as your monthly digest"
+					>
+						{feedLoading ? (
+							<p className="text-sm text-[#64748b]">Loading live tenders…</p>
+						) : feed.length === 0 ? (
+							<p className="text-sm text-[#64748b]">No open tenders match right now. Check back soon.</p>
+						) : (
+							<div className="space-y-3">
+								{feed.map((item) => (
+									<div
+										key={item.tenderNo}
+										className={`rounded-xl border p-4 ${item.urgent ? "border-rose-300 bg-rose-50/40" : "border-[#e2e8f0] bg-white"}`}
+									>
+										<div className="flex flex-wrap items-start justify-between gap-3">
+											<div className="min-w-0">
+												<div className="flex items-center gap-2 flex-wrap">
+													<span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${badgeColors(item.bidLabel)}`}>
+														{item.bidLabel || "—"}
+													</span>
+													{item.urgent && (
+														<span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-600">
+															<Clock className="w-3 h-3" /> Closing in {item.daysToClose}d
+														</span>
+													)}
+												</div>
+												<p className="text-sm font-semibold text-[#0f172a] mt-1.5">{item.title || item.tenderNo}</p>
+												<p className="text-xs text-[#64748b] mt-0.5">
+													{item.agency || "—"} · {fmtSgd(item.estimatedValue)}
+													{item.daysToClose != null && !item.urgent ? ` · closes in ${item.daysToClose}d` : ""}
+												</p>
+											</div>
+											<div className="flex items-center gap-2">
+												{item.url && (
+													<a href={item.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-violet-600 hover:text-violet-700 font-medium">
+														GeBIZ <ExternalLink className="w-3 h-3" />
+													</a>
+												)}
+											</div>
+										</div>
+
+										{item.bidReason && (
+											<button
+												onClick={() => setExpanded((p) => ({ ...p, [item.tenderNo]: !p[item.tenderNo] }))}
+												className="mt-2 text-xs text-violet-600 hover:text-violet-700 font-medium"
+											>
+												{expanded[item.tenderNo] ? "Hide reasoning" : "Why?"}
+											</button>
+										)}
+										{expanded[item.tenderNo] && item.bidReason && (
+											<p className="mt-1.5 text-xs text-[#475569] bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-2.5">
+												{item.bidReason}
+												{item.bidConfidence != null ? ` (confidence ${item.bidConfidence}%)` : ""}
+											</p>
+										)}
+
+										<div className="mt-3 flex flex-wrap gap-2">
+											{INTENT_BUTTONS.map((b) => {
+												const active = item.intent === b.value;
+												return (
+													<button
+														key={b.value}
+														onClick={() => setIntent(item, b.value)}
+														disabled={!!savingIntent[item.tenderNo]}
+														className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors disabled:opacity-60 ${active ? "bg-violet-600 text-white border-violet-600" : "bg-white text-[#475569] border-[#e2e8f0] hover:bg-[#f8fafc]"}`}
+													>
+														{b.label}
+													</button>
+												);
+											})}
+										</div>
+									</div>
+								))}
+							</div>
+						)}
+					</Panel>
+				</div>
+
+				{/* ── Tracked tenders ───────────────────────────────────────────── */}
+				{tracked.length > 0 && (
+					<div className="mb-6">
+						<Panel
+							icon={Bookmark}
+							title={`Tracked tenders (${tracked.length})`}
+							description="Tenders you've marked — badges update as ratings change"
+						>
+							<div className="divide-y divide-[#e2e8f0]">
+								{tracked.map((t) => (
+									<div key={t.tenderNo} className="py-2.5 flex flex-wrap items-center justify-between gap-2">
+										<div className="min-w-0">
+											<p className="text-sm text-[#0f172a] truncate">{t.title || t.tenderNo}</p>
+											<p className="text-xs text-[#64748b]">{t.agency || "—"} · {fmtSgd(t.estimatedValue)}{t.closed ? " · closed" : ""}</p>
+										</div>
+										<div className="flex items-center gap-2">
+											<span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${badgeColors(t.bidLabel)}`}>{t.bidLabel || "—"}</span>
+											<span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-violet-50 text-violet-700 border border-violet-200 capitalize">{(t.intent || "").replace("_", " ")}</span>
+										</div>
+									</div>
+								))}
+							</div>
+						</Panel>
+					</div>
+				)}
 
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 					{/* ── Sector Trends ─────────────────────────────────────────── */}
