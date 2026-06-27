@@ -3,13 +3,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { SUBSCRIPTION_PRODUCTS } from "@/lib/pricing";
+import { startCheckout } from "@/lib/checkout";
 
 const BUYER_TIER_KEYS = ["buyer_starter_monthly", "buyer_pro_monthly", "buyer_enterprise_monthly"] as const;
 
 type Tab =
 	| "vendors"
 	| "buyers"
-	| "enterprise";
+	| "enterprise"
+	| "csps";
 
 function CheckItem({
 	text,
@@ -32,36 +34,6 @@ const BUNDLE_TYPES = new Set([
 	"enterprise_bid_kit",
 	"compliance_evidence_pack",
 ]);
-
-async function startCheckout(productType: string, extraBody?: Record<string, string>): Promise<void> {
-	try {
-		const res = await fetch("/api/checkout", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ productType, ...extraBody }),
-		});
-		const data = await res.json();
-		if (data.url) {
-			window.location.href = data.url;
-		} else if (res.status === 409) {
-			window.location.href = "/vendor/dashboard";
-		} else if (res.status === 422 && /website/i.test(data.error || "")) {
-			const website = prompt("We need your website URL to run your first scan.\n\nEnter your website (e.g. https://example.com):");
-			if (website?.trim()) {
-				await startCheckout(productType, { ...(extraBody || {}), website: website.trim() });
-			}
-		} else if (res.status === 422 && /company/i.test(data.error || "")) {
-			const company = prompt("We need your company name to generate your bundle reports.\n\nEnter your company name:");
-			if (company?.trim()) {
-				await startCheckout(productType, { ...(extraBody || {}), company_name: company.trim() });
-			}
-		} else {
-			alert(data.error || "Unable to start checkout. Please try again.");
-		}
-	} catch {
-		alert("Unable to start checkout. Please try again.");
-	}
-}
 
 export default function PricingPage() {
 	const [activeTab, setActiveTab] = useState<Tab>("vendors");
@@ -148,7 +120,10 @@ export default function PricingPage() {
 		{ id: "vendors", label: "For Vendors" },
 		{ id: "buyers", label: "For Buyers" },
 		{ id: "enterprise", label: "For Enterprise" },
+		{ id: "csps", label: "For CSPs" },
 	];
+
+	const [cspBilling, setCspBilling] = useState<"one-time" | "subscription">("one-time");
 
 	return (
 		<main className="bg-white min-h-screen">
@@ -741,6 +716,124 @@ export default function PricingPage() {
 									</Link>
 								</div>
 							</div>
+						</div>
+					)}
+
+					{/* ── FOR CSPs ────────────────────────────────────────────────────── */}
+					{activeTab === "csps" && (
+						<div className="space-y-12">
+							<div className="text-center mb-8">
+								<h2 className="text-3xl font-black text-[#0f172a] mb-4">CSP Compliance Pack</h2>
+								<p className="text-[#64748b] max-w-2xl mx-auto text-lg">
+									AML/CFT/PF compliance infrastructure for ACRA-registered Corporate Service
+									Providers — client CDD, STR framework, nominee &amp; UBO registers, and 8
+									AI-generated, blockchain-notarized programme documents.
+								</p>
+								<Link href="/csp" className="inline-block mt-4 text-sm font-semibold text-[#10b981] hover:underline">
+									Learn more about the CSP Compliance Pack →
+								</Link>
+							</div>
+
+							{/* Full pack — one-time vs monthly toggle */}
+							<div className="flex justify-center mb-4">
+								<div className="inline-flex items-center gap-1 p-1.5 rounded-full bg-[#f1f5f9] border border-[#e2e8f0]">
+									<button
+										type="button"
+										onClick={() => setCspBilling("one-time")}
+										className={`px-7 py-2.5 rounded-full text-sm font-bold transition-all ${cspBilling === "one-time" ? "bg-[#10b981] text-white shadow-sm" : "text-[#64748b] hover:text-[#0f172a]"}`}
+									>
+										One-Time
+									</button>
+									<button
+										type="button"
+										onClick={() => setCspBilling("subscription")}
+										className={`px-7 py-2.5 rounded-full text-sm font-bold transition-all ${cspBilling === "subscription" ? "bg-[#10b981] text-white shadow-sm" : "text-[#64748b] hover:text-[#0f172a]"}`}
+									>
+										Monthly
+									</button>
+								</div>
+							</div>
+
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+								{/* Full pack */}
+								<div className="bg-[#0f172a] p-8 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl relative flex flex-col">
+									<div className="absolute top-[-14px] left-8 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
+										{cspBilling === "one-time" ? "Best Value" : "Recommended"}
+									</div>
+									<h3 className="text-2xl font-black text-white mb-2">CSP Compliance Pack — Full</h3>
+									{cspBilling === "one-time" ? (
+										<div className="text-5xl font-black text-white mb-1">SGD 3,999</div>
+									) : (
+										<div className="text-5xl font-black text-white mb-1">SGD 299<span className="text-xl text-white/40 font-normal">/mo</span></div>
+									)}
+									<p className="text-xs text-white/50 mb-6">
+										{cspBilling === "one-time" ? "One-time · lifetime pack access" : "Monthly · cancel anytime · monitoring included"}
+									</p>
+									<ul className="space-y-3 mb-8 flex-1">
+										{[
+											"Complete AML/CFT/PF Programme — 8 AI documents, blockchain-notarized",
+											"Client registry with CDD/EDD tracker (unlimited clients)",
+											"STR decision framework with rationale logging",
+											"Nominee Director + Shareholder registers (fit-and-proper workflow)",
+											"Beneficial Owner (UBO) verification tracker",
+											"Risk-Based Approach scoring per client",
+											"Regulatory Compliance Calendar with alerts",
+											"Staff AML/CFT training records",
+											"Completion Certificate for ACRA licence renewal",
+										].map(f => (
+											<li key={f} className="flex items-start gap-2 text-sm text-white/80">
+												<span className="text-[#10b981] font-bold flex-shrink-0">✓</span>
+												{f}
+											</li>
+										))}
+									</ul>
+									<button
+										type="button"
+										disabled={loadingProduct === (cspBilling === "one-time" ? "csp_pack_onetime" : "csp_pack_monthly")}
+										onClick={() => handleCheckout(cspBilling === "one-time" ? "csp_pack_onetime" : "csp_pack_monthly")}
+										className="w-full bg-[#10b981] text-white font-bold py-4 rounded-2xl hover:bg-[#059669] transition shadow-lg shadow-[#10b981]/20 disabled:opacity-50"
+									>
+										{loadingProduct === (cspBilling === "one-time" ? "csp_pack_onetime" : "csp_pack_monthly")
+											? "Redirecting..."
+											: cspBilling === "one-time" ? "Get the Pack — SGD 3,999 →" : "Subscribe — SGD 299/mo →"}
+									</button>
+								</div>
+
+								{/* Monitoring add-on */}
+								<div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
+									<h3 className="text-xl font-bold text-[#0f172a] mb-2">CSP Monitoring Add-On</h3>
+									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 299<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+									<p className="text-xs text-[#64748b] mb-6">Subscription · continuous regulatory monitoring</p>
+									<ul className="space-y-3 mb-8 flex-1">
+										{[
+											"Continuous monitoring of ACRA enforcement decisions",
+											"FATF grey/black list updates",
+											"PDPC enforcement alerts for CSP data handling",
+											"Singapore sanctions list updates (MAS, OFAC, UN, EU)",
+											"Regulatory deadline reminders with escalation",
+											"Monthly compliance health report",
+										].map(f => <CheckItem key={f} text={f} />)}
+									</ul>
+									<div className="pt-6 border-t border-[#f1f5f9] mb-6">
+										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
+										<p className="text-sm text-[#475569]">CSPs with their own AML programme who need ongoing alerts</p>
+									</div>
+									<button
+										type="button"
+										disabled={loadingProduct === "csp_monitoring_monthly"}
+										onClick={() => handleCheckout("csp_monitoring_monthly")}
+										className="w-full border-2 border-[#0f172a] text-[#0f172a] font-bold py-3.5 rounded-2xl hover:bg-[#0f172a] hover:text-white transition disabled:opacity-50"
+									>
+										{loadingProduct === "csp_monitoring_monthly" ? "Redirecting..." : "Subscribe — SGD 299/mo →"}
+									</button>
+								</div>
+							</div>
+
+							<p className="text-center text-xs text-[#94a3b8] max-w-2xl mx-auto">
+								BOOPPA provides compliance tooling and documentation — not regulatory
+								certification or legal advice. You remain responsible for actual compliance
+								with the ACRA RFA regime and AML/CFT obligations.
+							</p>
 						</div>
 					)}
 

@@ -464,12 +464,75 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
   },
 }
 
+// ── CSP Compliance Pack ──────────────────────────────────────────────────────
+// Corporate Service Provider AML/CFT compliance suite. Sold to any account
+// (role-agnostic). Keys MUST match the backend product_type strings in
+// app/api/stripe_checkout.py:MODE_MAP. The /csp landing page fetches the live
+// catalog from GET /api/v1/csp/pricing; these entries back the static tiles and
+// the "For CSPs" pricing tab.
+
+export const CSP_PRODUCTS: Record<string, Product> = {
+  csp_pack_onetime: {
+    id: 'csp_pack_onetime',
+    name: 'CSP Compliance Pack — Full',
+    description: 'Complete AML/CFT/PF programme for Corporate Service Providers — one-time, lifetime pack access',
+    price: 3999,
+    currency: 'SGD',
+    type: 'one-time',
+    badge: 'Best Value',
+    features: [
+      'Complete AML/CFT/PF Programme — 8 AI-generated documents, blockchain-notarized',
+      'Client registry with CDD/EDD tracker (unlimited clients)',
+      'STR decision framework with documented rationale logging',
+      'Nominee Director + Shareholder registers with fit-and-proper workflow',
+      'Beneficial Owner (UBO) identification and verification tracker',
+      'Risk-Based Approach scoring per client',
+      'Regulatory Compliance Calendar — all deadlines with alerts',
+      'Staff AML/CFT training records',
+      'Completion Certificate for ACRA licence renewal evidence',
+    ],
+  },
+  csp_pack_monthly: {
+    id: 'csp_pack_monthly',
+    name: 'CSP Compliance Pack — Full (Monthly)',
+    description: 'The full CSP Compliance Pack billed monthly — same scope as one-time, with ongoing monitoring included',
+    price: 299,
+    currency: 'SGD',
+    type: 'subscription',
+    badge: 'Recommended',
+    features: [
+      'Everything in the Full Pack',
+      'Monthly ACRA / PDPC / FATF monitoring alerts',
+      'PDPA + NRIC compliance included',
+      'Continuous regulatory-change updates',
+      'Cancel anytime',
+    ],
+  },
+  csp_monitoring_monthly: {
+    id: 'csp_monitoring_monthly',
+    name: 'CSP Monitoring Add-On',
+    description: 'Continuous regulatory monitoring for CSPs — sanctions, FATF, ACRA, and PDPC alerts',
+    price: 299,
+    currency: 'SGD',
+    type: 'subscription',
+    features: [
+      'Continuous monitoring of ACRA enforcement decisions',
+      'FATF grey/black list updates',
+      'PDPC enforcement alerts relevant to CSP data handling',
+      'Singapore sanctions list updates (MAS, OFAC, UN, EU)',
+      'Regulatory deadline reminders with escalation',
+      'Monthly compliance health report',
+    ],
+  },
+}
+
 // ── Combined export ────────────────────────────────────────────────────────────
 
 export const ALL_PRODUCTS: Record<string, Product> = {
   ...ONE_TIME_PRODUCTS,
   ...BUNDLE_PRODUCTS,
   ...SUBSCRIPTION_PRODUCTS,
+  ...CSP_PRODUCTS,
 }
 
 export function getProduct(id: string): Product | undefined {

@@ -46,6 +46,26 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // ── CSP routes ───────────────────────────────────────────────────────────
+  // /csp is the public marketing + pricing landing page. Everything under
+  // /csp/* is the gated operational app — it needs a logged-in user, but the
+  // CSP *entitlement* (an active paid org) is a separate axis from vendor_plan,
+  // so it can't be checked here; the (app) layout enforces it server-side via
+  // the backend 402. NB: don't fold /csp into the prefix-matched publicRoutes —
+  // its startsWith() logic would wrongly expose /csp/dashboard.
+  if (pathname === '/csp') {
+    return NextResponse.next()
+  }
+  if (pathname.startsWith('/csp/')) {
+    const cspToken = request.cookies.get('token')?.value
+    if (!cspToken) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('from', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+    return NextResponse.next()
+  }
+
   // ── Vendor / user routes ─────────────────────────────────────────────────
   const token = request.cookies.get('token')?.value
   const isPublicPrefix = publicPrefixes.some(p => pathname.startsWith(p))

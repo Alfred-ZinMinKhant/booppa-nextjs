@@ -55,6 +55,12 @@ function loadingCopyFor(pt: string | undefined): { headline: string; detail: str
       detail: 'Verifying your payment — your verification certificate is being issued.',
     };
   }
+  if (pt?.startsWith('csp_')) {
+    return {
+      headline: 'Activating your CSP Compliance Pack',
+      detail: 'Once verified, you’ll accept the CSP Terms and set up your compliance profile.',
+    };
+  }
   return {
     headline: 'Activating your subscription',
     detail: 'Verifying your payment with Stripe…',
@@ -206,6 +212,9 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
     const isVendorPro = productType === 'vendor_pro_monthly' || productType === 'vendor_pro_annual';
     const isSubscription = isPdpaMonitor || isVendorActive || isTenderIntelligence || isVendorPro;
     const isRfp = productType?.startsWith('rfp_');
+    // CSP is a separate entitlement axis — activation flips the CspOrganisation to
+    // active at webhook time, then the buyer accepts ToS + builds a profile.
+    const isCsp = productType?.startsWith('csp_');
 
     content = (
       <>
@@ -221,7 +230,9 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
           <div>
             <p className="text-sm font-semibold text-blue-400">Please check your email</p>
             <p className="text-xs text-gray-400 mt-0.5">
-              {isNotarization
+              {isCsp
+                ? 'Your CSP Compliance Pack is activated. Next, accept the CSP Terms of Service and set up your compliance profile to generate your 8 AML/CFT documents.'
+                : isNotarization
                 ? 'Your notarization certificate and blockchain proof will be delivered to your email shortly.'
                 : isPdpa
                   ? 'Your PDPA compliance report will be sent to your email shortly.'
@@ -266,7 +277,11 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
           </div>
         </div>
 
-        {isPdpa ? (
+        {isCsp ? (
+          <Link href="/csp/onboarding" className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
+            Set Up Your CSP Compliance Pack →
+          </Link>
+        ) : isPdpa ? (
           <Link href={`/pdpa/report?session_id=${sessionId}`} className="mt-6 inline-block px-6 py-3 bg-booppa-green text-white font-semibold rounded-lg hover:bg-booppa-green/80 transition">
             View PDPA Report
           </Link>
