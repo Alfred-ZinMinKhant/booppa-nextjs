@@ -13,6 +13,87 @@ type Tab =
 	| "enterprise"
 	| "csps";
 
+type Faq = { q: string; a: string };
+
+// Questions that apply to every audience — appended after the tab-specific set.
+const COMMON_FAQ: Faq[] = [
+	{
+		q: "Can I cancel anytime?",
+		a: "Yes. Monthly plans are cancel-anytime with no long-term contracts. Your historical evidence and certificates remain accessible for 90 days after cancellation.",
+	},
+	{
+		q: "What payment methods do you accept?",
+		a: "All payments via Stripe: Visa, Mastercard, Amex. PayNow available for Singapore customers. Invoicing available for Enterprise plans.",
+	},
+	{
+		q: "Is GST included?",
+		a: "Prices shown exclude GST. 9% GST will be added for Singapore-registered businesses at checkout.",
+	},
+];
+
+const FAQ_BY_TAB: Record<Tab, Faq[]> = {
+	vendors: [
+		{
+			q: "Is this PDPC-approved certification?",
+			a: "No. BOOPPA provides technical evidence and documentation tools. This is not regulatory certification or legal advice. We help you generate operational compliance evidence — you remain responsible for actual compliance.",
+		},
+		{
+			q: "When does Strategy 6 fire?",
+			a: "Strategy 6 fires automatically when RFP Express is purchased (standalone or as part of the RFP Accelerator bundle). It does not fire for RFP Complete — that is a vendor-side credibility tool, not a lead generation mechanism.",
+		},
+		{
+			q: "What's the difference between a one-time scan and monthly monitoring?",
+			a: "A one-time scan gives you a point-in-time PDPA risk report and verified badge. Monthly monitoring re-scans automatically, tracks drift, and keeps your audit log and badge current — so your compliance posture stays evidenced over time.",
+		},
+	],
+	buyers: [
+		{
+			q: "What do buyer plans actually give me?",
+			a: "Procurement intelligence: verify vendors against ACRA/PDPC/GeBIZ, browse and compare verified suppliers, and monitor supply-chain risk. Higher tiers add more seats, deeper analytics, and bulk verification.",
+		},
+		{
+			q: "Can I verify vendors who aren't on BOOPPA yet?",
+			a: "Yes. You can run a verification on any Singapore-registered entity by UEN — the vendor doesn't need an existing BOOPPA profile for you to check their compliance signals.",
+		},
+		{
+			q: "Is this regulatory certification of my suppliers?",
+			a: "No. BOOPPA surfaces compliance evidence and risk signals to support your own due diligence. It is not certification or legal advice — your procurement decisions remain yours.",
+		},
+	],
+	enterprise: [
+		{
+			q: "What's included in Enterprise suites?",
+			a: "Multi-entity/subsidiary management, SSO, API access, webhooks, org-level controls, and priority support — on top of the vendor and procurement tooling. Suites are billed monthly with annual options available.",
+		},
+		{
+			q: "Do you support multiple subsidiaries or entities?",
+			a: "Yes. Enterprise supports a parent organisation with multiple subsidiaries, each with its own profiles, reports, and evidence, managed under one account.",
+		},
+		{
+			q: "Can we get invoicing and a custom contract?",
+			a: "Yes. Enterprise plans support invoicing and custom terms. Contact us to arrange procurement-friendly billing and any required security/legal review.",
+		},
+	],
+	csps: [
+		{
+			q: "Is this an ACRA licence or ACRA-approved certification?",
+			a: "No. The CSP Compliance Pack is compliance tooling and documentation — it generates your AML/CFT/PF programme, tracks your obligations, and produces a tamper-evident evidence trail. It is not regulatory certification or legal advice. You remain responsible for actual compliance with the ACRA RFA regime.",
+		},
+		{
+			q: "What's the difference between the Full pack and the Monitoring Add-On?",
+			a: "The Full pack does the whole programme: 8 AI-generated documents, the client CDD/EDD registry, STR framework, nominee & UBO registers, scoring, calendar, and training — and monitoring is already included. The Monitoring Add-On is a separate, standalone subscription for CSPs who already run their own AML programme and only want ongoing alerts. If you buy the Full pack you do not need the add-on.",
+		},
+		{
+			q: "One-time vs monthly — what do I actually get?",
+			a: "Both unlock the full pack. One-time (SGD 3,999) is lifetime access to the pack and your generated programme. Monthly (SGD 299/mo) is the same pack plus continuous monitoring and regulatory updates, cancel anytime.",
+		},
+		{
+			q: "Is my clients' personal data (NRIC, passport) secure?",
+			a: "Yes. Sensitive identity fields are encrypted at rest with AES (Fernet) before they touch the database, and every CDD, STR decision, nominee and training record is SHA-256 hashed and notarized on-chain so the audit trail is tamper-evident.",
+		},
+	],
+};
+
 function CheckItem({
 	text,
 	color = "text-[#10b981]",
@@ -754,8 +835,8 @@ export default function PricingPage() {
 								</div>
 							</div>
 
-							<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-								{/* Full pack */}
+							{/* Full pack — the toggle above governs only this card */}
+							<div className="max-w-xl mx-auto">
 								<div className="bg-[#0f172a] p-8 rounded-[2.5rem] border-2 border-[#10b981] shadow-2xl relative flex flex-col">
 									<div className="absolute top-[-14px] left-8 bg-[#10b981] text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
 										{cspBilling === "one-time" ? "Best Value" : "Recommended"}
@@ -798,38 +879,52 @@ export default function PricingPage() {
 											: cspBilling === "one-time" ? "Get the Pack — SGD 3,999 →" : "Subscribe — SGD 299/mo →"}
 									</button>
 								</div>
+							</div>
 
-								{/* Monitoring add-on */}
-								<div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
-									<h3 className="text-xl font-bold text-[#0f172a] mb-2">CSP Monitoring Add-On</h3>
-									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 299<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
-									<p className="text-xs text-[#64748b] mb-6">Subscription · continuous regulatory monitoring</p>
-									<ul className="space-y-3 mb-8 flex-1">
-										{[
-											"Continuous monitoring of ACRA enforcement decisions",
-											"FATF grey/black list updates",
-											"PDPC enforcement alerts for CSP data handling",
-											"Singapore sanctions list updates (MAS, OFAC, UN, EU)",
-											"Regulatory deadline reminders with escalation",
-											"Monthly compliance health report",
-										].map(f => <CheckItem key={f} text={f} />)}
-									</ul>
-									<div className="pt-6 border-t border-[#f1f5f9] mb-6">
-										<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
-										<p className="text-sm text-[#475569]">CSPs with their own AML programme who need ongoing alerts</p>
+							{/* Standalone Monitoring Add-On — a separate SKU, not a billing variant */}
+							<div className="max-w-3xl mx-auto pt-12 border-t border-[#e2e8f0]">
+								<div className="text-center mb-6">
+									<h3 className="text-2xl font-black text-[#0f172a]">Already run your own AML programme?</h3>
+									<p className="text-[#64748b] text-sm max-w-xl mx-auto mt-2">
+										Monitoring is already included in the Full pack. If you only need ongoing
+										regulatory alerts — not the documents or registers — subscribe to the add-on on its own.
+									</p>
+								</div>
+								<div className="bg-white p-6 lg:p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm flex flex-col lg:flex-row lg:items-center gap-6">
+									<div className="flex-1">
+										<h4 className="text-lg font-bold text-[#0f172a] mb-1">CSP Monitoring Add-On</h4>
+										<p className="text-xs text-[#64748b] mb-4">Subscription · continuous regulatory monitoring</p>
+										<ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+											{[
+												"Continuous monitoring of ACRA enforcement decisions",
+												"FATF grey/black list updates",
+												"PDPC enforcement alerts for CSP data handling",
+												"Singapore sanctions list updates (MAS, OFAC, UN, EU)",
+												"Regulatory deadline reminders with escalation",
+												"Monthly compliance health report",
+											].map(f => <CheckItem key={f} text={f} />)}
+										</ul>
+										<div className="mt-4">
+											<p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
+											<p className="text-sm text-[#475569]">CSPs with their own AML programme who need ongoing alerts</p>
+										</div>
 									</div>
-									<button
-										type="button"
-										disabled={loadingProduct === "csp_monitoring_monthly"}
-										onClick={() => handleCheckout("csp_monitoring_monthly")}
-										className="w-full border-2 border-[#0f172a] text-[#0f172a] font-bold py-3.5 rounded-2xl hover:bg-[#0f172a] hover:text-white transition disabled:opacity-50"
-									>
-										{loadingProduct === "csp_monitoring_monthly" ? "Redirecting..." : "Subscribe — SGD 299/mo →"}
-									</button>
+									<div className="lg:w-56 lg:text-right lg:border-l lg:border-[#f1f5f9] lg:pl-6 flex flex-col items-stretch lg:items-end">
+										<div className="text-3xl font-black text-[#0f172a] mb-1">SGD 299<span className="text-base text-[#64748b] font-normal">/mo</span></div>
+										<button
+											type="button"
+											disabled={loadingProduct === "csp_monitoring_monthly"}
+											onClick={() => handleCheckout("csp_monitoring_monthly")}
+											className="mt-3 w-full lg:w-auto border-2 border-[#0f172a] text-[#0f172a] font-bold px-6 py-3 rounded-2xl hover:bg-[#0f172a] hover:text-white transition disabled:opacity-50 whitespace-nowrap"
+										>
+											{loadingProduct === "csp_monitoring_monthly" ? "Redirecting..." : "Subscribe →"}
+										</button>
+									</div>
 								</div>
 							</div>
 
 							<p className="text-center text-xs text-[#94a3b8] max-w-2xl mx-auto">
+								Prices exclude GST; 9% GST is added at checkout for Singapore-registered businesses.
 								BOOPPA provides compliance tooling and documentation — not regulatory
 								certification or legal advice. You remain responsible for actual compliance
 								with the ACRA RFA regime and AML/CFT obligations.
@@ -837,34 +932,13 @@ export default function PricingPage() {
 						</div>
 					)}
 
-					{/* FAQ */}
+					{/* FAQ — reflects the active tab */}
 					<div className="mt-20 bg-[#f8fafc] p-8 lg:p-16 rounded-[3rem] border border-[#e2e8f0]">
 						<h2 className="text-3xl font-black mb-12 text-center text-[#0f172a]">
-							Pricing FAQ
+							{tabs.find((t) => t.id === activeTab)?.label || "Pricing"} — FAQ
 						</h2>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-10 max-w-5xl mx-auto">
-							{[
-								{
-									q: "Is this PDPC-approved certification?",
-									a: "No. BOOPPA provides technical evidence and documentation tools. This is not regulatory certification or legal advice. We help you generate operational compliance evidence — you remain responsible for actual compliance.",
-								},
-								{
-									q: "Can I cancel anytime?",
-									a: "Yes. Monthly plans are cancel-anytime with no long-term contracts. Your historical evidence and certificates remain accessible for 90 days after cancellation.",
-								},
-								{
-									q: "What payment methods do you accept?",
-									a: "All payments via Stripe: Visa, Mastercard, Amex. PayNow available for Singapore customers. Invoicing available for Enterprise plans.",
-								},
-								{
-									q: "Is GST included?",
-									a: "Prices shown exclude GST. 9% GST will be added for Singapore-registered businesses at checkout.",
-								},
-								{
-									q: "When does Strategy 6 fire?",
-									a: "Strategy 6 fires automatically when RFP Express is purchased (standalone or as part of the RFP Accelerator bundle). It does not fire for RFP Complete — that is a vendor-side credibility tool, not a lead generation mechanism.",
-								},
-							].map((faq) => (
+							{[...FAQ_BY_TAB[activeTab], ...COMMON_FAQ].map((faq) => (
 								<div key={faq.q}>
 									<h4 className="text-base font-bold mb-2 text-[#0f172a]">
 										{faq.q}

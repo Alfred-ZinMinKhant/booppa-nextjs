@@ -197,6 +197,13 @@ export default function Navigation() {
 							</Link>
 
 							<Link
+								href="/csp"
+								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/csp") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
+							>
+								For CSP
+							</Link>
+
+							<Link
 								href="/opportunities"
 								className={`text-sm font-medium transition-colors ${pathname?.startsWith("/opportunities") ? "text-[#10b981]" : "text-white/80 hover:text-white"}`}
 							>
@@ -370,6 +377,12 @@ export default function Navigation() {
 								href="/solutions/enterprise"
 								label="For Enterprise"
 								active={pathname?.startsWith("/solutions/enterprise")}
+								close={() => setMobileOpen(false)}
+							/>
+							<MobileLink
+								href="/csp"
+								label="For CSP"
+								active={pathname?.startsWith("/csp")}
 								close={() => setMobileOpen(false)}
 							/>
 							<MobileLink
