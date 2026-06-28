@@ -96,7 +96,7 @@ export default function CspLandingPage() {
             {[
               { t: "8 AML/CFT programme documents", d: "AI-generated from your profile — IRA, AML/CFT policy, EDD procedures, STR SOP, training plan, and more. Each SHA-256 hashed and anchored on Polygon." },
               { t: "Client CDD/EDD registry", d: "Track customer due diligence for unlimited clients, with periodic-review scheduling and EDD workflows for PEPs and high-risk relationships." },
-              { t: "Sanctions screening", d: "Screen clients against MAS, OFAC, UN, and EU lists. Hits auto-escalate to very-high risk with EDD required." },
+              { t: "Sanctions screening", d: "Screen clients against the OFAC (US), UN, and EU consolidated sanctions lists — with MAS prohibition orders, PEP and adverse-media coverage via optional World-Check. Hits auto-escalate to very-high risk with EDD required." },
               { t: "STR decision framework", d: "Log every suspicious-transaction decision with mandatory rationale — filed, not-filed, or escalated — with a tamper-evident audit trail." },
               { t: "Nominee & UBO registers", d: "Nominee director/shareholder registers with fit-and-proper assessments, plus beneficial-owner identification down to 25% ownership." },
               { t: "Compliance calendar", d: "15 seeded regulatory deadlines with automated reminders and escalation, so an ACRA filing never slips." },

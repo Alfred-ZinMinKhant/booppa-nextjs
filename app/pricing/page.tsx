@@ -899,7 +899,7 @@ export default function PricingPage() {
 												"Continuous monitoring of ACRA enforcement decisions",
 												"FATF grey/black list updates",
 												"PDPC enforcement alerts for CSP data handling",
-												"Singapore sanctions list updates (MAS, OFAC, UN, EU)",
+												"Sanctions list updates — OFAC, UN & EU (MAS via World-Check)",
 												"Regulatory deadline reminders with escalation",
 												"Monthly compliance health report",
 											].map(f => <CheckItem key={f} text={f} />)}
