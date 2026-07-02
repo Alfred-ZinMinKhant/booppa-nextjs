@@ -19,8 +19,10 @@ async function proxy(req: NextRequest, params: { path: string[] }) {
 
   let body: BodyInit | undefined
   if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'DELETE') {
-    const text = await req.text()
-    if (text) body = text
+    // arrayBuffer, not text — multipart bodies (bulk-scan CSV/XLSX upload) are
+    // binary and get corrupted by a text round-trip.
+    const buf = await req.arrayBuffer()
+    if (buf.byteLength > 0) body = buf
     headers['Content-Type'] = req.headers.get('content-type') || 'application/json'
   }
 

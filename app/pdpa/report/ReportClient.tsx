@@ -996,7 +996,7 @@ export default function ReportClient() {
       {/* ── Page header ──────────────────────────────────── */}
       <section className="bg-[#0f172a] py-10 px-6">
         <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#10b981] mb-2">PDPA Quick Scan — BACF-v1.0</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#10b981] mb-2">PDPA Snapshot — BACF-v1.0</p>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-white">Compliance Report</h1>
@@ -1091,7 +1091,7 @@ export default function ReportClient() {
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-sm">
           <SectionHeading n="2" title="Context &amp; Purpose of This Document" />
           <p className="text-sm text-[#334155] leading-relaxed">
-            This document summarises a PDPA Quick Scan compliance audit performed by Booppa,
+            This document summarises a PDPA Snapshot compliance audit performed by Booppa,
             translated into English and enriched with developer implementation tasks.
             It is intended to be forwarded directly to the development team.
             The audit was anchored on the Polygon Amoy Testnet blockchain for evidentiary integrity.
@@ -1226,7 +1226,7 @@ export default function ReportClient() {
         {/* ── Section 8: Important Limitations ─────────── */}
         <div className="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] p-6">
           <SectionHeading n="8" title="Important Limitations of This Scan" />
-          <p className="text-sm text-[#64748b] mb-3">This Quick Scan has the following limitations — further audit may be needed for:</p>
+          <p className="text-sm text-[#64748b] mb-3">This Snapshot has the following limitations — further audit may be needed for:</p>
           <ul className="space-y-2">
             {[
               "Data Protection Officer (DPO) appointment verification (mandatory for many organisations under PDPA)",

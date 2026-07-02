@@ -319,7 +319,7 @@ function CoverSheetInner() {
                   ) : (
                     <Loader2 className="w-5 h-5 text-sky-600 animate-spin" />
                   )}
-                  <p className="font-bold text-[#0f172a] text-sm">PDPA Quick Scan</p>
+                  <p className="font-bold text-[#0f172a] text-sm">PDPA Snapshot</p>
                 </div>
                 <p className="text-xs text-[#64748b]">
                   {pdpaDone
@@ -387,8 +387,8 @@ function CoverSheetInner() {
             {!coverReady && (!pdpaDone || !rfpDone) && (
               <p className="text-xs text-[#94a3b8] mt-4">
                 {rfpBriefPending
-                  ? 'Submit your RFP brief above to start the RFP Complete Kit. The Cover Sheet generates automatically once both PDPA Quick Scan and RFP Complete Kit are ready.'
-                  : 'Cover Sheet generates automatically once PDPA Quick Scan and RFP Complete Kit are ready. Page refreshes every 8 seconds.'}
+                  ? 'Submit your RFP brief above to start the RFP Complete Kit. The Cover Sheet generates automatically once both PDPA Snapshot and RFP Complete Kit are ready.'
+                  : 'Cover Sheet generates automatically once PDPA Snapshot and RFP Complete Kit are ready. Page refreshes every 8 seconds.'}
               </p>
             )}
           </div>

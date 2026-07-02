@@ -16,7 +16,7 @@ export default function CompliancePage() {
           <div className="bg-[#f8fafc] p-10 rounded-3xl border-2 border-[#10b981] mb-12 shadow-sm">
             <h3 className="text-2xl font-bold mb-4 text-[#0f172a]">📊 From Point-in-Time Scans to Continuous Monitoring</h3>
             <p className="text-[#64748b] mb-4">
-              PDPA Snapshot (SGD 79) gives you a one-time assessment.
+              PDPA Snapshot (SGD 299) gives you a one-time assessment.
               Compliance monitoring plans provide ongoing operational infrastructure.
             </p>
             <p className="text-[#64748b]">
@@ -33,7 +33,7 @@ export default function CompliancePage() {
               {/* One-time scan */}
               <div className="bg-white p-10 rounded-3xl border border-[#e2e8f0] shadow-sm hover:translate-y-[-5px] hover:shadow-xl transition-all">
                 <h3 className="text-xl font-bold mb-4 text-[#0f172a]">PDPA Snapshot</h3>
-                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 79<span className="text-xl text-[#64748b] font-normal"> one-time</span></div>
+                <div className="text-4xl font-bold text-[#0f172a] mb-2">SGD 299<span className="text-xl text-[#64748b] font-normal"> one-time</span></div>
                 <p className="text-sm text-[#64748b] mb-8">Point-in-time PDPA compliance scan</p>
 
                 <ul className="space-y-4 mb-8">
@@ -71,7 +71,7 @@ export default function CompliancePage() {
                 <ul className="space-y-4 mb-8">
                   <li className="font-bold text-[#0f172a] text-sm">Everything in Snapshot, plus:</li>
                   {[
-                    'Monthly automatic PDPA re-scan (SGD 79 value)',
+                    'Monthly automatic PDPA re-scan (SGD 299 value)',
                     'Monthly PDPC regulatory alerts',
                     'Running compliance score chart',
                     'Always-current PDF for buyers',
@@ -266,7 +266,7 @@ export default function CompliancePage() {
             <h2 className="text-3xl lg:text-5xl font-black mb-6 leading-tight">Ready to Automate Your Compliance Operations?</h2>
             <p className="text-white/70 text-xl mb-12 max-w-2xl mx-auto font-medium">Start with a one-time PDPA Snapshot or subscribe to PDPA Monitor for continuous coverage.</p>
             <div className="flex flex-wrap justify-center gap-6">
-              <Link href="/pdpa" className="btn btn-primary px-10 py-5 text-xl font-bold">Run PDPA Scan — SGD 79</Link>
+              <Link href="/pdpa" className="btn btn-primary px-10 py-5 text-xl font-bold">Run PDPA Scan — SGD 299</Link>
               <Link href="/pricing" className="btn btn-secondary bg-white text-[#0f172a] px-10 py-5 text-xl font-bold hover:bg-white/90 border-0 transition-colors">View All Plans</Link>
             </div>
           </div>

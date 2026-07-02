@@ -59,7 +59,7 @@ export default function Home() {
 						<div className="bg-white p-8 rounded-3xl border-2 border-[#e2e8f0] transition-all hover:shadow-xl flex flex-col">
 							<h3 className="text-xl font-bold mb-4">PDPA Scan</h3>
 							<div className="text-3xl font-bold text-[#0f172a] mb-2">
-								SGD 79
+								SGD 299
 							</div>
 							<p className="text-[#64748b] text-sm mb-6 pb-6 border-b border-[#e2e8f0]">
 								One-time technical scan

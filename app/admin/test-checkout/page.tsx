@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Loader2, AlertTriangle, ExternalLink, Building2, CheckCircle2, X } from 'lucide-react'
+import { ALL_PRODUCTS, formatPrice } from '@/lib/pricing'
 
 type Dispatch = 'subscription' | 'bundle' | 'rfp' | 'rfp-deferred' | 'standalone'
 
@@ -22,7 +23,7 @@ interface SimRow extends SimResponse {
 interface Product {
   product_type: string
   label: string
-  section: 'one-time-vendors' | 'one-time-buyers' | 'subs-vendors' | 'subs-buyers' | 'subs-enterprise'
+  section: 'one-time-vendors' | 'one-time-buyers' | 'subs-vendors' | 'subs-buyers' | 'subs-enterprise' | 'csp'
   needsUrl?: boolean
   needsCompany?: boolean
   needsRfp?: boolean
@@ -61,14 +62,20 @@ const IDENTITY_DEFAULTS: Record<IdentityKey, Identity> = {
 
 const STORAGE_KEY = 'booppa_admin_test_identities'
 
-// Complete product catalog with all SKUs + field requirements
+// Product catalog: section grouping + per-SKU field requirements only.
+// Display names and prices come from lib/pricing.ts (ALL_PRODUCTS) — the same
+// source the /pricing page renders — and any SKU here that is missing from
+// ALL_PRODUCTS is filtered out of the page, so the admin list always shows
+// exactly the pricing-page products.
 const PRODUCT_CATALOG: Product[] = [
   // One-time — Vendors
   { product_type: 'vendor_proof', label: 'Vendor Proof', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
   { product_type: 'pdpa_quick_scan', label: 'PDPA Snapshot', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
   { product_type: 'rfp_complete', label: 'RFP Complete', section: 'one-time-vendors', needsCompany: true, needsUrl: true, needsRfp: true },
   { product_type: 'vendor_trust_pack', label: 'Vendor Trust Pack', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
-  { product_type: 'compliance_evidence_pack', label: 'Compliance Evidence Pack', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
+  // rfp_accelerator / enterprise_bid_kit are retired products — the backend
+  // simulate-purchase denylists them and they are no longer sold anywhere.
+  { product_type: 'compliance_evidence_pack', label: 'Compliance Bundle', section: 'one-time-vendors', needsCompany: true, needsUrl: true },
   { product_type: 'compliance_notarization_1', label: 'Notarization (1 doc)', section: 'one-time-vendors' },
   // One-time — Buyers
   { product_type: 'notarization_addon_1', label: 'Extra Notarization', section: 'one-time-buyers' },
@@ -94,7 +101,26 @@ const PRODUCT_CATALOG: Product[] = [
   // Subscriptions — Enterprise
   { product_type: 'standard_suite_monthly', label: 'Standard Suite — monthly', section: 'subs-enterprise' },
   { product_type: 'pro_suite_monthly', label: 'Pro Suite — monthly', section: 'subs-enterprise' },
-]
+  // CSP Compliance Pack
+  { product_type: 'csp_pack_onetime', label: 'CSP Compliance Pack — Full', section: 'csp', needsCompany: true },
+  { product_type: 'csp_pack_monthly', label: 'CSP Compliance Pack — Full (Monthly)', section: 'csp', needsCompany: true },
+  { product_type: 'csp_monitoring_monthly', label: 'CSP Monitoring Add-On', section: 'csp', needsCompany: true },
+].filter(p => p.product_type in ALL_PRODUCTS) as Product[]
+
+// Canonical display name + price come from lib/pricing.ts (the storefront
+// source of truth) so the admin page always matches what customers see on
+// /pricing. The hardcoded catalog label is only a fallback for SKUs missing
+// from ALL_PRODUCTS.
+function productName(p: Product): string {
+  return ALL_PRODUCTS[p.product_type]?.name ?? p.label
+}
+
+function productPrice(p: Product): string | null {
+  const cp = ALL_PRODUCTS[p.product_type]
+  if (!cp) return null
+  const suffix = p.product_type.endsWith('_annual') ? '/yr' : cp.type === 'subscription' ? '/mo' : ''
+  return `${formatPrice(cp.price)}${suffix}`
+}
 
 function dispatchColor(d: Dispatch) {
   switch (d) {
@@ -113,6 +139,7 @@ function getSectionTitle(section: Product['section']) {
     case 'subs-vendors': return 'For Vendors'
     case 'subs-buyers': return 'For Buyers'
     case 'subs-enterprise': return 'For Enterprise'
+    case 'csp': return 'CSP Compliance Pack'
   }
 }
 
@@ -245,7 +272,12 @@ export default function AdminTestCheckoutPage() {
         className="flex items-center gap-3 py-3 border-b border-neutral-800 last:border-0"
       >
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-neutral-100 truncate">{product.label}</p>
+          <p className="text-sm font-medium text-neutral-100 truncate">
+            {productName(product)}
+            {productPrice(product) && (
+              <span className="ml-2 text-emerald-300 font-semibold">{productPrice(product)}</span>
+            )}
+          </p>
           <p className="text-xs text-neutral-500 font-mono truncate">{product.product_type}</p>
         </div>
         <button
@@ -499,6 +531,12 @@ export default function AdminTestCheckoutPage() {
         </Section>
       </SectionGroup>
 
+      <SectionGroup title="CSP Compliance Pack">
+        <Section title="For CSPs">
+          {PRODUCT_CATALOG.filter(p => p.section === 'csp').map(renderRow)}
+        </Section>
+      </SectionGroup>
+
       <SectionGroup title="Recent Simulations">
         <Section title="Last 10">
         {history.length === 0 ? (
@@ -537,7 +575,12 @@ export default function AdminTestCheckoutPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-neutral-900 border border-neutral-700 rounded-lg max-w-md w-full">
             <div className="flex items-center justify-between p-4 border-b border-neutral-700">
-              <h3 className="text-base font-semibold text-neutral-100">{dialogProduct.label}</h3>
+              <h3 className="text-base font-semibold text-neutral-100">
+                {productName(dialogProduct)}
+                {productPrice(dialogProduct) && (
+                  <span className="ml-2 text-sm text-emerald-300 font-semibold">{productPrice(dialogProduct)}</span>
+                )}
+              </h3>
               <button
                 type="button"
                 onClick={closeDialog}

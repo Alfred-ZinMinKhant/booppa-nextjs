@@ -28,7 +28,7 @@ function loadingCopyFor(pt: string | undefined): { headline: string; detail: str
   if (pt === 'compliance_evidence_pack') {
     return {
       headline: 'Securing your Compliance Evidence Pack',
-      detail: 'Once verified, you’ll start your 7-document Evidence Pack intake and submit a short RFP brief. Your PDPA Quick Scan runs in parallel; everything feeds your regulator-ready Cover Sheet.',
+      detail: 'Once verified, you’ll start your 7-document Evidence Pack intake and submit a short RFP brief. Your PDPA Snapshot runs in parallel; everything feeds your regulator-ready Cover Sheet.',
     };
   }
   if (pt === 'rfp_accelerator' || pt === 'enterprise_bid_kit') {
@@ -253,23 +253,23 @@ export default function VerifyPayment({ sessionId, product: productProp }: { ses
                           : isBundle
                             ? (productType === 'compliance_evidence_pack'
                                 ? ((evidencePackIntakeId || pendingRfpIntakeId)
-                                    ? `Your Compliance Evidence Pack is activated — your PDPA Quick Scan is running now. ${
+                                    ? `Your Compliance Evidence Pack is activated — your PDPA Snapshot is running now. ${
                                         evidencePackIntakeId && pendingRfpIntakeId
                                           ? 'Start your 7-document Evidence Pack intake and complete a short RFP brief below'
                                           : evidencePackIntakeId
                                             ? 'Start your 7-document Evidence Pack intake below'
                                             : 'Complete a short RFP brief below'
                                       } — everything feeds your regulator-ready Cover Sheet. We have also emailed you these links.`
-                                    : 'Your Compliance Evidence Pack is activated — your 7 governance documents, PDPA Quick Scan, and RFP Complete Kit are being prepared. We will email each deliverable plus your regulator-ready Cover Sheet shortly.')
+                                    : 'Your Compliance Evidence Pack is activated — your 7 governance documents, PDPA Snapshot, and RFP Complete Kit are being prepared. We will email each deliverable plus your regulator-ready Cover Sheet shortly.')
                                 : productType === 'enterprise_bid_kit'
                                   ? (pendingRfpIntakeId
-                                      ? 'Your Enterprise Bid Kit is activated — Vendor Proof and PDPA Quick Scan are running now. Tell us about your RFP to generate the Complete Kit, then notarize your 7 included documents.'
-                                      : 'Your Enterprise Bid Kit is activated — Vendor Proof, PDPA Quick Scan, and RFP Complete are running now. Click below to notarize your 7 included bundle documents.')
+                                      ? 'Your Enterprise Bid Kit is activated — Vendor Proof and PDPA Snapshot are running now. Tell us about your RFP to generate the Complete Kit, then notarize your 7 included documents.'
+                                      : 'Your Enterprise Bid Kit is activated — Vendor Proof, PDPA Snapshot, and RFP Complete are running now. Click below to notarize your 7 included bundle documents.')
                                   : productType === 'rfp_accelerator'
                                     ? (pendingRfpIntakeId
-                                        ? 'Your RFP Accelerator is activated — Vendor Proof and PDPA Quick Scan are running now. Tell us about your RFP to generate the Express Kit, then notarize your 2 included documents.'
-                                        : 'Your RFP Accelerator is activated — Vendor Proof, PDPA Quick Scan, and RFP Express are running now. Click below to notarize your 2 included bundle documents.')
-                                    : 'Your Vendor Trust Pack is activated — Vendor Proof and PDPA Quick Scan are running now. Click below to notarize your 2 included bundle documents.')
+                                        ? 'Your RFP Accelerator is activated — Vendor Proof and PDPA Snapshot are running now. Tell us about your RFP to generate the Express Kit, then notarize your 2 included documents.'
+                                        : 'Your RFP Accelerator is activated — Vendor Proof, PDPA Snapshot, and RFP Express are running now. Click below to notarize your 2 included bundle documents.')
+                                    : 'Your Vendor Trust Pack is activated — Vendor Proof and PDPA Snapshot are running now. Click below to notarize your 2 included bundle documents.')
                             : isEnterprise || isCompliance
                               ? 'Your Enterprise workspace has been activated. Details have been sent to your email.'
                               : 'A confirmation and your deliverables will be sent to your email shortly.'}

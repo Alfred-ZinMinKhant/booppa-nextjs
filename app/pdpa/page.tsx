@@ -145,7 +145,7 @@ export default function PDPAPage() {
 					{/* Scan Form */}
 					<div className="bg-white p-8 lg:p-12 rounded-3xl shadow-xl border border-[#e2e8f0] mb-12">
 						<h2 className="text-2xl font-bold mb-8 text-[#0f172a]">
-							Run Instant Scan — SGD 79
+							Run Instant Scan — SGD 299
 						</h2>
 
 						<form onSubmit={handleSubmit} className="space-y-6">
@@ -245,7 +245,7 @@ export default function PDPAPage() {
 							>
 								{isLoading
 									? "Processing..."
-									: "Run Scan — Pay SGD 79 (Stripe Checkout)"}
+									: "Run Scan — Pay SGD 299 (Stripe Checkout)"}
 							</button>
 
 							<p className="text-center text-[#94a3b8] text-xs mt-4">
@@ -273,7 +273,7 @@ export default function PDPAPage() {
 							</h3>
 							<p className="text-sm text-[#475569] mb-3">
 								Instead of a one-off scan, get{" "}
-								<strong>monthly automatic re-scans</strong> (SGD 79 value
+								<strong>monthly automatic re-scans</strong> (SGD 299 value
 								each), monthly PDPC regulatory alerts, and a running compliance
 								score chart — continuous evidence for buyers and regulators.
 							</p>

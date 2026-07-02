@@ -44,6 +44,7 @@ const NAV: { group: string; items: { href: string; label: string; icon: any }[] 
     group: 'QA',
     items: [
       { href: '/admin/test-checkout', label: 'Test Checkout', icon: FlaskConical },
+      { href: '/admin/pdpa-bulk-scan', label: 'PDPA Bulk Scan', icon: FlaskConical },
       { href: '/admin/validation-matrix', label: 'Validation Matrix', icon: FlaskConical },
     ],
   },

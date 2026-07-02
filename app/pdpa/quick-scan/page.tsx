@@ -17,7 +17,7 @@ export default function QuickScanPage() {
     e.preventDefault();
     const normalizedUrl = normalizeUrl(website);
     if (!normalizedUrl) {
-      alert("Website is required for the Quick Scan");
+      alert("Website is required for the Snapshot");
       return;
     }
     if (!email.trim()) {
@@ -63,8 +63,8 @@ export default function QuickScanPage() {
   return (
     <main className="min-h-[60vh] flex items-center justify-center p-6">
       <div className="w-full max-w-xl bg-gray-900 rounded-xl p-8">
-        <h1 className="text-2xl font-bold mb-4">PDPA Quick Scan</h1>
-        <p className="text-gray-400 mb-6">Provide your website and contact details to start a one-time PDPA quick scan (SGD 79).</p>
+        <h1 className="text-2xl font-bold mb-4">PDPA Snapshot</h1>
+        <p className="text-gray-400 mb-6">Provide your website and contact details to start a one-time PDPA Snapshot scan (SGD 299).</p>
 
         <form onSubmit={handleSubmit}>
           <label className="block text-sm text-gray-300 mb-1">Website URL</label>
@@ -82,7 +82,7 @@ export default function QuickScanPage() {
 
           <div className="flex justify-end">
             <button type="submit" className="px-4 py-2 rounded bg-green-500 text-white disabled:opacity-40 disabled:cursor-not-allowed" disabled={loading || !consentValid}>
-              {loading ? 'Starting...' : 'Start Quick Scan & Checkout'}
+              {loading ? 'Starting...' : 'Start Snapshot & Checkout'}
             </button>
           </div>
         </form>

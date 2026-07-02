@@ -128,7 +128,7 @@ export default function ReportPreview() {
 				<div className="mt-12 text-center">
 					<p className="text-[#64748b] mb-6 font-medium">Want your own audit-ready report?</p>
 					<Link href="/pdpa" className="btn btn-primary px-10 py-4 text-lg font-black">
-						Get your report — SGD 79
+						Get your report — SGD 299
 					</Link>
 				</div>
 			</div>

@@ -165,7 +165,7 @@ export default function PdpaDeclarationSection() {
           </div>
           <p className="text-xs text-slate-600 mb-3">
             Your Level-2 self-declaration is part of your PDPA evidence trail: a tamper-evident,
-            blockchain-anchored record alongside your Quick Scan (Level 1).
+            blockchain-anchored record alongside your Snapshot (Level 1).
           </p>
           <div className="flex flex-wrap gap-2">
             {status.download_url && (
@@ -203,7 +203,7 @@ export default function PdpaDeclarationSection() {
       <div>
         <h3 className="font-bold text-[#0f172a] text-sm">Upgrade to PDPC Level 2 — Self-Declaration</h3>
         <p className="text-xs text-slate-500 mt-1">
-          Your Quick Scan covers Level 1 (automated). Declare your processing activities and
+          Your Snapshot covers Level 1 (automated). Declare your processing activities and
           accountability measures below to produce a blockchain-anchored PDPC Level 2 record.
         </p>
       </div>

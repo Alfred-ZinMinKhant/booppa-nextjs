@@ -43,8 +43,8 @@ const FAQS: QA[] = [
     a: 'No. BOOPPA does not use customer personal data for AI training. The platform applies strict data minimization, processing only what is required for compliance documentation. AI is used solely to generate audit narratives and summaries from structured findings.',
   },
   {
-    q: 'What is the difference between PDPA Quick Scan and PDPA subscriptions?',
-    a: 'PDPA Quick Scan is a one-time compliance assessment with one-time notarized evidence. PDPA Subscriptions (Basic / Pro) provide continuous monitoring, automated consent logging, ongoing evidence generation, dashboards and exports, and operational compliance tooling.',
+    q: 'What is the difference between PDPA Snapshot and PDPA subscriptions?',
+    a: 'PDPA Snapshot is a one-time compliance assessment with one-time notarized evidence. PDPA Subscriptions (Basic / Pro) provide continuous monitoring, automated consent logging, ongoing evidence generation, dashboards and exports, and operational compliance tooling.',
   },
   {
     q: 'What is Supply Chain / Notarization used for?',

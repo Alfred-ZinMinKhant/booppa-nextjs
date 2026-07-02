@@ -49,7 +49,7 @@ export default function TermsPage() {
               'RFP readiness documentation and tender preparation ("RFP Express" and "RFP Complete")',
               'Procurement analytics and vendor discovery ("Enterprise" and "Enterprise Pro")',
               'Indicative likelihood signal analysis ("Tender Win Probability Calculator" — non-predictive experimental metric)',
-              'Bundled product offerings ("Vendor Trust Pack," "RFP Accelerator," "Enterprise Bid Kit")',
+              'Bundled product offerings ("Vendor Trust Pack," "Compliance Bundle")',
             ].map((s, i) => <Li key={i}>{s}</Li>)}
           </ul>
           <p className="mt-3">Booppa facilitates connections between vendors and procurement buyers but is not a party to any procurement transaction. Booppa does not guarantee that any User will win any tender, contract, or procurement opportunity.</p>

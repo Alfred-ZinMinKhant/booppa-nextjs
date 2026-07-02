@@ -2,6 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ONE_TIME_PRODUCTS, SUBSCRIPTION_PRODUCTS, BUNDLE_PRODUCTS } from '@/lib/pricing';
+import { startCheckout } from '@/lib/checkout';
+
+// Bundles that include a PDPA Snapshot / Vendor Proof need the buyer's website
+// + company name up front, so they route through a modal instead of a direct
+// checkout (same treatment as /pricing).
+const BUNDLE_TYPES = new Set(['vendor_trust_pack', 'compliance_evidence_pack']);
 
 function CheckItem({ text, color = 'text-[#10b981]' }: { text: string; color?: string }) {
   return (
@@ -10,24 +17,6 @@ function CheckItem({ text, color = 'text-[#10b981]' }: { text: string; color?: s
       <span>{text}</span>
     </li>
   );
-}
-
-async function startCheckout(productType: string): Promise<void> {
-  try {
-    const res = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productType }),
-    });
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      alert(data.error || 'Unable to start checkout. Please try again.');
-    }
-  } catch {
-    alert('Unable to start checkout. Please try again.');
-  }
 }
 
 const JOURNEY_STEPS = [
@@ -49,6 +38,9 @@ export default function SolutionsVendorsPage() {
   const [stats, setStats] = useState({ vendorsIndexed: 0, verifiedEntities: 0, openTenders: 0 });
   const [loggedIn, setLoggedIn] = useState(false);
   const [billingTab, setBillingTab] = useState<'one-time' | 'subscription'>('one-time');
+  const [bundleModal, setBundleModal] = useState<{ productType: string } | null>(null);
+  const [bundleForm, setBundleForm] = useState({ website: '', company: '' });
+  const [bundleError, setBundleError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -72,8 +64,44 @@ export default function SolutionsVendorsPage() {
         window.location.href = "/login?from=/solutions/vendors";
         return;
     }
+    if (BUNDLE_TYPES.has(productType)) {
+      try {
+        const meRes = await fetch('/api/auth/me');
+        if (meRes.ok) {
+          const me = await meRes.json();
+          setBundleForm({
+            website: me?.website || me?.vendor_url || '',
+            company: me?.company_name || me?.company || '',
+          });
+        }
+      } catch {}
+      setBundleError(null);
+      setBundleModal({ productType });
+      return;
+    }
     setLoadingProduct(productType);
     await startCheckout(productType);
+    setLoadingProduct(null);
+  }
+
+  async function submitBundleForm() {
+    if (!bundleModal) return;
+    let website = bundleForm.website.trim();
+    const company = bundleForm.company.trim();
+    if (!website) { setBundleError('Website URL is required.'); return; }
+    if (!company) { setBundleError('Company name is required.'); return; }
+    if (!/^https?:\/\//i.test(website)) website = `https://${website}`;
+    try {
+      const u = new URL(website);
+      if (!u.hostname.includes('.')) throw new Error('invalid host');
+    } catch {
+      setBundleError('Please enter a valid website (e.g. yourcompany.com).');
+      return;
+    }
+    const productType = bundleModal.productType;
+    setLoadingProduct(productType);
+    setBundleModal(null);
+    await startCheckout(productType, { vendor_url: website, company_name: company });
     setLoadingProduct(null);
   }
 
@@ -182,7 +210,7 @@ export default function SolutionsVendorsPage() {
               {/* Vendor Proof */}
               <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">RFP Complete</h3>
-                <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 599</div>
+                <div className="text-4xl font-black text-[#0f172a] mb-1">SGD {ONE_TIME_PRODUCTS.rfp_complete.price}</div>
                 <p className="text-xs text-[#64748b] mb-6">Per RFP · Compliance &amp; security answers</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Full compliance dossier (15 Q&A)", "PDF + editable DOCX deliverable", "Generated in under 2 minutes", "Answers verified against ACRA, PDPC, SSL, GeBIZ"].map(f => <CheckItem key={f} text={f} color="text-[#10b981]" />)}
@@ -200,7 +228,7 @@ export default function SolutionsVendorsPage() {
               <div className="bg-white p-8 rounded-[2.5rem] border-2 border-blue-500 shadow-xl relative flex flex-col">
                 <div className="absolute top-[-14px] left-8 bg-blue-600 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Best Value</div>
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">Compliance Bundle</h3>
-                <div className="text-4xl font-black text-blue-600 mb-1">SGD 799</div>
+                <div className="text-4xl font-black text-blue-600 mb-1">SGD {BUNDLE_PRODUCTS.compliance_evidence_pack.price}</div>
                 <p className="text-xs text-[#64748b] mb-6">One-time bundle · <span className="text-blue-600 font-bold">Save over SGD 300</span></p>
                 <p className="text-sm text-[#475569] mb-6 leading-relaxed">The ultimate foundation for winning large-scale enterprise and government contracts — a full PDPA governance set grounded in a live scan of your site.</p>
                 <ul className="space-y-3 mb-8 flex-1">
@@ -218,7 +246,7 @@ export default function SolutionsVendorsPage() {
               {/* PDPA Snapshot */}
               <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
                 <h3 className="text-xl font-bold text-[#0f172a] mb-2">PDPA Snapshot</h3>
-                <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 299</div>
+                <div className="text-4xl font-black text-[#0f172a] mb-1">SGD {ONE_TIME_PRODUCTS.pdpa_quick_scan.price}</div>
                 <p className="text-xs text-[#64748b] mb-6">One-time scan · Full risk report</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["11-dimension PDPA scan", "Risk severity breakdown", "PDPC enforcement precedents per finding", "Remediation guide", "Audit-ready PDF report"].map(f => <CheckItem key={f} text={f} color="text-blue-500" />)}
@@ -235,7 +263,7 @@ export default function SolutionsVendorsPage() {
               {/* Vendor Proof */}
               <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
                 <h3 className="text-xl font-bold text-[#0f172a] mb-2">Vendor Proof</h3>
-                <div className="text-4xl font-black text-[#10b981] mb-1">SGD 149</div>
+                <div className="text-4xl font-black text-[#10b981] mb-1">SGD {ONE_TIME_PRODUCTS.vendor_proof.price}</div>
                 <p className="text-xs text-[#64748b] mb-6">One-time payment · Lifetime verified badge</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Verified badge on profile", "Appear in verified searches", "Trust scores activation", "Embeddable trust badge"].map(f => <CheckItem key={f} text={f} />)}
@@ -243,6 +271,26 @@ export default function SolutionsVendorsPage() {
                 <Link href="/vendor-proof" className="block w-full text-center bg-[#10b981] text-white font-bold py-3.5 rounded-xl hover:bg-[#059669] transition shadow-lg">
                   Get Verified →
                 </Link>
+              </div>
+
+              {/* Vendor Trust Pack */}
+              <div className="bg-white p-8 rounded-[2.5rem] border-2 border-[#10b981] shadow-xl relative flex flex-col">
+                {BUNDLE_PRODUCTS.vendor_trust_pack.badge && (
+                  <div className="absolute top-[-14px] left-8 bg-[#10b981] text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{BUNDLE_PRODUCTS.vendor_trust_pack.badge}</div>
+                )}
+                <h3 className="text-xl font-bold text-[#0f172a] mb-1">{BUNDLE_PRODUCTS.vendor_trust_pack.name}</h3>
+                <div className="text-4xl font-black text-[#10b981] mb-1">SGD {BUNDLE_PRODUCTS.vendor_trust_pack.price}</div>
+                <p className="text-xs text-[#64748b] mb-6">One-time bundle · your complete trust foundation</p>
+                <ul className="space-y-3 mb-8 flex-1">
+                  {BUNDLE_PRODUCTS.vendor_trust_pack.features.map(f => <CheckItem key={f} text={f} color="text-[#10b981]" />)}
+                </ul>
+                <button
+                  disabled={loadingProduct === "vendor_trust_pack"}
+                  onClick={() => handleCheckout("vendor_trust_pack")}
+                  className="w-full bg-[#10b981] text-white font-bold py-3.5 rounded-xl hover:bg-[#059669] transition shadow-lg shadow-[#10b981]/20 disabled:opacity-50"
+                >
+                  {loadingProduct === "vendor_trust_pack" ? "Redirecting..." : "Get Trust Pack →"}
+                </button>
               </div>
             </div>
           </div>
@@ -259,7 +307,7 @@ export default function SolutionsVendorsPage() {
               {/* Vendor Active */}
               <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm flex flex-col">
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">Vendor Active</h3>
-                <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 39<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                <div className="text-4xl font-black text-[#0f172a] mb-1">SGD {SUBSCRIPTION_PRODUCTS.vendor_active_monthly.price}<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
                 <p className="text-xs text-[#64748b] mb-6">Your monthly procurement intelligence layer</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Monthly intelligence report — emailed branded PDF", "Personalized tender matches (BID / WATCH / PASS)", "Sector benchmark + Trust-score trend", "Priority placement & Active badge", "Unlimited win-probability checks"].map(f => <CheckItem key={f} text={f} />)}
@@ -277,7 +325,7 @@ export default function SolutionsVendorsPage() {
               <div className="bg-white p-8 rounded-[2rem] border-2 border-violet-500 shadow-md relative flex flex-col">
                 <div className="absolute top-[-14px] left-8 bg-violet-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">New</div>
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">Vendor Pro</h3>
-                <div className="text-4xl font-black text-violet-600 mb-1">SGD 99<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                <div className="text-4xl font-black text-violet-600 mb-1">SGD {SUBSCRIPTION_PRODUCTS.vendor_pro_monthly.price}<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
                 <p className="text-xs text-[#64748b] mb-6">Full procurement intelligence for growing vendors</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {[
@@ -304,7 +352,7 @@ export default function SolutionsVendorsPage() {
                   onClick={() => handleCheckout("vendor_pro_annual")}
                   className="w-full mt-2 border border-violet-500 text-violet-600 font-semibold py-2 rounded-xl hover:bg-violet-50 transition disabled:opacity-50 text-sm"
                 >
-                  {loadingProduct === "vendor_pro_annual" ? "Redirecting..." : "Annual SGD 1,099 · save 2 mo"}
+                  {loadingProduct === "vendor_pro_annual" ? "Redirecting..." : `Annual SGD ${SUBSCRIPTION_PRODUCTS.vendor_pro_annual.price.toLocaleString()} · save 2 mo`}
                 </button>
               </div>
 
@@ -312,7 +360,7 @@ export default function SolutionsVendorsPage() {
               <div className="bg-white p-8 rounded-[2rem] border-2 border-blue-500 shadow-md relative flex flex-col">
                 <div className="absolute top-[-14px] left-8 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Recommended</div>
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">PDPA Monitor</h3>
-                <div className="text-4xl font-black text-blue-600 mb-1">SGD 299<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                <div className="text-4xl font-black text-blue-600 mb-1">SGD {SUBSCRIPTION_PRODUCTS.pdpa_monitor_monthly.price}<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
                 <p className="text-xs text-[#64748b] mb-6">Automated data protection compliance</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Monthly automated scans", "Continuous risk monitoring", "Drift alerts & notifications", "Updated audit logs"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
@@ -330,7 +378,7 @@ export default function SolutionsVendorsPage() {
               {/* Compliance Evidence */}
               <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm flex flex-col">
                 <h3 className="text-xl font-bold text-[#0f172a] mb-1">Compliance Evidence</h3>
-                <div className="text-4xl font-black text-[#0f172a] mb-1">SGD 499<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                <div className="text-4xl font-black text-[#0f172a] mb-1">SGD {SUBSCRIPTION_PRODUCTS.compliance_evidence_monthly.price}<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
                 <p className="text-xs text-[#64748b] mb-6">Automated evidence & bid readiness</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["All-in-one PDF/Docs evidence", "PDPA + RFP data coverage", "Blockchain-anchored cover sheets", "Priority procurement support"].map(f => <CheckItem key={f} text={f} color="text-violet-500" />)}
@@ -356,8 +404,8 @@ export default function SolutionsVendorsPage() {
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-[#0f172a] mb-1">Tender Intelligence</h3>
                   <div className="flex items-baseline gap-3 mb-1">
-                    <div className="text-4xl font-black text-violet-600">SGD 149<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
-                    <div className="text-sm text-[#64748b]">or SGD 1,499/yr · save SGD 289</div>
+                    <div className="text-4xl font-black text-violet-600">SGD {SUBSCRIPTION_PRODUCTS.tender_intelligence_monthly.price}<span className="text-lg text-[#64748b] font-normal">/mo</span></div>
+                    <div className="text-sm text-[#64748b]">or SGD {SUBSCRIPTION_PRODUCTS.tender_intelligence_annual.price.toLocaleString()}/yr · save SGD 289</div>
                   </div>
                   <p className="text-xs text-[#64748b] mb-6">Win the right bids — GeBIZ tender analytics in one subscription</p>
                   <ul className="space-y-3 mb-2">
@@ -406,6 +454,59 @@ export default function SolutionsVendorsPage() {
           </Link>
         </div>
       </section>
+
+      {bundleModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => setBundleModal(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-black text-[#0f172a] mb-2">Activate your bundle</h3>
+            <p className="text-sm text-[#64748b] mb-6 leading-relaxed">
+              We need your website URL and company name so the included PDPA Snapshot and Vendor Proof can run on the right entity.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Website URL</label>
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="yourcompany.com"
+                  value={bundleForm.website}
+                  onChange={(e) => setBundleForm((f) => ({ ...f, website: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Company name</label>
+                <input
+                  type="text"
+                  placeholder="As it should appear on your reports"
+                  value={bundleForm.company}
+                  onChange={(e) => setBundleForm((f) => ({ ...f, company: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
+                />
+              </div>
+              {bundleError && (
+                <p className="text-sm text-red-600 font-semibold">{bundleError}</p>
+              )}
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setBundleModal(null)}
+                className="flex-1 py-3 rounded-xl border-2 border-[#e2e8f0] text-[#475569] font-bold text-sm hover:bg-[#f8fafc] transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={submitBundleForm}
+                className="flex-1 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-bold text-sm shadow-lg shadow-[#10b981]/20 transition"
+              >
+                Continue to checkout →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </main>
   );

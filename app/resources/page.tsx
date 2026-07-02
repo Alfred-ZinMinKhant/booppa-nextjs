@@ -165,7 +165,7 @@ const tools = [
 		cta: "Verify Document →",
 	},
 	{
-		title: "PDPA Quick Scan",
+		title: "PDPA Snapshot",
 		desc: "Run a 5-minute PDPA compliance check on your website.",
 		href: "/pdpa",
 		cta: "Start Scan →",

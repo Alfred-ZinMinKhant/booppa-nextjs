@@ -39,7 +39,7 @@ const FAQ_BY_TAB: Record<Tab, Faq[]> = {
 		},
 		{
 			q: "When does Strategy 6 fire?",
-			a: "Strategy 6 fires automatically when RFP Express is purchased (standalone or as part of the RFP Accelerator bundle). It does not fire for RFP Complete — that is a vendor-side credibility tool, not a lead generation mechanism.",
+			a: "Strategy 6 fires automatically when RFP Express is purchased. It does not fire for RFP Complete — that is a vendor-side credibility tool, not a lead generation mechanism.",
 		},
 		{
 			q: "What's the difference between a one-time scan and monthly monitoring?",
@@ -111,8 +111,6 @@ function CheckItem({
 
 const BUNDLE_TYPES = new Set([
 	"vendor_trust_pack",
-	"rfp_accelerator",
-	"enterprise_bid_kit",
 	"compliance_evidence_pack",
 ]);
 
@@ -633,9 +631,9 @@ export default function PricingPage() {
 							</div>
 
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-								{/* PDPA Quick Scan */}
+								{/* PDPA Snapshot */}
 								<div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
-									<h3 className="text-xl font-bold text-[#0f172a] mb-2">PDPA Quick Scan</h3>
+									<h3 className="text-xl font-bold text-[#0f172a] mb-2">PDPA Snapshot</h3>
 									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 299</div>
 									<p className="text-xs text-[#64748b] mb-6">one-time payment</p>
 									<ul className="space-y-3 mb-8 flex-1">
@@ -669,7 +667,7 @@ export default function PricingPage() {
 												scope: "DPMP, ROPA, Data Inventory, Vendor/DPA Register, Breach Runbook, Training Register, and Security Review Log — AI-drafted from your intake and grounded in a live website + PDPA scan, each anchored. Review & sign before evidentiary use.",
 											},
 											{
-												label: "PDPA Quick Scan included",
+												label: "PDPA Snapshot included",
 												scope: "Privacy policy + DPO contact + cookie consent + breach notification scan. Findings across PDPA's 7 obligations.",
 											},
 											{
@@ -958,7 +956,7 @@ export default function PricingPage() {
 					<div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
 						<h3 className="text-xl font-black text-[#0f172a] mb-2">Activate your bundle</h3>
 						<p className="text-sm text-[#64748b] mb-6 leading-relaxed">
-							We need your website URL and company name so the included PDPA Quick Scan and Vendor Proof can run on the right entity.
+							We need your website URL and company name so the included PDPA Snapshot and Vendor Proof can run on the right entity.
 						</p>
 						<div className="space-y-4">
 							<div>
