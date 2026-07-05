@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 
 export default function ReportPreviewTop() {
 	return (
@@ -49,12 +48,14 @@ export default function ReportPreviewTop() {
 								<div className="w-12 h-16 bg-white rounded border flex items-center justify-center text-sm text-gray-400">
 									PDF
 								</div>
-								<Link
-									href="/api/mock/report"
+								<a
+									href="/sample-report.pdf"
+									target="_blank"
+									rel="noopener noreferrer"
 									className="text-sm bg-blue-600 text-white px-3 py-2 rounded"
 								>
 									Download sample PDF
-								</Link>
+								</a>
 							</div>
 						</div>
 					</div>
