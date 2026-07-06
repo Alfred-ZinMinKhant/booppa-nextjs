@@ -127,7 +127,7 @@ export const ONE_TIME_PRODUCTS: Record<string, Product> = {
       'Full compliance dossier (15 Q&A)',
       'PDF + editable DOCX deliverable',
       'Generated in under 2 minutes',
-      'Answers verified against ACRA, PDPC, SSL, GeBIZ',
+      'Each answer badged Verified (ACRA, PDPC, SSL, GeBIZ) where evidence exists',
       'Blockchain-anchored on Polygon',
       'COMPLETE evidence package tier',
     ],

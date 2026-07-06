@@ -32,6 +32,12 @@ interface IntakeFields {
   sector: string;
   uen: string;
   description: string;
+  // Tender personalization — identify the specific tender this kit is for so the
+  // generated PDF/DOCX attributes itself ("Prepared in response to …"). Optional;
+  // best pre-filled from an uploaded tender PDF, editable by the buyer.
+  tender_ref: string;
+  tender_agency: string;
+  tender_title: string;
   dpo_appointed: 'yes' | 'no' | 'unknown';
   dpo_name: string;
   dpo_email: string;
@@ -71,6 +77,9 @@ const EMPTY: IntakeFields = {
   rfp_description: '',
   sector: '',
   uen: '',
+  tender_ref: '',
+  tender_agency: '',
+  tender_title: '',
   description: '',
   dpo_appointed: 'unknown',
   dpo_name: '',
@@ -287,6 +296,13 @@ export default function RfpIntakePage() {
       }
       if (typeof sx.sector === 'string' && sx.sector.trim() && sx.sector !== 'unknown') {
         patch.sector = String(sx.sector).trim();
+      }
+      // Tender identifiers — pre-fill so the kit personalizes to this tender.
+      for (const tf of ['tender_ref', 'tender_agency', 'tender_title'] as const) {
+        const val = sx[tf];
+        if (typeof val === 'string' && val.trim() && val !== 'unknown') {
+          patch[tf] = val.trim();
+        }
       }
       const iso = String(sx.iso_status || 'unknown');
       if (['certified', 'pursuing', 'none', 'unknown'].includes(iso) && iso !== 'unknown') {
@@ -573,6 +589,60 @@ export default function RfpIntakePage() {
               placeholder="e.g. Cloud-based HR system for a 50-person team, SG residency required, ISO 27001 preferred."
               className="w-full px-3 py-2 border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-[#0ea5e9]"
             />
+          </div>
+
+          {/* Tender personalization — identify the specific tender so the kit
+              reads "Prepared in response to Tender … issued by …". Optional;
+              auto-filled from the tender PDF above when present. */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-semibold text-[#0f172a] mb-1">
+                Which tender is this for? (optional)
+              </label>
+              <p className="text-xs text-[#64748b] mb-2">
+                Add the tender reference and agency and your kit will be personalized —
+                &ldquo;Prepared in response to Tender&nbsp;… issued by&nbsp;…&rdquo;.
+              </p>
+            </div>
+            <div>
+              <label htmlFor="tender_ref" className="block text-xs font-semibold text-[#475569] mb-1">
+                Tender reference no.
+              </label>
+              <input
+                id="tender_ref"
+                type="text"
+                value={form.tender_ref}
+                onChange={(e) => setForm({ ...form, tender_ref: e.target.value })}
+                placeholder="e.g. GEBIZ/2026/T012"
+                className="w-full px-3 py-2 border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-[#0ea5e9]"
+              />
+            </div>
+            <div>
+              <label htmlFor="tender_agency" className="block text-xs font-semibold text-[#475569] mb-1">
+                Issuing agency
+              </label>
+              <input
+                id="tender_agency"
+                type="text"
+                value={form.tender_agency}
+                onChange={(e) => setForm({ ...form, tender_agency: e.target.value })}
+                placeholder="e.g. Ministry of Digital Development"
+                className="w-full px-3 py-2 border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-[#0ea5e9]"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="tender_title" className="block text-xs font-semibold text-[#475569] mb-1">
+                Tender title
+              </label>
+              <input
+                id="tender_title"
+                type="text"
+                value={form.tender_title}
+                onChange={(e) => setForm({ ...form, tender_title: e.target.value })}
+                placeholder="e.g. Cloud HR Platform for the Public Service"
+                className="w-full px-3 py-2 border border-[#cbd5e1] rounded-lg focus:outline-none focus:border-[#0ea5e9]"
+              />
+            </div>
           </div>
 
           <div>

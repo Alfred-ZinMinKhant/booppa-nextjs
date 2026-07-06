@@ -213,7 +213,7 @@ export default function SolutionsVendorsPage() {
                 <div className="text-4xl font-black text-[#0f172a] mb-1">SGD {ONE_TIME_PRODUCTS.rfp_complete.price}</div>
                 <p className="text-xs text-[#64748b] mb-6">Per RFP · Compliance &amp; security answers</p>
                 <ul className="space-y-3 mb-8 flex-1">
-                  {["Full compliance dossier (15 Q&A)", "PDF + editable DOCX deliverable", "Generated in under 2 minutes", "Answers verified against ACRA, PDPC, SSL, GeBIZ"].map(f => <CheckItem key={f} text={f} color="text-[#10b981]" />)}
+                  {["Full compliance dossier (15 Q&A)", "PDF + editable DOCX deliverable", "Generated in under 2 minutes", "Each answer badged Verified (ACRA, PDPC, SSL, GeBIZ) where evidence exists"].map(f => <CheckItem key={f} text={f} color="text-[#10b981]" />)}
                 </ul>
                 <button 
                   disabled={loadingProduct === "rfp_complete"}
@@ -264,7 +264,7 @@ export default function SolutionsVendorsPage() {
               <div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
                 <h3 className="text-xl font-bold text-[#0f172a] mb-2">Vendor Proof</h3>
                 <div className="text-4xl font-black text-[#10b981] mb-1">SGD {ONE_TIME_PRODUCTS.vendor_proof.price}</div>
-                <p className="text-xs text-[#64748b] mb-6">One-time payment · Lifetime verified badge</p>
+                <p className="text-xs text-[#64748b] mb-6">One-time payment · Verified badge, renewed annually</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Verified badge on profile", "Appear in verified searches", "Trust scores activation", "Embeddable trust badge"].map(f => <CheckItem key={f} text={f} />)}
                 </ul>
