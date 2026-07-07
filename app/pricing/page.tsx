@@ -292,7 +292,7 @@ export default function PricingPage() {
 									<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
 										<h3 className="text-xl font-bold text-[#0f172a] mb-2">Vendor Proof</h3>
 										<div className="text-4xl font-black text-[#10b981] mb-1">SGD 149</div>
-										<p className="text-xs text-[#64748b] mb-6">One-time payment · Verified badge, renewed annually</p>
+										<p className="text-xs text-[#64748b] mb-6">One-time payment · Lifetime badge, renewed annually</p>
 										<ul className="space-y-3 mb-8 flex-1">
 											{["Verified badge on profile", "Appear in verified searches", "Trust scores activation", "Embeddable trust badge"].map(f => <CheckItem key={f} text={f} />)}
 										</ul>
@@ -301,9 +301,9 @@ export default function PricingPage() {
 										</Link>
 									</div>
 
-									{/* PDPA Snapshot */}
+									{/* PDPA Quick Scan */}
 									<div className="bg-white p-8 rounded-[2rem] border border-[#e2e8f0] shadow-sm hover:-translate-y-1 transition-all flex flex-col">
-										<h3 className="text-xl font-bold text-[#0f172a] mb-2">PDPA Snapshot</h3>
+										<h3 className="text-xl font-bold text-[#0f172a] mb-2">PDPA Quick Scan</h3>
 										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 299</div>
 										<p className="text-xs text-[#64748b] mb-6">One-time scan · Full risk report</p>
 										<ul className="space-y-3 mb-8 flex-1">
@@ -324,7 +324,7 @@ export default function PricingPage() {
 										<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 599</div>
 										<p className="text-xs text-[#64748b] mb-6">Per RFP · Compliance &amp; security answers</p>
 										<ul className="space-y-3 mb-8 flex-1">
-											{["Full compliance dossier (15 Q&A)", "PDF + editable DOCX deliverable", "Generated in under 2 minutes", "Each answer badged Verified (ACRA, PDPC, SSL, GeBIZ) where evidence exists"].map(f => <CheckItem key={f} text={f} color="text-amber-500" />)}
+											{["Full compliance dossier (15 Q&A)", "PDF + editable DOCX deliverable", "Generated in under 2 minutes", "Answers verified against ACRA, PDPC, SSL, GeBIZ"].map(f => <CheckItem key={f} text={f} color="text-amber-500" />)}
 										</ul>
 										<button
 											type="button"
@@ -458,7 +458,7 @@ export default function PricingPage() {
 												"Consolidated monthly Intelligence Report (PDF)",
 												"Win-probability tender pipeline",
 												"Sector competitor intelligence",
-												"Quarterly PDPA Snapshot with drift tracking",
+												"Quarterly PDPA Quick Scan with drift tracking",
 												"1 notarization/month (SGD 69 value)",
 												"Priority email support",
 											].map(f => <CheckItem key={f} text={f} color="text-violet-600" />)}
@@ -631,9 +631,9 @@ export default function PricingPage() {
 							</div>
 
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-								{/* PDPA Snapshot */}
+								{/* PDPA Quick Scan */}
 								<div className="bg-white p-8 rounded-[2.5rem] border border-[#e2e8f0] shadow-sm flex flex-col">
-									<h3 className="text-xl font-bold text-[#0f172a] mb-2">PDPA Snapshot</h3>
+									<h3 className="text-xl font-bold text-[#0f172a] mb-2">PDPA Quick Scan</h3>
 									<div className="text-4xl font-black text-[#0f172a] mb-1">SGD 299</div>
 									<p className="text-xs text-[#64748b] mb-6">one-time payment</p>
 									<ul className="space-y-3 mb-8 flex-1">
@@ -667,7 +667,7 @@ export default function PricingPage() {
 												scope: "DPMP, ROPA, Data Inventory, Vendor/DPA Register, Breach Runbook, Training Register, and Security Review Log — AI-drafted from your intake and grounded in a live website + PDPA scan, each anchored. Review & sign before evidentiary use.",
 											},
 											{
-												label: "PDPA Snapshot included",
+												label: "PDPA Quick Scan included",
 												scope: "Privacy policy + DPO contact + cookie consent + breach notification scan. Findings across PDPA's 7 obligations.",
 											},
 											{
@@ -956,7 +956,7 @@ export default function PricingPage() {
 					<div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
 						<h3 className="text-xl font-black text-[#0f172a] mb-2">Activate your bundle</h3>
 						<p className="text-sm text-[#64748b] mb-6 leading-relaxed">
-							We need your website URL and company name so the included PDPA Snapshot and Vendor Proof can run on the right entity.
+							We need your website URL and company name so the included PDPA Quick Scan and Vendor Proof can run on the right entity.
 						</p>
 						<div className="space-y-4">
 							<div>
