@@ -66,8 +66,28 @@ interface DeepScan {
     confidenceScore: number | null;
   };
   activityWindow: { days: number; proofViewsInWindow: number };
+  deepScan: DeepScanBlock | null;
   snapshotHash: string;
   generatedAt: string;
+}
+
+// The real Deep Scan payload (11-dim PDPA + certifications + financial risk).
+// NOTE: camelCase wrapper, but snake_case keys inside each dimension dict.
+interface DeepScanDimension {
+  category: string; // "pdpa" | "certifications" | "financial_risk"
+  dimension_name: string;
+  status: string; // "Compliant" | "Partial" | "Non-Compliant"
+  score: number;
+  detail?: Record<string, unknown>;
+}
+
+interface DeepScanBlock {
+  scanId: string | null;
+  overallPdpaScore: number | null;
+  dimensions: DeepScanDimension[];
+  certifications: DeepScanDimension | null;
+  financialRisk: DeepScanDimension | null;
+  generatedAt: string | null;
 }
 
 interface EvidenceScan {
@@ -153,6 +173,34 @@ function Badge({ label, value }: { label: string; value: string }) {
     <span className={`inline-flex items-center px-2 py-1 rounded-md border text-[10px] font-bold uppercase tracking-widest ${tone(value)}`}>
       {label}: {value.replace(/_/g, " ")}
     </span>
+  );
+}
+
+// Deep Scan dimension status ("Compliant" | "Partial" | "Non-Compliant").
+function statusTone(status: string): string {
+  switch (status) {
+    case "Compliant":
+      return "text-emerald-300 bg-emerald-500/10 border-emerald-500/30";
+    case "Partial":
+      return "text-amber-300 bg-amber-500/10 border-amber-500/30";
+    default:
+      return "text-red-300 bg-red-500/10 border-red-500/30";
+  }
+}
+
+function DimRow({ dim }: { dim: DeepScanDimension }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-2 border-b border-white/5 last:border-0">
+      <span className="text-sm text-white/80">{dim.dimension_name}</span>
+      <div className="flex items-center gap-3 shrink-0">
+        <span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-[10px] font-bold uppercase tracking-widest ${statusTone(dim.status)}`}>
+          {dim.status}
+        </span>
+        <span className="text-xs text-white/50 tabular-nums w-14 text-right">
+          {dim.score}/100
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -388,6 +436,61 @@ export default function VendorDetailPage() {
                   value={deep.activityWindow.proofViewsInWindow.toString()}
                 />
               </div>
+              {deep.deepScan && (
+                <div className="pt-4 border-t border-white/10 space-y-6">
+                  {/* Overall PDPA score + PDF download */}
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div className="flex items-center gap-3">
+                      <Shield className="h-4 w-4 text-emerald-400" />
+                      <div>
+                        <p className="text-[11px] text-white/40">Overall PDPA score</p>
+                        <p className="text-lg font-bold text-white">
+                          {deep.deepScan.overallPdpaScore ?? "—"}
+                          <span className="text-xs font-normal text-white/40">/100</span>
+                        </p>
+                      </div>
+                    </div>
+                    <a
+                      href={`/api/procurement/snapshot/${encodeURIComponent(slug)}/deep-scan.pdf`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-white/15 hover:bg-white/5 text-white/80"
+                    >
+                      <FileText className="h-3.5 w-3.5" /> Download PDF
+                    </a>
+                  </div>
+
+                  {/* 11 PDPA dimensions */}
+                  <div>
+                    <p className="text-[11px] uppercase tracking-widest text-white/40 mb-2">
+                      PDPA dimensions
+                    </p>
+                    <div className="rounded-lg border border-white/10 bg-black/20 px-4">
+                      {deep.deepScan.dimensions
+                        .filter((d) => d.category === "pdpa")
+                        .map((d) => (
+                          <DimRow key={d.dimension_name} dim={d} />
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Certifications + Financial risk */}
+                  {(deep.deepScan.certifications || deep.deepScan.financialRisk) && (
+                    <div>
+                      <p className="text-[11px] uppercase tracking-widest text-white/40 mb-2">
+                        Certifications &amp; financial risk
+                      </p>
+                      <div className="rounded-lg border border-white/10 bg-black/20 px-4">
+                        {deep.deepScan.certifications && (
+                          <DimRow dim={deep.deepScan.certifications} />
+                        )}
+                        {deep.deepScan.financialRisk && (
+                          <DimRow dim={deep.deepScan.financialRisk} />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="pt-4 border-t border-white/10">
                 <p className="text-[11px] text-white/40 mb-1">Snapshot hash (immutable audit fingerprint)</p>
                 <code className="text-[11px] text-emerald-300 font-mono break-all">
