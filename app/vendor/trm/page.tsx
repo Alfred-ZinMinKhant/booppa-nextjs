@@ -148,6 +148,9 @@ export default function TrmPage() {
           <SummaryCard label="High/critical risk" value={String((s.by_risk.high || 0) + (s.by_risk.critical || 0))} hint="from AI analysis" tone={gapsAndHighRisk ? 'warn' : 'good'} />
         </div>
 
+        {/* MAS TRM Baseline — the starting-inventory PDF generated on Suite activation */}
+        <BaselineReportCard />
+
         {/* Board-ready monthly report — download latest or generate on demand */}
         <BoardReportCard />
 
@@ -361,7 +364,7 @@ function ProFeaturesCard() {
   const features = [
     { title: 'Multi-entity comparison', desc: 'Group-wide MAS TRM rollup across subsidiaries.', href: '/vendor/subsidiaries' },
     { title: 'Single sign-on (SSO)', desc: 'SAML 2.0 / OIDC for your team.', href: '/vendor/sso' },
-    { title: 'White-label board report', desc: 'Your logo and colours on the monthly board PDF.', href: '/vendor/profile' },
+    { title: 'White-label board report', desc: 'Your logo and colours on the monthly board PDF.', href: '/vendor/white-label' },
   ]
   return (
     <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
@@ -468,6 +471,63 @@ function BoardReportCard() {
   )
 }
 
+interface BaselineReport {
+  available: boolean
+  download_url?: string | null
+  generated_at?: string | null
+  plan_label?: string | null
+}
+
+function BaselineReportCard() {
+  const [report, setReport] = useState<BaselineReport | null>(null)
+  const [hidden, setHidden] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    fetch('/api/vendor/trm/baseline/latest', { cache: 'no-store' })
+      .then(async r => {
+        if (!r.ok) { if (active) setHidden(true); return null }
+        return r.json()
+      })
+      .then(d => { if (active && d) setReport(d) })
+      .catch(() => { if (active) setHidden(true) })
+    return () => { active = false }
+  }, [])
+
+  if (hidden) return null
+
+  const generatedOn = report?.generated_at ? new Date(report.generated_at).toLocaleDateString() : null
+
+  return (
+    <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <FileText className="h-4 w-4 text-emerald-400" /> MAS TRM Baseline Assessment
+          </h2>
+          <p className="text-xs text-neutral-400 mt-1">
+            Your starting inventory across all 13 MAS TRM domains, generated when your Suite subscription
+            activated and emailed to you at the time.
+            {report?.available
+              ? ` Generated ${generatedOn || 'recently'}.`
+              : ' Not generated yet — this is created automatically once your Suite subscription is active.'}
+          </p>
+        </div>
+        {report?.available && report.download_url && (
+          <a
+            href={report.download_url}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg"
+          >
+            <FileText className="h-3.5 w-3.5" /> Download baseline (PDF)
+          </a>
+        )}
+      </div>
+    </section>
+  )
+}
+
 interface ComparisonEntity {
   user_id: string
   name: string
@@ -498,6 +558,7 @@ const RAG_DOT: Record<string, string> = {
 function SubsidiaryComparison() {
   const [data, setData] = useState<ComparisonPayload | null>(null)
   const [hidden, setHidden] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -550,12 +611,19 @@ function SubsidiaryComparison() {
           </thead>
           <tbody>
             {data.entities.map(e => (
-              <tr key={e.user_id} className="border-b border-neutral-800/60">
+              <tr
+                key={e.user_id}
+                onClick={() => !e.is_parent && setSelectedId(selectedId === e.user_id ? null : e.user_id)}
+                className={`border-b border-neutral-800/60 ${!e.is_parent ? 'cursor-pointer hover:bg-neutral-800/40' : ''}`}
+              >
                 <td className="py-2.5 pr-3">
                   <div className="flex items-center gap-2">
                     <span className="text-white font-medium">{e.name}</span>
                     {e.is_parent && (
                       <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">Parent</span>
+                    )}
+                    {!e.is_parent && (
+                      <ChevronRight className={`h-3 w-3 text-neutral-500 transition-transform ${selectedId === e.user_id ? 'rotate-90' : ''}`} />
                     )}
                   </div>
                   {e.sector && <span className="text-[10px] text-neutral-500 capitalize">{e.sector}</span>}
@@ -585,7 +653,76 @@ function SubsidiaryComparison() {
           </tbody>
         </table>
       </div>
+
+      {selectedId && (
+        <SubsidiaryDetail
+          subsidiaryId={selectedId}
+          name={data.entities.find(e => e.user_id === selectedId)?.name || 'Subsidiary'}
+        />
+      )}
     </section>
+  )
+}
+
+// Read-only drill-down into one subsidiary's own 13-domain TRM workspace
+// (gap analysis text + evidence count) — the group table above only shows
+// a per-domain status matrix, not the underlying detail. Parent-tenant only;
+// the backend (_resolve_trm_target_user) 403s any other caller.
+function SubsidiaryDetail({ subsidiaryId, name }: { subsidiaryId: string; name: string }) {
+  const [data, setData] = useState<TrmPayload | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    setError('')
+    fetch(`/api/vendor/trm?subsidiary_id=${encodeURIComponent(subsidiaryId)}`, { cache: 'no-store' })
+      .then(async r => {
+        const d = await r.json()
+        if (!r.ok) { if (active) setError(d?.detail || `Failed (${r.status})`); return }
+        if (active) setData(d)
+      })
+      .catch(() => { if (active) setError('Network error') })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [subsidiaryId])
+
+  return (
+    <div className="border-t border-neutral-800 pt-4">
+      <p className="text-xs font-bold text-neutral-300 mb-2">{name} — full TRM workspace</p>
+      {loading ? (
+        <div className="text-neutral-500 text-xs inline-flex items-center gap-1.5"><Loader2 className="h-3 w-3 animate-spin" /> Loading…</div>
+      ) : error ? (
+        <p className="text-xs text-red-400">{error}</p>
+      ) : data ? (
+        <div className="space-y-1.5">
+          {data.items.map(item => {
+            const meta = STATUS_META[item.status || 'not_started']
+            return (
+              <div key={item.id} className="flex items-center gap-3 text-xs py-1.5 border-b border-neutral-800/60 last:border-0">
+                <span className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${meta.color} flex-shrink-0`}>{meta.label}</span>
+                <span className="text-neutral-200 flex-1 min-w-0 truncate">{item.domain}</span>
+                {item.risk_rating && (
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded ${RISK_META[item.risk_rating]}`}>{item.risk_rating}</span>
+                )}
+                <span className="text-neutral-500 text-[10px] flex-shrink-0">{item.evidence_count || 0} evidence</span>
+              </div>
+            )
+          })}
+          {data.items.some(i => i.gap_analysis) && (
+            <div className="mt-3 space-y-2">
+              {data.items.filter(i => i.gap_analysis).map(i => (
+                <div key={i.id} className="bg-neutral-950 border border-neutral-800 rounded-lg p-2.5">
+                  <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">{i.domain} — gap analysis</p>
+                  <p className="text-xs text-neutral-300 whitespace-pre-wrap">{i.gap_analysis}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
+    </div>
   )
 }
 

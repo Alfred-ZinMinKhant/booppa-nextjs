@@ -310,6 +310,7 @@ export default function AdminTestCheckoutPage() {
       { href: '/vendor/api-keys', label: 'API keys' },
       { href: '/vendor/sso', label: 'SSO' },
       { href: '/vendor/subsidiaries', label: 'Subsidiaries' },
+      { href: '/vendor/white-label', label: 'White-label' },
     ],
   } as const
 
@@ -499,7 +500,7 @@ export default function AdminTestCheckoutPage() {
                     {renderVerifyStrip(card.tier, last.identity_email)}
                     {card.tier === 'pro' && (
                       <p className="text-[10px] text-neutral-500 mt-1.5">
-                        White-label report toggle lives on <span className="font-mono">/vendor/profile</span>.
+                        White-label branding lives on <span className="font-mono">/vendor/white-label</span>.
                       </p>
                     )}
                   </div>
