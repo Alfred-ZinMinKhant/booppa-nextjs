@@ -109,9 +109,19 @@ function CheckItem({
 	);
 }
 
+// Product types that need the buyer's entity (website + registered company name)
+// before checkout. The backend 422s without it; collecting it in the modal keeps
+// the fallback prompt() chain in lib/checkout.ts from ever firing.
+// CSP SKUs are here because the backend confirms the entity against ACRA and
+// issues the Day-1 Registration Readiness Baseline from it — same reason /csp
+// asks for it. Without them a SGD 3,999 checkout fell through to two
+// consecutive browser prompts.
 const BUNDLE_TYPES = new Set([
 	"vendor_trust_pack",
 	"compliance_evidence_pack",
+	"csp_pack_onetime",
+	"csp_pack_monthly",
+	"csp_monitoring_monthly",
 ]);
 
 export default function PricingPage() {
