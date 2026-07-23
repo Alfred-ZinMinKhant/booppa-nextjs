@@ -156,6 +156,17 @@ function detailLinks(details: Record<string, unknown>) {
   return out
 }
 
+type TrmDemoResult = {
+  download_url?: string | null
+  user_id: string
+  user_email: string
+  org_id: string
+  domains_analysed: string[]
+  evidence_summary: Record<string, string>
+  deepseek_live: boolean
+  at: string
+}
+
 export default function AdminTestCheckoutPage() {
   const [identities, setIdentities] = useState<Record<IdentityKey, Identity>>(IDENTITY_DEFAULTS)
   const [activeIdentity, setActiveIdentity] = useState<IdentityKey>('A')
@@ -169,6 +180,8 @@ export default function AdminTestCheckoutPage() {
     company_name: '',
     rfp_description: '',
   })
+  const [trmDemo, setTrmDemo] = useState<TrmDemoResult | null>(null)
+  const [trmLiveAi, setTrmLiveAi] = useState(true)
 
   // Hydrate identities from localStorage on first render so the operator's
   // edits survive reloads (and tab swaps). Failure path falls back to defaults.
@@ -257,6 +270,43 @@ export default function AdminTestCheckoutPage() {
         identity_label: `Identity ${activeIdentity}`,
       }
       setHistory(prev => [row, ...prev].slice(0, 10))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Network error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  // Runs the same harness as `scripts/demo_trm_baseline.py` — seeds the three
+  // statutory-notice domains, attaches documented + tested evidence, and
+  // regenerates the baseline through the real worker path. Slow (gap analysis
+  // may hit DeepSeek live), so it runs synchronously with its own busy key.
+  async function runTrmDemo() {
+    const id = identities[activeIdentity]
+    const email = id.email.trim()
+    if (!email) {
+      setError('Set an email on the active Test Identity first')
+      return
+    }
+    setBusy('trm_demo_baseline')
+    setError('')
+    try {
+      const body: Record<string, unknown> = { customer_email: email, live_ai: trmLiveAi }
+      const company = id.company.trim()
+      if (company) body.company_name = company
+
+      const res = await fetch('/api/admin/api/admin/trm/demo-baseline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        cache: 'no-store',
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(typeof data.detail === 'string' ? data.detail : 'TRM demo failed')
+        return
+      }
+      setTrmDemo({ ...data, at: new Date().toLocaleTimeString() })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Network error')
     } finally {
@@ -509,6 +559,104 @@ export default function AdminTestCheckoutPage() {
             )
           })}
         </div>
+      </div>
+
+      {/* TRM evidence demo — the layer-3 artifact. Proves the baseline can show
+          *tested* evidence (dated, attested, anchored) as distinct from a policy
+          document, which is the distinction MAS actually inspects on. Same code
+          path as scripts/demo_trm_baseline.py, no shell required. */}
+      <div className="mb-10 rounded-lg border border-sky-500/30 bg-sky-500/5 p-5">
+        <div className="flex items-baseline justify-between mb-1">
+          <h2 className="text-base font-black uppercase tracking-widest text-sky-300">TRM Evidence Demo</h2>
+          <span className="text-[11px] text-neutral-500">MAS TRM Baseline · schema v4</span>
+        </div>
+        <p className="text-xs text-neutral-400 mb-4">
+          Seeds all 13 MAS TRM domains for the active identity, runs AI gap analysis on the three
+          domains carrying binding statutory notices, attaches evidence, and regenerates the
+          baseline through the real worker path. The buyer gets the same email a paying customer does.
+        </p>
+
+        <ul className="text-[11px] text-neutral-300 space-y-1 mb-4">
+          <li className="flex items-start gap-1.5">
+            <CheckCircle2 className="w-3 h-3 text-emerald-400 mt-0.5 flex-shrink-0" />
+            <span><strong>Cyber Security</strong> — Notice 655/FSM-N06 (MFA, rapid patching) · Documented (2)</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <AlertTriangle className="w-3 h-3 text-amber-400 mt-0.5 flex-shrink-0" />
+            <span>
+              <strong>Incident Management</strong> — Notice 644/FSM-N05 (1-hour notification) ·
+              Documented only, no drill on file. Renders as a residual gap, not falsely compliant.
+            </span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <CheckCircle2 className="w-3 h-3 text-emerald-400 mt-0.5 flex-shrink-0" />
+            <span>
+              <strong>Business Continuity &amp; DR</strong> — Notice 644/FSM-N05 (4-hour recovery) ·
+              Tested 15 Mar 2026, attested and anchored
+            </span>
+          </li>
+        </ul>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            disabled={busy === 'trm_demo_baseline' || !identities[activeIdentity].email.trim()}
+            onClick={runTrmDemo}
+            className="px-3 py-1.5 text-xs font-semibold rounded bg-sky-600 hover:bg-sky-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center gap-1.5"
+          >
+            {busy === 'trm_demo_baseline' && <Loader2 className="w-3 h-3 animate-spin" />}
+            Generate baseline for Identity {activeIdentity}
+          </button>
+          <label className="text-[11px] text-neutral-400 inline-flex items-center gap-1.5">
+            <input
+              type="checkbox"
+              checked={trmLiveAi}
+              onChange={e => setTrmLiveAi(e.target.checked)}
+              className="accent-sky-500"
+            />
+            Live DeepSeek gap analysis (uncheck for deterministic narratives)
+          </label>
+          <span className="text-[11px] text-neutral-500 font-mono">
+            {identities[activeIdentity].email || '(no email on active identity)'}
+          </span>
+        </div>
+
+        {busy === 'trm_demo_baseline' && (
+          <p className="mt-3 text-[11px] text-neutral-500">
+            Gap analysis + PDF generation runs inline — this can take up to a minute.
+          </p>
+        )}
+
+        {trmDemo && (
+          <div className="mt-4 pt-4 border-t border-neutral-800">
+            <p className="text-[11px] text-emerald-400 mb-2">
+              ✓ Generated {trmDemo.at} · {trmDemo.user_email} · DeepSeek{' '}
+              {trmDemo.deepseek_live ? 'live' : 'seeded fallback'}
+            </p>
+            <dl className="text-[11px] text-neutral-300 space-y-0.5 mb-3">
+              {Object.entries(trmDemo.evidence_summary).map(([domain, summary]) => (
+                <div key={domain} className="flex gap-2">
+                  <dt className="text-neutral-500 min-w-[16rem]">{domain}</dt>
+                  <dd>{summary}</dd>
+                </div>
+              ))}
+            </dl>
+            {trmDemo.download_url ? (
+              <a
+                href={trmDemo.download_url}
+                target="_blank"
+                rel="noreferrer"
+                className="px-2 py-0.5 text-[10px] rounded border border-neutral-700 hover:border-sky-500 hover:text-sky-300 text-neutral-300 inline-flex items-center gap-1"
+              >
+                Download baseline PDF <ExternalLink className="w-2.5 h-2.5" />
+              </a>
+            ) : (
+              <p className="text-[11px] text-amber-400">
+                PDF generated but no download URL returned — check the S3 upload logs.
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       <SectionGroup title="One-Time Products">
