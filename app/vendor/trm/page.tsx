@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   ShieldCheck, AlertCircle, AlertTriangle, Loader2, ArrowLeft,
@@ -741,7 +741,7 @@ function EvidenceManager({ controlId, onChange }: { controlId: string; onChange:
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     try {
       const r = await fetch(`/api/vendor/trm/${controlId}/evidence`, { cache: 'no-store' })
@@ -754,9 +754,9 @@ function EvidenceManager({ controlId, onChange }: { controlId: string; onChange:
     } finally {
       setLoading(false)
     }
-  }
+  }, [controlId])
 
-  useEffect(() => { load() /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [controlId])
+  useEffect(() => { load() }, [load])
 
   const upload = async (file: File) => {
     setUploading(true); setError('')

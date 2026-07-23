@@ -92,7 +92,7 @@ export default function WhiteLabelPage() {
             <Palette className="h-6 w-6 text-emerald-400" /> White-label reports
           </h1>
           <p className="text-sm text-neutral-400 mt-1">
-            Pro Suite exclusive. Your logo and brand colors replace Booppa's on the MAS TRM Baseline
+            Pro Suite exclusive. Your logo and brand colors replace Booppa&apos;s on the MAS TRM Baseline
             Assessment PDF and board report — set them here, then regenerate a report to see it applied.
           </p>
         </div>
@@ -117,7 +117,8 @@ export default function WhiteLabelPage() {
               <div className="flex items-center gap-4">
                 <div className="h-16 w-16 rounded-lg border border-neutral-800 bg-neutral-950 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {logoUrl
-                    ? <img src={logoUrl} alt="Brand logo" className="max-h-full max-w-full object-contain" />
+                    ? /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={logoUrl} alt="Brand logo" className="max-h-full max-w-full object-contain" />
                     : <ImageIcon className="h-6 w-6 text-neutral-700" />}
                 </div>
                 <div>
