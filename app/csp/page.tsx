@@ -33,6 +33,9 @@ export default function CspLandingPage() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [billing, setBilling] = useState<"one-time" | "subscription">("one-time");
+  const [entityModal, setEntityModal] = useState<{ productType: string } | null>(null);
+  const [entityForm, setEntityForm] = useState({ website: "", company: "" });
+  const [entityError, setEntityError] = useState<string | null>(null);
 
   useEffect(() => {
     // Public catalog — the /api/v1/* rewrite proxies straight to FastAPI, no auth needed.
@@ -49,13 +52,46 @@ export default function CspLandingPage() {
       .catch(() => {});
   }, []);
 
+  // Every CSP SKU needs the buyer's registered entity: the backend confirms it
+  // against ACRA and issues the Day-1 Registration Readiness Baseline from it,
+  // and 422s the checkout without it. Same modal pattern as /pricing bundles.
   async function buy(productType: string) {
     if (!loggedIn) {
       window.location.href = `/login?from=${encodeURIComponent("/csp")}`;
       return;
     }
+    try {
+      const meRes = await fetch("/api/auth/me");
+      if (meRes.ok) {
+        const me = await meRes.json();
+        setEntityForm({
+          website: me?.website || me?.vendor_url || "",
+          company: me?.company_name || me?.company || "",
+        });
+      }
+    } catch {}
+    setEntityError(null);
+    setEntityModal({ productType });
+  }
+
+  async function submitEntityForm() {
+    if (!entityModal) return;
+    let website = entityForm.website.trim();
+    const company = entityForm.company.trim();
+    if (!company) { setEntityError("Registered company name is required."); return; }
+    if (!website) { setEntityError("Website URL is required."); return; }
+    if (!/^https?:\/\//i.test(website)) website = `https://${website}`;
+    try {
+      const u = new URL(website);
+      if (!u.hostname.includes(".")) throw new Error("invalid host");
+    } catch {
+      setEntityError("Please enter a valid website (e.g. yourfirm.com.sg).");
+      return;
+    }
+    const productType = entityModal.productType;
     setLoading(productType);
-    await startCheckout(productType);
+    setEntityModal(null);
+    await startCheckout(productType, { vendor_url: website, company_name: company });
     setLoading(null);
   }
 
@@ -270,6 +306,61 @@ export default function CspLandingPage() {
           </div>
         </div>
       </section>
+
+      {entityModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => setEntityModal(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-black text-[#0f172a] mb-2">Confirm your firm&apos;s details</h3>
+            <p className="text-sm text-[#64748b] mb-6 leading-relaxed">
+              We verify your entity against the ACRA register and issue your CSP Registration
+              Readiness Baseline immediately after checkout — so we need the registered name,
+              exactly as ACRA holds it.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Registered company name</label>
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="As registered with ACRA"
+                  value={entityForm.company}
+                  onChange={(e) => setEntityForm((f) => ({ ...f, company: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Website URL</label>
+                <input
+                  type="text"
+                  placeholder="yourfirm.com.sg"
+                  value={entityForm.website}
+                  onChange={(e) => setEntityForm((f) => ({ ...f, website: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
+                />
+              </div>
+              {entityError && (
+                <p className="text-sm text-red-600 font-semibold">{entityError}</p>
+              )}
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setEntityModal(null)}
+                className="flex-1 py-3 rounded-xl border-2 border-[#e2e8f0] text-[#475569] font-bold text-sm hover:bg-[#f8fafc] transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={submitEntityForm}
+                className="flex-1 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-bold text-sm shadow-lg shadow-[#10b981]/20 transition"
+              >
+                Continue to checkout →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
