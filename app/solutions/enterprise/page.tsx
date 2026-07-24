@@ -186,7 +186,7 @@ export default function EnterprisePage() {
                             <div className="text-4xl font-black text-[#0f172a] mb-1">SGD {SUBSCRIPTION_PRODUCTS.standard_suite_monthly.price.toLocaleString()}<span className="text-lg text-[#64748b] font-normal">/month</span></div>
                             <p className="text-xs text-[#64748b] mb-6">Subscription</p>
                             <ul className="space-y-3 mb-8 flex-1">
-                                {["MAS TRM — all 13 domains", "AI gap analysis (DeepSeek)", "50 notarizations/month", "RESTful API + webhooks"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
+                                {["MAS TRM — all 13 domains", "AI gap analysis (DeepSeek)", "50 notarizations/month", "RESTful API + webhooks", "Multi-subsidiary management"].map(f => <CheckItem key={f} text={f} color="text-blue-600" />)}
                             </ul>
                             <div className="pt-6 border-t border-[#f1f5f9] mb-6">
                                 <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Best for</p>
@@ -208,9 +208,9 @@ export default function EnterprisePage() {
                                 <div className="flex-1">
                                     <h3 className="text-2xl font-black text-white mb-2">Pro Suite</h3>
                                     <div className="text-5xl font-black text-blue-400 mb-1">SGD {SUBSCRIPTION_PRODUCTS.pro_suite_monthly.price.toLocaleString()}<span className="text-xl text-white/40 font-normal">/month</span></div>
-                                    <p className="text-sm text-white/60 mb-8 leading-relaxed">Full enterprise evidence infrastructure. Multi-subsidiary management and a generous 100 notarizations every month.</p>
+                                    <p className="text-sm text-white/60 mb-8 leading-relaxed">Full enterprise evidence infrastructure. SSO, your own branding on every report, and a generous 100 notarizations every month.</p>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {["SSO — SAML 2.0 + OIDC", "White-label reports", "Multi-subsidiary management", "100 notarizations/month"].map(f => (
+                                        {["SSO — SAML 2.0 + OIDC", "White-label reports", "100 notarizations/month"].map(f => (
                                             <div key={f} className="flex items-center gap-2 text-sm text-white/80">
                                                 <span className="text-blue-400 font-bold">✓</span>
                                                 {f}

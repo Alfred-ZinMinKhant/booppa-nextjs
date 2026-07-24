@@ -29,6 +29,10 @@ interface Product {
   needsRfp?: boolean
 }
 
+// Only subscription SKUs run through `_activate_subscription`, so only they
+// carry the once-per-(email, SKU) activation claim that force_resend releases.
+const isSubscription = (p: Product) => p.section.startsWith('subs-')
+
 interface DialogFields {
   email: string
   vendor_url: string
@@ -167,6 +171,43 @@ type TrmDemoResult = {
   at: string
 }
 
+type ProSuiteSubsidiary = {
+  id: string
+  org_id: string
+  name: string
+  domains_complete: number
+  domains_total: number
+  open_gap_domain?: string
+}
+
+type ProSuiteResult = {
+  download_url?: string | null
+  user_id: string
+  user_email: string
+  org_id: string
+  org_slug: string
+  subsidiaries: ProSuiteSubsidiary[]
+  white_label: {
+    report_header_text: string
+    primary_color: string
+    secondary_color: string
+    logo_uploaded: boolean
+  }
+  sso: { protocol: string; is_active: boolean; acs_url?: string; metadata_url?: string }
+  provisioning_status: Record<string, string>
+  group_rollup_url: string
+  at: string
+}
+
+type SsoRoundtripResult = {
+  ok: boolean
+  assertion_valid?: boolean
+  name_id?: string | null
+  status_code?: number
+  tampered?: boolean
+  error?: string | null
+}
+
 export default function AdminTestCheckoutPage() {
   const [identities, setIdentities] = useState<Record<IdentityKey, Identity>>(IDENTITY_DEFAULTS)
   const [activeIdentity, setActiveIdentity] = useState<IdentityKey>('A')
@@ -182,6 +223,12 @@ export default function AdminTestCheckoutPage() {
   })
   const [trmDemo, setTrmDemo] = useState<TrmDemoResult | null>(null)
   const [trmLiveAi, setTrmLiveAi] = useState(true)
+  const [proSuite, setProSuite] = useState<ProSuiteResult | null>(null)
+  const [proLiveAi, setProLiveAi] = useState(true)
+  const [ssoRoundtrip, setSsoRoundtrip] = useState<{ signed?: SsoRoundtripResult; tampered?: SsoRoundtripResult } | null>(null)
+  // Subscriptions dedupe activation side effects per (email, SKU). Off by
+  // default so a double-click is a no-op rather than a duplicate email.
+  const [forceResend, setForceResend] = useState(false)
 
   // Hydrate identities from localStorage on first render so the operator's
   // edits survive reloads (and tab swaps). Failure path falls back to defaults.
@@ -239,10 +286,11 @@ export default function AdminTestCheckoutPage() {
       // identity-driven — fulfillment must reflect the active Test Identity
       // (e.g. Crayon Singapore / crayon.com), never the logged-in user's profile
       // or the backend's Booppa fallback defaults.
-      const body: Record<string, string> = {
+      const body: Record<string, unknown> = {
         product_type: dialogProduct.product_type,
         customer_email: email,
       }
+      if (isSubscription(dialogProduct) && forceResend) body.force_resend = true
       const url = dialogFields.vendor_url.trim()
       const company = dialogFields.company_name.trim()
       if (url) body.vendor_url = url
@@ -307,6 +355,69 @@ export default function AdminTestCheckoutPage() {
         return
       }
       setTrmDemo({ ...data, at: new Date().toLocaleTimeString() })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Network error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  // Same harness as `scripts/demo_pro_suite.py`: seeds two subsidiaries with
+  // uneven completion profiles, applies customer branding, activates SAML, and
+  // regenerates the branded baseline. Flips all four Pro capabilities Ready →
+  // Active with real artifacts. Slow — runs synchronously with its own busy key.
+  async function runProSuiteDemo() {
+    const id = identities[activeIdentity]
+    const email = id.email.trim()
+    if (!email) {
+      setError('Set an email on the active Test Identity first')
+      return
+    }
+    setBusy('pro_suite_demo')
+    setError('')
+    setSsoRoundtrip(null)
+    try {
+      const body: Record<string, unknown> = { customer_email: email, live_ai: proLiveAi }
+      const company = id.company.trim()
+      if (company) body.company_name = company
+
+      const res = await fetch('/api/admin/api/admin/pro-suite/demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        cache: 'no-store',
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(typeof data.detail === 'string' ? data.detail : 'Pro Suite demo failed')
+        return
+      }
+      setProSuite({ ...data, at: new Date().toLocaleTimeString() })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Network error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  // Drives a signed assertion (and a tampered one) through the real ACS route.
+  // The tampered verdict is the negative control — it must be rejected, or the
+  // signature check is meaningless.
+  async function runSsoRoundtrip() {
+    if (!proSuite) return
+    setBusy('sso_roundtrip')
+    setError('')
+    try {
+      const call = async (tamper: boolean): Promise<SsoRoundtripResult> => {
+        const res = await fetch(
+          `/api/admin/api/admin/pro-suite/demo/${proSuite.user_id}/sso-roundtrip?tamper=${tamper}`,
+          { method: 'POST', cache: 'no-store' },
+        )
+        return res.json()
+      }
+      const signed = await call(false)
+      const tampered = await call(true)
+      setSsoRoundtrip({ signed, tampered })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Network error')
     } finally {
@@ -659,6 +770,185 @@ export default function AdminTestCheckoutPage() {
         )}
       </div>
 
+      <div className="mb-10 rounded-lg border border-violet-500/30 bg-violet-500/5 p-5">
+        <div className="flex items-baseline justify-between mb-1">
+          <h2 className="text-base font-black uppercase tracking-widest text-violet-300">Pro Suite Feature Proof</h2>
+          <span className="text-[11px] text-neutral-500">SGD 4,500/mo · four exclusives, Active not Ready</span>
+        </div>
+        <p className="text-xs text-neutral-400 mb-4">
+          Activates all four Pro-exclusive capabilities on the active identity and regenerates the
+          branded baseline through the real worker — the answer to &quot;show me these working, not
+          described as working.&quot; Multi-subsidiary seeds two entities with different completion
+          profiles; white-label replaces our name in the PDF; SSO runs a signed assertion through the
+          real ACS route.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            disabled={busy === 'pro_suite_demo' || !identities[activeIdentity].email.trim()}
+            onClick={runProSuiteDemo}
+            className="px-3 py-1.5 text-xs font-semibold rounded bg-violet-600 hover:bg-violet-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center gap-1.5"
+          >
+            {busy === 'pro_suite_demo' && <Loader2 className="w-3 h-3 animate-spin" />}
+            Activate Pro Suite for Identity {activeIdentity}
+          </button>
+          <label className="text-[11px] text-neutral-400 inline-flex items-center gap-1.5">
+            <input
+              type="checkbox"
+              checked={proLiveAi}
+              onChange={e => setProLiveAi(e.target.checked)}
+              className="accent-violet-500"
+            />
+            Live gap analysis (uncheck for deterministic narratives)
+          </label>
+          <span className="text-[11px] text-neutral-500 font-mono">
+            {identities[activeIdentity].email || '(no email on active identity)'}
+          </span>
+        </div>
+
+        {busy === 'pro_suite_demo' && (
+          <p className="mt-3 text-[11px] text-neutral-500">
+            Seeds subsidiaries, applies branding, and regenerates the baseline inline — up to a minute.
+          </p>
+        )}
+
+        {proSuite && (
+          <div className="mt-4 pt-4 border-t border-neutral-800 space-y-4">
+            <p className="text-[11px] text-emerald-400">
+              ✓ Activated {proSuite.at} · {proSuite.user_email} · org {proSuite.org_slug}
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(proSuite.provisioning_status).map(([cap, status]) => (
+                <span
+                  key={cap}
+                  className={`px-2 py-0.5 text-[10px] rounded border font-bold uppercase tracking-wider ${
+                    status === 'Active'
+                      ? 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10'
+                      : 'border-amber-500/40 text-amber-300 bg-amber-500/10'
+                  }`}
+                >
+                  {cap.replace(/_/g, ' ')}: {status}
+                </span>
+              ))}
+            </div>
+
+            {/* 1. Multi-subsidiary — group rollup + per-entity drill-down */}
+            <div>
+              <p className="text-[11px] font-semibold text-violet-300 mb-1 flex items-center gap-1.5">
+                <Building2 className="w-3 h-3" /> Multi-subsidiary — group + drill-down
+              </p>
+              <table className="w-full text-[11px] text-neutral-300">
+                <thead>
+                  <tr className="text-neutral-500 text-left">
+                    <th className="font-normal py-0.5">Entity</th>
+                    <th className="font-normal py-0.5">Complete</th>
+                    <th className="font-normal py-0.5">Open gap</th>
+                    <th className="font-normal py-0.5">Drill-down</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {proSuite.subsidiaries.map(sub => (
+                    <tr key={sub.id} className="border-t border-neutral-800/60">
+                      <td className="py-0.5">{sub.name}</td>
+                      <td className="py-0.5">{sub.domains_complete}/{sub.domains_total}</td>
+                      <td className="py-0.5 text-amber-400">{sub.open_gap_domain || '—'}</td>
+                      <td className="py-0.5">
+                        <Link
+                          href={`/vendor/trm?as=${encodeURIComponent(proSuite.user_email)}&subsidiary_id=${sub.id}`}
+                          target="_blank"
+                          className="text-sky-400 hover:text-sky-300 inline-flex items-center gap-1"
+                        >
+                          view <ExternalLink className="w-2.5 h-2.5" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <Link
+                href={`/vendor/subsidiaries?as=${encodeURIComponent(proSuite.user_email)}`}
+                target="_blank"
+                className="mt-1 inline-flex items-center gap-1 text-[10px] text-sky-400 hover:text-sky-300"
+              >
+                Open group rollup <ExternalLink className="w-2.5 h-2.5" />
+              </Link>
+            </div>
+
+            {/* 2. White-label — branded PDF */}
+            <div>
+              <p className="text-[11px] font-semibold text-violet-300 mb-1">White-label — branded output</p>
+              <p className="text-[11px] text-neutral-400 mb-1">
+                Header &quot;{proSuite.white_label.report_header_text}&quot; · band{' '}
+                <span style={{ color: proSuite.white_label.secondary_color }}>{proSuite.white_label.secondary_color}</span>{' '}
+                · accent{' '}
+                <span style={{ color: proSuite.white_label.primary_color }}>{proSuite.white_label.primary_color}</span>{' '}
+                · logo {proSuite.white_label.logo_uploaded ? 'uploaded' : 'skipped (no S3)'}
+              </p>
+              {proSuite.download_url ? (
+                <a
+                  href={proSuite.download_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2 py-0.5 text-[10px] rounded border border-neutral-700 hover:border-sky-500 hover:text-sky-300 text-neutral-300 inline-flex items-center gap-1"
+                >
+                  Download branded baseline PDF <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              ) : (
+                <p className="text-[11px] text-amber-400">
+                  PDF generated but no download URL — check the S3 upload logs.
+                </p>
+              )}
+            </div>
+
+            {/* 3. SSO — real ACS round trip */}
+            <div>
+              <p className="text-[11px] font-semibold text-violet-300 mb-1">SSO — signed assertion through the real ACS</p>
+              <button
+                type="button"
+                disabled={busy === 'sso_roundtrip'}
+                onClick={runSsoRoundtrip}
+                className="px-3 py-1.5 text-xs font-semibold rounded bg-sky-600 hover:bg-sky-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center gap-1.5"
+              >
+                {busy === 'sso_roundtrip' && <Loader2 className="w-3 h-3 animate-spin" />}
+                Run SAML round trip
+              </button>
+              {ssoRoundtrip && (
+                <ul className="mt-2 text-[11px] space-y-1">
+                  <li className="flex items-center gap-1.5">
+                    {ssoRoundtrip.signed?.ok ? (
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <AlertTriangle className="w-3 h-3 text-red-400" />
+                    )}
+                    <span className="text-neutral-300">
+                      Signed assertion:{' '}
+                      {ssoRoundtrip.signed?.ok
+                        ? `ACCEPTED (${ssoRoundtrip.signed.status_code}) — session minted for ${ssoRoundtrip.signed.name_id}`
+                        : `did not authenticate: ${ssoRoundtrip.signed?.error || 'rejected'}`}
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    {ssoRoundtrip.tampered && !ssoRoundtrip.tampered.ok ? (
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <AlertTriangle className="w-3 h-3 text-red-400" />
+                    )}
+                    <span className="text-neutral-300">
+                      Tampered assertion:{' '}
+                      {ssoRoundtrip.tampered && !ssoRoundtrip.tampered.ok
+                        ? `REJECTED (${ssoRoundtrip.tampered.status_code}) — correct`
+                        : 'ACCEPTED — THIS IS A BUG'}
+                    </span>
+                  </li>
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
       <SectionGroup title="One-Time Products">
         <Section title="For Vendors">
           {PRODUCT_CATALOG.filter(p => p.section === 'one-time-vendors').map(renderRow)}
@@ -792,6 +1082,24 @@ export default function AdminTestCheckoutPage() {
                   />
                   <p className="text-[10px] text-neutral-500 mt-1">
                     If blank, admin will collect the brief via intake form
+                  </p>
+                </div>
+              )}
+              {isSubscription(dialogProduct) && (
+                <div>
+                  <label className="flex items-start gap-2 text-xs text-neutral-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={forceResend}
+                      onChange={e => setForceResend(e.target.checked)}
+                      className="mt-0.5 accent-amber-500"
+                    />
+                    <span>Force resend</span>
+                  </label>
+                  <p className="text-[10px] text-neutral-500 mt-1">
+                    Activation emails and first-cycle deliverables fire once per
+                    (email, product). Repeating this checkout is normally a no-op —
+                    tick this to deliberately send them again.
                   </p>
                 </div>
               )}
