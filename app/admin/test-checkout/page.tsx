@@ -208,6 +208,34 @@ type SsoRoundtripResult = {
   error?: string | null
 }
 
+type CspDemoResult = {
+  user_id: string
+  user_email: string
+  org_id: string
+  profile_id: string
+  entity: { legal_name: string; uen: string }
+  baseline: { plan_label: string; billing_label: string }
+  nominee: {
+    id: string
+    subject: string
+    outcome: string
+    determination: string
+    title: string
+    record_sha256: string
+    record_url?: string | null
+  }
+  str: {
+    id: string
+    client: string
+    decision: string
+    rationale: string
+    title: string
+    record_sha256: string
+    record_url?: string | null
+  }
+  at: string
+}
+
 export default function AdminTestCheckoutPage() {
   const [identities, setIdentities] = useState<Record<IdentityKey, Identity>>(IDENTITY_DEFAULTS)
   const [activeIdentity, setActiveIdentity] = useState<IdentityKey>('A')
@@ -226,6 +254,7 @@ export default function AdminTestCheckoutPage() {
   const [proSuite, setProSuite] = useState<ProSuiteResult | null>(null)
   const [proLiveAi, setProLiveAi] = useState(true)
   const [ssoRoundtrip, setSsoRoundtrip] = useState<{ signed?: SsoRoundtripResult; tampered?: SsoRoundtripResult } | null>(null)
+  const [cspDemo, setCspDemo] = useState<CspDemoResult | null>(null)
   // Subscriptions dedupe activation side effects per (email, SKU). Off by
   // default so a double-click is a no-op rather than a duplicate email.
   const [forceResend, setForceResend] = useState(false)
@@ -393,6 +422,41 @@ export default function AdminTestCheckoutPage() {
         return
       }
       setProSuite({ ...data, at: new Date().toLocaleTimeString() })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Network error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  // Walks a demo CSP org through onboarding and renders the actual inspection
+  // records — the fit-and-proper writeup and the STR decision rationale.
+  async function runCspDemo() {
+    const id = identities[activeIdentity]
+    const email = id.email.trim()
+    if (!email) {
+      setError('Set an email on the active Test Identity first')
+      return
+    }
+    setBusy('csp_demo')
+    setError('')
+    try {
+      const body: Record<string, unknown> = { customer_email: email }
+      const company = id.company.trim()
+      if (company) body.company_name = company
+
+      const res = await fetch('/api/admin/api/admin/csp/demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        cache: 'no-store',
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(typeof data.detail === 'string' ? data.detail : 'CSP onboarding demo failed')
+        return
+      }
+      setCspDemo({ ...data, at: new Date().toLocaleTimeString() })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Network error')
     } finally {
@@ -943,6 +1007,88 @@ export default function AdminTestCheckoutPage() {
                     </span>
                   </li>
                 </ul>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="mb-10 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-5">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-base font-black uppercase tracking-widest text-emerald-300">CSP Onboarding Proof</h2>
+        </div>
+        <p className="text-xs text-neutral-400 mb-4">
+          Walks a demo CSP org through onboarding and renders the actual inspection records — the nominee
+          fit-and-proper assessment and the STR decision rationale — alongside the Day-1 baseline. The
+          reasoning is authored by the CSP, not generated; this shows the record faithfully carries it.
+        </p>
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          <button
+            type="button"
+            disabled={busy === 'csp_demo'}
+            onClick={runCspDemo}
+            className="px-3 py-1.5 text-xs font-semibold rounded bg-emerald-600 hover:bg-emerald-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center gap-1.5"
+          >
+            {busy === 'csp_demo' && <Loader2 className="w-3 h-3 animate-spin" />}
+            Run CSP onboarding demo
+          </button>
+          <span className="text-[11px] text-neutral-500">Uses the active Test Identity&apos;s email + company.</span>
+        </div>
+
+        {cspDemo && (
+          <div className="space-y-3">
+            <p className="text-[11px] text-emerald-300/80">
+              ✓ Onboarded {cspDemo.at} · {cspDemo.user_email} · {cspDemo.entity.legal_name} (UEN {cspDemo.entity.uen})
+            </p>
+
+            <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
+              <p className="text-[11px] font-semibold text-emerald-300 mb-1">Day-1 Registration Readiness Baseline</p>
+              <p className="text-[11px] text-neutral-400">
+                {cspDemo.baseline.plan_label} · {cspDemo.baseline.billing_label} — generated for the ACRA-verified entity.
+              </p>
+            </div>
+
+            <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
+              <p className="text-[11px] font-semibold text-emerald-300 mb-1">
+                Nominee director fit-and-proper — {cspDemo.nominee.subject}
+              </p>
+              <p className="text-[11px] text-neutral-300 mb-1">
+                Determination: <span className="font-semibold uppercase">{cspDemo.nominee.determination.replace('_', ' ')}</span>
+              </p>
+              <p className="text-[11px] text-neutral-400 mb-2">{cspDemo.nominee.outcome}</p>
+              {cspDemo.nominee.record_url ? (
+                <a
+                  href={cspDemo.nominee.record_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 underline"
+                >
+                  Download fit-and-proper record (PDF)
+                </a>
+              ) : (
+                <span className="text-[11px] text-neutral-500">Record rendered (no S3 link — offline)</span>
+              )}
+            </div>
+
+            <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
+              <p className="text-[11px] font-semibold text-emerald-300 mb-1">
+                STR decision — {cspDemo.str.client}
+              </p>
+              <p className="text-[11px] text-neutral-300 mb-1">
+                Decision: <span className="font-semibold uppercase">{cspDemo.str.decision.replace('_', ' ')}</span>
+              </p>
+              <p className="text-[11px] text-neutral-400 mb-2">{cspDemo.str.rationale}</p>
+              {cspDemo.str.record_url ? (
+                <a
+                  href={cspDemo.str.record_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 underline"
+                >
+                  Download STR decision record (PDF)
+                </a>
+              ) : (
+                <span className="text-[11px] text-neutral-500">Record rendered (no S3 link — offline)</span>
               )}
             </div>
           </div>
