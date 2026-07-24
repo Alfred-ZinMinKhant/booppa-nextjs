@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Loader2, AlertCircle, Search } from 'lucide-react'
+import { adminApiFetch } from '@/lib/adminApiClient'
 
 interface Vendor {
   id: string
@@ -29,7 +30,7 @@ export default function VendorsPage() {
     setLoading(true)
     const params = new URLSearchParams({ limit: '100' })
     if (search.trim()) params.set('q', search.trim())
-    const res = await fetch(`/api/admin/api/admin/vendors?${params}`, { cache: 'no-store' })
+    const res = await adminApiFetch(`/api/admin/api/admin/vendors?${params}`, { cache: 'no-store' })
     if (!res.ok) {
       setError(`Failed to load (${res.status})`)
       setLoading(false)

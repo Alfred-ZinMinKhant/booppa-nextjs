@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Loader2, AlertTriangle, ExternalLink, CheckCircle2 } from 'lucide-react'
+import { adminApiFetch } from '@/lib/adminApiClient'
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -207,7 +208,7 @@ export default function AdminValidationMatrixPage() {
       // RFP Complete must defer (no brief at this point). Leave rfp_description
       // empty so the backend creates a PendingRfpIntake instead of generating
       // a placeholder kit.
-      const res = await fetch('/api/admin/api/admin/simulate-purchase', {
+      const res = await adminApiFetch('/api/admin/api/admin/simulate-purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

@@ -7,7 +7,10 @@ export const dynamic = 'force-dynamic'
 async function proxy(req: NextRequest, params: { path: string[] }) {
   const adminToken = cookies().get('admin_token')?.value
   if (!adminToken) {
-    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json(
+      { detail: 'Admin session expired', code: 'admin_session_expired' },
+      { status: 401 },
+    )
   }
   const segments = params.path.join('/')
   const search = req.nextUrl.search || ''

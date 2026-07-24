@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -13,6 +13,15 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [expired, setExpired] = useState(false)
+
+  // Set by adminApiFetch when an admin-panel request hit a 401 (session lapsed).
+  // Read from the URL directly to avoid the useSearchParams() Suspense boundary.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('expired') === '1') {
+      setExpired(true)
+    }
+  }, [])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -58,6 +67,13 @@ export default function AdminLoginPage() {
         <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8">
           <h1 className="text-xl font-semibold text-white mb-1">Admin sign in</h1>
           <p className="text-neutral-400 text-sm mb-6">Restricted area. Authorized personnel only.</p>
+
+          {expired && !error && (
+            <div className="flex items-center gap-2 text-amber-400 text-sm bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2.5 mb-4">
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              Your session expired — please sign in again.
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

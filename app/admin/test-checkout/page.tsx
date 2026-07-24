@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Loader2, AlertTriangle, ExternalLink, Building2, CheckCircle2, X } from 'lucide-react'
 import { ALL_PRODUCTS, formatPrice } from '@/lib/pricing'
+import { adminApiFetch } from '@/lib/adminApiClient'
 
 type Dispatch = 'subscription' | 'bundle' | 'rfp' | 'rfp-deferred' | 'standalone'
 
@@ -329,7 +330,7 @@ export default function AdminTestCheckoutPage() {
         if (desc) body.rfp_description = desc
       }
 
-      const res = await fetch('/api/admin/api/admin/simulate-purchase', {
+      const res = await adminApiFetch('/api/admin/api/admin/simulate-purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -372,7 +373,7 @@ export default function AdminTestCheckoutPage() {
       const company = id.company.trim()
       if (company) body.company_name = company
 
-      const res = await fetch('/api/admin/api/admin/trm/demo-baseline', {
+      const res = await adminApiFetch('/api/admin/api/admin/trm/demo-baseline', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -410,7 +411,7 @@ export default function AdminTestCheckoutPage() {
       const company = id.company.trim()
       if (company) body.company_name = company
 
-      const res = await fetch('/api/admin/api/admin/pro-suite/demo', {
+      const res = await adminApiFetch('/api/admin/api/admin/pro-suite/demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -445,7 +446,7 @@ export default function AdminTestCheckoutPage() {
       const company = id.company.trim()
       if (company) body.company_name = company
 
-      const res = await fetch('/api/admin/api/admin/csp/demo', {
+      const res = await adminApiFetch('/api/admin/api/admin/csp/demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -473,7 +474,7 @@ export default function AdminTestCheckoutPage() {
     setError('')
     try {
       const call = async (tamper: boolean): Promise<SsoRoundtripResult> => {
-        const res = await fetch(
+        const res = await adminApiFetch(
           `/api/admin/api/admin/pro-suite/demo/${proSuite.user_id}/sso-roundtrip?tamper=${tamper}`,
           { method: 'POST', cache: 'no-store' },
         )

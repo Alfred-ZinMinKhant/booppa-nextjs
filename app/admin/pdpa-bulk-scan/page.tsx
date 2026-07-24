@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2, Upload, Download, AlertTriangle, FileSpreadsheet } from 'lucide-react'
+import { adminApiFetch } from '@/lib/adminApiClient'
 
 interface BatchItem {
   id: string
@@ -43,7 +44,7 @@ export default function AdminPdpaBulkScanPage() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const fetchBatch = useCallback(async (batchId: string) => {
-    const res = await fetch(`/api/admin/api/admin/pdpa/bulk-scan/${batchId}?limit=1000`, { cache: 'no-store' })
+    const res = await adminApiFetch(`/api/admin/api/admin/pdpa/bulk-scan/${batchId}?limit=1000`, { cache: 'no-store' })
     if (!res.ok) return
     const data: BatchStatus = await res.json()
     setBatch(data)
@@ -72,7 +73,7 @@ export default function AdminPdpaBulkScanPage() {
     try {
       const form = new FormData()
       form.append('file', file)
-      const res = await fetch('/api/admin/api/admin/pdpa/bulk-scan', {
+      const res = await adminApiFetch('/api/admin/api/admin/pdpa/bulk-scan', {
         method: 'POST',
         body: form,
         cache: 'no-store',
@@ -92,7 +93,7 @@ export default function AdminPdpaBulkScanPage() {
 
   async function handleExport() {
     if (!batch) return
-    const res = await fetch(`/api/admin/api/admin/pdpa/bulk-scan/${batch.batch_id}/export`, { cache: 'no-store' })
+    const res = await adminApiFetch(`/api/admin/api/admin/pdpa/bulk-scan/${batch.batch_id}/export`, { cache: 'no-store' })
     if (!res.ok) return
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       path: '/',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 12,
+      maxAge: 60 * 60 * 24, // 24h — keep in sync with create_admin_token() TTL
       sameSite: 'lax',
     })
     return response

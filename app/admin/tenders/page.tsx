@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Loader2, AlertCircle } from 'lucide-react'
+import { adminApiFetch } from '@/lib/adminApiClient'
 
 interface Tender {
   id: string
@@ -22,7 +23,7 @@ export default function TendersPage() {
   useEffect(() => {
     let alive = true
     ;(async () => {
-      const res = await fetch('/api/admin/api/admin/tenders?limit=200', { cache: 'no-store' })
+      const res = await adminApiFetch('/api/admin/api/admin/tenders?limit=200', { cache: 'no-store' })
       if (!alive) return
       if (!res.ok) {
         setError(`Failed to load (${res.status})`)

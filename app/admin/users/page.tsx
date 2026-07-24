@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Loader2, AlertCircle, Search, ShieldCheck, CheckCircle2, XCircle } from 'lucide-react'
+import { adminApiFetch } from '@/lib/adminApiClient'
 
 interface AdminUser {
   id: string
@@ -56,7 +57,7 @@ export default function AdminUsersPage() {
     if (search.trim()) params.set('q', search.trim())
     if (role) params.set('role', role)
     try {
-      const res = await fetch(`/api/admin/api/admin/users?${params}`, { cache: 'no-store' })
+      const res = await adminApiFetch(`/api/admin/api/admin/users?${params}`, { cache: 'no-store' })
       if (!res.ok) {
         setError(`Failed to load (${res.status})`)
         setLoading(false)
