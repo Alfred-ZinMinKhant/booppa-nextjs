@@ -25,6 +25,13 @@ jobs:
         run: npm run lint
       - name: TypeScript
         run: npx tsc --noEmit
+      - name: Dependency vulnerability scan
+        # Fails the job on known HIGH/CRITICAL advisories in production deps.
+        run: npm audit --omit=dev --audit-level=high
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   e2e:
     runs-on: ubuntu-latest

@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { config, endpoints } from './config'
+import { fetchWithTimeout } from './fetchTimeout'
 import type { User, RefreshTokenResponse } from '@/types'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -36,7 +37,7 @@ export async function refreshServerToken(): Promise<RefreshTokenResponse | null>
   if (!refreshToken) return null
 
   try {
-    const res = await fetch(`${config.apiUrl}/api/v1${endpoints.auth.refresh}`, {
+    const res = await fetchWithTimeout(`${config.apiUrl}/api/v1${endpoints.auth.refresh}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
@@ -59,7 +60,7 @@ export async function getServerSideUser(): Promise<User | null> {
   if (!token) return null
 
   try {
-    const res = await fetch(`${config.apiUrl}/api/v1${endpoints.auth.me}`, {
+    const res = await fetchWithTimeout(`${config.apiUrl}/api/v1${endpoints.auth.me}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     })
@@ -70,7 +71,7 @@ export async function getServerSideUser(): Promise<User | null> {
     const refreshed = await refreshServerToken()
     if (!refreshed) return null
 
-    const retry = await fetch(`${config.apiUrl}/api/v1${endpoints.auth.me}`, {
+    const retry = await fetchWithTimeout(`${config.apiUrl}/api/v1${endpoints.auth.me}`, {
       headers: { Authorization: `Bearer ${refreshed.token}` },
       cache: 'no-store',
     })
@@ -90,7 +91,7 @@ export async function fetchWithAuth(
   const token = cookies().get('token')?.value
 
   const makeRequest = (t: string) =>
-    fetch(`${config.apiUrl}${url}`, {
+    fetchWithTimeout(`${config.apiUrl}${url}`, {
       ...options,
       headers: {
         ...options.headers,

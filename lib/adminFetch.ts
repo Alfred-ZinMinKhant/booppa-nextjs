@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { config } from '@/lib/config'
+import { fetchWithTimeout } from '@/lib/fetchTimeout'
 
 /**
  * Server-side fetch helper for the admin section.
@@ -13,7 +14,7 @@ export async function adminFetch(path: string, init: RequestInit = {}) {
   if (!headers.has('Content-Type') && init.body && typeof init.body === 'string') {
     headers.set('Content-Type', 'application/json')
   }
-  return fetch(`${config.apiUrl}${path}`, { ...init, headers, cache: 'no-store' })
+  return fetchWithTimeout(`${config.apiUrl}${path}`, { ...init, headers, cache: 'no-store' })
 }
 
 export function getAdminToken(): string | null {

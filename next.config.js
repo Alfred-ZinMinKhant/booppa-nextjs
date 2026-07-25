@@ -21,7 +21,7 @@ const securityHeaders = [
   },
   {
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: https://api.qrserver.com https://polygonscan.com https://assets.calendly.com https://cms.booppa.io http://13.229.135.184; font-src 'self' fonts.gstatic.com; connect-src 'self' https://api.booppa.io https://cms.booppa.io https://cloudflareinsights.com http://13.229.135.184; frame-src 'self' https://calendly.com;",
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: https://api.qrserver.com https://polygonscan.com https://assets.calendly.com https://cms.booppa.io; font-src 'self' fonts.gstatic.com; connect-src 'self' https://api.booppa.io https://cms.booppa.io https://cloudflareinsights.com; frame-src 'self' https://calendly.com;",
   },
 ];
 
@@ -37,13 +37,6 @@ const nextConfig = {
         hostname: 'api.qrserver.com',
         pathname: '/v1/create-qr-code/**',
       },
-      // Allow local Django media during development
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '8001',
-        pathname: '/media/**',
-      },
       {
         protocol: 'https',
         hostname: 'polygonscan.com',
@@ -55,16 +48,27 @@ const nextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'http',
-        hostname: '13.229.135.184',
-        port: '8001',
-        pathname: '/media/**',
-      },
-      {
         protocol: 'https',
         hostname: 'cms.booppa.io',
         pathname: '/media/**',
       },
+      // Plaintext-HTTP dev/staging media origins — only in non-production builds.
+      ...(process.env.NODE_ENV !== 'production'
+        ? [
+            {
+              protocol: 'http',
+              hostname: 'localhost',
+              port: '8001',
+              pathname: '/media/**',
+            },
+            {
+              protocol: 'http',
+              hostname: '13.229.135.184',
+              port: '8001',
+              pathname: '/media/**',
+            },
+          ]
+        : []),
     ],
   },
   async redirects() {

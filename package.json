@@ -21,7 +21,6 @@
     "pdf-lib": "^1.17.1",
     "postcss": "^8.4.38",
     "qrcode": "^1.5.4",
-    "rate-limiter-flexible": "^2.3.10",
     "react": "^18",
     "react-dom": "^18",
     "recharts": "^3.7.0",

@@ -4,11 +4,16 @@ applications:
       phases:
         preBuild:
           commands:
+            # Pin Node 20 to match CI (.github/workflows/test.yml). Amplify images
+            # ship nvm; .nvmrc holds the version.
+            - nvm install
+            - nvm use
+            - node -v
             - npm ci --legacy-peer-deps
         build:
           commands:
             # Expose Amplify Console env vars to Next.js SSR runtime
-            - env | grep -E '^(CMS_ADMIN_TOKEN|CMS_BASE|BACKEND_BASE_URL|VERIFY_BASE_URL|COOKIE_SIGNING_SECRET|ADMIN_USER|ADMIN_PASSWORD|NEXT_PUBLIC_BASE_URL|NEXT_PUBLIC_API_BACKEND|NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY|NEXT_PUBLIC_STRIPE_PDPA_QUICK_SCAN|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|RESEND_API_KEY|S3_BUCKET|FEATURE_SEO)=' >> .env.production || true
+            - env | grep -E '^(CMS_ADMIN_TOKEN|CMS_BASE|BACKEND_BASE_URL|VERIFY_BASE_URL|COOKIE_SIGNING_SECRET|ADMIN_USER|ADMIN_PASSWORD|NEXT_PUBLIC_BASE_URL|NEXT_PUBLIC_API_BASE|NEXT_PUBLIC_CMS_BASE|NEXT_PUBLIC_WS_URL|NEXT_PUBLIC_CALENDLY_URL|NEXT_PUBLIC_PRIVACY_VERSION|NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY|NEXT_PUBLIC_STRIPE_PDPA_QUICK_SCAN|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RESEND_API_KEY|S3_BUCKET|FEATURE_SEO)=' >> .env.production || true
             - npm run build
       artifacts:
         baseDirectory: .next

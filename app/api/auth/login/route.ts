@@ -12,14 +12,13 @@ export async function POST(req: NextRequest) {
   })
 
   const text = await res.text()
-  console.log('[LOGIN] Backend status:', res.status)
-  console.log('[LOGIN] Backend response:', text)
 
   let data: any
   try {
     data = JSON.parse(text)
   } catch (e) {
-    console.error('[LOGIN] Failed to parse response as JSON:', e)
+    // Do not log `text` — the auth response body carries tokens/role.
+    console.error('[LOGIN] Failed to parse backend response as JSON')
     return NextResponse.json({ error: 'Invalid backend response' }, { status: 502 })
   }
 
@@ -27,7 +26,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(data, { status: res.status })
   }
 
-  console.log('[LOGIN] Setting cookies, plan:', data.plan)
   const response = NextResponse.json({ ok: true, role: data.role || 'VENDOR' })
   const isProduction = process.env.NODE_ENV === 'production'
 
