@@ -13,6 +13,16 @@ interface SimResponse {
   product_type: string
   dispatch: Dispatch
   details: Record<string, unknown>
+  // Only returned when the run named a subject entity. `verified: false` is a
+  // real outcome, not an error — it means the deliverable will read "Not
+  // verified" instead of borrowing the ordering account's identity.
+  subject_identity?: {
+    managed_entity_id: string
+    company_name: string
+    legal_name: string | null
+    uen: string | null
+    verified: boolean
+  } | null
 }
 
 interface SimRow extends SimResponse {
@@ -38,6 +48,10 @@ interface DialogFields {
   email: string
   vendor_url: string
   company_name: string
+  // Names a CSP/DPO client company as the subject of the order. When set, the
+  // company/website fields describe that entity and are NOT written back to the
+  // test account — the same precedence a real managed-entity checkout applies.
+  managed_entity_name: string
   rfp_description: string
 }
 
@@ -248,6 +262,7 @@ export default function AdminTestCheckoutPage() {
     email: '',
     vendor_url: '',
     company_name: '',
+    managed_entity_name: '',
     rfp_description: '',
   })
   const [trmDemo, setTrmDemo] = useState<TrmDemoResult | null>(null)
@@ -290,6 +305,10 @@ export default function AdminTestCheckoutPage() {
       email: id.email,
       vendor_url: id.url,
       company_name: id.company,
+      // Never carried over from the Test Identity: an entity subject must be an
+      // explicit choice on each run, not a sticky default that silently
+      // redirects an ordinary self-assessment run at a client company.
+      managed_entity_name: '',
       rfp_description: '',
     })
     setDialogProduct(product)
@@ -325,6 +344,11 @@ export default function AdminTestCheckoutPage() {
       const company = dialogFields.company_name.trim()
       if (url) body.vendor_url = url
       if (company) body.company_name = company
+      // Sent last and deliberately unconditional on the product flags: any SKU
+      // can be ordered on behalf of a client company, and the backend decides
+      // what that means per product.
+      const entity = dialogFields.managed_entity_name.trim()
+      if (entity) body.managed_entity_name = entity
       if (dialogProduct.needsRfp) {
         const desc = dialogFields.rfp_description.trim()
         if (desc) body.rfp_description = desc
@@ -1139,6 +1163,26 @@ export default function AdminTestCheckoutPage() {
                 <span className="text-[10px] text-neutral-400 font-mono truncate w-48" title={row.identity_email}>
                   {row.identity_label} · {row.identity_email}
                 </span>
+                {/* The subject the deliverable will actually name. Shown only when
+                    the run picked an entity — its absence means the account was
+                    its own subject, which is the normal case. */}
+                {row.subject_identity && (
+                  <span
+                    className={`px-2 py-0.5 rounded border text-[10px] font-mono truncate max-w-[16rem] ${
+                      row.subject_identity.verified
+                        ? 'border-emerald-700 text-emerald-400'
+                        : 'border-amber-700 text-amber-400'
+                    }`}
+                    title={
+                      row.subject_identity.verified
+                        ? `ACRA verified · UEN ${row.subject_identity.uen}`
+                        : 'No ACRA match — the deliverable will read "Not verified"'
+                    }
+                  >
+                    {row.subject_identity.verified ? '✓ ' : '⚠ '}
+                    {row.subject_identity.legal_name || row.subject_identity.company_name}
+                  </span>
+                )}
                 <div className="flex-1 flex flex-wrap gap-2">
                   {detailLinks(row.details).map((l, j) => (
                     <Link key={j} href={l.href} target="_blank" className="text-xs text-sky-400 hover:text-sky-300 inline-flex items-center gap-1">
@@ -1216,6 +1260,26 @@ export default function AdminTestCheckoutPage() {
                   />
                 </div>
               )}
+              {/* Always offered, on every SKU: the question "who is this report
+                  about" is orthogonal to which product is being bought. Left
+                  blank, the run behaves exactly as it always has. */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
+                  Subject entity <span className="text-neutral-600 normal-case tracking-normal">— CSP/DPO client, optional</span>
+                </label>
+                <input
+                  type="text"
+                  value={dialogFields.managed_entity_name}
+                  onChange={e => setDialogFields({ ...dialogFields, managed_entity_name: e.target.value })}
+                  placeholder="Leave blank for a self-assessment run"
+                  className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-neutral-100 text-sm"
+                />
+                <p className="mt-1 text-[11px] text-neutral-500 leading-relaxed">
+                  Names the client company the deliverable is about. Registered and
+                  ACRA-checked on first use; the test account&apos;s own company and
+                  website are left untouched.
+                </p>
+              </div>
               {dialogProduct.needsRfp && (
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
