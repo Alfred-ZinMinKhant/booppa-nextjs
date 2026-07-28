@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { cspGet, cspSend } from "@/lib/cspClient";
 import { PageHeader, Card, RiskBadge, StatusBadge, NotarizationBadge, fmtDate, EmptyState } from "@/components/csp/ui";
+import { VerifiedBadge } from "@/components/EntityPicker";
 
 export default function ClientDetailPage() {
   const params = useParams();
@@ -38,6 +39,33 @@ export default function ClientDetailPage() {
         subtitle={`${String(client.client_type || "").replace("_", " ")}${client.uen_or_reg_no ? ` · ${client.uen_or_reg_no}` : ""}`}
         action={<RiskBadge rating={client.risk_rating} />}
       />
+
+      {/* Identity is stated separately from the AML fields above. `uen_or_reg_no`
+          in the subtitle is what the CSP entered; this block is what the registry
+          confirmed. Only a verified company can be named on a certified report. */}
+      {client.client_type !== "individual" && (
+        <div className="mb-6 rounded-xl border border-[#e2e8f0] bg-white p-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <p className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest">Company identity</p>
+            <VerifiedBadge verified={!!client.identity_verified} />
+          </div>
+          {client.identity_verified ? (
+            <p className="text-sm text-[#0f172a] mt-2">
+              <b>{client.identity_legal_name}</b>
+              {client.identity_uen && <span className="font-mono text-[#475569]"> · {client.identity_uen}</span>}
+              <span className="block text-xs text-[#64748b] mt-0.5">
+                Confirmed against ACRA{client.identity_verified_at ? ` on ${fmtDate(client.identity_verified_at)}` : ""}.
+              </span>
+            </p>
+          ) : (
+            <p className="text-sm text-[#475569] mt-2 leading-relaxed">
+              No ACRA match. Reports ordered for this client will state the company as
+              “Not verified” rather than naming a legal entity. If the legal name or
+              UEN was mistyped, correcting it will let the company verify.
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <Mini label="CDD status"><StatusBadge status={client.cdd_status} /></Mini>

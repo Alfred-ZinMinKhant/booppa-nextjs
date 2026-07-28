@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { cspGet } from "@/lib/cspClient";
 import { PageHeader, Card, RiskBadge, StatusBadge, EmptyState, PrimaryLink, fmtDate } from "@/components/csp/ui";
+import { VerifiedBadge } from "@/components/EntityPicker";
 
 export default function CspClientsPage() {
   const [clients, setClients] = useState<any[]>([]);
@@ -79,7 +80,15 @@ export default function CspClientsPage() {
                 <tr key={c.id} className="border-t border-[#f1f5f9] hover:bg-[#f8fafc]">
                   <td className="px-4 py-3">
                     <Link href={`/csp/clients/${c.id}`} className="font-semibold text-[#0f172a] hover:text-[#10b981]">{c.legal_name}</Link>
-                    {c.uen_or_reg_no && <span className="block text-xs text-[#94a3b8]">{c.uen_or_reg_no}</span>}
+                    {/* The UEN is labelled "as entered" deliberately. It is an AML
+                        case-file field, not a confirmed identity — an unlabelled
+                        UEN sitting under a name reads as though we checked it. */}
+                    {c.uen_or_reg_no && (
+                      <span className="block text-xs text-[#94a3b8]">{c.uen_or_reg_no} <span className="text-[#cbd5e1]">as entered</span></span>
+                    )}
+                    {c.client_type !== "individual" && (
+                      <span className="inline-block mt-1"><VerifiedBadge verified={!!c.identity_verified} /></span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-[#475569] capitalize">{String(c.client_type || "").replace("_", " ")}</td>
                   <td className="px-4 py-3"><RiskBadge rating={c.risk_rating} /></td>

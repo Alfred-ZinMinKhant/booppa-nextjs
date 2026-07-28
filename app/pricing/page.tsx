@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { SUBSCRIPTION_PRODUCTS } from "@/lib/pricing";
 import { startCheckout } from "@/lib/checkout";
+import EntityPicker from "@/components/EntityPicker";
+import type { ManagedEntity } from "@/lib/managedEntities";
 
 const BUYER_TIER_KEYS = ["buyer_starter_monthly", "buyer_pro_monthly", "buyer_enterprise_monthly"] as const;
 
@@ -157,6 +159,9 @@ export default function PricingPage() {
 	const [bundleModal, setBundleModal] = useState<{ productType: string } | null>(null);
 	const [bundleForm, setBundleForm] = useState({ website: "", company: "" });
 	const [bundleError, setBundleError] = useState<string | null>(null);
+	// Non-null only for accounts that manage client companies. When set, it — not
+	// the typed name, and never the logged-in account — is the subject of the order.
+	const [subject, setSubject] = useState<ManagedEntity | null>(null);
 
 	async function handleCheckout(productType: string) {
 		if (!loggedIn) {
@@ -186,6 +191,23 @@ export default function PricingPage() {
 
 	async function submitBundleForm() {
 		if (!bundleModal) return;
+
+		// A named subject short-circuits the free-text fields entirely. The entity's
+		// identity was already ACRA-checked when it was registered, so re-sending a
+		// typed company name here would only give the backend something to disagree
+		// with. Only the website is still needed, and only if the entity lacks one.
+		if (subject) {
+			let site = (subject.website || bundleForm.website).trim();
+			if (!site) { setBundleError("Website URL is required to scan this company."); return; }
+			if (!/^https?:\/\//i.test(site)) site = `https://${site}`;
+			const pt = bundleModal.productType;
+			setLoadingProduct(pt);
+			setBundleModal(null);
+			await startCheckout(pt, { managed_entity_id: subject.id, vendor_url: site });
+			setLoadingProduct(null);
+			return;
+		}
+
 		let website = bundleForm.website.trim();
 		const company = bundleForm.company.trim();
 		if (!website) { setBundleError("Website URL is required."); return; }
@@ -969,7 +991,19 @@ export default function PricingPage() {
 							We need your website URL and company name so the included PDPA Quick Scan and Vendor Proof can run on the right entity.
 						</p>
 						<div className="space-y-4">
-							<div>
+							{/* Renders only for accounts with managed client companies. */}
+							<EntityPicker selected={subject} onSelect={setSubject} />
+							<div className={subject ? "hidden" : undefined}>
+								<label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Company name</label>
+								<input
+									type="text"
+									placeholder="As it should appear on your reports"
+									value={bundleForm.company}
+									onChange={(e) => setBundleForm((f) => ({ ...f, company: e.target.value }))}
+									className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
+								/>
+							</div>
+							<div className={subject?.website ? "hidden" : undefined}>
 								<label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Website URL</label>
 								<input
 									type="text"
@@ -977,16 +1011,6 @@ export default function PricingPage() {
 									placeholder="yourcompany.com"
 									value={bundleForm.website}
 									onChange={(e) => setBundleForm((f) => ({ ...f, website: e.target.value }))}
-									className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
-								/>
-							</div>
-							<div>
-								<label className="block text-xs font-bold text-[#0f172a] uppercase tracking-wider mb-2">Company name</label>
-								<input
-									type="text"
-									placeholder="As it should appear on your reports"
-									value={bundleForm.company}
-									onChange={(e) => setBundleForm((f) => ({ ...f, company: e.target.value }))}
 									className="w-full px-4 py-3 rounded-xl border-2 border-[#e2e8f0] focus:border-[#10b981] focus:outline-none text-sm text-[#0f172a]"
 								/>
 							</div>

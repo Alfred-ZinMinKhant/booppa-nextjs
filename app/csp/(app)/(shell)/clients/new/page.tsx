@@ -9,6 +9,9 @@ export default function NewClientPage() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Set when the client was registered but its company could not be confirmed
+  // against ACRA. Not an error — the CDD record is valid either way.
+  const [notice, setNotice] = useState<{ clientId: string; warning: string | null } | null>(null);
   const [form, setForm] = useState<Record<string, any>>({
     client_type: "company",
     legal_name: "",
@@ -41,6 +44,18 @@ export default function NewClientPage() {
     const r = await cspSend("clients", "POST", payload);
     setBusy(false);
     if (r.ok && r.data?.client_id) {
+      // Registering the client always succeeds — CDD must never be blocked by a
+      // registry miss. But if the company could not be confirmed, say so here
+      // rather than redirecting past it: this is the last moment the CSP is
+      // looking at the name and UEN they just typed, and a correction now is far
+      // cheaper than a report that reads "Not verified" after it is ordered.
+      if (!r.data.identity_verified && form.client_type !== "individual") {
+        setNotice({
+          clientId: r.data.client_id,
+          warning: r.data.identity_warning || null,
+        });
+        return;
+      }
       router.push(`/csp/clients/${r.data.client_id}`);
     } else {
       setError(typeof r.data?.detail === "string" ? r.data.detail : "Could not register client.");
@@ -52,6 +67,32 @@ export default function NewClientPage() {
       <PageHeader title="New client" subtitle="CDD is required before providing any service." />
       <Card className="p-6 max-w-2xl">
         {error && <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 font-semibold">{error}</div>}
+
+        {notice && (
+          <div className="mb-5 rounded-xl bg-amber-50 border border-amber-200 px-4 py-4">
+            <p className="text-sm font-bold text-amber-900 mb-1">
+              Client registered — company not verified
+            </p>
+            <p className="text-sm text-amber-900 leading-relaxed">
+              {notice.warning
+                ? notice.warning
+                : "We could not match this company against the ACRA register, so its reports will state the company as “Not verified” rather than naming a legal entity."}
+            </p>
+            <p className="text-xs text-amber-800 mt-2 leading-relaxed">
+              The CDD record is complete and valid. If the legal name or UEN was
+              mistyped, correcting it will let the company verify.
+            </p>
+            <div className="flex gap-3 mt-4">
+              <button
+                type="button"
+                onClick={() => router.push(`/csp/clients/${notice.clientId}`)}
+                className="bg-[#0f172a] text-white font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-[#1e293b] transition"
+              >
+                Continue to client →
+              </button>
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label>Client type</Label>

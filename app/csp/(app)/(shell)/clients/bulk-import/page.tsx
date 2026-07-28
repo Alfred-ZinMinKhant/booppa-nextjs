@@ -65,6 +65,42 @@ export default function BulkImportPage() {
               <li>Imported: <b className="text-[#10b981]">{result.import_summary?.imported}</b></li>
               <li>Skipped: <b className="text-amber-600">{result.import_summary?.invalid_skipped}</b></li>
             </ul>
+
+            {/* Identity is reported separately from import success on purpose: an
+                unverified row is a complete, valid AML case file. The only thing it
+                cannot do is put a certified company name on a report. */}
+            <div className="mt-4 pt-4 border-t border-[#e2e8f0]">
+              <p className="font-bold text-[#0f172a] mb-2">Company identity</p>
+              <ul className="text-sm text-[#475569] space-y-1">
+                <li>Verified against ACRA: <b className="text-[#10b981]">{result.import_summary?.identity_verified ?? 0}</b></li>
+                <li>Not verified: <b className="text-amber-600">{result.import_summary?.identity_unverified ?? 0}</b></li>
+                {(result.import_summary?.identity_individuals ?? 0) > 0 && (
+                  <li>Individuals (no company identity): <b>{result.import_summary.identity_individuals}</b></li>
+                )}
+              </ul>
+              {(result.import_summary?.identity_unverified ?? 0) > 0 && (
+                <p className="text-xs text-[#64748b] mt-2 leading-relaxed">
+                  Unverified clients imported normally and their CDD records are complete.
+                  Their reports will state the company as “Not verified” until it is
+                  confirmed against the registry — open the client and correct the name
+                  or UEN to resolve it.
+                </p>
+              )}
+            </div>
+
+            {Array.isArray(result.import_summary?.warnings) && result.import_summary.warnings.length > 0 && (
+              <div className="mt-4 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+                <p className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">Identity warnings</p>
+                <ul className="text-xs text-amber-900 space-y-1">
+                  {result.import_summary.warnings.map((w: any, i: number) => (
+                    <li key={i}>
+                      <b>Row {w.row}</b> — {w.client}: {w.message}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {Array.isArray(result.import_summary?.errors) && result.import_summary.errors.length > 0 && (
               <pre className="text-xs mt-3 overflow-x-auto">{JSON.stringify(result.import_summary.errors, null, 2)}</pre>
             )}
