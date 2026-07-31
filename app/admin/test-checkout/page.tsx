@@ -52,6 +52,10 @@ interface DialogFields {
   // company/website fields describe that entity and are NOT written back to the
   // test account — the same precedence a real managed-entity checkout applies.
   managed_entity_name: string
+  // Sector for Tender Intelligence digest scoping. Carried over from the active
+  // Test Identity (unlike managed_entity_name) because it describes the ordering
+  // account, not a per-run subject.
+  industry: string
   rfp_description: string
 }
 
@@ -64,6 +68,11 @@ interface Identity {
   email: string
   company: string
   url: string
+  // Drives VendorSector, which scopes the Tender Intelligence digest. Cannot be
+  // recovered from a UEN — the open ACRA dataset carries no SSIC field — so
+  // this is the only way to exercise a sector-scoped digest from the harness.
+  // Leave it blank to test the unresolvable path (checkout 422 + sector prompt).
+  industry: string
 }
 
 const IDENTITY_DEFAULTS: Record<IdentityKey, Identity> = {
@@ -71,11 +80,13 @@ const IDENTITY_DEFAULTS: Record<IdentityKey, Identity> = {
     email: 'test+suite-a@booppa.io',
     company: 'Suite Test Co A',
     url: 'https://suite-a.booppa.io',
+    industry: 'IT',
   },
   B: {
     email: 'test+suite-b@booppa.io',
     company: 'Suite Test Co B',
     url: 'https://suite-b.booppa.io',
+    industry: 'Construction',
   },
 }
 
@@ -263,6 +274,7 @@ export default function AdminTestCheckoutPage() {
     vendor_url: '',
     company_name: '',
     managed_entity_name: '',
+    industry: '',
     rfp_description: '',
   })
   const [trmDemo, setTrmDemo] = useState<TrmDemoResult | null>(null)
@@ -309,6 +321,7 @@ export default function AdminTestCheckoutPage() {
       // explicit choice on each run, not a sticky default that silently
       // redirects an ordinary self-assessment run at a client company.
       managed_entity_name: '',
+      industry: id.industry,
       rfp_description: '',
     })
     setDialogProduct(product)
@@ -349,6 +362,12 @@ export default function AdminTestCheckoutPage() {
       // what that means per product.
       const entity = dialogFields.managed_entity_name.trim()
       if (entity) body.managed_entity_name = entity
+      // Unconditional like company/website: the backend seeds VendorSector from
+      // this for any SKU, so a Vendor purchase can establish the sector that a
+      // later Tender Intelligence run is expected to pick up. Sent blank-safe —
+      // omitting it leaves the account's existing industry untouched.
+      const industry = dialogFields.industry.trim()
+      if (industry) body.industry = industry
       if (dialogProduct.needsRfp) {
         const desc = dialogFields.rfp_description.trim()
         if (desc) body.rfp_description = desc
@@ -657,6 +676,21 @@ export default function AdminTestCheckoutPage() {
                   onChange={e => updateIdentity(k, 'url', e.target.value)}
                   className="w-full px-2 py-1 bg-neutral-900 border border-neutral-700 rounded text-neutral-100 text-xs"
                 />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-wider text-neutral-500 mb-0.5">
+                  Industry / sector
+                </label>
+                <input
+                  type="text"
+                  value={identities[k].industry}
+                  onChange={e => updateIdentity(k, 'industry', e.target.value)}
+                  placeholder="blank = test the sector prompt"
+                  className="w-full px-2 py-1 bg-neutral-900 border border-neutral-700 rounded text-neutral-100 text-xs placeholder:text-neutral-600"
+                />
+                <p className="mt-0.5 text-[10px] leading-tight text-neutral-500">
+                  Scopes the Tender Intelligence digest. Blank ⇒ no sector on file ⇒ checkout 422s and the sector prompt fires.
+                </p>
               </div>
             </div>
           </div>
@@ -1260,6 +1294,23 @@ export default function AdminTestCheckoutPage() {
                   />
                 </div>
               )}
+              {/* Offered on every SKU, like company/website: any purchase can
+                  seed VendorSector, and the sector is a property of the ordering
+                  account rather than of this product. Prefilled from the active
+                  Test Identity; clear it to exercise the no-sector-on-file path. */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
+                  Industry / sector{' '}
+                  <span className="text-neutral-600 normal-case tracking-normal">— scopes tender digest</span>
+                </label>
+                <input
+                  type="text"
+                  value={dialogFields.industry}
+                  onChange={e => setDialogFields({ ...dialogFields, industry: e.target.value })}
+                  placeholder="e.g. IT, Construction, Healthcare"
+                  className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 rounded text-neutral-100 text-sm"
+                />
+              </div>
               {/* Always offered, on every SKU: the question "who is this report
                   about" is orthogonal to which product is being bought. Left
                   blank, the run behaves exactly as it always has. */}

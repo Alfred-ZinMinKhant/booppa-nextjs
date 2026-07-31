@@ -26,6 +26,15 @@ test.beforeEach(async ({ context }) => {
 
 const BUNDLE_TYPES = new Set(BUNDLES.map((b) => b.productType))
 
+// Tender Intelligence gates on sector at checkout: the digest is sector-scoped,
+// and a standalone subscriber has no Vendor purchase to seed VendorSector from.
+// The QA account has no industry on file, so the sector must be sent explicitly
+// or checkout 422s to trigger the frontend prompt.
+const TENDER_INTEL_TYPES = new Set([
+  'tender_intelligence_monthly',
+  'tender_intelligence_annual',
+])
+
 for (const sku of ALL_SKUS) {
   test(`POST /api/checkout returns Stripe URL for ${sku.productType}`, async ({ request }) => {
     const body: Record<string, string> = {
@@ -36,6 +45,9 @@ for (const sku of ALL_SKUS) {
     if (sku.rfpDescription) body.rfp_description = sku.rfpDescription
     if (BUNDLE_TYPES.has(sku.productType)) {
       body.vendor_url = 'https://playwright.test'
+    }
+    if (TENDER_INTEL_TYPES.has(sku.productType)) {
+      body.sector = 'IT'
     }
 
     const res = await request.post('/api/checkout', { data: body })

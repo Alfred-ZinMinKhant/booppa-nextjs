@@ -37,6 +37,17 @@ export async function startCheckout(
       if (company?.trim()) {
         await startCheckout(productType, { ...(extraBody || {}), company_name: company.trim() });
       }
+    } else if (res.status === 422 && /sector/i.test(data.error || "")) {
+      // Tender Intelligence scopes its digest to the subscriber's sector. The
+      // backend only 422s here when there is no sector on the order AND no
+      // industry on the account, so this prompt is the last chance to capture it
+      // before the subscriber starts receiving broad "all sectors" digests.
+      const sector = prompt(
+        "We need your sector to scope your tender intelligence digest.\n\nEnter the sector your business operates in (e.g. IT, Construction, Healthcare):",
+      );
+      if (sector?.trim()) {
+        await startCheckout(productType, { ...(extraBody || {}), sector: sector.trim() });
+      }
     } else {
       alert(data.error || "Unable to start checkout. Please try again.");
     }
