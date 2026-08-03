@@ -148,6 +148,10 @@ export default function TrmPage() {
           <SummaryCard label="High/critical risk" value={String((s.by_risk.high || 0) + (s.by_risk.critical || 0))} hint="from AI analysis" tone={gapsAndHighRisk ? 'warn' : 'good'} />
         </div>
 
+        {/* MAS licence class — blocking when unconfirmed: the Outsourcing Risk
+            Register is withheld until it is set, so it sits above everything else */}
+        <MasLicenceCard />
+
         {/* MAS TRM Baseline — the starting-inventory PDF generated on Suite activation */}
         <BaselineReportCard />
 
@@ -467,6 +471,184 @@ function BoardReportCard() {
           </button>
         </div>
       </div>
+    </section>
+  )
+}
+
+interface LicencePayload {
+  mas_licence_type: string | null
+  label: string
+  is_set: boolean
+  options: { value: string; label: string }[]
+  pack_status: string | null
+  register_blocked: boolean
+}
+
+const REGIME_LABEL: Record<string, string> = {
+  bank_notices: 'MAS Notices 658 / 1121 (banks and merchant banks) — binding since 11 December 2024',
+  non_bank_guidelines: 'Guidelines on Outsourcing (Financial Institutions other than Banks) — guidance',
+}
+
+/**
+ * MAS licence class confirmation.
+ *
+ * This is a blocking prompt, not a settings row. The Outsourcing Risk Register
+ * in the TRM Document Pack branches entirely on this value and is withheld
+ * until it is confirmed — we do not guess a regime, because a bank holding a
+ * non-bank register is signed evidence that the entity misread its own rules.
+ *
+ * Always re-settable: a mis-selection must be correctable without support, and
+ * saving a changed value re-generates the register.
+ */
+function MasLicenceCard() {
+  const [data, setData] = useState<LicencePayload | null>(null)
+  const [hidden, setHidden] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [choice, setChoice] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [regime, setRegime] = useState<string | null>(null)
+  const [regenerating, setRegenerating] = useState(false)
+
+  const load = useCallback(async () => {
+    try {
+      const r = await fetch('/api/vendor/trm/licence', { cache: 'no-store' })
+      if (!r.ok) { setHidden(true); return }
+      const d: LicencePayload = await r.json()
+      setData(d)
+      setChoice(d.mas_licence_type || '')
+    } catch {
+      setHidden(true)
+    }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const save = async () => {
+    if (!choice) return
+    setSaving(true)
+    setError('')
+    try {
+      const r = await fetch('/api/vendor/trm/licence', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mas_licence_type: choice }),
+      })
+      const d = await r.json()
+      if (!r.ok) { setError(d?.detail || 'Could not save your licence class.'); return }
+      setRegime(d.outsourcing_regime || null)
+      setRegenerating(!!d.register_regenerating)
+      setEditing(false)
+      await load()
+    } catch {
+      setError('Could not reach the server. Please try again.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (hidden || !data) return null
+
+  const unset = !data.is_set
+  const showPicker = editing || unset
+
+  return (
+    <section
+      className={`rounded-xl p-5 border ${
+        unset
+          ? 'bg-amber-500/10 border-amber-500/40'
+          : 'bg-neutral-900 border-neutral-800'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex-1 min-w-[260px]">
+          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            {unset
+              ? <AlertTriangle className="h-4 w-4 text-amber-400" />
+              : <ShieldCheck className="h-4 w-4 text-emerald-400" />}
+            MAS licence class
+          </h2>
+          {unset ? (
+            <p className="text-xs text-amber-100/80 mt-1 leading-relaxed">
+              <strong className="text-amber-200">Action required.</strong> Your Outsourcing Risk
+              Register cannot be generated until you confirm which MAS licence your entity holds.
+              The register differs entirely between banks and merchant banks (MAS Notices 658 / 1121,
+              binding since 11 December 2024) and every other licensed FI (the Guidelines on
+              Outsourcing). We will not guess — a register in the wrong regime is signed evidence
+              that the entity misread its own rules.
+              {data.register_blocked && ' The rest of your document pack has already been delivered.'}
+            </p>
+          ) : (
+            <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
+              Confirmed as <strong className="text-white">{data.label}</strong>. This decides which
+              outsourcing regime your Outsourcing Risk Register is written against. If it is wrong,
+              correct it here and we will regenerate the register — do so <em>before</em> anyone
+              signs it.
+            </p>
+          )}
+          {regime && REGIME_LABEL[regime] && (
+            <p className="text-xs text-emerald-300 mt-2">
+              Outsourcing regime applied: {REGIME_LABEL[regime]}.
+            </p>
+          )}
+          {regenerating && (
+            <p className="text-xs text-emerald-300 mt-1 inline-flex items-center gap-1.5">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Regenerating your Outsourcing Risk Register — we will email it when it is ready.
+            </p>
+          )}
+          {error && <p className="text-xs text-red-300 mt-2">{error}</p>}
+        </div>
+
+        {!showPicker && (
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold bg-neutral-800 hover:bg-neutral-700 text-white px-3 py-1.5 rounded-lg"
+          >
+            Change licence class
+          </button>
+        )}
+      </div>
+
+      {showPicker && (
+        <div className="mt-4 flex items-end gap-2 flex-wrap">
+          <div className="flex-1 min-w-[260px]">
+            <label htmlFor="mas-licence" className="block text-xs font-semibold text-neutral-300 mb-1.5">
+              Which MAS licence does your entity hold?
+            </label>
+            <select
+              id="mas-licence"
+              value={choice}
+              onChange={e => setChoice(e.target.value)}
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+            >
+              <option value="">Select your licence class…</option>
+              {data.options.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving || !choice || choice === data.mas_licence_type}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg disabled:opacity-50"
+          >
+            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+            Confirm licence class
+          </button>
+          {editing && !unset && (
+            <button
+              type="button"
+              onClick={() => { setEditing(false); setChoice(data.mas_licence_type || ''); setError('') }}
+              className="text-xs text-neutral-400 hover:text-white px-2 py-2"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+      )}
     </section>
   )
 }
