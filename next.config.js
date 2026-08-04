@@ -20,8 +20,14 @@ const securityHeaders = [
     value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   },
   {
+    // The S3 host appears in BOTH img-src and connect-src, for two unrelated
+    // reasons. connect-src: the admin uploads blog images browser-direct to a
+    // presigned POST. img-src: `/api/public/cms-media/…` 302s to a presign, and
+    // CSP is enforced against redirect targets — so the admin thumbnail grid
+    // (a raw <img>, unlike the public pages' server-side next/image fetch)
+    // needs the redirect destination allowed or it renders blank.
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: https://api.qrserver.com https://polygonscan.com https://assets.calendly.com https://cms.booppa.io https://api.booppa.io; font-src 'self' fonts.gstatic.com; connect-src 'self' https://api.booppa.io https://cms.booppa.io https://cloudflareinsights.com https://booppa-reports-04bd50c4.s3.amazonaws.com https://booppa-reports-04bd50c4.s3.ap-southeast-1.amazonaws.com; frame-src 'self' https://calendly.com;",
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: https://api.qrserver.com https://polygonscan.com https://assets.calendly.com https://cms.booppa.io https://api.booppa.io https://booppa-reports-04bd50c4.s3.amazonaws.com https://booppa-reports-04bd50c4.s3.ap-southeast-1.amazonaws.com; font-src 'self' fonts.gstatic.com; connect-src 'self' https://api.booppa.io https://cms.booppa.io https://cloudflareinsights.com https://booppa-reports-04bd50c4.s3.amazonaws.com https://booppa-reports-04bd50c4.s3.ap-southeast-1.amazonaws.com; frame-src 'self' https://calendly.com;",
   },
 ];
 
