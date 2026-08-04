@@ -1,32 +1,36 @@
+// CMS admin proxy. Points at FastAPI's `/api/admin/cms/…` since the Django
+// service was retired.
+//
+// This stayed a separate file rather than collapsing into the sibling
+// `app/api/admin/api/[...path]/route.ts` for two reasons: that proxy targets
+// `/api/v1/<segments>` (wrong prefix here) and does NOT append a trailing
+// slash, whereas the FastAPI CMS routes are declared *with* one. Without the
+// slash every write 307-redirects and the POST body can be dropped.
+//
+// Auth is now the same admin bearer JWT the rest of the admin UI uses; the
+// `CMS_ADMIN_TOKEN` shared secret and its `token.length > 10` guard are gone.
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { verify_admin_token_present } from './_guard'
-
-const CMS_BASE =
-  process.env.CMS_BASE ||
-  process.env.NEXT_PUBLIC_CMS_BASE ||
-  'https://cms.booppa.io'
-
-const CMS_ADMIN_TOKEN =
-  process.env.CMS_ADMIN_TOKEN || process.env.ADMIN_TOKEN || ''
+import { config } from '@/lib/config'
 
 export const dynamic = 'force-dynamic'
 
 async function proxy(req: NextRequest, params: { path: string[] }) {
-  if (!verify_admin_token_present(cookies().get('admin_token')?.value)) {
-    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
-  }
-  if (!CMS_ADMIN_TOKEN) {
-    return NextResponse.json({ detail: 'CMS_ADMIN_TOKEN not configured on server.' }, { status: 503 })
+  const adminToken = cookies().get('admin_token')?.value
+  if (!adminToken) {
+    return NextResponse.json(
+      { detail: 'Admin session expired', code: 'admin_session_expired' },
+      { status: 401 },
+    )
   }
 
   const segments = params.path.join('/')
   const search = req.nextUrl.search || ''
-  const url = `${CMS_BASE.replace(/\/$/, '')}/api/admin/${segments}/${search}`
+  const url = `${config.apiUrl}/api/admin/cms/${segments}/${search}`
 
   const isFormData = (req.headers.get('content-type') || '').includes('multipart/form-data')
   const headers: Record<string, string> = {
-    'X-Admin-Token': CMS_ADMIN_TOKEN,
+    Authorization: `Bearer ${adminToken}`,
   }
 
   let body: BodyInit | undefined

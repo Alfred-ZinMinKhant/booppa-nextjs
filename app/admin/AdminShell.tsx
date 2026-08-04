@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  LayoutDashboard, FileText, Briefcase, Users, UserCircle, Activity,
+  LayoutDashboard, Briefcase, Users, UserCircle, Activity,
   Upload, Inbox, LifeBuoy, LogOut, Brain, Newspaper, BookOpen,
   ScrollText, GraduationCap, FlaskConical, RefreshCw, PackageX,
 } from 'lucide-react'
@@ -22,7 +22,6 @@ const NAV: { group: string; items: { href: string; label: string; icon: any }[] 
   {
     group: 'CMS Content',
     items: [
-      { href: '/admin/content', label: 'Overview', icon: FileText },
       { href: '/admin/content/blogs', label: 'Blogs', icon: Newspaper },
       { href: '/admin/content/rfp-tips', label: 'RFP Tips', icon: ScrollText },
       { href: '/admin/content/compliance', label: 'Compliance', icon: BookOpen },

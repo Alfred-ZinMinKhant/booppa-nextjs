@@ -21,7 +21,7 @@ const securityHeaders = [
   },
   {
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: https://api.qrserver.com https://polygonscan.com https://assets.calendly.com https://cms.booppa.io; font-src 'self' fonts.gstatic.com; connect-src 'self' https://api.booppa.io https://cms.booppa.io https://cloudflareinsights.com; frame-src 'self' https://calendly.com;",
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: https://api.qrserver.com https://polygonscan.com https://assets.calendly.com https://cms.booppa.io https://api.booppa.io; font-src 'self' fonts.gstatic.com; connect-src 'self' https://api.booppa.io https://cms.booppa.io https://cloudflareinsights.com; frame-src 'self' https://calendly.com;",
   },
 ];
 
@@ -47,28 +47,22 @@ const nextConfig = {
         hostname: 'assets.calendly.com',
         pathname: '/**',
       },
+      // Blog images. BOTH hosts are required until the `blog_post_images` row
+      // rewrite runs at cutover: the rows still hold Django-relative paths
+      // (`blog_images/x.png`), which the backend's `_image_url` maps to
+      // CMS_LEGACY_MEDIA_BASE — so images keep coming from cms.booppa.io even
+      // though the JSON now comes from api.booppa.io. Drop the cms entry only
+      // after the rows are rewritten to the `cms/` prefix.
       {
         protocol: 'https',
         hostname: 'cms.booppa.io',
         pathname: '/media/**',
       },
-      // Plaintext-HTTP dev/staging media origins — only in non-production builds.
-      ...(process.env.NODE_ENV !== 'production'
-        ? [
-            {
-              protocol: 'http',
-              hostname: 'localhost',
-              port: '8001',
-              pathname: '/media/**',
-            },
-            {
-              protocol: 'http',
-              hostname: '13.229.135.184',
-              port: '8001',
-              pathname: '/media/**',
-            },
-          ]
-        : []),
+      {
+        protocol: 'https',
+        hostname: 'api.booppa.io',
+        pathname: '/api/public/cms-media/**',
+      },
     ],
   },
   async redirects() {
@@ -76,12 +70,14 @@ const nextConfig = {
   },
   async rewrites() {
     const backend = process.env.BACKEND_BASE_URL || 'https://api.booppa.io';
-    const cms = process.env.CMS_BASE || 'https://cms.booppa.io';
     return [
       { source: '/api/v1/:path*', destination: `${backend}/api/v1/:path*` },
       { source: '/api/admin/intelligence', destination: `${backend}/api/v1/admin/intelligence` },
       { source: '/api/admin/intelligence/:path*', destination: `${backend}/api/v1/admin/intelligence/:path*` },
-      { source: '/api/public/:path*', destination: `${cms}/api/public/:path*` },
+      // CMS retirement: public content now comes from FastAPI. The path is
+      // unchanged because main.py dual-mounts the router at `/api`, so this is
+      // a host swap only — `cms.booppa.io` stays up as the rollback target.
+      { source: '/api/public/:path*', destination: `${backend}/api/public/:path*` },
     ];
   },
   async headers() {
