@@ -408,8 +408,16 @@ export const SUBSCRIPTION_PRODUCTS: Record<string, Product> = {
     currency: 'SGD',
     type: 'subscription',
     badge: 'Suite',
+    // These list what already ships on activation, not a roadmap. The TRM
+    // document pack and the monthly board report have been generated since
+    // launch and were simply never listed here — the tile undersold the product.
+    // PDPA wording is deliberately "assessment"/"documentation", never
+    // "compliance": we assess and document, we do not certify.
     features: [
       'MAS TRM — all 13 domains',
+      '7-document MAS TRM policy pack',
+      'Monthly board-ready TRM + PDPA report',
+      'PDPA assessment + 7-document Evidence Pack',
       'AI gap analysis (DeepSeek)',
       '50 notarizations / month',
       'RESTful API + webhooks',
