@@ -53,12 +53,10 @@ const nextConfig = {
         hostname: 'assets.calendly.com',
         pathname: '/**',
       },
-      // Blog images. BOTH hosts are required until the `blog_post_images` row
-      // rewrite runs at cutover: the rows still hold Django-relative paths
-      // (`blog_images/x.png`), which the backend's `_image_url` maps to
-      // CMS_LEGACY_MEDIA_BASE — so images keep coming from cms.booppa.io even
-      // though the JSON now comes from api.booppa.io. Drop the cms entry only
-      // after the rows are rewritten to the `cms/` prefix.
+      // Blog images. The `blog_post_images` row rewrite to the `cms/` prefix is
+      // done, so every image now resolves through api.booppa.io. The
+      // cms.booppa.io entry below is retained only as the rollback path for the
+      // §6 Django teardown and comes out in its final step.
       {
         protocol: 'https',
         hostname: 'cms.booppa.io',
