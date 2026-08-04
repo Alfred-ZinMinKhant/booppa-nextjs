@@ -165,6 +165,7 @@ export function CmsEditView({ kind, id }: { kind: CmsKind; id: string | 'new' })
   })
   const [postId, setPostId] = useState<string | null>(isNew ? null : id)
   const [images, setImages] = useState<{ id: number; url: string; caption: string | null }[]>([])
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     if (isNew) return
@@ -207,17 +208,56 @@ export function CmsEditView({ kind, id }: { kind: CmsKind; id: string | 'new' })
     }
   }
 
+  // Uploads go browser → S3 directly, never through this app's own API route.
+  // The chain in front of us (Cloudflare → CloudFront → Amplify SSR) caps a
+  // request body at ~1MB, and real blog images are 1–2MB, so posting the file
+  // here silently stalls and never reaches the backend at all. The two calls to
+  // our API carry only JSON: mint a ticket, then record the result.
   async function handleImageUpload(file: File) {
     if (!postId) return
-    const fd = new FormData()
-    fd.append('image', file)
-    const res = await fetch(`/api/admin/cms/blogs/${postId}/images`, { method: 'POST', body: fd })
-    if (!res.ok) {
-      alert(`Image upload failed (${res.status})`)
-      return
+    setUploading(true)
+    try {
+      const presignRes = await fetch(`/api/admin/cms/blogs/${postId}/images/presign`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_type: file.type, size: file.size }),
+      })
+      const ticket = await presignRes.json().catch(() => ({}))
+      if (!presignRes.ok) {
+        alert(ticket.detail || `Image upload failed (${presignRes.status})`)
+        return
+      }
+
+      // Field order matters to S3: every policy field must precede the file.
+      const fd = new FormData()
+      Object.entries(ticket.fields as Record<string, string>).forEach(([k, v]) =>
+        fd.append(k, v),
+      )
+      fd.append('file', file)
+      const s3Res = await fetch(ticket.url, { method: 'POST', body: fd })
+      if (!s3Res.ok) {
+        // S3 enforces the size/type policy itself, so this is where an
+        // oversized file is rejected even if the browser reported otherwise.
+        alert(`Image upload to storage failed (${s3Res.status})`)
+        return
+      }
+
+      const confirmRes = await fetch(`/api/admin/cms/blogs/${postId}/images/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: ticket.key }),
+      })
+      const img = await confirmRes.json().catch(() => ({}))
+      if (!confirmRes.ok) {
+        alert(img.detail || `Image upload failed (${confirmRes.status})`)
+        return
+      }
+      setImages(imgs => [...imgs, img])
+    } catch {
+      alert('Image upload failed — check your connection and retry.')
+    } finally {
+      setUploading(false)
     }
-    const img = await res.json()
-    setImages(imgs => [...imgs, img])
   }
 
   async function handleImageDelete(imageId: number) {
@@ -325,14 +365,20 @@ export function CmsEditView({ kind, id }: { kind: CmsKind; id: string | 'new' })
           <h2 className="text-lg font-semibold text-white mb-3">Images</h2>
           <input
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg,image/webp"
+            disabled={uploading}
             onChange={e => {
               const f = e.target.files?.[0]
               if (f) handleImageUpload(f)
               e.target.value = ''
             }}
-            className="block text-sm text-neutral-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-neutral-800 file:text-neutral-200 hover:file:bg-neutral-700"
+            className="block text-sm text-neutral-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-neutral-800 file:text-neutral-200 hover:file:bg-neutral-700 disabled:opacity-50"
           />
+          {uploading && (
+            <div className="flex items-center gap-2 mt-2 text-sm text-neutral-400">
+              <Loader2 className="h-4 w-4 animate-spin" /> Uploading to storage…
+            </div>
+          )}
           {images.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
               {images.map(img => (
