@@ -234,6 +234,41 @@ type SsoRoundtripResult = {
   error?: string | null
 }
 
+type LicenceOption = {
+  value: string
+  label: string
+  documents_available: number
+  total_documents: number
+}
+
+type PackDocument = {
+  title: string | null
+  sha256: string | null
+  word_count: number | null
+  skipped: boolean
+  skip_reason: string | null
+  error?: string | null
+}
+
+type PackCase = {
+  case?: string
+  company_name?: string
+  pack_id: string | null
+  status: string
+  outsourcing_regime: string | null
+  mas_licence_type: string | null
+  user_email: string
+  deepseek_live: boolean
+  acra?: { verified?: boolean; uen?: string | null; legal_name?: string | null } | null
+  documents: Record<string, PackDocument>
+  // Matrix mode only — a single run has nothing to be graded against.
+  checks?: Record<string, boolean>
+  passed?: boolean
+  expected?: { expect_docs: number; expect_status: string; expect_regime: string | null }
+}
+
+type PackResult = { passed?: boolean; cases: PackCase[]; at: string }
+
 type CspDemoResult = {
   user_id: string
   user_email: string
@@ -279,6 +314,13 @@ export default function AdminTestCheckoutPage() {
   })
   const [trmDemo, setTrmDemo] = useState<TrmDemoResult | null>(null)
   const [trmLiveAi, setTrmLiveAi] = useState(true)
+  const [packResult, setPackResult] = useState<PackResult | null>(null)
+  const [packMode, setPackMode] = useState<'matrix' | 'single'>('matrix')
+  const [packLicence, setPackLicence] = useState('')
+  const [packCompany, setPackCompany] = useState('')
+  const [packUen, setPackUen] = useState('')
+  const [packLiveAi, setPackLiveAi] = useState(true)
+  const [licenceOptions, setLicenceOptions] = useState<LicenceOption[]>([])
   const [proSuite, setProSuite] = useState<ProSuiteResult | null>(null)
   const [proLiveAi, setProLiveAi] = useState(true)
   const [ssoRoundtrip, setSsoRoundtrip] = useState<{ signed?: SsoRoundtripResult; tampered?: SsoRoundtripResult } | null>(null)
@@ -428,6 +470,63 @@ export default function AdminTestCheckoutPage() {
         return
       }
       setTrmDemo({ ...data, at: new Date().toLocaleTimeString() })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Network error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  // Licence classes come from the backend, never a copy here: the list grew
+  // from seven keys to eleven when `insurer` was split against MAS's "Applies
+  // to" lists, and a hardcoded copy would still be offering `insurer` to a
+  // captive insurer. Each option carries how many of the seven documents it can
+  // actually support, so an operator sees the mapping before spending a run.
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await adminApiFetch('/api/admin/api/admin/trm/licence-options', { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json()
+        if (!cancelled) setLicenceOptions(data.options || [])
+      } catch {
+        // Non-fatal: matrix mode needs no licence input, so the panel still works.
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  // Same harness as `scripts/demo_trm_document_pack.py`. Nothing is emailed,
+  // uploaded or anchored — the harness stubs S3, the chain and the mail
+  // provider, so this cannot mail a demo pack to a real customer. What *is*
+  // real: the generator, the licence branching, and (when a UEN is supplied)
+  // the ACRA legal-name lookup.
+  async function runTrmDocumentPack() {
+    setBusy('trm_demo_pack')
+    setError('')
+    try {
+      const body: Record<string, unknown> = { mode: packMode, live_ai: packLiveAi }
+      if (packMode === 'single') {
+        const company = packCompany.trim() || identities[activeIdentity].company.trim()
+        if (company) body.company_name = company
+        if (packUen.trim()) body.uen = packUen.trim()
+        // Deliberately sent only when set: omitting it is the unconfirmed-licence
+        // acceptance case, not a missing field.
+        if (packLicence) body.mas_licence_type = packLicence
+      }
+      const res = await adminApiFetch('/api/admin/api/admin/trm/demo-document-pack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        cache: 'no-store',
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(typeof data.detail === 'string' ? data.detail : 'TRM document pack demo failed')
+        return
+      }
+      setPackResult({ passed: data.passed, cases: data.cases || [], at: new Date().toLocaleTimeString() })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Network error')
     } finally {
@@ -889,6 +988,170 @@ export default function AdminTestCheckoutPage() {
                 PDF generated but no download URL returned — check the S3 upload logs.
               </p>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* TRM Document Pack acceptance matrix. Previously API-only, which meant
+          the licence branching — the part that decides which MAS Notice a
+          customer's documents cite — could only be exercised by hand with curl.
+          Same code path as scripts/demo_trm_document_pack.py. */}
+      <div className="mb-10 rounded-lg border border-teal-500/30 bg-teal-500/5 p-5">
+        <div className="flex items-baseline justify-between mb-1">
+          <h2 className="text-base font-black uppercase tracking-widest text-teal-300">TRM Document Pack</h2>
+          <span className="text-[11px] text-neutral-500">7 documents · licence-branched</span>
+        </div>
+        <p className="text-xs text-neutral-400 mb-2">
+          Runs the real pack worker. <strong className="text-neutral-300">Matrix</strong> runs every
+          acceptance case and grades each against its expected regime, status and document count.
+          <strong className="text-neutral-300"> Single</strong> runs one tenant with a company name,
+          an optional UEN and a licence class of your choosing.
+        </p>
+        <p className="text-[11px] text-neutral-500 mb-4">
+          Nothing is emailed, uploaded or anchored — S3, the chain and the mail provider are stubbed,
+          so this cannot mail a demo pack to a real customer. Real: the generator, the licence
+          branching, and the ACRA legal-name lookup when you supply a UEN. A pack that resolves fewer
+          than 7 documents is the mapping working, not a failed run.
+        </p>
+
+        <div className="flex flex-wrap items-end gap-3 mb-3">
+          <label className="text-[11px] text-neutral-400">
+            <span className="block mb-1">Mode</span>
+            <select
+              value={packMode}
+              onChange={e => setPackMode(e.target.value as 'matrix' | 'single')}
+              className="bg-neutral-950 border border-neutral-700 rounded px-2 py-1 text-xs text-white"
+            >
+              <option value="matrix">Acceptance matrix (all cases)</option>
+              <option value="single">Single tenant</option>
+            </select>
+          </label>
+
+          {packMode === 'single' && (
+            <>
+              <label className="text-[11px] text-neutral-400">
+                <span className="block mb-1">Company name</span>
+                <input
+                  value={packCompany}
+                  onChange={e => setPackCompany(e.target.value)}
+                  placeholder={identities[activeIdentity].company || 'NovaPay Fintech Pte Ltd'}
+                  className="bg-neutral-950 border border-neutral-700 rounded px-2 py-1 text-xs text-white w-56"
+                />
+              </label>
+              <label className="text-[11px] text-neutral-400">
+                <span className="block mb-1">UEN (real ACRA lookup)</span>
+                <input
+                  value={packUen}
+                  onChange={e => setPackUen(e.target.value)}
+                  placeholder="e.g. 201234567A"
+                  className="bg-neutral-950 border border-neutral-700 rounded px-2 py-1 text-xs text-white w-40 font-mono"
+                />
+              </label>
+              <label className="text-[11px] text-neutral-400">
+                <span className="block mb-1">MAS licence class</span>
+                <select
+                  value={packLicence}
+                  onChange={e => setPackLicence(e.target.value)}
+                  className="bg-neutral-950 border border-neutral-700 rounded px-2 py-1 text-xs text-white max-w-[24rem]"
+                >
+                  <option value="">(unconfirmed — gates the register)</option>
+                  {licenceOptions.map(o => (
+                    <option key={o.value} value={o.value}>
+                      {o.label} — {o.documents_available}/{o.total_documents} docs
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </>
+          )}
+
+          <label className="text-[11px] text-neutral-400 inline-flex items-center gap-1.5 pb-1">
+            <input
+              type="checkbox"
+              checked={packLiveAi}
+              onChange={e => setPackLiveAi(e.target.checked)}
+              className="accent-teal-500"
+            />
+            Live DeepSeek
+          </label>
+
+          <button
+            type="button"
+            disabled={busy === 'trm_demo_pack'}
+            onClick={runTrmDocumentPack}
+            className="px-3 py-1.5 text-xs font-semibold rounded bg-teal-600 hover:bg-teal-500 text-white disabled:bg-neutral-700 disabled:text-neutral-400 inline-flex items-center gap-1.5"
+          >
+            {busy === 'trm_demo_pack' && <Loader2 className="w-3 h-3 animate-spin" />}
+            {packMode === 'matrix' ? 'Run acceptance matrix' : 'Generate pack'}
+          </button>
+        </div>
+
+        {busy === 'trm_demo_pack' && (
+          <p className="text-[11px] text-neutral-500">
+            Each case generates up to 7 documents inline. The full matrix with live DeepSeek can take
+            several minutes.
+          </p>
+        )}
+
+        {packResult && (
+          <div className="mt-4 pt-4 border-t border-neutral-800 space-y-4">
+            {packResult.passed !== undefined && (
+              <p className={`text-xs font-semibold ${packResult.passed ? 'text-emerald-400' : 'text-red-400'}`}>
+                {packResult.passed ? '✓ All cases passed' : '✗ At least one case failed'} · {packResult.at}
+              </p>
+            )}
+            {packResult.cases.map((c, i) => {
+              const delivered = Object.values(c.documents).filter(d => !d.skipped).length
+              const total = Object.keys(c.documents).length || 7
+              return (
+                <div key={c.pack_id || i} className="rounded border border-neutral-800 bg-neutral-950/60 p-3">
+                  <div className="flex flex-wrap items-baseline gap-2 mb-1">
+                    {c.case && <span className="text-xs font-black text-teal-300">Case {c.case}</span>}
+                    <span className="text-xs text-white">{c.company_name || c.user_email}</span>
+                    {c.passed !== undefined && (
+                      <span className={`text-[10px] font-bold ${c.passed ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {c.passed ? 'PASS' : 'FAIL'}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-neutral-400 mb-2">
+                    {c.mas_licence_type || 'licence unconfirmed'} · regime {c.outsourcing_regime || '—'} ·
+                    status <span className="font-mono">{c.status}</span> · {delivered}/{total} documents ·
+                    DeepSeek {c.deepseek_live ? 'live' : 'seeded'}
+                  </p>
+                  {/* Never left ambiguous: a cover page carrying a placeholder name
+                      instead of an ACRA-verified one is the defect this reports. */}
+                  <p className="text-[11px] mb-2">
+                    {c.acra?.verified ? (
+                      <span className="text-emerald-400">
+                        ACRA verified: {c.acra.legal_name || '(name not returned)'}
+                        {c.acra.uen ? ` · ${c.acra.uen}` : ''}
+                      </span>
+                    ) : (
+                      <span className="text-amber-400">
+                        No ACRA-verified legal name — the cover carries the supplied company name.
+                      </span>
+                    )}
+                  </p>
+                  <dl className="text-[11px] space-y-0.5">
+                    {Object.entries(c.documents).map(([docType, d]) => (
+                      <div key={docType} className="flex gap-2 items-baseline">
+                        <dt className={`min-w-[15rem] ${d.skipped ? 'text-neutral-600' : 'text-neutral-400'}`}>
+                          {d.title || docType}
+                        </dt>
+                        <dd className={d.skipped ? 'text-amber-400/80' : 'text-neutral-300'}>
+                          {d.error
+                            ? `error: ${d.error}`
+                            : d.skipped
+                              ? `withheld — ${d.skip_reason || 'no binding instrument for this licence'}`
+                              : `${d.word_count ?? '?'} words · ${(d.sha256 || '').slice(0, 12)}…`}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

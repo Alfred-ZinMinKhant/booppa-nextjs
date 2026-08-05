@@ -482,6 +482,8 @@ interface LicencePayload {
   options: { value: string; label: string }[]
   pack_status: string | null
   register_blocked: boolean
+  documents_available: number
+  documents_blocked: number
 }
 
 const REGIME_LABEL: Record<string, string> = {
@@ -584,6 +586,29 @@ function MasLicenceCard() {
               outsourcing regime your Outsourcing Risk Register is written against. If it is wrong,
               correct it here and we will regenerate the register — do so <em>before</em> anyone
               signs it.
+            </p>
+          )}
+          {/*
+            A confirmed licence does not always mean a complete pack, and before
+            this was shown the difference was invisible: the card turned green
+            and the customer silently received fewer documents than the seven
+            they were sold. Which documents depends on what MAS actually binds
+            the entity to — a captive insurer is named in FSM-N04 but not
+            FSM-N03, and a marine mutual is named in neither, so the documents
+            that would have to cite those Notices cannot be written at all.
+            Saying so is the product; issuing a document citing a Notice that
+            does not bind the reader is the failure this replaced.
+          */}
+          {!unset && data.documents_blocked > 0 && (
+            <p className="text-xs text-amber-100/80 mt-2 leading-relaxed">
+              <strong className="text-amber-200">
+                {data.documents_available} of {data.documents_available + data.documents_blocked} documents
+              </strong>{' '}
+              can be issued for this licence class. The remaining {data.documents_blocked} each have
+              to cite a MAS Notice that binds your entity, and MAS does not list {data.label} in the
+              Notices those documents are written against. We will not issue them citing a Notice
+              that does not apply to you. If this licence class is wrong, correct it above and the
+              missing documents are generated automatically.
             </p>
           )}
           {regime && REGIME_LABEL[regime] && (
