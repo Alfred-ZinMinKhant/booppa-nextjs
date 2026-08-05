@@ -27,7 +27,7 @@ const securityHeaders = [
     // (a raw <img>, unlike the public pages' server-side next/image fetch)
     // needs the redirect destination allowed or it renders blank.
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: https://api.qrserver.com https://polygonscan.com https://assets.calendly.com https://cms.booppa.io https://api.booppa.io https://booppa-reports-04bd50c4.s3.amazonaws.com https://booppa-reports-04bd50c4.s3.ap-southeast-1.amazonaws.com; font-src 'self' fonts.gstatic.com; connect-src 'self' https://api.booppa.io https://cms.booppa.io https://cloudflareinsights.com https://booppa-reports-04bd50c4.s3.amazonaws.com https://booppa-reports-04bd50c4.s3.ap-southeast-1.amazonaws.com; frame-src 'self' https://calendly.com;",
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' blob: data: https://api.qrserver.com https://polygonscan.com https://assets.calendly.com https://api.booppa.io https://booppa-reports-04bd50c4.s3.amazonaws.com https://booppa-reports-04bd50c4.s3.ap-southeast-1.amazonaws.com; font-src 'self' fonts.gstatic.com; connect-src 'self' https://api.booppa.io https://cloudflareinsights.com https://booppa-reports-04bd50c4.s3.amazonaws.com https://booppa-reports-04bd50c4.s3.ap-southeast-1.amazonaws.com; frame-src 'self' https://calendly.com;",
   },
 ];
 
@@ -53,15 +53,8 @@ const nextConfig = {
         hostname: 'assets.calendly.com',
         pathname: '/**',
       },
-      // Blog images. The `blog_post_images` row rewrite to the `cms/` prefix is
-      // done, so every image now resolves through api.booppa.io. The
-      // cms.booppa.io entry below is retained only as the rollback path for the
-      // §6 Django teardown and comes out in its final step.
-      {
-        protocol: 'https',
-        hostname: 'cms.booppa.io',
-        pathname: '/media/**',
-      },
+      // Blog images. Every value in `blog_post_images.image` resolves through
+      // api.booppa.io — the Django CMS at cms.booppa.io is retired and gone.
       {
         protocol: 'https',
         hostname: 'api.booppa.io',
@@ -78,9 +71,9 @@ const nextConfig = {
       { source: '/api/v1/:path*', destination: `${backend}/api/v1/:path*` },
       { source: '/api/admin/intelligence', destination: `${backend}/api/v1/admin/intelligence` },
       { source: '/api/admin/intelligence/:path*', destination: `${backend}/api/v1/admin/intelligence/:path*` },
-      // CMS retirement: public content now comes from FastAPI. The path is
-      // unchanged because main.py dual-mounts the router at `/api`, so this is
-      // a host swap only — `cms.booppa.io` stays up as the rollback target.
+      // CMS retirement: public content comes from FastAPI. The path is
+      // unchanged because main.py dual-mounts the router at `/api`, so this was
+      // a host swap only. The Django CMS is deleted; this is the only source.
       { source: '/api/public/:path*', destination: `${backend}/api/public/:path*` },
     ];
   },

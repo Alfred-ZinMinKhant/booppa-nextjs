@@ -59,7 +59,7 @@ Stripe checkout flow: UI → `POST /api/checkout` (proxy in `app/api/checkout/ro
 
 ### CSP is strict
 
-`next.config.js` ships a hand-rolled CSP. Adding a new third-party origin (script, image, fetch target, iframe) requires editing the matching `*-src` directive there or the request will be blocked silently in the browser. Current allowed origins include `api.booppa.io`, `cms.booppa.io`, `calendly.com`, `polygonscan.com`, and the staging IPs.
+`next.config.js` ships a hand-rolled CSP. Adding a new third-party origin (script, image, fetch target, iframe) requires editing the matching `*-src` directive there or the request will be blocked silently in the browser. Current allowed origins include `api.booppa.io`, the reports S3 bucket, `calendly.com`, `polygonscan.com`, and the staging IPs.
 
 ### Maintenance mode
 
@@ -71,7 +71,6 @@ Stripe checkout flow: UI → `POST /api/checkout` (proxy in `app/api/checkout/ro
 - Stripe: publishable + secret keys, webhook secret, one `STRIPE_*` price ID per SKU. Legacy SKUs are commented out — leave blank for new deployments.
 - AWS SES (transactional email)
 - `NEXT_PUBLIC_API_BASE` / `BACKEND_BASE_URL` (the FastAPI sibling)
-- `NEXT_PUBLIC_CMS_BASE` / `CMS_BASE` (the CMS sibling)
 - `COOKIE_SIGNING_SECRET` (required in prod; gates the `vendor_plan` paywall)
 
 ## Conventions

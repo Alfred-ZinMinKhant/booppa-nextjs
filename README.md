@@ -16,7 +16,7 @@ So this app is built as a shell:
 
 - Dynamic pages and API routes delegate to the FastAPI backend at `api.booppa.io`.
 - Route handlers under `app/api/*/route.ts` are proxies, not real backends. They attach the caller's credentials and forward the request. `app/api/checkout/route.ts` is the canonical example.
-- `next.config.js` rewrites `/api/v1/:path*` straight to the backend and `/api/public/:path*` to the CMS, so client code can call the versioned API directly.
+- `next.config.js` rewrites both `/api/v1/:path*` and `/api/public/:path*` straight to the backend, so client code can call the versioned API directly.
 
 The value this repository adds is not business logic. It is presentation, routing, and a correct, multi-zone authentication boundary.
 
@@ -32,13 +32,12 @@ flowchart TD
     Rewrites["next.config.js rewrites"]
   end
   Backend["FastAPI backend<br/>api.booppa.io"]
-  CMS["CMS<br/>cms.booppa.io"]
   Stripe["Stripe"]
 
   Browser --> MW --> Pages
   Pages --> Proxies
   Browser -->|/api/v1/*| Rewrites --> Backend
-  Browser -->|/api/public/*| Rewrites --> CMS
+  Browser -->|/api/public/*| Rewrites --> Backend
   Proxies -->|fetchWithAuth| Backend
   Proxies -->|webhook signature verify| Stripe
 ```

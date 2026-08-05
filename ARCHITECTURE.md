@@ -4,7 +4,7 @@ How the Booppa frontend is put together, and why it is shaped the way it is.
 
 ## System context
 
-This is one of three services. The frontend renders the product and controls access; the FastAPI backend owns all business logic, data, scoring, payments, and the blockchain-anchored audit trail; a separate CMS serves marketing and educational content.
+This is one of two services. The frontend renders the product and controls access; the FastAPI backend owns all business logic, data, scoring, payments, the blockchain-anchored audit trail, and the marketing/educational CMS content (previously a separate Django service, retired 2026-08-05).
 
 ```mermaid
 flowchart LR
@@ -16,7 +16,6 @@ flowchart LR
     RH["Route handlers (proxies)"]
   end
   API["FastAPI backend<br/>api.booppa.io"]
-  CMS["CMS<br/>cms.booppa.io"]
   Stripe["Stripe"]
 
   User --> MW
@@ -24,7 +23,7 @@ flowchart LR
   RSC --> RH
   RH -->|fetchWithAuth / adminFetch| API
   RSC -->|/api/v1 rewrite| API
-  RSC -->|/api/public rewrite| CMS
+  RSC -->|/api/public rewrite| API
   RH -->|webhook| Stripe
 ```
 
@@ -32,7 +31,7 @@ flowchart LR
 
 The dominant decision is that this repository holds almost no business logic. Three mechanisms carry delegation:
 
-1. **Rewrites.** `next.config.js` maps `/api/v1/:path*` to `${BACKEND_BASE_URL}/api/v1/:path*` and `/api/public/:path*` to the CMS. Client code calls the versioned API directly and it transparently reaches FastAPI. There are also two explicit rewrites for `/api/admin/intelligence`.
+1. **Rewrites.** `next.config.js` maps both `/api/v1/:path*` and `/api/public/:path*` to `${BACKEND_BASE_URL}`. Client code calls the versioned API directly and it transparently reaches FastAPI. There are also two explicit rewrites for `/api/admin/intelligence`.
 2. **Proxy route handlers.** Handlers under `app/api/*/route.ts` (113 of them) attach the caller's credentials with `fetchWithAuth` and forward to the backend, re-emitting the response. `app/api/checkout/route.ts` is the reference implementation: it requires a signed-in user, enriches the payload with the user's email, then forwards to `/api/v1/stripe/checkout`.
 3. **Centralized config.** `lib/config.ts` holds `apiUrl`, `wsUrl`, and an `endpoints` map. Paths are named there rather than hardcoded at call sites.
 
@@ -133,7 +132,7 @@ The webhook route verifies the `stripe-signature` header with `stripe.webhooks.c
 
 ## Content security and headers
 
-`next.config.js` ships a hand-rolled CSP alongside HSTS, `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, a referrer policy, and a `Permissions-Policy` that disables camera, microphone, geolocation, and FLoC. The CSP allowlist names each permitted origin (`api.booppa.io`, `cms.booppa.io`, Calendly, polygonscan.com, Cloudflare Insights, and the staging IP). A new third-party origin requires editing the matching `*-src` directive, or the browser blocks it silently.
+`next.config.js` ships a hand-rolled CSP alongside HSTS, `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, a referrer policy, and a `Permissions-Policy` that disables camera, microphone, geolocation, and FLoC. The CSP allowlist names each permitted origin (`api.booppa.io`, the reports S3 bucket, Calendly, polygonscan.com, Cloudflare Insights, and the staging IP). A new third-party origin requires editing the matching `*-src` directive, or the browser blocks it silently.
 
 ## Conventions worth preserving
 
