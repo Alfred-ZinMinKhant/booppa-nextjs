@@ -26,6 +26,13 @@ type VendorProof = {
   validity?: { expires_at?: string | null; expired?: boolean | null };
 };
 
+type TrustPassportData = {
+  tier?: string | null;
+  dimensions_total?: number | null;
+  dimensions_failing?: number | null;
+  scan_id?: string | null;
+};
+
 type VerifyData = {
   report_id: string;
   framework: string;
@@ -37,6 +44,7 @@ type VerifyData = {
   schema_version?: string;
   disclaimer?: string;
   vendor_proof?: VendorProof;
+  trust_passport?: TrustPassportData;
 };
 
 async function fetchVerification(hash: string): Promise<VerifyData | null> {
@@ -206,6 +214,58 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
                 Request full compliance dossier
               </Link>
             </div>
+
+            <div className="mt-8 rounded-xl bg-slate-50 p-4 text-xs text-slate-600">
+              {data.disclaimer}
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // ── Trust Passport verification view ─────────────────────────────────────
+  if (data.framework === "trust_passport" || data.trust_passport) {
+    const tp = data.trust_passport || {};
+    const company = data.company_name || "This vendor";
+    const tier = tp.tier || "L1";
+
+    return (
+      <main className="mx-auto max-w-3xl px-6 py-12">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="bg-slate-900 px-8 py-5">
+            <p className="text-xs uppercase tracking-widest text-emerald-400">
+              Booppa Trust Passport Verification
+            </p>
+            <h1 className="mt-1 text-2xl font-semibold text-white">
+              {company} — Tier {tier}
+            </h1>
+            <p className="mt-1 text-sm text-white/80">
+              Read-only proof record verified on Booppa infrastructure.
+            </p>
+          </div>
+
+          <div className="p-8">
+            <dl className="grid gap-4 text-sm text-slate-700">
+              <Row label="Company Name" value={company} />
+              <Row label="Trust Passport Tier" value={tier} />
+              <Row label="Audit Hash" value={data.report_id} />
+              <Row label="Transaction Hash" value={data.tx_hash || "Pending Anchor"} />
+              {typeof tp.dimensions_failing === "number" ? (
+                <Row label="Compliance Gaps (Failing)" value={String(tp.dimensions_failing)} />
+              ) : null}
+            </dl>
+
+            {data.tx_hash ? (
+              <Link
+                className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-emerald-700"
+                href={polygonscanTxUrl(data.tx_hash)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                View Polygonscan Blockchain Anchor →
+              </Link>
+            ) : null}
 
             <div className="mt-8 rounded-xl bg-slate-50 p-4 text-xs text-slate-600">
               {data.disclaimer}

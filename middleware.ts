@@ -17,7 +17,7 @@ const publicRoutes = [
   '/compliance-notarization',
   '/government',
 ]
-const publicPrefixes = ['/verify', '/vendors', '/blog', '/solutions', '/auth']
+const publicPrefixes = ['/verify', '/passport', '/vendors', '/blog', '/solutions', '/auth']
 
 // Routes that require a paid plan (pro or enterprise).
 const proPrefixes = ['/vendor/evidence', '/vendor/rfp']
