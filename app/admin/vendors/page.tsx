@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Loader2, AlertCircle, Search } from 'lucide-react'
+import { Loader2, AlertCircle, Search, RefreshCw } from 'lucide-react'
 import { adminApiFetch } from '@/lib/adminApiClient'
 
 interface Vendor {
@@ -25,6 +25,8 @@ export default function VendorsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const [acraState, setAcraState] = useState<'idle' | 'running' | 'queued' | 'error'>('idle')
+  const [acraMsg, setAcraMsg] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -44,14 +46,69 @@ export default function VendorsPage() {
 
   useEffect(() => { load() }, [load])
 
+  // Kicks off the targeted ACRA pass over every UEN in our own data. The button
+  // exists because the alternative is waiting for the Wednesday 06:00 beat entry,
+  // and until one cycle completes `registry_status` is NULL on every profile.
+  //
+  // Deliberately does NOT reload the table afterwards: the pass runs for minutes
+  // in a Celery worker and chains itself across several bounded passes, so an
+  // immediate refetch would show unchanged rows and read as "the button did
+  // nothing". The coverage numbers land in the worker log, not in this response.
+  const runAcraRefresh = useCallback(async () => {
+    setAcraState('running')
+    setAcraMsg('')
+    try {
+      const res = await adminApiFetch('/api/admin/api/admin/acra/refresh-targeted', { method: 'POST' })
+      if (!res.ok) {
+        setAcraState('error')
+        setAcraMsg(`Could not queue the refresh (${res.status}).`)
+        return
+      }
+      const data = await res.json()
+      setAcraState('queued')
+      // A pass already in flight takes the same Redis lock and no-ops rather than
+      // running twice, so this cannot promise the work started — only that it was
+      // accepted.
+      setAcraMsg(
+        `Queued${data.task_id ? ` (task ${String(data.task_id).slice(0, 8)})` : ''}. ` +
+        `Runs in the background over several passes; if one is already in progress this is a no-op.`,
+      )
+    } catch {
+      setAcraState('error')
+      setAcraMsg('Could not reach the admin API.')
+    }
+  }, [])
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold text-white">Vendors</h1>
-          <p className="text-sm text-neutral-400 mt-1">{total} marketplace vendors · read-only.</p>
+          <p className="text-sm text-neutral-400 mt-1">{total} marketplace vendors · list is read-only.</p>
         </div>
+        <button
+          type="button"
+          onClick={runAcraRefresh}
+          disabled={acraState === 'running'}
+          title="Fetch current ACRA registration date and registry status for every UEN in our data"
+          className="inline-flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-800 hover:border-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+        >
+          <RefreshCw className={`h-4 w-4 ${acraState === 'running' ? 'animate-spin' : ''}`} />
+          {acraState === 'running' ? 'Queueing…' : 'Refresh ACRA registry'}
+        </button>
       </div>
+
+      {acraMsg && (
+        <div
+          className={`text-sm rounded-lg px-3 py-2.5 mb-4 border ${
+            acraState === 'error'
+              ? 'text-red-400 bg-red-500/10 border-red-500/20'
+              : 'text-amber-300 bg-amber-500/10 border-amber-500/20'
+          }`}
+        >
+          {acraMsg}
+        </div>
+      )}
 
       <div className="relative mb-4 max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
