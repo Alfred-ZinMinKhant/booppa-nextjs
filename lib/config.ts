@@ -73,4 +73,12 @@ export const endpoints = {
   },
   verify: (token: string) => `/verify/${token}`,
   verifyComplete: (token: string) => `/verify/${token}/complete`,
+  scout: {
+    pending:     '/scout/pending',
+    preview:     (id: string) => `/scout/pending/${id}/preview`,
+    approve:     '/scout/approve',
+    reject:      '/scout/reject',
+    cspUpload:   '/scout/csp/seed-upload',
+    cspTemplate: '/scout/csp/seed-template.csv',
+  },
 } as const

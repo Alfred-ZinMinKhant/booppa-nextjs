@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Briefcase, Users, UserCircle, Activity,
   Upload, Inbox, LifeBuoy, LogOut, Brain, Newspaper, BookOpen,
-  ScrollText, GraduationCap, FlaskConical, RefreshCw, PackageX,
+  ScrollText, GraduationCap, FlaskConical, RefreshCw, PackageX, Target,
 } from 'lucide-react'
 
 const NAV: { group: string; items: { href: string; label: string; icon: any }[] }[] = [
@@ -17,6 +17,7 @@ const NAV: { group: string; items: { href: string; label: string; icon: any }[] 
       { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/admin/intelligence', label: 'Intelligence', icon: Brain },
       { href: '/admin/agent-dashboard', label: 'Agent Leads', icon: Activity },
+      { href: '/admin/scout/approve', label: 'SCOUT Approvals', icon: Target },
     ],
   },
   {
