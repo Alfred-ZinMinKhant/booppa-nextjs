@@ -49,12 +49,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ detail: "Invalid email address format." }, { status: 422 });
   }
 
-  // Forward to backend contact endpoint
+  // Forward to the support ticket system.
+  //
+  // This used to POST `${API}/api/v1/contact`, an endpoint that has never
+  // existed on the backend — every contact submission the site has ever taken
+  // returned 404 and reached nobody (AUDIT_2026-08-08.md P1-7). `/tickets/submit`
+  // is the real intake: it persists a SupportTicket, emails SUPPORT_EMAIL and
+  // the sender, and issues a trackable ticket id, which a fire-and-forget
+  // email would not.
   try {
-    const backendRes = await fetch(`${API}/api/v1/contact`, {
+    const backendRes = await fetch(`${API}/api/v1/tickets/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, agency, message, source, to: "evidence@booppa.io" }),
+      body: JSON.stringify({
+        name,
+        email,
+        // The agency, when given, is the single most useful routing signal on
+        // a government enquiry, so it goes in the subject rather than being
+        // dropped — TicketCreate has no field for it.
+        category: source,
+        subject: agency ? `${source} — ${agency}` : source,
+        message,
+      }),
       signal: AbortSignal.timeout(10_000),
     });
 
@@ -66,7 +82,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    const data = await backendRes.json().catch(() => ({}));
+    return NextResponse.json(
+      { success: true, ticket_id: data?.ticket_id, tracking_url: data?.tracking_url },
+      { status: 200 }
+    );
   } catch (err) {
     console.error("[contact] Backend error:", err);
     return NextResponse.json(

@@ -5,7 +5,7 @@
  * ========================================================
  * Production-grade. Connected to real Booppa APIs.
  * WCAG 2.1 AA compliant. Responsive 320px–2560px.
- * Full keyboard navigation. AGO-auditable PDF export.
+ * Full keyboard navigation. AGO-auditable plain-text shortlist export.
  *
  * Route:  app/buyer/dashboard/page.tsx
  * Auth:   Requires token cookie with role=GOV_BUYER
@@ -16,8 +16,10 @@
  *   GET /api/v1/marketplace/industries   → industry list for filter
  *   GET /api/v1/gebiz/latest-tenders     → live GeBIZ tenders
  *   GET /api/v1/verify/{uen}             → blockchain verification
- *   POST /api/v1/reports/gov-shortlist   → PDF generation (backend)
- *   GET /auth/me                         → current user (server component)
+ *   POST /api/government/shortlist-report → AGO shortlist (text), via the BFF
+ *                                          at app/api/government/[...path],
+ *                                          which attaches the session as Bearer
+ *   GET /api/v1/auth/me                  → current user
  */
 
 import React, {
@@ -478,7 +480,9 @@ function VerifyModal({ onClose }: { onClose: () => void }) {
 }
 
 // ── Export modal ──────────────────────────────────────────────────────────────
-function ExportModal({ vendors, userEmail, onClose }: { vendors: Vendor[]; userEmail: string; onClose: () => void }) {
+// The officer is taken from the authenticated session server-side, so the
+// modal no longer passes an email it cannot verify.
+function ExportModal({ vendors, onClose }: { vendors: Vendor[]; onClose: () => void }) {
   const headingId = useId();
   const officerId = useId();
   const tenderId   = useId();
@@ -504,29 +508,49 @@ function ExportModal({ vendors, userEmail, onClose }: { vendors: Vendor[]; userE
     setError(""); setLoading(true);
 
     try {
-      const res = await fetch(`${API}/api/v1/reports/gov-shortlist`, {
+      // Via the BFF, which attaches the HttpOnly session cookie as a Bearer
+      // token. This used to POST `${API}/api/v1/reports/gov-shortlist` — an
+      // endpoint that does not exist — with a body the real endpoint does not
+      // accept, using cookie credentials the API ignores, and then saved the
+      // reply as a PDF. Four separate reasons the button could never work
+      // (AUDIT_2026-08-08.md P1-4). The real endpoint is
+      // POST /government/shortlist-report and it returns plain text.
+      const res = await fetch(`/api/government/shortlist-report`, {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          vendor_ids: vendors.map((v) => v.id),
-          officer_name: officer.trim(),
-          tender_reference: tenderRef.trim(),
-          generated_by_email: userEmail,
+          vendors: vendors.map((v) => ({
+            company_name: v.company_name,
+            uen: v.uen,
+            industry: v.industry,
+            trust_score: v.trust_score,
+            verification_depth: v.verification_depth,
+            risk_signal: v.risk_signal,
+            procurement_readiness: v.procurement_readiness,
+            sector_percentile: v.sector_percentile,
+          })),
+          officer: officer.trim(),
+          tender_ref: tenderRef.trim(),
         }),
       });
 
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d?.detail ?? `Export failed (${res.status})`);
+        throw new Error(
+          res.status === 401 || res.status === 403
+            ? "Your government session has expired. Please sign in again."
+            : d?.detail ?? `Export failed (${res.status})`
+        );
       }
 
-      // Backend returns PDF binary
-      const blob = await res.blob();
+      const text = await res.text();
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
+      // .txt, because that is what the endpoint produces. Naming a text file
+      // .pdf is what made this look like it worked.
+      a.download = `Booppa_Shortlist_${tenderRef.replace(/\//g, "-")}_${new Date().toISOString().slice(0, 10)}.txt`;
       a.href = url;
-      a.download = `Booppa_Shortlist_${tenderRef.replace(/\//g, "-")}_${new Date().toISOString().slice(0, 10)}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -800,7 +824,10 @@ export default function BuyerDashboard() {
   const [industry, setIndustry] = useState("All");
   const [verifyOpen, setVerify] = useState(false);
   const [exportOpen, setExport] = useState(false);
-  const [userEmail, setUserEmail] = useState("procurement@agency.gov.sg");
+  // Empty until /auth/me answers. This used to default to
+  // "procurement@agency.gov.sg", so every officer saw a stranger's address
+  // rendered as "SIGNED IN AS" (AUDIT_2026-08-08.md P1-4).
+  const [userEmail, setUserEmail] = useState("");
   const [userPlan, setUserPlan] = useState("free");
 
   const [vendors, setVendors]   = useState<APIState<Vendor[]>>({ data: null, loading: true, error: null });
@@ -933,7 +960,7 @@ export default function BuyerDashboard() {
 
       {/* ── Modals ─────────────────────────────────────────────────────────── */}
       {verifyOpen && <VerifyModal onClose={handleVerifyClose} />}
-      {exportOpen && <ExportModal vendors={selected} userEmail={userEmail} onClose={handleExportClose} />}
+      {exportOpen && <ExportModal vendors={selected} onClose={handleExportClose} />}
 
       {/* ── Top bar ────────────────────────────────────────────────────────── */}
       <header role="banner" style={{ position: "sticky", top: 0, zIndex: 50, background: C.white, borderBottom: `1px solid ${C.creamDark}` }}>
@@ -954,7 +981,7 @@ export default function BuyerDashboard() {
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <p style={{ fontSize: 11, color: C.slate }}>
                 <span style={{ fontSize: 9, letterSpacing: "0.06em", color: C.slate }}>SIGNED IN AS </span>
-                <strong style={{ color: C.ink }}>{userEmail}</strong>
+                <strong style={{ color: C.ink }}>{userEmail || "\u2014"}</strong>
               </p>
               <button
                 ref={verifyBtnRef}

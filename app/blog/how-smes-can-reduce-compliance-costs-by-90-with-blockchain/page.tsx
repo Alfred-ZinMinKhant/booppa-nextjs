@@ -1,12 +1,14 @@
 "use client";
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { ShoppingCart, Calendar } from 'lucide-react';
 
-const PRICE_ENV = process.env.NEXT_PUBLIC_STRIPE_PDPA_QUICK_SCAN;
-
 export default function ConversionPost() {
+  /**
+   * Send the reader to the product page rather than starting checkout here.
+   * See the sibling `singapore-courts-blockchain-evidence-2025` post for the
+   * full rationale — same defect, same fix (AUDIT_2026-08-08.md P1-1).
+   */
   const handlePrimary = async () => {
     try {
       await fetch('/api/track', {
@@ -14,18 +16,10 @@ export default function ConversionPost() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ article: 'conversion-layer', cta: 'primary', action: 'click' }),
       });
-
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? 'https://api.booppa.io';
-      const res = await fetch(`${apiBase}/api/stripe/checkout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: PRICE_ENV, productType: 'quick_fix' }),
-      });
-      const data = await res.json();
-      if (data?.url) window.location.href = data.url;
     } catch (err) {
-      console.error('checkout error', err);
+      console.error('track primary error', err);
     }
+    window.location.href = '/notarization';
   };
 
   const handleSecondary = async () => {
