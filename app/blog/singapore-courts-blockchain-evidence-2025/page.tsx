@@ -1,12 +1,23 @@
 "use client";
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { ShoppingCart, Calendar } from 'lucide-react';
 
-const PRICE_ENV = process.env.NEXT_PUBLIC_STRIPE_PDPA_QUICK_SCAN;
-
 export default function AuthorityPost() {
+  /**
+   * Send the reader to the product page rather than starting checkout here.
+   *
+   * This used to POST `{ priceId: <PDPA quick-scan price>, productType: 'quick_fix' }`
+   * straight at the backend. Two defects (AUDIT_2026-08-08.md P1-1): `quick_fix`
+   * is in no product map, so a completed payment matched no webhook handler and
+   * delivered nothing; and the price sent was the SGD 299 scan while the button
+   * says SGD 69. It could not have succeeded anyway — `/api/stripe/checkout`
+   * requires a signed-in user and this call carried no credentials, so the 401
+   * left `data.url` undefined and the button silently did nothing.
+   *
+   * `/notarization` is where the SGD 69 single-document product is actually
+   * sold, and it handles sign-in before purchase.
+   */
   const handlePrimary = async () => {
     try {
       await fetch('/api/track', {
@@ -14,18 +25,10 @@ export default function AuthorityPost() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ article: 'authority-layer', cta: 'primary', action: 'click' }),
       });
-
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? 'https://api.booppa.io';
-      const res = await fetch(`${apiBase}/api/stripe/checkout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: PRICE_ENV, productType: 'quick_fix' }),
-      });
-      const data = await res.json();
-      if (data?.url) window.location.href = data.url;
     } catch (err) {
-      console.error('checkout error', err);
+      console.error('track primary error', err);
     }
+    window.location.href = '/notarization';
   };
 
   const handleSecondary = async () => {

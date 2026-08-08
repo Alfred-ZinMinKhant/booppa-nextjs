@@ -99,7 +99,13 @@ export default function PrivacyPage() {
                 <Li>Transaction records: <strong className="text-[#0f172a]">7 years</strong> (US tax law and Singapore corporate records requirements)</Li>
                 <Li>Compliance reports and certificates: <strong className="text-[#0f172a]">5 years</strong> from generation</Li>
                 <Li>Notarization records and hashes: <strong className="text-[#0f172a]">indefinitely</strong> (integrity of the immutable ledger)</Li>
-                <Li>Server logs: <strong className="text-[#0f172a]">90 days</strong></Li>
+                {/* 14 days is what the CloudWatch log groups (/ecs/booppa-app,
+                    -worker, -beat) are actually set to. This said 90 days while
+                    the infrastructure kept 14 (AUDIT_2026-08-08.md P1-6). Keeping
+                    less than promised does not harm anyone, but the policy must
+                    describe the system that exists. Change this number and the
+                    log groups' retentionInDays together, never one alone. */}
+                <Li>Server logs: <strong className="text-[#0f172a]">14 days</strong></Li>
                 <Li>Marketing consent records: until withdrawal of consent plus <strong className="text-[#0f172a]">3 years</strong></Li>
               </ul>
               <p className="mt-2">Data is securely deleted or anonymized upon expiry of the applicable retention period.</p>

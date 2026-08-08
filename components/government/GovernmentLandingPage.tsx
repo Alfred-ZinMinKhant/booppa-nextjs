@@ -217,16 +217,32 @@ export default function GovernmentLandingPage() {
     setReg({ status: "loading", message: "" });
 
     try {
-      const res = await fetch("/api/government/register", {
+      // Access requests go to the team, not to a self-serve signup.
+      //
+      // This used to POST to /api/government/register, which forwards only
+      // `{email}` to a backend endpoint requiring `password` — so it returned
+      // 422 every single time and no officer has ever registered. The page
+      // meanwhile said a verification link had been sent, and none exists:
+      // `gov_register` mints tokens directly and sends no email at all
+      // (AUDIT_2026-08-08.md P1-4). Self-serve .gov.sg verification is a
+      // feature to build deliberately; until it exists the form says what it
+      // actually does.
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+        body: JSON.stringify({
+          name: email.trim().toLowerCase(),
+          email: email.trim().toLowerCase(),
+          agency: "",
+          message: "Government portal access request (.gov.sg address).",
+          source: "government-access-request",
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data?.detail || `Server error (${res.status}). Please try again.`);
       }
-      setReg({ status: "success", message: `Verification link sent to ${email}. Please check your inbox.` });
+      setReg({ status: "success", message: `Request received for ${email}. We'll set up your access and email you within one business day.` });
       setEmail("");
     } catch (err) {
       setReg({ status: "error", message: err instanceof Error ? err.message : "An unexpected error occurred. Please try again." });
@@ -403,16 +419,17 @@ export default function GovernmentLandingPage() {
                       </p>
                     )}
                     <p style={{ fontSize: 10, color: C.slate, marginTop: 8 }}>
-                      Access is reserved for Singapore government email addresses. A verification link will be sent immediately.
+                      Access is reserved for Singapore government email addresses. We verify the address and set up your account manually, usually within one business day.
                     </p>
                   </form>
                 ) : (
                   <div ref={statusRef} id={statusId} role="status" aria-live="polite" tabIndex={-1} style={{ padding: "16px 20px", borderRadius: 6, background: "rgba(26,107,69,0.07)", border: `1.5px solid rgba(26,107,69,0.25)`, outline: "none" }}>
                     <p style={{ fontSize: 13, fontWeight: 600, color: C.verified }}>✓ {reg.message}</p>
                     <p style={{ fontSize: 11, color: C.slate, marginTop: 6 }}>
-                      Can&apos;t find the email? Check your spam folder or{" "}
+                      Wrong address, or need this sooner? Email
+                      evidence@booppa.io, or{" "}
                       <button type="button" onClick={() => setReg({ status: "idle", message: "" })} style={{ background: "none", border: "none", color: C.inkLight, cursor: "pointer", fontWeight: 600, fontSize: 11, padding: 0, textDecoration: "underline" }}>
-                        try again
+                        submit another request
                       </button>.
                     </p>
                   </div>

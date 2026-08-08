@@ -27,7 +27,26 @@ jobs:
         run: npx tsc --noEmit
       - name: Dependency vulnerability scan
         # Fails the job on known HIGH/CRITICAL advisories in production deps.
-        run: npm audit --omit=dev --audit-level=high
+        #
+        # Allowlisted: `next` itself and the postcss copy bundled inside it.
+        # Every next release <16.3.0 carries these advisories, so there is no
+        # fix inside the ^14 line — clearing them requires the 14 -> 16 major
+        # upgrade, tracked separately. Any *other* high/critical still fails.
+        run: |
+          npm audit --omit=dev --audit-level=high --json > audit.json || true
+          jq '
+            [ .vulnerabilities[]
+              | select(.severity == "high" or .severity == "critical")
+              | select(.name != "next")
+              | select((.name != "postcss") or ([.nodes[] | select(. != "node_modules/next/node_modules/postcss")] | length > 0))
+            ]
+          ' audit.json > offending.json
+          if [ "$(jq 'length' offending.json)" -gt 0 ]; then
+            echo "High/critical advisories outside the allowlist:"
+            jq -r '.[] | "  \(.severity)\t\(.name)"' offending.json
+            exit 1
+          fi
+          echo "No high/critical advisories outside the allowlist."
       - name: Secret scan (gitleaks)
         uses: gitleaks/gitleaks-action@v2
         env:
