@@ -82,7 +82,7 @@ export async function getServerSideUser(): Promise<User | null> {
   }
 }
 
-// ─── Fetch autenticato (Server Components) ────────────────────────────────────
+// ─── Authenticated fetch (Server Components) ────────────────────────────────────
 
 export async function fetchWithAuth(
   url: string,

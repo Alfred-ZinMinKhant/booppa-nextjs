@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ShieldCheck, ExternalLink, FileSearch, ArrowRight, AlertCircle } from 'lucide-react';
-import { config } from '@/lib/config';
+import { apiPath } from '@/lib/config';
 
 interface VendorData {
   company_name: string;
@@ -13,9 +13,9 @@ interface VendorData {
   country: string | null;
   claimed: boolean;
   uen: string | null;
-  tier: string | null;
+  tier?: string | null;
   website: string | null;
-  seo_slug: string | null;
+  slug: string | null;
   short_description: string | null;
 }
 
@@ -36,7 +36,10 @@ function QRScanContent() {
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
-    fetch(`${config.apiUrl}/api/v1/vendors/${slug}`)
+    // `/api/v1/vendors/{slug}` does not exist on the backend — this 404'd on
+    // every scan. The public slug-keyed vendor endpoint is
+    // /api/v1/marketplace/vendor/{slug} (app/api/marketplace.py:99).
+    fetch(apiPath(`/marketplace/vendor/${slug}`))
       .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
       .then(data => setVendor(data))
       .catch(() => setError('Vendor profile not found.'))
@@ -87,7 +90,7 @@ function QRScanContent() {
   }
 
   const proofUrl = `/vendor-proof?company=${encodeURIComponent(vendor.company_name)}&website=${encodeURIComponent(vendor.website || '')}`;
-  const profileUrl = `/vendors/${vendor.seo_slug || slug}`;
+  const profileUrl = `/vendors/${vendor.slug || slug}`;
 
   return (
     <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-6">

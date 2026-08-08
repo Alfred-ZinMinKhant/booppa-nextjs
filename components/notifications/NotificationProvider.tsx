@@ -28,7 +28,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const [notifications, setNotifications] = useState<Notification[]>([])
   const socketRef = useRef<Socket | null>(null)
 
-  // removeNotification è stabile grazie a useCallback
+  // removeNotification is stable thanks to useCallback
   const removeNotification = useCallback((id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id))
   }, [])
@@ -37,23 +37,24 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     const id = crypto.randomUUID()
     const notification: Notification = { id, timestamp: new Date(), ...payload }
     setNotifications(prev => [...prev, notification])
-    // Auto-dismiss dopo 5 s — un singolo timeout, gestito qui
+    // Auto-dismiss after 5s — a single timeout, owned here
     setTimeout(() => removeNotification(id), 5000)
   }, [removeNotification])
 
   useEffect(() => {
     // ─────────────────────────────────────────────────────────────────────────
-    // SOLUZIONE AL BUG COOKIE HttpOnly:
-    // Il token è in un cookie HttpOnly e NON è leggibile da document.cookie.
-    // Lo recuperiamo tramite una Route API dedicata che lo legge lato server
-    // e lo restituisce solo per inizializzare il WebSocket.
+    // HttpOnly cookie constraint:
+    // The session token lives in an HttpOnly cookie and is NOT readable from
+    // document.cookie. A dedicated API route reads it server-side and exchanges
+    // it for a short-lived, WS-scoped handshake token used only to open the
+    // socket. The session token itself never reaches the browser.
     // ─────────────────────────────────────────────────────────────────────────
     let cancelled = false
 
     const initSocket = async () => {
       try {
-        const res = await fetch('/api/auth/ws-token')
-        if (!res.ok) return          // utente non autenticato: niente socket
+        const res = await fetch('/api/ws-token')
+        if (!res.ok) return          // not authenticated: no socket
 
         const { wsToken } = await res.json() as { wsToken: string }
         if (cancelled) return
@@ -61,27 +62,27 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         const socket = io(config.wsUrl, {
           path: '/socket.io',
           transports: ['websocket'],
-          auth: { token: wsToken },   // ← modo raccomandato da socket.io
+          auth: { token: wsToken },   // ← the socket.io-recommended mechanism
         })
 
         socket.on('connect', () => {
           console.log('[WS] connected')
         })
 
-        // Evento emesso dal backend quando un'Enterprise apre il link di verifica
+        // Emitted by the backend when an Enterprise opens the verification link
         socket.on('enterprise_visited', (data: { enterpriseName: string }) => {
           addNotification({
             type: 'info',
-            message: `${data.enterpriseName} ha aperto il link di verifica`,
+            message: `${data.enterpriseName} opened the verification link`,
             enterpriseName: data.enterpriseName,
           })
         })
 
-        // Evento generico di successo (es. verifica completata)
+        // Generic success event (e.g. verification completed)
         socket.on('verify_completed', (data: { enterpriseName: string }) => {
           addNotification({
             type: 'success',
-            message: `${data.enterpriseName} ha completato la verifica`,
+            message: `${data.enterpriseName} completed verification`,
             enterpriseName: data.enterpriseName,
           })
         })
@@ -121,7 +122,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
 export function useNotifications(): NotificationContextType {
   const ctx = useContext(NotificationContext)
-  if (!ctx) throw new Error('useNotifications deve essere usato dentro NotificationProvider')
+  if (!ctx) throw new Error('useNotifications must be used inside NotificationProvider')
   return ctx
 }
 
@@ -163,7 +164,7 @@ function NotificationToast({ notification }: { notification: Notification }) {
       <button
         onClick={() => removeNotification(notification.id)}
         className="flex-shrink-0 text-white/80 hover:text-white"
-        aria-label="Chiudi notifica"
+        aria-label="Dismiss notification"
       >
         ✕
       </button>

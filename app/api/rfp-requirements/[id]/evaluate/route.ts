@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const body = await req.json()
-  const res = await fetchWithAuth(`/rfp-requirements/${params.id}/evaluate`, {
+  const res = await fetchWithAuth(`/api/v1/rfp-requirements/${params.id}/evaluate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

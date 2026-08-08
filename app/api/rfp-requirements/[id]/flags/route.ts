@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status')
   const qs = status ? `?status=${encodeURIComponent(status)}` : ''
-  const res = await fetchWithAuth(`/rfp-requirements/${params.id}/flags${qs}`)
+  const res = await fetchWithAuth(`/api/v1/rfp-requirements/${params.id}/flags${qs}`)
   if (!res.ok) return NextResponse.json(await res.json().catch(() => ({})), { status: res.status })
   return NextResponse.json(await res.json())
 }

@@ -26,6 +26,7 @@ function LoginForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [ssoOptions, setSsoOptions] = useState<SsoOption[]>([])
+  const [ssoUnavailable, setSsoUnavailable] = useState(false)
 
   // Debounced SSO discovery: as the user types their email, ask the backend
   // whether their org has SSO configured. Only fires once we have a "@" + 3 chars.
@@ -35,10 +36,22 @@ function LoginForm() {
       return
     }
     const handle = setTimeout(() => {
+      // A failed lookup is NOT the same as "this org has no SSO". Silently
+      // showing nothing tells an SSO customer their org isn't configured and
+      // leaves them stuck at a password box they may not have a password for.
       fetch(`/api/sso-discover?email=${encodeURIComponent(email)}`, { cache: 'no-store' })
-        .then(r => r.ok ? r.json() : { options: [] })
-        .then((d: { options: SsoOption[] }) => setSsoOptions(d.options || []))
-        .catch(() => setSsoOptions([]))
+        .then(async r => {
+          if (!r.ok) throw new Error('discovery_unavailable')
+          return r.json()
+        })
+        .then((d: { options: SsoOption[] }) => {
+          setSsoOptions(d.options || [])
+          setSsoUnavailable(false)
+        })
+        .catch(() => {
+          setSsoOptions([])
+          setSsoUnavailable(true)
+        })
     }, 350)
     return () => clearTimeout(handle)
   }, [email])
@@ -177,6 +190,15 @@ function LoginForm() {
                   </p>
                 )
               ))}
+            </div>
+          )}
+
+          {ssoUnavailable && (
+            <div className="mt-5 pt-5 border-t border-neutral-800">
+              <p className="text-xs text-neutral-500 text-center">
+                We couldn&apos;t check whether your organisation uses SSO. If it does,
+                sign in from your identity provider portal.
+              </p>
             </div>
           )}
 

@@ -28,14 +28,14 @@ export function LoginForm() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Login fallito')
+        setError(data.error || 'Login failed')
         return
       }
 
       router.push(from)
       router.refresh()
     } catch {
-      setError('Errore di connessione. Riprova più tardi.')
+      setError('Connection error. Please try again.')
     } finally {
       setIsLoading(false)
     }

@@ -29,6 +29,26 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
+  const [revoking, setRevoking] = useState(false)
+  const [revokeError, setRevokeError] = useState('')
+
+  /** Sign out everywhere. Only redirect once the backend confirms — reporting
+   *  success on a failed revoke would leave live sessions the user thinks are
+   *  closed. */
+  async function handleSignOutEverywhere() {
+    setRevokeError('')
+    setRevoking(true)
+    try {
+      const r = await fetch('/api/auth/revoke', { method: 'POST' })
+      if (!r.ok) throw new Error('revoke failed')
+      window.location.href = '/login'
+    } catch {
+      setRevokeError(
+        "We couldn't sign out your other devices. Your sessions are unchanged — please try again.",
+      )
+      setRevoking(false)
+    }
+  }
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -285,6 +305,37 @@ export default function ProfilePage() {
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Security — the backend has revoked sessions since launch, but nothing
+            in the UI could reach it, so a user who suspected a compromise had no
+            self-service remedy. */}
+        <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 md:p-8 mt-6">
+          <h2 className="flex items-center gap-2 text-white font-semibold mb-1">
+            <ShieldCheck className="h-4 w-4 text-emerald-400" />
+            Security
+          </h2>
+          <p className="text-sm text-neutral-400 mb-4">
+            Sign out of every device where you&apos;re logged in. Use this if you think
+            someone else has access to your account. You&apos;ll need to sign in again here.
+          </p>
+
+          {revokeError && (
+            <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2.5 mb-3">
+              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              {revokeError}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={handleSignOutEverywhere}
+            disabled={revoking}
+            className="flex items-center justify-center gap-2 border border-red-500/40 text-red-300 hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed font-semibold py-2.5 px-6 rounded-lg transition-all text-sm w-full md:w-auto"
+          >
+            {revoking && <Loader2 className="h-4 w-4 animate-spin" />}
+            {revoking ? 'Signing out everywhere…' : 'Sign out of all devices'}
+          </button>
         </div>
       </div>
     </div>

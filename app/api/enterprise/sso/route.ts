@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { config } from '@/lib/config'
+import { apiPath } from '@/lib/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   if (!orgId) return NextResponse.json({ error: 'org_id required' }, { status: 400 })
 
   const r = await fetch(
-    `${config.apiUrl}/enterprise/organisations/${orgId}/sso`,
+    apiPath(`/enterprise/organisations/${orgId}/sso`),
     { headers: { ...bearer() }, cache: 'no-store' },
   )
   const body = await r.json().catch(() => ({}))
@@ -41,7 +41,7 @@ export async function PUT(request: Request) {
 
   const payload = await request.json().catch(() => ({}))
   const r = await fetch(
-    `${config.apiUrl}/enterprise/organisations/${orgId}/sso`,
+    apiPath(`/enterprise/organisations/${orgId}/sso`),
     {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', ...bearer() },

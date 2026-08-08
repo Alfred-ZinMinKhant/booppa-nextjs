@@ -25,7 +25,7 @@ export function LoadingPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <Spinner size="lg" />
-      <p className="mt-4 text-gray-600">Caricamento in corso...</p>
+      <p className="mt-4 text-gray-600">Loading…</p>
     </div>
   )
 }

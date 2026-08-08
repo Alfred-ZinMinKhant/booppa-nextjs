@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { config } from '@/lib/config'
+import { apiPath } from '@/lib/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
   }
   const r = await fetch(
-    `${config.apiUrl}/enterprise/organisations/${orgId}/seats`,
+    apiPath(`/enterprise/organisations/${orgId}/seats`),
     { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' },
   )
   const body = await r.json().catch(() => ({}))

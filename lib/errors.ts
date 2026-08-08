@@ -17,11 +17,11 @@ export function handleApiError(error: unknown): ApiError {
   if (error instanceof Error) {
     return { error: error.message }
   }
-  return { error: 'Si è verificato un errore sconosciuto' }
+  return { error: 'An unknown error occurred' }
 }
 
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message
   if (typeof error === 'string') return error
-  return 'Si è verificato un errore'
+  return 'Something went wrong'
 }

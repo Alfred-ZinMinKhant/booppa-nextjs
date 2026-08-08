@@ -4,14 +4,14 @@ import { fetchWithAuth } from '@/lib/auth'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const res = await fetchWithAuth('/rfp-requirements')
+  const res = await fetchWithAuth('/api/v1/rfp-requirements')
   if (!res.ok) return NextResponse.json({ error: 'Failed to fetch requirements' }, { status: res.status })
   return NextResponse.json(await res.json())
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const res = await fetchWithAuth('/rfp-requirements', {
+  const res = await fetchWithAuth('/api/v1/rfp-requirements', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

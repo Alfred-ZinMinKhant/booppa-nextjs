@@ -12,7 +12,17 @@ applications:
             - npm ci --legacy-peer-deps
         build:
           commands:
-            # Expose Amplify Console env vars to Next.js SSR runtime
+            # Expose Amplify Console env vars to Next.js SSR runtime.
+            #
+            # Audited 2026-08-08 (P2-7). This writes secrets to .env.production,
+            # which LOOKS alarming but does not expose them:
+            #   - Next.js only inlines NEXT_PUBLIC_* into client bundles. Verified
+            #     by grepping .next/static for every secret name below — 0 hits.
+            #   - artifacts.baseDirectory is .next, and .env.production is written
+            #     at the repo root, so it is not part of the deployed artifact.
+            #   - `env | grep` writes via >> and never echoes to the build log.
+            # Outstanding (ops, not code): AWS_ACCESS_KEY_ID/SECRET are long-lived
+            # static keys. Prefer an Amplify service role over static credentials.
             - env | grep -E '^(BACKEND_BASE_URL|VERIFY_BASE_URL|COOKIE_SIGNING_SECRET|ADMIN_USER|ADMIN_PASSWORD|NEXT_PUBLIC_BASE_URL|NEXT_PUBLIC_API_BASE|NEXT_PUBLIC_WS_URL|NEXT_PUBLIC_CALENDLY_URL|NEXT_PUBLIC_PRIVACY_VERSION|NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY|NEXT_PUBLIC_STRIPE_PDPA_QUICK_SCAN|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|RESEND_API_KEY|S3_BUCKET|FEATURE_SEO)=' >> .env.production || true
             - npm run build
       artifacts:
